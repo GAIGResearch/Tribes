@@ -1,4 +1,4 @@
-import core.Game;
+import core.game.Game;
 
 /**
  * Entry point of the framework.

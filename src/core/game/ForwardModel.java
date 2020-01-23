@@ -1,11 +1,12 @@
-package core;
+package core.game;
 
-import java.util.Queue;
+import core.Types;
+import core.actions.Action;
 
 public class ForwardModel {
 
     // Board of the game, with all objects distributed in a 2D array of size 'this.size x this.size'
-    private Types.TILETYPE[][] board; //Change this for terrain types, rather than integers
+    private Types.TERRAIN[][] board; //Change this for terrain types, rather than integers
 
     // Size of the board.
     private int size;
@@ -21,7 +22,7 @@ public class ForwardModel {
         this.size = size;
     }
 
-    void next(Queue<Types.ACTIONS> playerActions, int gsTick){
+    void next(Action playerAction, int gsTick){
 
     }
 

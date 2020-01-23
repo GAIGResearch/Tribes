@@ -26,7 +26,8 @@ public class Types {
         FRUIT,
         ANIMAL,
         WHALES,
-        FOREST
+        FOREST,
+        NONE
     }
 
     /**
@@ -52,7 +53,8 @@ public class Types {
         GATE_OF_POWER,
         GRAND_BAZAR,
         PARK_OF_FORTUNE,
-        TOWER_OF_WISDOM
+        TOWER_OF_WISDOM,
+        NONE
     }
 
 
@@ -68,7 +70,8 @@ public class Types {
         ARCHER,
         CATAPULT,
         KNIGHT,
-        MIND_BEARER
+        MIND_BEARER,
+        NONE
     }
 
 
@@ -139,6 +142,8 @@ public class Types {
         RUINS(6);
 
         private int key;
+        private RESOURCE resource;
+        private UNIT unit;
         TERRAIN(int numVal) {  this.key = numVal;  }
         public int getKey() {  return key; }
 
@@ -160,6 +165,8 @@ public class Types {
 
             else return null;
         }
+
+
 
         /**
          * Checks if two boards (arrays of tiletypes) are the same

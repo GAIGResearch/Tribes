@@ -1,3 +1,5 @@
-.xml
-.class
-.iml
+*.xml
+*.class
+*.iml
+*.kotlin_module
+.DS_Store

@@ -1,6 +1,6 @@
-package core;
+package core.game;
 
-import players.Player;
+import players.Agent;
 
 import java.util.ArrayList;
 
@@ -16,7 +16,7 @@ public class Game {
     private int size;
 
     // List of players of the game
-    private ArrayList<Player> players;
+    private ArrayList<Agent> players;
 
     public Game()
     {}

@@ -3,60 +3,74 @@ package core;
 import utils.Vector2d;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 public class Types {
 
+    /**
+     * Defines the status of the turn for an unit. (May be in Unit.java?)
+     */
+    public enum TURN_STATUS {
+        FRESH,
+        MOVED,
+        ATTACKED,
+        MOVED_AND_ATTACKED,
+        FINISHED
+    }
 
     /**
-     * Defines all actions in the game.
+     * Enum for resources. May need to be merged with TILES or somehow put in common
      */
-    public enum ACTIONS {
-        ACTION_STOP(0),
-        ACTION_UP(1),
-        ACTION_DOWN(2),
-        ACTION_LEFT(3),
-        ACTION_RIGHT(4),
-        ACTION_USE(5);
-
-        private int key;
-        ACTIONS(int numVal) {  this.key = numVal; }
-        public int getKey() {return this.key;}
-
-        /**
-         * Gets all actions of the game
-         * @return all the actions in an array list.
-         */
-        public static ArrayList<ACTIONS> all()
-        {
-            ArrayList<ACTIONS> allActions = new ArrayList<ACTIONS>();
-            allActions.add(ACTION_STOP);
-            allActions.add(ACTION_UP);
-            allActions.add(ACTION_DOWN);
-            allActions.add(ACTION_LEFT);
-            allActions.add(ACTION_RIGHT);
-            allActions.add(ACTION_USE);
-            return allActions;
-        }
-
-        /**
-         * For directional actions, returns the corresponding direction.
-         * @return the direction that represents the movement action. NONE if this is not a movement action.
-         */
-        public DIRECTIONS getDirection()
-        {
-            if(this == ACTION_UP)
-                return DIRECTIONS.UP;
-            else if(this == ACTION_DOWN)
-                return DIRECTIONS.DOWN;
-            else if(this == ACTION_LEFT)
-                return DIRECTIONS.LEFT;
-            else if(this == ACTION_RIGHT)
-                return DIRECTIONS.RIGHT;
-            else
-                return DIRECTIONS.NONE;
-        }
+    public enum RESOURCE
+    {
+        FISH,
+        FRUIT,
+        ANIMAL,
+        WHALES,
+        FOREST
     }
+
+    /**
+     * Types of buildings that can be built by cities
+     */
+    public enum BUILDING
+    {
+        PORT,
+        MINE,
+        FORGE,
+        FARM,
+        WINDMILL,
+        ROAD,
+        CUSTOM_HOUSE,
+        SAWMILL,
+        TEMPLE,
+        WATER_TEMPLE,
+        FOREST_TEMPLE,
+        MOUNTAIN_TEMPLE,
+        ALTAR_OF_PEACE,
+        EMPERORS_TOMB,
+        EYE_OF_GOD,
+        GATE_OF_POWER,
+        GRAND_BAZAR,
+        PARK_OF_FORTUNE,
+        TOWER_OF_WISDOM
+    }
+
+
+    /**
+     * Types of units
+     */
+    public enum UNIT
+    {
+        WARRIOR,
+        RIDER,
+        DEFENDER,
+        SWORDMAN,
+        ARCHER,
+        CATAPULT,
+        KNIGHT,
+        MIND_BEARER
+    }
+
 
     /**
      * Defines the directions that game objects can have for movement.
@@ -90,8 +104,7 @@ public class Types {
     public enum RESULT {
         WIN(0),
         LOSS(1),
-        TIE(2),
-        INCOMPLETE(3);
+        INCOMPLETE(2);
 
         private int key;
         RESULT(int numVal) { this.key = numVal; }
@@ -104,27 +117,29 @@ public class Types {
         public Color getColor() {
             if (key == WIN.key) return Color.green;
             if (key == LOSS.key) return Color.red;
-            if (key == TIE.key) return Color.orange;
             return null;
         }
     }
 
     /**
-     * Different TILETYPES allowed in the game.
+     * Different TERRAIN allowed in the game.
      * If more types are added, check methods in this enum to add them where they corresponds
      * (example: if new power-up is added, include it in getPowerUpTypes() so the board generator
      *  can place them in the game).
      */
-    public enum TILETYPE {
+    public enum TERRAIN {
 
         //Types and IDs
-        GRASS(0),
-        WATER(1);
-
-        //... add more
+        PLAIN(0),
+        SHALLOW_WATER(1),
+        DEEP_WATER(2),
+        MOUNTAIN(3),
+        VILLAGE(4),
+        CITY(5),
+        RUINS(6);
 
         private int key;
-        TILETYPE(int numVal) {  this.key = numVal;  }
+        TERRAIN(int numVal) {  this.key = numVal;  }
         public int getKey() {  return key; }
 
         /**
@@ -134,9 +149,13 @@ public class Types {
 
         public Image getImage()
         {
-            if      (key == GRASS.key) return null /*Image for GUI */;
-            else if (key == WATER.key) return null /*Image for GUI */;
-
+            if      (key == PLAIN.key)          return null /*Image for GUI */;
+            else if (key == SHALLOW_WATER.key)  return null /*Image for GUI */;
+            else if (key == DEEP_WATER.key)     return null /*Image for GUI */;
+            else if (key == MOUNTAIN.key)       return null /*Image for GUI */;
+            else if (key == VILLAGE.key)        return null /*Image for GUI */;
+            else if (key == CITY.key)           return null /*Image for GUI */;
+            else if (key == RUINS.key)          return null /*Image for GUI */;
             // ... add more
 
             else return null;
@@ -148,15 +167,15 @@ public class Types {
          * @param board2 the other board to check
          * @return true if they're equals.
          */
-        public static boolean boardEquals(TILETYPE[][] board1, TILETYPE[][] board2) {
+        public static boolean boardEquals(TERRAIN[][] board1, TERRAIN[][] board2) {
 
             if( (board1.length != board2.length) || (board1[0].length != board2[0].length))
                 return false;
 
             for (int i = 0; i < board1.length; i++) {
                 for (int i1 = 0; i1 < board1[i].length; i1++) {
-                    TILETYPE b1i = board1[i][i1];
-                    TILETYPE b2i = board2[i][i1];
+                    TERRAIN b1i = board1[i][i1];
+                    TERRAIN b2i = board2[i][i1];
                     if (b1i != null && b2i != null && b1i != b2i)
                         return false;
                 }

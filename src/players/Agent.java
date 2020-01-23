@@ -1,11 +1,11 @@
 package players;
 
-import core.GameState;
-import core.Types;
+import core.actions.Action;
+import core.game.GameState;
+import utils.ElapsedCpuTimer;
 
-import java.util.Queue;
+public abstract class Agent {
 
-public abstract class Player {
     protected int playerID;
     protected long seed;
 
@@ -14,16 +14,17 @@ public abstract class Player {
      * @param seed - random seed for this player.
      * @param pId - this player's ID.
      */
-    protected Player(long seed, int pId) {
+    protected Agent(long seed, int pId) {
         reset(seed, pId);
     }
 
     /**
      * Function requests an action from the agent, given current game state observation.
      * @param gs - current game state.
+     * @param ect - a timer that indicates when the turn time is due to finish.
      * @return - action to play in this game state.
      */
-    public abstract Queue<Types.ACTIONS> act(GameState gs);
+    public abstract Action act(GameState gs, ElapsedCpuTimer ect);
 
     /**
      * Function called at the end of the game. May be used by agents for final analysis.
@@ -47,7 +48,7 @@ public abstract class Player {
         return seed;
     }
 
-    public abstract Player copy();
+    public abstract Agent copy();
 
     public void reset(long seed, int playerID) {
         this.playerID = playerID;

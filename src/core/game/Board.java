@@ -65,11 +65,63 @@ public class Board {
 
     // Moves a unit on the board if unit exists on tile
     void moveUnit(Types.DIRECTIONS direction, int x, int y){
+        Types.UNIT[][] newUnits = new Types.UNIT[size][size];
 
         if(units[x][y] != Types.UNIT.NONE){
-            units[x+direction.x()][y+direction.y()] = units[x][y];
-            units[x][y] = Types.UNIT.NONE;
+            System.out.println("Invalid move, there is no unit on this tile");
+            return;
         }
 
+        // Loop through old units array and update new units array with new position
+        for(int i =0; i<units.length; i++){
+            for(int j =0; x<units.length; x++){
+                if((i !=x && j!=y) && (i != x+direction.x() && j != y+direction.y())){
+                    newUnits[i][j] = checkUnit(i,j);
+                }else if( i == x && j == y){
+                    newUnits[i][j] = Types.UNIT.NONE;
+                }else if(i == x+direction.x() && j == y+direction.y()){
+                    Types.UNIT oldUnit = checkUnit(x,y);
+                    newUnits[i][j] = oldUnit;
+                }
+            }
+        }
+
+        // Update units array
+        units = newUnits;
+
+    }
+
+    // Helper method to check which unit at which tile for deep copying unit array
+    Types.UNIT checkUnit(int x, int y){
+        switch (units[x][y]){
+            case NONE:
+                return Types.UNIT.NONE;
+                break;
+            case RIDER:
+                return Types.UNIT.RIDER;
+                break;
+            case KNIGHT:
+                return Types.UNIT.KNIGHT;
+                break;
+            case ARCHER:
+                return Types.UNIT.ARCHER;
+                break;
+            case WARRIOR:
+                return Types.UNIT.WARRIOR;
+                break;
+            case CATAPULT:
+                return Types.UNIT.CATAPULT;
+                break;
+            case DEFENDER:
+                return Types.UNIT.DEFENDER;
+                break;
+            case SWORDMAN:
+                return Types.UNIT.SWORDMAN;
+                break;
+            case MIND_BEARER:
+                return Types.UNIT.MIND_BEARER;
+                break;
+        }
+        return Types.UNIT.NONE;
     }
 }

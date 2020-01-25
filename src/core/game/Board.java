@@ -96,31 +96,22 @@ public class Board {
         switch (units[x][y]){
             case NONE:
                 return Types.UNIT.NONE;
-                break;
             case RIDER:
                 return Types.UNIT.RIDER;
-                break;
             case KNIGHT:
                 return Types.UNIT.KNIGHT;
-                break;
             case ARCHER:
                 return Types.UNIT.ARCHER;
-                break;
             case WARRIOR:
                 return Types.UNIT.WARRIOR;
-                break;
             case CATAPULT:
                 return Types.UNIT.CATAPULT;
-                break;
             case DEFENDER:
                 return Types.UNIT.DEFENDER;
-                break;
             case SWORDMAN:
                 return Types.UNIT.SWORDMAN;
-                break;
             case MIND_BEARER:
                 return Types.UNIT.MIND_BEARER;
-                break;
         }
         return Types.UNIT.NONE;
     }

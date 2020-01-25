@@ -63,4 +63,13 @@ public class Board {
         return resources[x][y];
     }
 
+    // Moves a unit on the board if unit exists on tile
+    void moveUnit(Types.DIRECTIONS direction, int x, int y){
+
+        if(units[x][y] != Types.UNIT.NONE){
+            units[x+direction.x()][y+direction.y()] = units[x][y];
+            units[x][y] = Types.UNIT.NONE;
+        }
+
+    }
 }

@@ -20,11 +20,13 @@ public class Board {
         terrains = new Types.TERRAIN[size][size];
         resources = new Types.RESOURCE[size][size];
         units = new Types.UNIT[size][size];
+        this.size = size;
     }
 
     // Return deep copy of board
     public Board copyBoard(){
-        //todo
+        Board copyBoard = new Board(this.size);
+
         return new Board(this.size);
     }
 
@@ -58,10 +60,25 @@ public class Board {
         return units[x][y];
     }
 
+    // Set Resource at pos x,y
+    public void setResourceAt(int x, int y, Types.RESOURCE r){
+        resources[x][y] =  r;
+    }
+    // Set Terrain at pos x,y
+    public void setTerrainAt(int x, int y, Types.TERRAIN t){
+        terrains[x][y] =  t;
+    }
+
+    // Set Terrain at pos x,y
+    public void setUnitAt(int x, int y, Types.UNIT u){
+        units[x][y] =  u;
+    }
+
     // Get Resource at pos x,y
     public Types.RESOURCE getResourceAt(int x, int y){
         return resources[x][y];
     }
+
 
     // Moves a unit on the board if unit exists on tile
     void moveUnit(Types.DIRECTIONS direction, int x, int y){
@@ -115,4 +132,21 @@ public class Board {
         }
         return Types.UNIT.NONE;
     }
+
+    // Setter method for units array
+    public void setUnits(Types.UNIT[][] units){
+        //todo
+    }
+
+    // Setter method for terrains array
+    public void setTerrains(Types.TERRAIN[][] terrains){
+        //todo
+    }
+
+    // Setter method for resources array
+    public void setResources(Types.RESOURCE[][] resources){
+        //todo
+    }
+
+
 }

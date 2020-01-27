@@ -27,7 +27,10 @@ public class Game {
     private int size;
 
     // List of players of the game
-    private ArrayList<Agent> players;
+    private Agent[] players;
+
+    //Number of players of the game.
+    private int numPlayers;
 
     public Game()
     {}
@@ -41,8 +44,70 @@ public class Game {
         this.seed = seed;
         this.size = size;
         this.gs = new GameState(seed, size);
+    }
+
+
+    /**
+     * Initializes the game. This method does the following:
+     *   Sets the players of the game, the number of players and their IDs
+     *   Initializes the array to hold the player game states.
+     *   Assigns the tribes that will play the game.
+     *   Creates the board according to the above information and resets the game so it's ready to start.
+     * @param players Players of the game.
+     * @param tribes Tribes to play the game with. Players and tribes related by position in array lists.
+     */
+    public void init(ArrayList<Agent> players, ArrayList<Tribe> tribes) {
+
+        if(players.size() != tribes.size())
+        {
+            System.out.printf("ERROR: Number of tribes must equal the number of players.");
+        }
+
+        numPlayers = players.size();
+        this.players = new Agent[numPlayers];
+        for(int i = 0; i < numPlayers; ++i)
+        {
+            this.players[i] = players.get(i);
+            this.players[i].setPlayerID(i);
+        }
+        this.gameStateObservations = new GameState[numPlayers];
+        this.gs.assignTribes(tribes);
+
+        resetGame();
+    }
+
+
+    /**
+     * Resets the game, providing a seed.
+     * @param repeatLevel true if the same level should be played.
+     */
+    public void reset(boolean repeatLevel)
+    {
+        this.seed = repeatLevel ? seed : System.currentTimeMillis();
+        resetGame();
+    }
+
+    /**
+     * Resets the game, providing a seed.
+     * @param seed new seed for the game.
+     */
+    public void reset(int seed)
+    {
+        this.seed = seed;
+        resetGame();
+    }
+
+
+    /**
+     * Resets the game, creating the original game state (and level) and assigning the initial
+     * game state views that each player will have.
+     */
+    private void resetGame()
+    {
+        this.gs.init();
         updateAssignedGameStates();
     }
+
 
     /**
      * Runs a game once. Receives frame and window input. If any is null, forces a run with no visuals.
@@ -102,12 +167,11 @@ public class Game {
         }
 
         Tribe[] tribes = gs.getTribes();
-        for (int i = 0; i < players.size(); i++) {
+        for (int i = 0; i < numPlayers; i++) {
             Tribe tribe = tribes[i];
-            Agent ag = players.get(i);
 
             //play the full turn for this player
-            processTurn(ag, tribe);
+            processTurn(i, tribe);
 
             //it may be that this player won the game, no more playing.
             if(isEnded())
@@ -123,11 +187,14 @@ public class Game {
     /**
      * Process a turn for a given player. It queries the player for an action until no more
      * actions are available or the player returns a EndTurnAction action.
-     * @param ag agent to process the turn for.
+     * @param playerID ID of the player whose turn is being processed.
      * @param tribe tribe that corresponds to this player.
      */
-    void processTurn(Agent ag, Tribe tribe)
+    void processTurn(int playerID, Tribe tribe)
     {
+        //Take the player for this turn
+        Agent ag = players[playerID];
+
         //compute the actions available for this player.
         gs.computePlayerActions(tribe);
 
@@ -138,8 +205,7 @@ public class Game {
         while(gs.existAvailableActions(tribe) && !ect.exceededMaxTime())
         {
             //get one action from the player
-            //TODO: gs.copy() is wrong. We have to use gameStateObservations[i]
-            Action action = ag.act(gs.copy(), ect);
+            Action action = ag.act(gameStateObservations[playerID], ect);
 
             //note down the remaining time to use it for the next iteration
             long remaining = ect.remainingTimeMillis();
@@ -165,15 +231,15 @@ public class Game {
 
         //Build the results array
         Tribe[] tribes = gs.getTribes();
-        Types.RESULT[] results = new Types.RESULT[players.size()];
-        for (int i = 0; i < players.size(); i++) {
+        Types.RESULT[] results = new Types.RESULT[numPlayers];
+        for (int i = 0; i < numPlayers; i++) {
             Tribe tribe = (Tribe) tribes[i];
             results[i] = tribe.getWinner();
         }
 
         // Call all agents' end-of-game method for post-processing. Agents receive their final reward.
-        for (int i = 0; i < players.size(); i++) {
-            Agent ag = players.get(i);
+        for (int i = 0; i < numPlayers; i++) {
+            Agent ag = players[i];
             ag.result(tribes[i].getScore());
         }
 
@@ -182,13 +248,12 @@ public class Game {
 
 
     /**
-     * Updates the state observations for all players.
+     * Updates the state observations for all players with copies of the
+     * current game state, adapted for PO.
      */
     private void updateAssignedGameStates() {
-        if (gameStateObservations == null) {
-            gameStateObservations = new GameState[players.size()];
-        }
-        for (int i = 0; i < players.size(); i++) {
+
+        for (int i = 0; i < numPlayers; i++) {
             gameStateObservations[i] = getGameState(i);
         }
     }

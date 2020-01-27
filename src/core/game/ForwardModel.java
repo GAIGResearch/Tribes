@@ -4,10 +4,15 @@ import core.Types;
 import core.actions.Action;
 import core.units.Tribe;
 
+import java.util.ArrayList;
+
 public class ForwardModel {
 
     // Board of the game, with all objects distributed in a 2D array of size 'this.size x this.size'
     private Types.TERRAIN[][] board; //Change this for terrain types, rather than integers
+
+    // Number of tribes playing the game
+    private int numTribes;
 
     //Tribes playing this game
     private Tribe[] tribes;
@@ -24,6 +29,16 @@ public class ForwardModel {
      */
     ForwardModel(int size) {
         this.size = size;
+    }
+
+    /**
+     * Initializes the data structures of the game: board, bombs, flames, etc.
+     * Adds avatars to the game and sets them alive.
+     * Generates the initial board of the game.
+     */
+    void init(long seed, int size)
+    {
+        //TODO: Init the game, including creating the level.
     }
 
 
@@ -50,6 +65,25 @@ public class ForwardModel {
     }
 
 
+    /**
+     * Sets the tribes that will play the game. The number of tribes must equal the number of players in Game.
+     * @param tribes to play with
+     */
+    public void assignTribes(ArrayList<Tribe> tribes)
+    {
+        numTribes = tribes.size();
+        this.tribes = new Tribe[numTribes];
+        for(int i = 0; i < numTribes; ++i)
+        {
+            this.tribes[i] = tribes.get(i);
+            this.tribes[i].setTribeID(i);
+        }
+    }
+
+    /**
+     * Returns the tribes playing the game
+     * @return the tribes playing the game
+     */
     public Tribe[] getTribes() {
         return tribes;
     }

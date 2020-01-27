@@ -19,8 +19,7 @@ public class GUI extends JFrame {
         this.game = game;
         this.ki = ki;
 
-        // Create frame layout, panels etc...
-        // TODO
+        // TODO: Create frame layout, panels etc...
 
 
 

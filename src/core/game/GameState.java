@@ -4,6 +4,8 @@ import core.actions.Action;
 import core.units.Tribe;
 import players.Agent;
 
+import java.util.ArrayList;
+
 public class GameState {
 
     // Forward model for the game.
@@ -28,6 +30,26 @@ public class GameState {
         this.seed = seed;
         this.size = size;
         this.model = new ForwardModel(size);
+    }
+
+    /**
+     * Initializes the ForwardModel in the GameState. If the model is null, it creates a new one.
+     * The level is only generated when this initialization method is called.
+     */
+    void init() {
+        if (model == null) {
+            model = new ForwardModel(size);
+        }
+        this.model.init(seed, size);
+    }
+
+    /**
+     * Sets the tribes that will play the game. The number of tribes must equal the number of players in Game.
+     * @param tribes to play with
+     */
+    public void assignTribes(ArrayList<Tribe> tribes)
+    {
+        this.model.assignTribes(tribes);
     }
 
     /**
@@ -106,7 +128,7 @@ public class GameState {
         GameState copy = new GameState(seed, size);
         copy.model = model.copy(playerIdx);
 
-        return null;
+        return copy;
     }
 
     /**

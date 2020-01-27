@@ -1,6 +1,7 @@
 package core.game;
 
 import core.Types;
+import core.units.Unit;
 
 public class Board {
 
@@ -26,6 +27,17 @@ public class Board {
     // Return deep copy of board
     public Board copyBoard(){
         Board copyBoard = new Board(this.size);
+
+        for (int x = 0; x<this.size; x++){
+            for(int y = 0; y<this.size; y++){
+                Types.TERRAIN t = checkTerrain(x,y);
+                Types.UNIT u = checkUnit(x,y);
+                Types.RESOURCE r = checkResource(x,y);
+                copyBoard.setTerrainAt(x,y,t);
+                copyBoard.setUnitAt(x,y,u);
+                copyBoard.setResourceAt(x,y,r);
+            }
+        }
 
         return new Board(this.size);
     }
@@ -133,19 +145,57 @@ public class Board {
         return Types.UNIT.NONE;
     }
 
+    // Helper method to check which terrain at which tile for deep copying unit array
+    Types.TERRAIN checkTerrain(int x, int y){
+        switch (terrains[x][y]){
+            case PLAIN :
+                return Types.TERRAIN.PLAIN;
+            case VILLAGE:
+                return Types.TERRAIN.VILLAGE;
+            case SHALLOW_WATER:
+                return Types.TERRAIN.SHALLOW_WATER;
+            case  DEEP_WATER:
+                return Types.TERRAIN.DEEP_WATER;
+            case CITY:
+                return Types.TERRAIN.CITY;
+            case RUINS:
+                return Types.TERRAIN.RUINS;
+            case MOUNTAIN:
+                return Types.TERRAIN.MOUNTAIN;
+        }
+        return Types.TERRAIN.PLAIN;
+    }
+
+    // Helper method to check which terrain at which tile for deep copying unit array
+    Types.RESOURCE checkResource(int x, int y){
+        switch (resources[x][y]){
+            case FISH:
+                return Types.RESOURCE.FISH;
+            case FRUIT:
+                return Types.RESOURCE.FRUIT;
+            case FOREST:
+                return Types.RESOURCE.FOREST;
+            case  ANIMAL:
+                return Types.RESOURCE.ANIMAL;
+            case WHALES:
+                return Types.RESOURCE.WHALES;
+        }
+        return Types.RESOURCE.NONE;
+    }
+
     // Setter method for units array
-    public void setUnits(Types.UNIT[][] units){
-        //todo
+    public void setUnits(Types.UNIT[][] u){
+        this.units = u;
     }
 
     // Setter method for terrains array
-    public void setTerrains(Types.TERRAIN[][] terrains){
-        //todo
+    public void setTerrains(Types.TERRAIN[][] t){
+        this.terrains = t;
     }
 
     // Setter method for resources array
-    public void setResources(Types.RESOURCE[][] resources){
-        //todo
+    public void setResources(Types.RESOURCE[][] r){
+        this.resources = r;
     }
 
 

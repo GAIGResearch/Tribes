@@ -2,7 +2,7 @@ package core.units;
 
 import utils.Vector2d;
 
-public abstract class Unit
+public abstract class Unit extends Actor
 {
     public final int ATK;
     public final int DEF;

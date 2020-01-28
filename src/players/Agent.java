@@ -12,10 +12,9 @@ public abstract class Agent {
     /**
      * Default constructor, to be called in subclasses (initializes player ID and random seed for this agent.
      * @param seed - random seed for this player.
-     * @param pId - this player's ID.
      */
-    protected Agent(long seed, int pId) {
-        reset(seed, pId);
+    protected Agent(long seed) {
+        reset(seed);
     }
 
     /**
@@ -41,6 +40,12 @@ public abstract class Agent {
     }
 
     /**
+     * Setter for the player ID field
+     * @param playerID the player ID of this agent
+     */
+    public void setPlayerID (int playerID) { this.playerID = playerID; }
+
+    /**
      * Getter for seed field.
      * @return - this player's random seed.
      */
@@ -50,8 +55,7 @@ public abstract class Agent {
 
     public abstract Agent copy();
 
-    public void reset(long seed, int playerID) {
-        this.playerID = playerID;
+    public void reset(long seed) {
         this.seed = seed;
     }
 

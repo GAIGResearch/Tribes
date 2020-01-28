@@ -6,9 +6,9 @@ import utils.ElapsedCpuTimer;
 
 public class DoNothingAgent extends Agent {
 
-    public DoNothingAgent(long seed, int pId)
+    public DoNothingAgent(long seed)
     {
-        super(seed, pId);
+        super(seed);
     }
 
     @Override

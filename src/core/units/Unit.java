@@ -54,4 +54,15 @@ public abstract class Unit
     public void addKill() {
         this.kills++;
     }
+
+    public boolean isVeteran() {
+        return isVeteran;
+    }
+
+    public void setVeteran(boolean veteran) {
+        isVeteran = veteran;
+    }
+
+    public abstract Unit copy();
+
 }

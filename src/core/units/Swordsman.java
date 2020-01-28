@@ -7,4 +7,9 @@ public class Swordsman extends Unit
     public Swordsman(Vector2d pos, int kills, boolean isVeteran) {
         super(3, 3, 1, 15, 1, 5, pos, kills, isVeteran);
     }
+
+    @Override
+    public Swordsman copy() {
+        return new Swordsman(getCurrentPosition(), getKills(), isVeteran());
+    }
 }

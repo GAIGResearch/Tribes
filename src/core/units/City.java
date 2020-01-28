@@ -3,7 +3,7 @@ package core.units;
 import java.util.LinkedList;
 import java.util.List;
 
-public class City {
+public class City extends Actor{
 
     private int x;
     private int y;

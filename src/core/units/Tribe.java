@@ -2,7 +2,7 @@ package core.units;
 
 import core.Types;
 
-public class Tribe {
+public class Tribe extends Actor{
 
     private Types.RESULT winner = Types.RESULT.INCOMPLETE;
     private int score = 0;

@@ -1,4 +1,4 @@
 package core.units;
 
-public class City {
+public class City extends Actor{
 }

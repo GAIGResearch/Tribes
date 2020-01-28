@@ -1,5 +1,8 @@
 package core.units;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class City {
 
     private int x;
@@ -11,6 +14,7 @@ public class City {
     private boolean isPrism;
     private boolean hasWorkShop = false;
     // TODO: Add the owner(tribe)
+    private LinkedList<Building> buildings = new LinkedList();
 
     // The constructor to initial the valley
     public City(int x, int y) {
@@ -22,7 +26,7 @@ public class City {
         isPrism = false;
     }
 
-    public City(int x, int y, int level, int population, int population_need, boolean isValley, boolean isPrism, boolean hasWorkShop) {
+    public City(int x, int y, int level, int population, int population_need, boolean isValley, boolean isPrism, boolean hasWorkShop, LinkedList<Building> buildings) {
         this.x = x;
         this.y = y;
         this.level = level;
@@ -31,6 +35,7 @@ public class City {
         this.isValley = isValley;
         this.isPrism = isPrism;
         this.hasWorkShop = hasWorkShop;
+        this.buildings = buildings;
     }
 
     /*
@@ -54,6 +59,10 @@ public class City {
             return levelUp();
         }
         return 0;
+    }
+
+    public void addBuildings(Building building){
+        buildings.add(building);
     }
 
     // Level up
@@ -124,7 +133,11 @@ public class City {
         return population_need;
     }
 
+    public LinkedList<Building> getBuildings() {
+        return (LinkedList<Building>)buildings.clone();
+    }
+
     public City copy(){
-        return new City(x, y, level, population, population_need, isValley, isPrism, hasWorkShop);
+        return new City(x, y, level, population, population_need, isValley, isPrism, hasWorkShop, (LinkedList<Building>)buildings.clone());
     }
 }

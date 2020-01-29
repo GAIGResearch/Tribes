@@ -4,34 +4,33 @@ import core.Types;
 
 public class Port extends Building {
 
-    private Types.BUILDING type = Types.BUILDING.PORT;
-    private int cost = 10;
-    private int production = 2;
-    private Types.TERRAIN constraint = Types.TERRAIN.SHALLOW_WATER;
-    private City belonging;
+    private final Types.BUILDING TYPE = Types.BUILDING.PORT;
+    private final int COST = 10;
+    private final int PRODUCTION = 2;
+    private final Types.TERRAIN CONSTRAINT = Types.TERRAIN.SHALLOW_WATER;
 
-    public Port(int x, int y, City belonging) {
+    public Port(int x, int y) {
         super(x, y);
-        this.belonging = belonging;
     }
 
-    public Types.BUILDING getType() {
-        return type;
+    public Types.BUILDING getTYPE() {
+        return TYPE;
     }
 
-    public int getCost() {
-        return cost;
+    public int getCOST() {
+        return COST;
     }
 
-    public int getProduction() {
-        return production;
+    public int getPRODUCTION() {
+        return PRODUCTION;
     }
 
-    public Types.TERRAIN getConstraint() {
-        return constraint;
+    public Types.TERRAIN getCONSTRAINT() {
+        return CONSTRAINT;
     }
 
-    public City getBelonging() {
-        return belonging;
+    public Port copy(){
+        return new Port(getX(), getY());
     }
+
 }

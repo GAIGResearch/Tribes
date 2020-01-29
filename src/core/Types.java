@@ -1,5 +1,6 @@
 package core;
 
+import utils.ImageIO;
 import utils.Vector2d;
 
 import java.awt.*;
@@ -22,11 +23,37 @@ public class Types {
      */
     public enum RESOURCE
     {
-        FISH,
-        FRUIT,
-        ANIMAL,
-        WHALES,
-        FOREST
+        FISH(0),
+        FRUIT(1),
+        ANIMAL(2),
+        WHALES(3),
+        FOREST(4),
+        ORE(5),
+        CROPS(6);
+
+
+        private int key;
+        RESOURCE(int numVal) {  this.key = numVal;  }
+        public int getKey() {  return key; }
+
+        /**
+         * Sprites (Image objects) to use in the game for the different elements.
+         * @return the image to use
+         */
+
+        public Image getImage()
+        {
+            if      (key == FISH.key)       return ImageIO.GetInstance().getImage("img/resource/fish.png");
+            else if (key == FRUIT.key)      return ImageIO.GetInstance().getImage("img/resource/fruit.png");
+            else if (key == ANIMAL.key)     return ImageIO.GetInstance().getImage("img/resource/animal.png");
+            else if (key == WHALES.key)     return ImageIO.GetInstance().getImage("img/resource/whale.png");
+            else if (key == FOREST.key)     return ImageIO.GetInstance().getImage("img/resource/forest.png");
+            else if (key == ORE.key)        return ImageIO.GetInstance().getImage("img/resource/pre.png");
+            else if (key == CROPS.key)      return ImageIO.GetInstance().getImage("img/resource/crops.png");
+                // ... add more
+
+            else return null;
+        }
     }
 
     /**
@@ -149,13 +176,13 @@ public class Types {
 
         public Image getImage()
         {
-            if      (key == PLAIN.key)          return null /*Image for GUI */;
-            else if (key == SHALLOW_WATER.key)  return null /*Image for GUI */;
-            else if (key == DEEP_WATER.key)     return null /*Image for GUI */;
-            else if (key == MOUNTAIN.key)       return null /*Image for GUI */;
-            else if (key == VILLAGE.key)        return null /*Image for GUI */;
-            else if (key == CITY.key)           return null /*Image for GUI */;
-            else if (key == RUINS.key)          return null /*Image for GUI */;
+            if      (key == PLAIN.key)          return ImageIO.GetInstance().getImage("img/terrain/grass.png");
+            else if (key == SHALLOW_WATER.key)  return ImageIO.GetInstance().getImage("img/terrain/shallow_water.png");
+            else if (key == DEEP_WATER.key)     return ImageIO.GetInstance().getImage("img/terrain/deep_water.png");
+            else if (key == MOUNTAIN.key)       return ImageIO.GetInstance().getImage("img/terrain/mountain.png");
+            else if (key == VILLAGE.key)        return ImageIO.GetInstance().getImage("img/terrain/village.png");
+            else if (key == CITY.key)           return ImageIO.GetInstance().getImage("img/terrain/city.png");
+            else if (key == RUINS.key)          return ImageIO.GetInstance().getImage("img/terrain/ruins.png");
             // ... add more
 
             else return null;

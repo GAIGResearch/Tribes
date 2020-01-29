@@ -14,6 +14,11 @@ public class Board {
     // Array for units each tile of the board will have
     private Types.UNIT[][] units;
 
+    // Array for buildings each tile of the board will have
+    private Types.BUILDING[][] buildings;
+
+
+    //variable to declare size of board
     private int size;
 
     // Constructor for board
@@ -21,6 +26,7 @@ public class Board {
         terrains = new Types.TERRAIN[size][size];
         resources = new Types.RESOURCE[size][size];
         units = new Types.UNIT[size][size];
+        buildings = new Types.BUILDING[size][size];
         this.size = size;
     }
 
@@ -33,9 +39,11 @@ public class Board {
                 Types.TERRAIN t = checkTerrain(x,y);
                 Types.UNIT u = checkUnit(x,y);
                 Types.RESOURCE r = checkResource(x,y);
+                Types.BUILDING b = checkBuilding(x,y);
                 copyBoard.setTerrainAt(x,y,t);
                 copyBoard.setUnitAt(x,y,u);
                 copyBoard.setResourceAt(x,y,r);
+                copyBoard.setBuildingAt(x,y,b);
             }
         }
 
@@ -84,6 +92,11 @@ public class Board {
     // Set Terrain at pos x,y
     public void setUnitAt(int x, int y, Types.UNIT u){
         units[x][y] =  u;
+    }
+
+    // Set Building at pos x,y
+    public void setBuildingAt(int x, int y, Types.BUILDING b){
+        buildings[x][y] = b;
     }
 
     // Get Resource at pos x,y
@@ -181,6 +194,51 @@ public class Board {
                 return Types.RESOURCE.WHALES;
         }
         return Types.RESOURCE.NONE;
+    }
+
+    // Helper method to check which Building at which tile for deep copying unit array
+    Types.BUILDING checkBuilding(int x, int y){
+        switch (buildings[x][y]){
+            case TEMPLE:
+                return Types.BUILDING.TEMPLE;
+            case  PORT:
+                return Types.BUILDING.PORT;
+            case MINE:
+                return Types.BUILDING.MINE;
+            case  FORGE:
+                return Types.BUILDING.FORGE;
+            case FARM:
+                return Types.BUILDING.FARM;
+            case WINDMILL:
+                return Types.BUILDING.WINDMILL;
+            case ROAD:
+                return Types.BUILDING.ROAD;
+            case CUSTOM_HOUSE:
+                return Types.BUILDING.CUSTOM_HOUSE;
+            case SAWMILL:
+                return Types.BUILDING.SAWMILL;
+            case WATER_TEMPLE:
+                return Types.BUILDING.WATER_TEMPLE;
+            case FOREST_TEMPLE:
+                return Types.BUILDING.FOREST_TEMPLE;
+            case MOUNTAIN_TEMPLE:
+                return Types.BUILDING.MOUNTAIN_TEMPLE;
+            case ALTAR_OF_PEACE:
+                return Types.BUILDING.ALTAR_OF_PEACE;
+            case EMPERORS_TOMB:
+                return Types.BUILDING.EMPERORS_TOMB;
+            case EYE_OF_GOD:
+                return Types.BUILDING.EYE_OF_GOD;
+            case GATE_OF_POWER:
+                return Types.BUILDING.GATE_OF_POWER;
+            case GRAND_BAZAR:
+                return Types.BUILDING.GRAND_BAZAR;
+            case PARK_OF_FORTUNE:
+                return Types.BUILDING.PARK_OF_FORTUNE;
+            case TOWER_OF_WISDOM:
+                return Types.BUILDING.TOWER_OF_WISDOM;
+        }
+        return Types.BUILDING.NONE;
     }
 
     // Setter method for units array

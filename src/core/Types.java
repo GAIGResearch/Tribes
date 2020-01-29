@@ -27,7 +27,9 @@ public class Types {
         FRUIT(1),
         ANIMAL(2),
         WHALES(3),
-        FOREST(4);
+        FOREST(4),
+        ORE(5),
+        CROPS(6);
 
 
         private int key;
@@ -41,11 +43,13 @@ public class Types {
 
         public Image getImage()
         {
-            if      (key == FISH.key)          return ImageIO.GetInstance().getImage("img/resource/fish.png");
-            else if (key == FRUIT.key)  return ImageIO.GetInstance().getImage("img/resource/fruit.png");
+            if      (key == FISH.key)       return ImageIO.GetInstance().getImage("img/resource/fish.png");
+            else if (key == FRUIT.key)      return ImageIO.GetInstance().getImage("img/resource/fruit.png");
             else if (key == ANIMAL.key)     return ImageIO.GetInstance().getImage("img/resource/animal.png");
-            else if (key == WHALES.key)       return ImageIO.GetInstance().getImage("img/resource/whale.png");
-            else if (key == FOREST.key)        return ImageIO.GetInstance().getImage("img/resource/forest.png");
+            else if (key == WHALES.key)     return ImageIO.GetInstance().getImage("img/resource/whale.png");
+            else if (key == FOREST.key)     return ImageIO.GetInstance().getImage("img/resource/forest.png");
+            else if (key == ORE.key)        return ImageIO.GetInstance().getImage("img/resource/pre.png");
+            else if (key == CROPS.key)      return ImageIO.GetInstance().getImage("img/resource/crops.png");
                 // ... add more
 
             else return null;

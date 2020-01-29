@@ -14,3 +14,5 @@ Animals - https://opengameart.org/content/round-animals
 Fruit - https://opengameart.org/content/fruits
 Fish - https://opengameart.org/content/aqua-fish
 Forest - https://opengameart.org/content/pine-trees
+Ore - https://www.deviantart.com/petschko/gallery/48259194/RPG-Maker-art
+Crops - https://www.textures.com/download/farmland0027/43471?q=plow

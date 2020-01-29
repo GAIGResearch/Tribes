@@ -43,13 +43,15 @@ public class City extends Actor{
     population_need = level+1, level = 1
      */
 
-    // TODO: Parameter should get the owner and occupy need to assign the owner
+    // TODO: Parameter should get the owner and occupy need to assign the owner ->
+    //       Linked to Board to occupy the belonging tiles
     // Occupy the valley/city
     public void occupy(){
         if (isValley){
+            isValley=false;
+            // TODO: Assign the owner
             levelUp();
         }
-        // TODO: Assign the owner
     }
 
     // Increase population (return points)
@@ -134,10 +136,14 @@ public class City extends Actor{
     }
 
     public LinkedList<Building> getBuildings() {
-        return (LinkedList<Building>)buildings.clone();
+        LinkedList<Building> copyList = new LinkedList<>();
+        for(Building building : buildings) {
+            copyList.add(building.copy());
+        }
+        return copyList;
     }
 
     public City copy(){
-        return new City(x, y, level, population, population_need, isValley, isPrism, hasWorkShop, (LinkedList<Building>)buildings.clone());
+        return new City(x, y, level, population, population_need, isValley, isPrism, hasWorkShop, getBuildings());
     }
 }

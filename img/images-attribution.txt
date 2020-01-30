@@ -39,33 +39,3 @@ Catapult - http://remusprites.carbonmade.com
 Knight - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
 Mind_bearer - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
 
-
-
-0 -
-Red - FB0207
-Red_light - FD827B
-Red_dark - ae4230
-
-1 - 
-Bule - 0000FF
-Blue_light - 667DFF
-Blue_dark - 3249b1
-
-2 - 
-Grey - 4C4C4C
-Grey_light - B0B2B2
-Grey_dark - 463a3a
-
-3 - 
-Yellow - FFFF0A
-Yellow_light - F2FF64
-Yellow_dark - 929000
-
-
-
-
-
-
-
-
-

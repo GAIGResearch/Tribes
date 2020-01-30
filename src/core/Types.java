@@ -91,6 +91,31 @@ public class Types {
         UNIT(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
         public int getKey() {  return key; }
         public Image getImage(int playerID) { return ImageIO.GetInstance().getImage(imageFile + playerID + ".png"); }
+
+
+        /*
+         * Tribes colours as used in the unit scripts
+        0 -
+Red - FB0207
+Red_light - FD827B
+Red_dark - ae4230
+
+1 -
+Bule - 0000FF
+Blue_light - 667DFF
+Blue_dark - 3249b1
+
+2 -
+Grey - 4C4C4C
+Grey_light - B0B2B2
+Grey_dark - 463a3a
+
+3 -
+Yellow - FFFF0A
+Yellow_light - F2FF64
+Yellow_dark - 929000
+         */
+
     }
 
 

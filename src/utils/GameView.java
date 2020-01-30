@@ -10,7 +10,6 @@ public class GameView extends JComponent {
 
     private int cellSize, gridSize;
     private Types.TERRAIN[][] objs; //This only counts terrains. Needs to be enhanced with units, resources, etc.
-    private int[][] bombLife;
     private Image backgroundImg;
 
     /**
@@ -94,11 +93,9 @@ public class GameView extends JComponent {
     private void copyObjects(Types.TERRAIN[][] objects, int[][] bombs)
     {
         objs = new Types.TERRAIN[gridSize][gridSize];
-        bombLife = new int[gridSize][gridSize];
 
         for (int i = 0; i < gridSize; ++i) {
             System.arraycopy(objects[i], 0, objs[i], 0, gridSize);
-            System.arraycopy(bombs[i], 0, bombLife[i], 0, gridSize);
         }
     }
 

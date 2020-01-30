@@ -23,37 +23,19 @@ public class Types {
      */
     public enum RESOURCE
     {
-        FISH(0),
-        FRUIT(1),
-        ANIMAL(2),
-        WHALES(3),
-        FOREST(4),
-        ORE(5),
-        CROPS(6);
-
+        FISH(0, "img/resource/fish.png"),
+        FRUIT(1, "img/resource/fruit.png"),
+        ANIMAL(2, "img/resource/animal.png"),
+        WHALES(3, "img/resource/whale.png"),
+        FOREST(4, "img/resource/forest.png"),
+        ORE(5, "img/resource/pre.png"),
+        CROPS(6, "img/resource/crops.png");
 
         private int key;
-        RESOURCE(int numVal) {  this.key = numVal;  }
+        private String imageFile;
+        RESOURCE(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
         public int getKey() {  return key; }
-
-        /**
-         * Sprites (Image objects) to use in the game for the different elements.
-         * @return the image to use
-         */
-
-        public Image getImage()
-        {
-            if      (key == FISH.key)       return ImageIO.GetInstance().getImage("img/resource/fish.png");
-            else if (key == FRUIT.key)      return ImageIO.GetInstance().getImage("img/resource/fruit.png");
-            else if (key == ANIMAL.key)     return ImageIO.GetInstance().getImage("img/resource/animal.png");
-            else if (key == WHALES.key)     return ImageIO.GetInstance().getImage("img/resource/whale.png");
-            else if (key == FOREST.key)     return ImageIO.GetInstance().getImage("img/resource/forest.png");
-            else if (key == ORE.key)        return ImageIO.GetInstance().getImage("img/resource/pre.png");
-            else if (key == CROPS.key)      return ImageIO.GetInstance().getImage("img/resource/crops.png");
-                // ... add more
-
-            else return null;
-        }
+        public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
     }
 
     /**
@@ -61,25 +43,32 @@ public class Types {
      */
     public enum BUILDING
     {
-        PORT,
-        MINE,
-        FORGE,
-        FARM,
-        WINDMILL,
-        ROAD,
-        CUSTOM_HOUSE,
-        SAWMILL,
-        TEMPLE,
-        WATER_TEMPLE,
-        FOREST_TEMPLE,
-        MOUNTAIN_TEMPLE,
-        ALTAR_OF_PEACE,
-        EMPERORS_TOMB,
-        EYE_OF_GOD,
-        GATE_OF_POWER,
-        GRAND_BAZAR,
-        PARK_OF_FORTUNE,
-        TOWER_OF_WISDOM
+        PORT (0,"img/building/port.png"),
+        MINE (1,"img/building/mine.png"),
+        FORGE (2,"img/building/forge.png"),
+        FARM (3, "img/building/farm.png"),
+        WINDMILL (4,"img/building/windmill.png"),
+        ROAD (5,"none.png"),
+        CUSTOM_HOUSE (6,"img/building/custom_house.png"),
+        LUMBER_HUT(7,"img/building/lumner_hut.png"),
+        SAWMILL (8,"img/building/sawmill.png"),
+        TEMPLE (9, "img/building/temple.png"),
+        WATER_TEMPLE (10,"img/building/temple.png"),
+        FOREST_TEMPLE (11,"img/building/temple.png"),
+        MOUNTAIN_TEMPLE (12,"img/building/temple.png"),
+        ALTAR_OF_PEACE (13,"img/building/monument.png"),
+        EMPERORS_TOMB (14,"img/building/monument.png"),
+        EYE_OF_GOD (15,"img/building/monument.png"),
+        GATE_OF_POWER (16,"img/building/monument.png"),
+        GRAND_BAZAR (17,"img/building/monument.png"),
+        PARK_OF_FORTUNE (18,"img/building/monument.png"),
+        TOWER_OF_WISDOM (19, "img/building/monument.png");
+
+        private int key;
+        private String imageFile;
+        BUILDING(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
+        public int getKey() {  return key; }
+        public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
     }
 
 
@@ -88,14 +77,20 @@ public class Types {
      */
     public enum UNIT
     {
-        WARRIOR,
-        RIDER,
-        DEFENDER,
-        SWORDMAN,
-        ARCHER,
-        CATAPULT,
-        KNIGHT,
-        MIND_BEARER
+        WARRIOR (0,"img/unit/warrior/"),
+        RIDER (1,"img/unit/rider/"),
+        DEFENDER (2,"img/unit/defender/"),
+        SWORDMAN (3,"img/unit/swordman/"),
+        ARCHER (4,"img/unit/archer/"),
+        CATAPULT (5,"img/unit//"),
+        KNIGHT (6,"img/unit/knight/"),
+        MIND_BEARER (7,"img/unit/mind_bearer/");
+
+        private int key;
+        private String imageFile;
+        UNIT(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
+        public int getKey() {  return key; }
+        public Image getImage(int playerID) { return ImageIO.GetInstance().getImage(imageFile + playerID + ".png"); }
     }
 
 
@@ -157,36 +152,20 @@ public class Types {
     public enum TERRAIN {
 
         //Types and IDs
-        PLAIN(0),
-        SHALLOW_WATER(1),
-        DEEP_WATER(2),
-        MOUNTAIN(3),
-        VILLAGE(4),
-        CITY(5),
-        RUINS(6);
+        PLAIN(0, "img/terrain/grass.png"),
+        SHALLOW_WATER(1, "img/terrain/shallow_water.jpg"),
+        DEEP_WATER(2, "img/terrain/deep_water.jpg"),
+        MOUNTAIN(3, "img/terrain/mountain.png"),
+        VILLAGE(4, "img/terrain/village.png"),
+        CITY(5, "img/terrain/city.png"),
+        RUINS(6, "img/terrain/ruins.png");
 
+        private String imageFile;
         private int key;
-        TERRAIN(int numVal) {  this.key = numVal;  }
+        TERRAIN(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
         public int getKey() {  return key; }
+        public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
 
-        /**
-         * Sprites (Image objects) to use in the game for the different elements.
-         * @return the image to use
-         */
-
-        public Image getImage()
-        {
-            if      (key == PLAIN.key)          return ImageIO.GetInstance().getImage("img/terrain/grass.png");
-            else if (key == SHALLOW_WATER.key)  return ImageIO.GetInstance().getImage("img/terrain/shallow_water.png");
-            else if (key == DEEP_WATER.key)     return ImageIO.GetInstance().getImage("img/terrain/deep_water.png");
-            else if (key == MOUNTAIN.key)       return ImageIO.GetInstance().getImage("img/terrain/mountain.png");
-            else if (key == VILLAGE.key)        return ImageIO.GetInstance().getImage("img/terrain/village.png");
-            else if (key == CITY.key)           return ImageIO.GetInstance().getImage("img/terrain/city.png");
-            else if (key == RUINS.key)          return ImageIO.GetInstance().getImage("img/terrain/ruins.png");
-            // ... add more
-
-            else return null;
-        }
 
         /**
          * Checks if two boards (arrays of tiletypes) are the same

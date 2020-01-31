@@ -15,9 +15,9 @@ public class Test {
 
         KeyController ki = new KeyController(true);
         long seed = System.currentTimeMillis();
-        int boardSize = 10;
+        String filename = "SampleLevel.csv";
 
-        Game game = new Game(seed,boardSize);
+        Game game = new Game(seed);
         ArrayList<Agent> players = new ArrayList<>();
         ArrayList<Tribe> tribes = new ArrayList<>();
 
@@ -30,7 +30,7 @@ public class Test {
         tribes.add(new Tribe());
 
 
-        game.init(players, tribes);
+        game.init(players, tribes, filename);
 
         Run.runGame(game, ki);
         System.out.println("Running Tribes...");

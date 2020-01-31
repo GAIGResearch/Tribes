@@ -1,6 +1,7 @@
 package core.game;
 
 import core.Types;
+import core.units.City;
 import core.units.Unit;
 
 public class Board {
@@ -17,6 +18,10 @@ public class Board {
     // Array for buildings each tile of the board will have
     private Types.BUILDING[][] buildings;
 
+    // Array for cities
+    private City[][] cities;
+
+
 
     //variable to declare size of board
     private int size;
@@ -27,6 +32,7 @@ public class Board {
         resources = new Types.RESOURCE[size][size];
         units = new Types.UNIT[size][size];
         buildings = new Types.BUILDING[size][size];
+        cities = new City[size][size];
         this.size = size;
     }
 
@@ -40,10 +46,14 @@ public class Board {
                 Types.UNIT u = checkUnit(x,y);
                 Types.RESOURCE r = checkResource(x,y);
                 Types.BUILDING b = checkBuilding(x,y);
+                City c = getCityAt(x,y);
                 copyBoard.setTerrainAt(x,y,t);
                 copyBoard.setUnitAt(x,y,u);
                 copyBoard.setResourceAt(x,y,r);
                 copyBoard.setBuildingAt(x,y,b);
+                // todo Will copy over city later but need a city copy method in city class
+                //if(c !=null)
+                 //   copyBoard.setCityAt(x,y,c.copy());
             }
         }
 
@@ -99,11 +109,18 @@ public class Board {
         buildings[x][y] = b;
     }
 
+    public void setCityAt(int x, int y, City city){
+        cities[x][y] = city;
+    }
+
     // Get Resource at pos x,y
     public Types.RESOURCE getResourceAt(int x, int y){
         return resources[x][y];
     }
 
+    public City getCityAt(int x, int y){
+        return cities[x][y];
+    }
 
     // Moves a unit on the board if unit exists on tile
     void moveUnit(Types.DIRECTIONS direction, int x, int y){
@@ -256,5 +273,31 @@ public class Board {
         this.resources = r;
     }
 
+    // Method to determine city borders, take city and x and y pos of city as params
+    public void setBorders(City city, int x, int y){
+        if (city.getTribe().equals(getCityAt(x, y).getTribe())) {
+            //   set border and city to that tribe
+        }
+        for (int i =x; i< x+2; i++){
+            for(int j = y; j<x+2; j++) {
+                //todo set border
+
+
+            }
+        }
+    }
+
+    // Method to expand city borders, take city x and x and y pos of city as params
+    public void expandBorder(City city, int x, int y){
+        for (int i =x; i< x+2; i++){
+            for(int j = y; j<x+2; j++) {
+                //todo set border
+
+                if (city.getTribe().equals(getCityAt(x, y).getTribe())) {
+                    //   set border and city to that tribe
+                }
+            }
+        }
+    }
 
 }

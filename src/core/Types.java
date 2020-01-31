@@ -1,5 +1,6 @@
 package core;
 
+import utils.ImageIO;
 import utils.Vector2d;
 
 import java.awt.*;
@@ -22,12 +23,19 @@ public class Types {
      */
     public enum RESOURCE
     {
-        FISH,
-        FRUIT,
-        ANIMAL,
-        WHALES,
-        FOREST,
-        NONE
+        FISH(0, "img/resource/fish.png"),
+        FRUIT(1, "img/resource/fruit.png"),
+        ANIMAL(2, "img/resource/animal.png"),
+        WHALES(3, "img/resource/whale.png"),
+        FOREST(4, "img/resource/forest.png"),
+        ORE(5, "img/resource/pre.png"),
+        CROPS(6, "img/resource/crops.png");
+
+        private int key;
+        private String imageFile;
+        RESOURCE(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
+        public int getKey() {  return key; }
+        public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
     }
 
     /**
@@ -35,26 +43,32 @@ public class Types {
      */
     public enum BUILDING
     {
-        PORT,
-        MINE,
-        FORGE,
-        FARM,
-        WINDMILL,
-        ROAD,
-        CUSTOM_HOUSE,
-        SAWMILL,
-        TEMPLE,
-        WATER_TEMPLE,
-        FOREST_TEMPLE,
-        MOUNTAIN_TEMPLE,
-        ALTAR_OF_PEACE,
-        EMPERORS_TOMB,
-        EYE_OF_GOD,
-        GATE_OF_POWER,
-        GRAND_BAZAR,
-        PARK_OF_FORTUNE,
-        TOWER_OF_WISDOM,
-        NONE
+        PORT (0,"img/building/port.png"),
+        MINE (1,"img/building/mine.png"),
+        FORGE (2,"img/building/forge.png"),
+        FARM (3, "img/building/farm.png"),
+        WINDMILL (4,"img/building/windmill.png"),
+        ROAD (5,"none.png"),
+        CUSTOM_HOUSE (6,"img/building/custom_house.png"),
+        LUMBER_HUT(7,"img/building/lumner_hut.png"),
+        SAWMILL (8,"img/building/sawmill.png"),
+        TEMPLE (9, "img/building/temple.png"),
+        WATER_TEMPLE (10,"img/building/temple.png"),
+        FOREST_TEMPLE (11,"img/building/temple.png"),
+        MOUNTAIN_TEMPLE (12,"img/building/temple.png"),
+        ALTAR_OF_PEACE (13,"img/building/monument.png"),
+        EMPERORS_TOMB (14,"img/building/monument.png"),
+        EYE_OF_GOD (15,"img/building/monument.png"),
+        GATE_OF_POWER (16,"img/building/monument.png"),
+        GRAND_BAZAR (17,"img/building/monument.png"),
+        PARK_OF_FORTUNE (18,"img/building/monument.png"),
+        TOWER_OF_WISDOM (19, "img/building/monument.png");
+
+        private int key;
+        private String imageFile;
+        BUILDING(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
+        public int getKey() {  return key; }
+        public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
     }
 
 
@@ -63,15 +77,45 @@ public class Types {
      */
     public enum UNIT
     {
-        WARRIOR,
-        RIDER,
-        DEFENDER,
-        SWORDMAN,
-        ARCHER,
-        CATAPULT,
-        KNIGHT,
-        MIND_BEARER,
-        NONE
+        WARRIOR (0,"img/unit/warrior/"),
+        RIDER (1,"img/unit/rider/"),
+        DEFENDER (2,"img/unit/defender/"),
+        SWORDMAN (3,"img/unit/swordman/"),
+        ARCHER (4,"img/unit/archer/"),
+        CATAPULT (5,"img/unit//"),
+        KNIGHT (6,"img/unit/knight/"),
+        MIND_BEARER (7,"img/unit/mind_bearer/");
+
+        private int key;
+        private String imageFile;
+        UNIT(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
+        public int getKey() {  return key; }
+        public Image getImage(int playerID) { return ImageIO.GetInstance().getImage(imageFile + playerID + ".png"); }
+
+
+        /*
+         * Tribes colours as used in the unit scripts
+        0 -
+Red - FB0207
+Red_light - FD827B
+Red_dark - ae4230
+
+1 -
+Bule - 0000FF
+Blue_light - 667DFF
+Blue_dark - 3249b1
+
+2 -
+Grey - 4C4C4C
+Grey_light - B0B2B2
+Grey_dark - 463a3a
+
+3 -
+Yellow - FFFF0A
+Yellow_light - F2FF64
+Yellow_dark - 929000
+         */
+
     }
 
 
@@ -133,39 +177,19 @@ public class Types {
     public enum TERRAIN {
 
         //Types and IDs
-        PLAIN(0),
-        SHALLOW_WATER(1),
-        DEEP_WATER(2),
-        MOUNTAIN(3),
-        VILLAGE(4),
-        CITY(5),
-        RUINS(6);
+        PLAIN(0, "img/terrain/grass.png"),
+        SHALLOW_WATER(1, "img/terrain/shallow_water.jpg"),
+        DEEP_WATER(2, "img/terrain/deep_water.jpg"),
+        MOUNTAIN(3, "img/terrain/mountain.png"),
+        VILLAGE(4, "img/terrain/village.png"),
+        CITY(5, "img/terrain/city.png"),
+        RUINS(6, "img/terrain/ruins.png");
 
+        private String imageFile;
         private int key;
-        private RESOURCE resource;
-        private UNIT unit;
-        TERRAIN(int numVal) {  this.key = numVal;  }
+        TERRAIN(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
         public int getKey() {  return key; }
-
-        /**
-         * Sprites (Image objects) to use in the game for the different elements.
-         * @return the image to use
-         */
-
-        public Image getImage()
-        {
-            if      (key == PLAIN.key)          return null /*Image for GUI */;
-            else if (key == SHALLOW_WATER.key)  return null /*Image for GUI */;
-            else if (key == DEEP_WATER.key)     return null /*Image for GUI */;
-            else if (key == MOUNTAIN.key)       return null /*Image for GUI */;
-            else if (key == VILLAGE.key)        return null /*Image for GUI */;
-            else if (key == CITY.key)           return null /*Image for GUI */;
-            else if (key == RUINS.key)          return null /*Image for GUI */;
-            // ... add more
-
-            else return null;
-        }
-
+        public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
 
 
         /**

@@ -3,7 +3,6 @@ package core.units;
 import core.Types;
 
 import java.util.LinkedList;
-import java.util.List;
 
 public class City extends Actor{
 
@@ -67,8 +66,53 @@ public class City extends Actor{
 
     public void addBuildings(Building building){
         // TODO: set Production for windmill, sawmill, forge, customhouse
+        if (building.getTYPE().equals(Types.BUILDING.WINDMILL) || building.getTYPE().equals(Types.BUILDING.SAWMILL)
+                || building.getTYPE().equals(Types.BUILDING.FORGE) || building.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
+            setProduction(building);
+        }
         // TODO: change production for special buildings(farm, lumberHut, mine, port)
+        if (building.getTYPE().equals(Types.BUILDING.FARM) || building.getTYPE().equals(Types.BUILDING.LUMBER_HUT)
+                || building.getTYPE().equals(Types.BUILDING.MINE) || building.getTYPE().equals(Types.BUILDING.PORT)){
+            changeProduction(building);
+        }
         buildings.add(building);
+    }
+
+    public void setProduction(Building building){
+        int x = building.getX();
+        int y = building.getY();
+        int production = 0;
+        for(Building existBuilding: buildings){
+            int exist_x = existBuilding.getX();
+            int exist_y = existBuilding.getY();
+            if ( (exist_x >= x-1 && exist_x <= x+1) && (exist_y >= y-1 && exist_y <= y+1)){
+                if (checkMatchedBuilding(existBuilding, building)){
+                    production++;
+                }
+            }
+        }
+        building.setProduction(production);
+    }
+
+    public void changeProduction(Building building){
+        int x = building.getX();
+        int y = building.getY();
+        for(Building existBuilding: buildings){
+            int exist_x = existBuilding.getX();
+            int exist_y = existBuilding.getY();
+            if ( (exist_x >= x-1 && exist_x <= x+1) && (exist_y >= y-1 && exist_y <= y+1)){
+                if (checkMatchedBuilding(building, existBuilding)){
+                    existBuilding.setProduction(existBuilding.getPRODUCTION() + 1);
+                }
+            }
+        }
+    }
+
+    public boolean checkMatchedBuilding(Building original, Building functional){
+        return original.getTYPE().equals(Types.BUILDING.FARM) && functional.getTYPE().equals(Types.BUILDING.WINDMILL) ||
+                original.getTYPE().equals(Types.BUILDING.LUMBER_HUT) && functional.getTYPE().equals(Types.BUILDING.SAWMILL) ||
+                original.getTYPE().equals(Types.BUILDING.MINE) && functional.getTYPE().equals(Types.BUILDING.FORGE) ||
+                original.getTYPE().equals(Types.BUILDING.PORT) && functional.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE);
     }
 
     // Level up

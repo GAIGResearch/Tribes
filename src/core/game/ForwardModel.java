@@ -8,8 +8,8 @@ import java.util.ArrayList;
 
 public class ForwardModel {
 
-    // Board of the game, with all objects distributed in a 2D array of size 'this.size x this.size'
-    private Types.TERRAIN[][] board; //Change this for terrain types, rather than integers
+    // Board of the game
+    private Board board;
 
     // Number of tribes playing the game
     private int numTribes;
@@ -25,10 +25,8 @@ public class ForwardModel {
 
     /**
      * Forward model constructor
-     * @param size Size of board
      */
-    ForwardModel(int size) {
-        this.size = size;
+    ForwardModel() {
     }
 
     /**
@@ -36,9 +34,11 @@ public class ForwardModel {
      * Adds avatars to the game and sets them alive.
      * Generates the initial board of the game.
      */
-    void init(long seed, int size)
+    void init(long seed, String filename)
     {
         //TODO: Init the game, including creating the level.
+        LevelLoader ll = new LevelLoader();
+        board = ll.buildLevel(filename);
     }
 
 
@@ -86,5 +86,14 @@ public class ForwardModel {
      */
     public Tribe[] getTribes() {
         return tribes;
+    }
+
+    /**
+     * Returns the game board.
+     * @return the game board.
+     */
+    public Board getBoard()
+    {
+        return board;
     }
 }

@@ -23,19 +23,28 @@ public class Types {
      */
     public enum RESOURCE
     {
-        FISH(0, "img/resource/fish.png"),
-        FRUIT(1, "img/resource/fruit.png"),
-        ANIMAL(2, "img/resource/animal.png"),
-        WHALES(3, "img/resource/whale.png"),
-        FOREST(4, "img/resource/forest.png"),
-        ORE(5, "img/resource/pre.png"),
-        CROPS(6, "img/resource/crops.png");
+        FISH(0, "img/resource/fish.png", 'h'),
+        FRUIT(1, "img/resource/fruit.png", 'f'),
+        ANIMAL(2, "img/resource/animal.png", 'a'),
+        WHALES(3, "img/resource/whale.png", 'w'),
+        ORE(5, "img/resource/ore.png", 'o'),
+        CROPS(6, "img/resource/crops.png", 'c'),
+        RUINS(7, "img/resource/ruins.png", 'r');
 
         private int key;
         private String imageFile;
-        RESOURCE(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
+        private char mapChar;
+        RESOURCE(int numVal, String imageFile, char mapChar) {  this.key = numVal;  this.imageFile = imageFile; this.mapChar = mapChar;}
         public int getKey() {  return key; }
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
+
+        public static RESOURCE getType(char resourceChar) {
+            for(RESOURCE r : Types.RESOURCE.values()){
+                if(r.mapChar == resourceChar)
+                    return r;
+            }
+            return null;
+        }
     }
 
     /**
@@ -177,17 +186,27 @@ Yellow_dark - 929000
     public enum TERRAIN {
 
         //Types and IDs
-        PLAIN(0, "img/terrain/grass.png"),
-        SHALLOW_WATER(1, "img/terrain/shallow_water.jpg"),
-        DEEP_WATER(2, "img/terrain/deep_water.jpg"),
-        MOUNTAIN(3, "img/terrain/mountain.png"),
-        VILLAGE(4, "img/terrain/village.png"),
-        CITY(5, "img/terrain/city.png"),
-        RUINS(6, "img/terrain/ruins.png");
+        PLAIN(0, "img/terrain/grass.png", '.'),
+        SHALLOW_WATER(1, "img/terrain/shallow_water.jpg", 's'),
+        DEEP_WATER(2, "img/terrain/deep_water.jpg", 'd'),
+        MOUNTAIN(3, "img/terrain/mountain.png", 'm'),
+        VILLAGE(4, "img/terrain/village.png", 'v'),
+        CITY(5, "img/terrain/city.png", 'c'),
+        FOREST(6, "img/terrain/forest.png", 'f');
 
         private String imageFile;
         private int key;
-        TERRAIN(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
+        private char mapChar;
+        TERRAIN(int numVal, String imageFile, char mapChar) {  this.key = numVal;  this.imageFile = imageFile; this.mapChar = mapChar; }
+
+        public static TERRAIN getType(char terrainChar) {
+            for(TERRAIN t : Types.TERRAIN.values()){
+                if(t.mapChar == terrainChar)
+                    return t;
+            }
+            return null;
+        }
+
         public int getKey() {  return key; }
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
 

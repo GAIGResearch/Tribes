@@ -1,12 +1,14 @@
 package utils;
 
+import core.Constants;
+import core.game.Board;
 import core.game.Game;
 import players.KeyController;
 
 import javax.swing.*;
 
 public class GUI extends JFrame {
-    private JLabel appTick;
+    private GameView view;
     private Game game;
     private KeyController ki;
 
@@ -14,14 +16,16 @@ public class GUI extends JFrame {
      * Constructor
      * @param title Title of the window.
      */
-    public GUI(Game game, String title, KeyController ki, boolean closeAppOnClosingWindow, boolean displayPOHuman) {
+    public GUI(Game game, String title, KeyController ki, boolean closeAppOnClosingWindow) {
         super(title);
         this.game = game;
         this.ki = ki;
 
         // TODO: Create frame layout, panels etc...
-
-
+        view = new GameView(game.getBoard(), Constants.CELL_SIZE);
+        JPanel mainPanel = new JPanel();
+        mainPanel.add(view);
+        getContentPane().add(mainPanel);
 
         // Frame properties
         pack();
@@ -37,7 +41,7 @@ public class GUI extends JFrame {
     /**
      * Paints the GUI, to be called at every game tick.
      */
-    public void paint() {
-
+    public void paint(Board b) {
+        view.paint(b);
     }
 }

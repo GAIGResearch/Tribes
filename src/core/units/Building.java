@@ -15,27 +15,21 @@ public abstract class Building {
         this.y = y;
     }
 
-    public int getX() {
+    public final int getX() {
         return x;
     }
 
-    public int getY() {
+    public final int getY() {
         return y;
     }
 
-    public Building copy(){return null;}
+    public abstract Building copy();
 
-    public Types.BUILDING getTYPE() {
-        return null;
-    }
+    public abstract Types.BUILDING getTYPE();
 
-    public int getCOST() {
-        return -1;
-    }
+    public abstract int getCOST();
 
-    public int getPRODUCTION() {
-        return -1;
-    }
+    public abstract int getPRODUCTION();
 
     public Types.TERRAIN getTERRAIN_CONSTRAINT() {
         return null;
@@ -43,7 +37,7 @@ public abstract class Building {
 
     public Types.RESOURCE getRESOURCE_CONSTRAINT(){return null;}
 
-    public boolean is_buildable(Board board){
+    public final boolean is_buildable(Board board){
         return board.getTerrainAt(x, y).equals(getTERRAIN_CONSTRAINT()) && board.getResourceAt(x, y).equals(getRESOURCE_CONSTRAINT());
     }
 }

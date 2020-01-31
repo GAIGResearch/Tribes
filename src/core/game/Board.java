@@ -126,7 +126,7 @@ public class Board {
     void moveUnit(Types.DIRECTIONS direction, int x, int y){
         Types.UNIT[][] newUnits = new Types.UNIT[size][size];
 
-        if(units[x][y] != Types.UNIT.NONE){
+        if(units[x][y] == null){
             System.out.println("Invalid move, there is no unit on this tile");
             return;
         }
@@ -137,7 +137,7 @@ public class Board {
                 if((i !=x && j!=y) && (i != x+direction.x() && j != y+direction.y())){
                     newUnits[i][j] = checkUnit(i,j);
                 }else if( i == x && j == y){
-                    newUnits[i][j] = Types.UNIT.NONE;
+                    newUnits[i][j] = null;
                 }else if(i == x+direction.x() && j == y+direction.y()){
                     Types.UNIT oldUnit = checkUnit(x,y);
                     newUnits[i][j] = oldUnit;
@@ -152,9 +152,8 @@ public class Board {
 
     // Helper method to check which unit at which tile for deep copying unit array
     Types.UNIT checkUnit(int x, int y){
+        Types.UNIT u = null;
         switch (units[x][y]){
-            case NONE:
-                return Types.UNIT.NONE;
             case RIDER:
                 return Types.UNIT.RIDER;
             case KNIGHT:
@@ -172,7 +171,7 @@ public class Board {
             case MIND_BEARER:
                 return Types.UNIT.MIND_BEARER;
         }
-        return Types.UNIT.NONE;
+        return u;
     }
 
     // Helper method to check which terrain at which tile for deep copying unit array
@@ -198,6 +197,7 @@ public class Board {
 
     // Helper method to check which terrain at which tile for deep copying unit array
     Types.RESOURCE checkResource(int x, int y){
+        Types.RESOURCE r = null;
         switch (resources[x][y]){
             case FISH:
                 return Types.RESOURCE.FISH;
@@ -209,12 +209,17 @@ public class Board {
                 return Types.RESOURCE.ANIMAL;
             case WHALES:
                 return Types.RESOURCE.WHALES;
+            case ORE:
+                return Types.RESOURCE.ORE;
+            case CROPS:
+                return Types.RESOURCE.CROPS;
         }
-        return Types.RESOURCE.NONE;
+        return r;
     }
 
     // Helper method to check which Building at which tile for deep copying unit array
     Types.BUILDING checkBuilding(int x, int y){
+        Types.BUILDING b = null;
         switch (buildings[x][y]){
             case TEMPLE:
                 return Types.BUILDING.TEMPLE;
@@ -255,7 +260,7 @@ public class Board {
             case TOWER_OF_WISDOM:
                 return Types.BUILDING.TOWER_OF_WISDOM;
         }
-        return Types.BUILDING.NONE;
+        return b;
     }
 
     // Setter method for units array

@@ -1,5 +1,7 @@
 package core.units;
 
+import core.Types;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,7 +16,7 @@ public class City extends Actor{
     private boolean isPrism;
     private boolean hasWorkShop = false;
     // TODO: Add the owner(tribe)
-    private LinkedList<Building> buildings = new LinkedList();
+    private LinkedList<Building> buildings = new LinkedList<>();
 
     // The constructor to initial the valley
     public City(int x, int y) {
@@ -64,6 +66,8 @@ public class City extends Actor{
     }
 
     public void addBuildings(Building building){
+        // TODO: set Production for windmill, sawmill, forge, customhouse
+        // TODO: change production for special buildings(farm, lumberHut, mine, port)
         buildings.add(building);
     }
 
@@ -133,6 +137,13 @@ public class City extends Actor{
 
     public int getPopulation_need() {
         return population_need;
+    }
+
+    public Types.TERRAIN type(){
+        if (isValley){
+            return Types.TERRAIN.VILLAGE;
+        }
+        return Types.TERRAIN.CITY;
     }
 
     public LinkedList<Building> getBuildings() {

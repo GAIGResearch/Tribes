@@ -273,31 +273,33 @@ public class Board {
         this.resources = r;
     }
 
-    // Method to determine city borders, take city and x and y pos of city as params
-    public void setBorders(City city, int x, int y){
-        if (city.getTribe().equals(getCityAt(x, y).getTribe())) {
-            //   set border and city to that tribe
-        }
-        for (int i =x; i< x+2; i++){
-            for(int j = y; j<x+2; j++) {
-                //todo set border
+    //TODO: Once city has owners
+//    // Method to determine city borders, take city and x and y pos of city as params
+//    public void setBorders(City city, int x, int y){
+//        if (city.getTribe().equals(getCityAt(x, y).getTribe())) {
+//            //   set border and city to that tribe
+//        }
+//        for (int i =x; i< x+2; i++){
+//            for(int j = y; j<x+2; j++) {
+//                //todo set border
+//
+//
+//            }
+//        }
+//    }
 
-
-            }
-        }
-    }
-
-    // Method to expand city borders, take city x and x and y pos of city as params
-    public void expandBorder(City city, int x, int y){
-        for (int i =x; i< x+2; i++){
-            for(int j = y; j<x+2; j++) {
-                //todo set border
-
-                if (city.getTribe().equals(getCityAt(x, y).getTribe())) {
-                    //   set border and city to that tribe
-                }
-            }
-        }
-    }
+    //TODO: Once city has owners
+//    // Method to expand city borders, take city x and x and y pos of city as params
+//    public void expandBorder(City city, int x, int y){
+//        for (int i =x; i< x+2; i++){
+//            for(int j = y; j<x+2; j++) {
+//                //todo set border
+//
+//                if (city.getTribe().equals(getCityAt(x, y).getTribe())) {
+//                    //   set border and city to that tribe
+//                }
+//            }
+//        }
+//    }
 
 }

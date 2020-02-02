@@ -7,7 +7,7 @@ public class Port extends Building {
     private final Types.BUILDING TYPE = Types.BUILDING.PORT;
     private final int COST = 10;
     private final int PRODUCTION = 2;
-    private final Types.TERRAIN CONSTRAINT = Types.TERRAIN.SHALLOW_WATER;
+    private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.SHALLOW_WATER;
 
     public Port(int x, int y) {
         super(x, y);
@@ -25,8 +25,9 @@ public class Port extends Building {
         return PRODUCTION;
     }
 
-    public Types.TERRAIN getCONSTRAINT() {
-        return CONSTRAINT;
+    @Override
+    public Types.TERRAIN getTERRAIN_CONSTRAINT() {
+        return TERRAIN_CONSTRAINT;
     }
 
     public Port copy(){

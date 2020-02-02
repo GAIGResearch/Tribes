@@ -1,6 +1,7 @@
 package core.units;
 
 import core.Types;
+import core.game.Board;
 
 public abstract class Building {
 
@@ -14,15 +15,40 @@ public abstract class Building {
         this.y = y;
     }
 
-    public int getX() {
+    public final int getX() {
         return x;
     }
 
-    public int getY() {
+    public final int getY() {
         return y;
     }
 
-    public Building copy(){return null;}
+    public abstract Building copy();
 
-    // TODO: Linked to BOARD to see if it make requirements to build (return boolean) -> Implement this method to all buildings
+    public abstract Types.BUILDING getTYPE();
+
+    public abstract int getCOST();
+
+    public abstract int getPRODUCTION();
+
+    public Types.TERRAIN getTERRAIN_CONSTRAINT() {
+        return null;
+    }
+
+    public Types.RESOURCE getRESOURCE_CONSTRAINT(){return null;}
+
+    public boolean is_buildable(Board board){
+        boolean condition = true;
+        if (getTERRAIN_CONSTRAINT() != null){
+            condition = board.getTerrainAt(x, y).equals(getTERRAIN_CONSTRAINT());
+        }
+        if (getTERRAIN_CONSTRAINT() != null && condition){
+            condition = board.getResourceAt(x, y).equals(getRESOURCE_CONSTRAINT());
+        }
+        return condition;
+    }
+
+    public void setProduction(int production){}
+
+    public int getPoints(){return -1;}
 }

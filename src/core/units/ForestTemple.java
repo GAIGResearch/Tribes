@@ -1,6 +1,7 @@
 package core.units;
 
 import core.Types;
+import core.game.Board;
 
 public class ForestTemple extends Building {
 
@@ -8,8 +9,7 @@ public class ForestTemple extends Building {
     private final int COST = 15;
     private final int PRODUCTION = 1;
     private final int points = 100;
-    private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.PLAIN;
-    private final Types.RESOURCE RESOURCE_CONSTRAINT = Types.RESOURCE.FOREST;
+    private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.FOREST;
 
 
     public ForestTemple(int x, int y) {
@@ -46,8 +46,4 @@ public class ForestTemple extends Building {
         return TERRAIN_CONSTRAINT;
     }
 
-    @Override
-    public Types.RESOURCE getRESOURCE_CONSTRAINT() {
-        return RESOURCE_CONSTRAINT;
-    }
 }

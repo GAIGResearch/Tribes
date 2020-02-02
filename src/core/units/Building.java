@@ -42,7 +42,7 @@ public abstract class Building {
         if (getTERRAIN_CONSTRAINT() != null){
             condition = board.getTerrainAt(x, y).equals(getTERRAIN_CONSTRAINT());
         }
-        if (getTERRAIN_CONSTRAINT() != null && condition){
+        if (getRESOURCE_CONSTRAINT() != null && condition){
             condition = board.getResourceAt(x, y).equals(getRESOURCE_CONSTRAINT());
         }
         return condition;

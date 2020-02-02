@@ -8,8 +8,7 @@ public class LumberHut extends Building{
     private final int COST = 2;
     private final int PRODUCTION = 1;
     // TODO: It needs to check if the resource is field tile or not
-    private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.PLAIN;
-    private final Types.RESOURCE RESOURCE_CONSTRAINT = Types.RESOURCE.FOREST;
+    private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.FOREST;
 
 
     public LumberHut(int x, int y) {
@@ -30,11 +29,6 @@ public class LumberHut extends Building{
 
     public Types.TERRAIN getTERRAIN_CONSTRAINT() {
         return TERRAIN_CONSTRAINT;
-    }
-
-    @Override
-    public Types.RESOURCE getRESOURCE_CONSTRAINT() {
-        return RESOURCE_CONSTRAINT;
     }
 
     @Override

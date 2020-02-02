@@ -14,6 +14,8 @@ public class City extends Actor{
     private boolean isValley;
     private boolean isPrism;
     private int extraStar = 0;
+    private int points = 0;
+    private int longTermPoints = 0;
     // TODO: Add the owner(tribe)
     private LinkedList<Building> buildings = new LinkedList<>();
 
@@ -64,23 +66,32 @@ public class City extends Actor{
     }
 
     public void addBuildings(Building building){
-        // TODO: set Production for windmill, sawmill, forge, customhouse
         if (building.getTYPE().equals(Types.BUILDING.WINDMILL) || building.getTYPE().equals(Types.BUILDING.SAWMILL)
                 || building.getTYPE().equals(Types.BUILDING.FORGE) || building.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
             setProduction(building);
-        }
-        // TODO: change production for special buildings(farm, lumberHut, mine, port)
-        if (building.getTYPE().equals(Types.BUILDING.FARM) || building.getTYPE().equals(Types.BUILDING.LUMBER_HUT)
+        }else if (building.getTYPE().equals(Types.BUILDING.FARM) || building.getTYPE().equals(Types.BUILDING.LUMBER_HUT)
                 || building.getTYPE().equals(Types.BUILDING.MINE) || building.getTYPE().equals(Types.BUILDING.PORT)){
             changeProduction(building);
+        }else if (building.getTYPE().equals(Types.BUILDING.TEMPLE) || building.getTYPE().equals(Types.BUILDING.WATER_TEMPLE)
+                || building.getTYPE().equals(Types.BUILDING.MOUNTAIN_TEMPLE) || building.getTYPE().equals(Types.BUILDING.FOREST_TEMPLE)){
+            addLongTimePoints(building.getPoints());
+        }else{
+            addPoints(building.getPoints());
         }
-
         if (building.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
             addExtraStar(building.getPRODUCTION());
         }else {
             addPopulation(building.getPRODUCTION());
         }
         buildings.add(building);
+    }
+
+    private void addPoints(int points) {
+        this.points += points;
+    }
+
+    private void addLongTimePoints(int points){
+        this.longTermPoints = points;
     }
 
     public void setProduction(Building building){
@@ -128,7 +139,7 @@ public class City extends Actor{
     }
 
     // Level up
-    public int levelUp(){
+    public void levelUp(){
         level++;
         population = population - population_need;
         population_need = level + 1;
@@ -150,14 +161,14 @@ public class City extends Actor{
                // TODO: getPark(250 points) or get super unit
         }
         */
-        return getPoints();
+        addPoints(getLevelUpPoints());
     }
 
     public void addExtraStar(int Star) {
         extraStar += Star;
     }
 
-    public int getPoints(){
+    public int getLevelUpPoints(){
         if (level == 1){
             return 100;
         }
@@ -209,6 +220,13 @@ public class City extends Actor{
             copyList.add(building.copy());
         }
         return copyList;
+    }
+
+    // Get the point for each turn
+    public int getPoints() {
+        int turnPoint = points + longTermPoints;
+        points = 0;
+        return turnPoint;
     }
 
     public City copy(){

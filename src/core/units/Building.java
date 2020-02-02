@@ -40,4 +40,6 @@ public abstract class Building {
     public final boolean is_buildable(Board board){
         return board.getTerrainAt(x, y).equals(getTERRAIN_CONSTRAINT()) && board.getResourceAt(x, y).equals(getRESOURCE_CONSTRAINT());
     }
+
+    public void setProduction(int production){};
 }

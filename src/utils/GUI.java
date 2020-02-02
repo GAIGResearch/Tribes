@@ -1,16 +1,27 @@
 package utils;
 
 import core.Constants;
+import core.Types;
 import core.game.Board;
 import core.game.Game;
 import players.KeyController;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 public class GUI extends JFrame {
-    private GameView view;
+    private JLabel appTurn;
+
     private Game game;
     private KeyController ki;
+
+    private GameView view;
+    private TribeView tribeView;
+    private InfoView infoView;
 
     /**
      * Constructor
@@ -21,11 +32,38 @@ public class GUI extends JFrame {
         this.game = game;
         this.ki = ki;
 
-        // TODO: Create frame layout, panels etc...
-        view = new GameView(game.getBoard(), Constants.CELL_SIZE);
-        JPanel mainPanel = new JPanel();
-        mainPanel.add(view);
-        getContentPane().add(mainPanel);
+
+        infoView = new InfoView();
+        tribeView = new TribeView();
+        view = new GameView(game.getBoard(), infoView);
+
+
+        // Create frame layout
+        GridBagLayout gbl = new GridBagLayout();
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.weighty = 0;
+
+        setLayout(gbl);
+
+        // Main panel definition
+        JPanel mainPanel = createGamePanel();
+        JPanel sidePanel = createSidePanel();
+
+        gbc.gridx = 0;
+        getContentPane().add(Box.createRigidArea(new Dimension(10, 0)), gbc);
+
+        gbc.gridx++;
+        getContentPane().add(mainPanel, gbc);
+
+        gbc.gridx++;
+        getContentPane().add(Box.createRigidArea(new Dimension(10, 0)), gbc);
+
+        gbc.gridx++;
+        getContentPane().add(sidePanel, gbc);
+
+        gbc.gridx++;
+        getContentPane().add(Box.createRigidArea(new Dimension(10, 0)), gbc);
 
         // Frame properties
         pack();
@@ -38,10 +76,103 @@ public class GUI extends JFrame {
     }
 
 
+    private JPanel createGamePanel()
+    {
+        JPanel mainPanel = new JPanel();
+
+        mainPanel.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                infoView.setHighlight(e.getX() / Constants.CELL_SIZE, e.getY() / Constants.CELL_SIZE);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
+
+        mainPanel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.SOUTH;
+        c.weighty = 0;
+
+        c.gridy = 0;
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+
+        c.gridy++;
+        mainPanel.add(view, c);
+
+        c.gridy++;
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+
+        return mainPanel;
+    }
+
+    private JPanel createSidePanel()
+    {
+        JPanel sidePanel = new JPanel();
+        sidePanel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.SOUTH;
+        c.weighty = 0;
+
+        JLabel appTitle = new JLabel("Tribes");
+        Font textFont = new Font(appTitle.getFont().getName(), Font.PLAIN, 16);
+        appTitle.setFont(textFont);
+
+        appTurn = new JLabel("Turn: 0");
+        appTurn.setFont(textFont);
+
+        c.gridy = 0;
+        sidePanel.add(appTitle, c);
+
+        c.gridy++;
+        sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+
+        c.gridy++;
+        sidePanel.add(appTurn, c);
+
+        c.gridy++;
+        sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+
+        c.gridy++;
+        sidePanel.add(infoView, c);
+
+        c.gridy++;
+        sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+
+        c.gridy++;
+        sidePanel.add(tribeView, c);
+
+        c.gridy++;
+        sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+
+        return sidePanel;
+    }
+
+
     /**
      * Paints the GUI, to be called at every game tick.
      */
     public void paint(Board b) {
         view.paint(b);
+        tribeView.paint(b);
+        infoView.paint(b);
     }
 }

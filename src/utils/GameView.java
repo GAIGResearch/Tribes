@@ -2,6 +2,8 @@ package utils;
 
 import javax.swing.*;
 import java.awt.*;
+
+import core.Constants;
 import core.Types;
 import core.game.Board;
 
@@ -12,16 +14,18 @@ public class GameView extends JComponent {
     private int cellSize, gridSize;
     private Board board; //This only counts terrains. Needs to be enhanced with units, resources, etc.
     private Image backgroundImg;
+    private InfoView infoView;
 
     /**
      * Dimensions of the window.
      */
     private Dimension dimension;
 
-    GameView(Board board, int cellSize)
+    GameView(Board board, InfoView inforView)
     {
         this.board = board.copyBoard();
-        this.cellSize = cellSize;
+        this.cellSize = CELL_SIZE;
+        this.infoView = inforView;
         this.gridSize = board.getSize();
         this.dimension = new Dimension(gridSize * cellSize, gridSize * cellSize);
         backgroundImg = Types.TERRAIN.PLAIN.getImage();
@@ -56,9 +60,29 @@ public class GameView extends JComponent {
                 paintImage(g, i, j, cellSize, (b == null) ? null : b.getImage());
 
                 Types.UNIT u = board.getUnitAt(i,j);
-                paintImage(g, i, j, cellSize, (u == null) ? null : u.getImage(0));
+                paintImage(g, i, j, cellSize, (u == null) ? null : u.getImage(0)); //TODO: This playerID will need to be checked.
+
             }
         }
+
+        //If there is a highlighted tile, highlight it.
+        int highlightedX = infoView.getHighlightX();
+        if(highlightedX != -1)
+        {
+            int highlightedY = infoView.getHighlightY();
+
+            Stroke oldStroke = g.getStroke();
+
+            g.setColor(Color.BLUE);
+            g.setStroke(new BasicStroke(3));
+
+            g.drawRect(highlightedX*cellSize, highlightedY*cellSize, cellSize -1, cellSize -1);
+
+            g.setStroke(oldStroke);
+            g.setColor(Color.BLACK);
+
+        }
+
 
         g.setColor(Color.BLACK);
         //player.draw(g); //if we want to give control to the agent to paint something (for debug), start here.

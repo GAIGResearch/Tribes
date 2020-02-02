@@ -163,7 +163,7 @@ public class Game {
      */
     void tick () {
         if (VERBOSE) {
-            System.out.println("tick: " + gs.getTick());
+            //System.out.println("tick: " + gs.getTick());
         }
 
         Tribe[] tribes = gs.getTribes();

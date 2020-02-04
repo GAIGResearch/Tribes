@@ -15,9 +15,9 @@ public abstract class Unit extends Actor
     private Vector2d currentPosition;
     private int kills;
     private boolean isVeteran;
-    //add owner?
+    private int ownerID;
 
-    public Unit(int atk, int def, int mov, int max_hp, int range, int cost, Vector2d pos, int kills, boolean isVeteran){
+    public Unit(int atk, int def, int mov, int max_hp, int range, int cost, Vector2d pos, int kills, boolean isVeteran, int ownerID){
         this.ATK = atk;
         this.DEF = def;
         this.MOV = mov;
@@ -29,6 +29,7 @@ public abstract class Unit extends Actor
         this.currentPosition = pos;
         this.kills = kills;
         this.isVeteran = isVeteran;
+        this.ownerID = ownerID;
     }
 
     public void setCurrentHP(float hp){
@@ -61,6 +62,10 @@ public abstract class Unit extends Actor
 
     public void setVeteran(boolean veteran) {
         isVeteran = veteran;
+    }
+
+    public int getOwnerID(){
+        return  ownerID;
     }
 
     public abstract Unit copy();

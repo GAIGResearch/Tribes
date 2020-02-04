@@ -2,27 +2,32 @@ package utils;
 
 import javax.swing.*;
 import java.awt.*;
+
+import core.Constants;
 import core.Types;
+import core.game.Board;
 
 import static core.Constants.*;
 
 public class GameView extends JComponent {
 
     private int cellSize, gridSize;
-    private Types.TERRAIN[][] objs; //This only counts terrains. Needs to be enhanced with units, resources, etc.
+    private Board board; //This only counts terrains. Needs to be enhanced with units, resources, etc.
     private Image backgroundImg;
+    private InfoView infoView;
 
     /**
      * Dimensions of the window.
      */
     private Dimension dimension;
 
-    GameView(Types.TERRAIN[][] objects, int cellSize)
+    GameView(Board board, InfoView inforView)
     {
-        this.cellSize = cellSize;
-        this.gridSize = objects.length;
+        this.board = board.copyBoard();
+        this.cellSize = CELL_SIZE;
+        this.infoView = inforView;
+        this.gridSize = board.getSize();
         this.dimension = new Dimension(gridSize * cellSize, gridSize * cellSize);
-        copyObjects(objects, new int[gridSize][gridSize]);
         backgroundImg = Types.TERRAIN.PLAIN.getImage();
     }
 
@@ -43,60 +48,70 @@ public class GameView extends JComponent {
 
         for(int i = 0; i < gridSize; ++i) {
             for(int j = 0; j < gridSize; ++j) {
-                Types.TERRAIN gobj = objs[i][j];
 
-                if (gobj == null) {
-                    if (VERBOSE) {
-                        System.out.println("OBJECT is NULL");
-                    }
-                } else {
-                    Rectangle rect = new Rectangle(j*cellSize, i*cellSize, cellSize, cellSize);
-                    if(gobj != Types.TERRAIN.PLAIN) {
-                        //Background:
-                        drawImage(g, backgroundImg, rect);
-                    }
+                //We paint, in this order: terrain, resources, buildings and units.
+                Types.TERRAIN t = board.getTerrainAt(i,j);
+                paintImage(g, i, j, cellSize, (t == null) ? null : t.getImage());
 
-                    // Actual image (admits transparencies).
-                    Image objImage = gobj.getImage();
-                    if (objImage != null) {
-                        drawImage(g, objImage, rect);
-                    }
-                }
+                Types.RESOURCE r = board.getResourceAt(i,j);
+                paintImage(g, i, j, cellSize, (r == null) ? null : r.getImage());
+
+                Types.BUILDING b = board.getBuildingAt(i,j);
+                paintImage(g, i, j, cellSize, (b == null) ? null : b.getImage());
+
+                Types.UNIT u = board.getUnitAt(i,j);
+                paintImage(g, i, j, cellSize, (u == null) ? null : u.getImage(0)); //TODO: This playerID will need to be checked.
+
             }
         }
+
+        //If there is a highlighted tile, highlight it.
+        int highlightedX = infoView.getHighlightX();
+        if(highlightedX != -1)
+        {
+            int highlightedY = infoView.getHighlightY();
+
+            Stroke oldStroke = g.getStroke();
+
+            g.setColor(Color.BLUE);
+            g.setStroke(new BasicStroke(3));
+
+            g.drawRect(highlightedX*cellSize, highlightedY*cellSize, cellSize -1, cellSize -1);
+
+            g.setStroke(oldStroke);
+            g.setColor(Color.BLACK);
+
+        }
+
 
         g.setColor(Color.BLACK);
         //player.draw(g); //if we want to give control to the agent to paint something (for debug), start here.
     }
 
-    static void drawImage(Graphics2D gphx, Image img, Rectangle r)
-    {
-        int w = img.getWidth(null);
-        int h = img.getHeight(null);
-        float scaleX = (float)r.width/w;
-        float scaleY = (float)r.height/h;
 
-        gphx.drawImage(img, r.x, r.y, (int) (w*scaleX), (int) (h*scaleY), null);
+    private static void paintImage(Graphics2D gphx, int i, int j, int cellSize, Image img)
+    {
+        if (img != null) {
+            Rectangle rect = new Rectangle(j*cellSize, i*cellSize, cellSize, cellSize);
+
+            int w = img.getWidth(null);
+            int h = img.getHeight(null);
+            float scaleX = (float)rect.width/w;
+            float scaleY = (float)rect.height/h;
+
+            gphx.drawImage(img, rect.x, rect.y, (int) (w*scaleX), (int) (h*scaleY), null);
+        }
     }
 
 
     /**
-     * All the objects in a board.
-     * @param objects in the game
+     * Paints the board
+     * @param b board from the game
      */
-    void paint(Types.TERRAIN[][] objects, int[][] bombLife)
+    void paint(Board b)
     {
-        copyObjects(objects, bombLife);
+        this.board = b.copyBoard();
         this.repaint();
-    }
-
-    private void copyObjects(Types.TERRAIN[][] objects, int[][] bombs)
-    {
-        objs = new Types.TERRAIN[gridSize][gridSize];
-
-        for (int i = 0; i < gridSize; ++i) {
-            System.arraycopy(objects[i], 0, objs[i], 0, gridSize);
-        }
     }
 
     /**

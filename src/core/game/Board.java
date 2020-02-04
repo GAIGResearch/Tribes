@@ -1,8 +1,7 @@
 package core.game;
 
 import core.Types;
-import core.units.City;
-import core.units.Unit;
+import core.units.*;
 
 public class Board {
 
@@ -14,13 +13,17 @@ public class Board {
     
     // Array for units each tile of the board will have
     // TODO: We need to know which tribe these units belong to.
-    private Types.UNIT[][] units;
+    private Unit[][] units;
 
     // Array for buildings each tile of the board will have
     private Types.BUILDING[][] buildings;
 
     // Array for cities
     private City[][] cities;
+
+    private Tribe [] tribes;
+
+    private int[][] id;
 
 
 
@@ -31,10 +34,11 @@ public class Board {
     public Board (int size){
         terrains = new Types.TERRAIN[size][size];
         resources = new Types.RESOURCE[size][size];
-        units = new Types.UNIT[size][size];
+        units = new Unit[size][size];
         buildings = new Types.BUILDING[size][size];
         cities = new City[size][size];
         this.size = size;
+        this.tribes = new Tribe[4];
     }
 
     // Return deep copy of board
@@ -43,13 +47,13 @@ public class Board {
 
         for (int x = 0; x<this.size; x++){
             for(int y = 0; y<this.size; y++){
-//                Types.TERRAIN t = checkTerrain(x,y);
-//                Types.UNIT u = checkUnit(x,y);
-//                Types.RESOURCE r = checkResource(x,y);
-//                Types.BUILDING b = checkBuilding(x,y);
+                Types.TERRAIN t = checkTerrain(x,y);
+                Unit u = checkUnit(x,y);
+                Types.RESOURCE r = checkResource(x,y);
+                Types.BUILDING b = checkBuilding(x,y);
                 City c = getCityAt(x,y);
                 copyBoard.setTerrainAt(x,y,terrains[x][y]);
-                copyBoard.setUnitAt(x,y,units[x][y]);
+                copyBoard.setUnitAt(x,y,u);
                 copyBoard.setResourceAt(x,y,resources[x][y]);
                 copyBoard.setBuildingAt(x,y,buildings[x][y]);
                 // todo Will copy over city later but need a city copy method in city class
@@ -72,7 +76,7 @@ public class Board {
     }
 
     // Get units array
-    public Types.UNIT[][] getUnits(){
+    public Unit[][] getUnits(){
         return this.units;
     }
 
@@ -87,7 +91,7 @@ public class Board {
     }
 
     // Get Unit at pos x,y
-    public Types.UNIT getUnitAt(int x, int y){
+    public Unit getUnitAt(int x, int y){
         return units[x][y];
     }
 
@@ -101,7 +105,7 @@ public class Board {
     }
 
     // Set Terrain at pos x,y
-    public void setUnitAt(int x, int y, Types.UNIT u){
+    public void setUnitAt(int x, int y, Unit u){
         units[x][y] =  u;
     }
 
@@ -130,7 +134,7 @@ public class Board {
 
     // Moves a unit on the board if unit exists on tile
     void moveUnit(Types.DIRECTIONS direction, int x, int y){
-        Types.UNIT[][] newUnits = new Types.UNIT[size][size];
+        Unit[][] newUnits = new Unit[size][size];
 
         if(units[x][y] == null){
             System.out.println("Invalid move, there is no unit on this tile");
@@ -145,7 +149,7 @@ public class Board {
                 }else if( i == x && j == y){
                     newUnits[i][j] = null;
                 }else if(i == x+direction.x() && j == y+direction.y()){
-                    Types.UNIT oldUnit = checkUnit(x,y);
+                    Unit oldUnit = checkUnit(x,y);
                     newUnits[i][j] = oldUnit;
                 }
             }
@@ -157,25 +161,26 @@ public class Board {
     }
 
     // Helper method to check which unit at which tile for deep copying unit array
-    Types.UNIT checkUnit(int x, int y){
-        Types.UNIT u = null;
-        switch (units[x][y]){
-            case RIDER:
-                return Types.UNIT.RIDER;
-            case KNIGHT:
-                return Types.UNIT.KNIGHT;
-            case ARCHER:
-                return Types.UNIT.ARCHER;
-            case WARRIOR:
-                return Types.UNIT.WARRIOR;
-            case CATAPULT:
-                return Types.UNIT.CATAPULT;
-            case DEFENDER:
-                return Types.UNIT.DEFENDER;
-            case SWORDMAN:
-                return Types.UNIT.SWORDMAN;
-            case MIND_BEARER:
-                return Types.UNIT.MIND_BEARER;
+    Unit checkUnit(int x, int y){
+        Unit u = units[x][y];
+        String unitName = u.getClass().getName();
+        switch (unitName){
+            case "Rider":
+                return new Rider(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+            case "Knight":
+                return new Knight(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+            case "Archer":
+                return new Archer(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+            case "Warrior":
+                return new Warrior(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+            case "Catapult":
+                return new Catapult(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+            case "Defender":
+                return new Defender(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+            case "Swordsman":
+                return new Swordsman(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+            //case 'MIND_BEARER':
+            //    return new Warrior(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
         }
         return u;
     }
@@ -272,7 +277,7 @@ public class Board {
     }
 
     // Setter method for units array
-    public void setUnits(Types.UNIT[][] u){
+    public void setUnits(Unit[][] u){
         this.units = u;
     }
 

@@ -1,6 +1,7 @@
 package core.actions.cityactions;
 
 import core.Types;
+import core.game.GameState;
 import core.units.City;
 
 public class Spawn extends CityAction
@@ -16,5 +17,15 @@ public class Spawn extends CityAction
 
     public Types.UNIT getUnitType() {
         return unit_type;
+    }
+
+    @Override
+    public boolean isFeasible(GameState gs) {
+        return false;
+    }
+
+    @Override
+    public void execute(GameState gs) {
+
     }
 }

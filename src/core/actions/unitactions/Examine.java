@@ -1,5 +1,6 @@
 package core.actions.unitactions;
 
+import core.game.GameState;
 import core.units.City;
 import core.units.Unit;
 
@@ -15,5 +16,15 @@ public class Examine extends UnitAction
 
     public City getTarget() {
         return target;
+    }
+
+    @Override
+    public boolean isFeasible(GameState gs) {
+        return false;
+    }
+
+    @Override
+    public void execute(GameState gs) {
+
     }
 }

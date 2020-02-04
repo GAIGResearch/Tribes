@@ -146,4 +146,12 @@ public class City extends Actor{
     public City copy(){
         return new City(x, y, level, population, population_need, isValley, isPrism, hasWorkShop, getBuildings());
     }
+
+    public boolean getIsValley(){
+        return this.isValley;
+    }
+
+    public void setIsValley(boolean isVal){
+         this.isValley = isValley;
+    }
 }

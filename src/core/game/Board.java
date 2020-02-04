@@ -307,4 +307,15 @@ public class Board {
 //        }
 //    }
 
+
+    public void occupy(int x, int y){
+        City c = getCityAt(x,y);
+        if (c.getIsValley()){
+            c.setIsValley(false);
+            // TODO: Assign the owner
+            c.levelUp();
+        }
+    }
+
+
 }

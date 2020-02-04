@@ -7,6 +7,44 @@ import java.awt.*;
 
 public class Types {
 
+    public enum TECHNOLOGY {
+        CLIMBING(5),
+        FISHING(5),
+        HUNTING(5),
+        ORGANIZATION(5),
+        RIDING(5),
+        ARCHERY(6),
+        FARMING(6),
+        FORESTRY(6),
+        FREE_SPIRIT(6),
+        MEDITATION(6),
+        MINING(6),
+        ROADS(6),
+        SAILING(6),
+        SHIELDS(6),
+        WHALING(6),
+        AQUATISM(7),
+        CHIVALRY(7),
+        CONSTRUCTION(7),
+        MATHEMATICS(7),
+        NAVIGATION(7),
+        SMITHERY(7),
+        SPIRITUALISM(7),
+        TRADE(7),
+        PHILOSOPHY(7);
+
+        private int baseCost;
+
+        TECHNOLOGY(int baseCost) {
+            this.baseCost = baseCost;
+        }
+
+        public int getCost(int numOfCities) {
+            return baseCost * numOfCities;
+        }
+
+    }
+
     /**
      * Defines the status of the turn for an unit. (May be in Unit.java?)
      */

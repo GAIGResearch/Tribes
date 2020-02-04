@@ -1,24 +1,23 @@
-package core.units;
+package core.actors.buildings;
 
 import core.Types;
 import core.game.Board;
 
-public class WaterTemple extends Building {
+public class ParkOfFortune extends Building {
 
-    private final Types.BUILDING TYPE = Types.BUILDING.TEMPLE;
-    private final int COST = 20;
-    private final int PRODUCTION = 1;
-    private final int points = 100;
-    private final Types.TERRAIN TERRAIN_CONSTRAINT_1 = Types.TERRAIN.SHALLOW_WATER;
-    private final Types.TERRAIN TERRAIN_CONSTRAINT_2 = Types.TERRAIN.DEEP_WATER;
+    private final Types.BUILDING TYPE = Types.BUILDING.PARK_OF_FORTUNE;
+    private final int PRODUCTION = 3;
+    private final int points = 400;
+    private final Types.TERRAIN TERRAIN_CONSTRAINT_1 = Types.TERRAIN.PLAIN;
+    private final Types.TERRAIN TERRAIN_CONSTRAINT_2 = Types.TERRAIN.SHALLOW_WATER;
 
-    public WaterTemple(int x, int y) {
+    public ParkOfFortune(int x, int y) {
         super(x, y);
     }
 
     @Override
     public Building copy() {
-        return new WaterTemple(getX(), getY());
+        return new ParkOfFortune(getX(), getY());
     }
 
     @Override
@@ -28,7 +27,7 @@ public class WaterTemple extends Building {
 
     @Override
     public int getCOST() {
-        return COST;
+        return 0;
     }
 
     @Override

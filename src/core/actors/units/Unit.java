@@ -1,5 +1,6 @@
-package core.units;
+package core.actors.units;
 
+import core.actors.Actor;
 import utils.Vector2d;
 
 public abstract class Unit extends Actor

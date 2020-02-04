@@ -1,7 +1,7 @@
 package core.actions.unitactions;
 
 import core.actions.Action;
-import core.units.Unit;
+import core.actors.units.Unit;
 
 public abstract class UnitAction extends Action
 {

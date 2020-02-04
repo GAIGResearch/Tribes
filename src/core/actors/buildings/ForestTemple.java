@@ -1,23 +1,23 @@
-package core.units;
+package core.actors.buildings;
 
 import core.Types;
 
-public class MountainTemple extends Building {
+public class ForestTemple extends Building {
 
     private final Types.BUILDING TYPE = Types.BUILDING.TEMPLE;
-    private final int COST = 20;
+    private final int COST = 15;
     private final int PRODUCTION = 1;
     private final int points = 100;
-    private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.MOUNTAIN;
+    private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.FOREST;
 
 
-    public MountainTemple(int x, int y) {
+    public ForestTemple(int x, int y) {
         super(x, y);
     }
 
     @Override
     public Building copy() {
-        return new MountainTemple(getX(), getY());
+        return new ForestTemple(getX(), getY());
     }
 
     @Override
@@ -44,4 +44,5 @@ public class MountainTemple extends Building {
     public Types.TERRAIN getTERRAIN_CONSTRAINT() {
         return TERRAIN_CONSTRAINT;
     }
+
 }

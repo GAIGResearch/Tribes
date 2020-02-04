@@ -1,24 +1,24 @@
-package core.units;
+package core.actors.buildings;
 
 import core.Types;
-import core.game.Board;
 
-public class ForestTemple extends Building {
+public class Temple extends Building {
 
     private final Types.BUILDING TYPE = Types.BUILDING.TEMPLE;
-    private final int COST = 15;
+    private final int COST = 20;
     private final int PRODUCTION = 1;
     private final int points = 100;
-    private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.FOREST;
+    // TODO: It needs to check if the resource is field tile or not
+    private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.PLAIN;
 
 
-    public ForestTemple(int x, int y) {
+    public Temple(int x, int y) {
         super(x, y);
     }
 
     @Override
     public Building copy() {
-        return new ForestTemple(getX(), getY());
+        return new Temple(getX(), getY());
     }
 
     @Override
@@ -45,5 +45,4 @@ public class ForestTemple extends Building {
     public Types.TERRAIN getTERRAIN_CONSTRAINT() {
         return TERRAIN_CONSTRAINT;
     }
-
 }

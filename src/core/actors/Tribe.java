@@ -1,4 +1,4 @@
-package core.units;
+package core.actors;
 
 import core.Types;
 

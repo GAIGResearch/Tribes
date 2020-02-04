@@ -1,8 +1,7 @@
 package core.game;
 
 import core.actions.Action;
-import core.units.Tribe;
-import players.Agent;
+import core.actors.Tribe;
 
 import java.util.ArrayList;
 

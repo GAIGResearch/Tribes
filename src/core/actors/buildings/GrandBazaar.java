@@ -1,23 +1,23 @@
-package core.units;
+package core.actors.buildings;
 
 import core.Types;
 import core.game.Board;
 
-public class ParkOfFortune extends Building {
+public class GrandBazaar extends Building {
 
-    private final Types.BUILDING TYPE = Types.BUILDING.PARK_OF_FORTUNE;
+    private final Types.BUILDING TYPE = Types.BUILDING.GRAND_BAZAR;
     private final int PRODUCTION = 3;
     private final int points = 400;
     private final Types.TERRAIN TERRAIN_CONSTRAINT_1 = Types.TERRAIN.PLAIN;
     private final Types.TERRAIN TERRAIN_CONSTRAINT_2 = Types.TERRAIN.SHALLOW_WATER;
 
-    public ParkOfFortune(int x, int y) {
+    public GrandBazaar(int x, int y) {
         super(x, y);
     }
 
     @Override
     public Building copy() {
-        return new ParkOfFortune(getX(), getY());
+        return new GrandBazaar(getX(), getY());
     }
 
     @Override

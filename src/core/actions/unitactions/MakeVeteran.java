@@ -1,6 +1,6 @@
 package core.actions.unitactions;
 
-import core.units.Unit;
+import core.actors.units.Unit;
 
 public class MakeVeteran extends UnitAction
 {

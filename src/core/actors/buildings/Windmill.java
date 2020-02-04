@@ -1,30 +1,30 @@
-package core.units;
+package core.actors.buildings;
 
 import core.Types;
 
-public class Forge extends Building {
+public class Windmill extends Building {
 
-    private final Types.BUILDING TYPE = Types.BUILDING.FORGE;
+    private final Types.BUILDING TYPE = Types.BUILDING.WINDMILL;
     private final int COST = 5;
     private int production;
     private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.PLAIN;
 
-    public Forge(int x, int y) {
+    public Windmill(int x, int y) {
         super(x, y);
     }
 
-    public Forge(int x, int y, int production) {
+    public Windmill(int x, int y, int production) {
         super(x, y);
         this.production = production;
     }
 
     public void setProduction(int production) {
-        this.production = production*2;
+        this.production = production;
     }
 
     @Override
     public Building copy() {
-        return new Forge(getX(), getY(), this.production);
+        return new Windmill(getX(), getY(), this.production);
     }
 
     @Override

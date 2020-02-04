@@ -1,6 +1,6 @@
 package core.actions.cityactions;
 
-import core.units.City;
+import core.actors.City;
 
 public class BurnForest extends CityAction
 {

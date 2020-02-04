@@ -1,23 +1,23 @@
-package core.units;
+package core.actors.buildings;
 
 import core.Types;
 import core.game.Board;
 
-public class GrandBazaar extends Building {
+public class TowerOfWisdom extends Building {
 
-    private final Types.BUILDING TYPE = Types.BUILDING.GRAND_BAZAR;
+    private final Types.BUILDING TYPE = Types.BUILDING.TOWER_OF_WISDOM;
     private final int PRODUCTION = 3;
     private final int points = 400;
     private final Types.TERRAIN TERRAIN_CONSTRAINT_1 = Types.TERRAIN.PLAIN;
     private final Types.TERRAIN TERRAIN_CONSTRAINT_2 = Types.TERRAIN.SHALLOW_WATER;
 
-    public GrandBazaar(int x, int y) {
+    public TowerOfWisdom(int x, int y) {
         super(x, y);
     }
 
     @Override
     public Building copy() {
-        return new GrandBazaar(getX(), getY());
+        return new TowerOfWisdom(getX(), getY());
     }
 
     @Override

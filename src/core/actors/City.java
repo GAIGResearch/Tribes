@@ -1,6 +1,7 @@
-package core.units;
+package core.actors;
 
 import core.Types;
+import core.actors.buildings.Building;
 
 import java.util.LinkedList;
 

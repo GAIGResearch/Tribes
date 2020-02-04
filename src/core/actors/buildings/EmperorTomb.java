@@ -1,23 +1,23 @@
-package core.units;
+package core.actors.buildings;
 
 import core.Types;
 import core.game.Board;
 
-public class GateOfPower extends Building {
+public class EmperorTomb extends Building {
 
-    private final Types.BUILDING TYPE = Types.BUILDING.GATE_OF_POWER;
+    private final Types.BUILDING TYPE = Types.BUILDING.EMPERORS_TOMB;
     private final int PRODUCTION = 3;
     private final int points = 400;
     private final Types.TERRAIN TERRAIN_CONSTRAINT_1 = Types.TERRAIN.PLAIN;
     private final Types.TERRAIN TERRAIN_CONSTRAINT_2 = Types.TERRAIN.SHALLOW_WATER;
 
-    public GateOfPower(int x, int y) {
+    public EmperorTomb(int x, int y) {
         super(x, y);
     }
 
     @Override
     public Building copy() {
-        return new GateOfPower(getX(), getY());
+        return new EmperorTomb(getX(), getY());
     }
 
     @Override

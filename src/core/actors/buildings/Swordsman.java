@@ -1,5 +1,6 @@
-package core.units;
+package core.actors.buildings;
 
+import core.actors.units.Unit;
 import utils.Vector2d;
 
 public class Swordsman extends Unit

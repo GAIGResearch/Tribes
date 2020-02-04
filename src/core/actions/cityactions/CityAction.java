@@ -1,7 +1,7 @@
 package core.actions.cityactions;
 
 import core.actions.Action;
-import core.units.City;
+import core.actors.City;
 
 public class CityAction extends Action {
 

@@ -120,7 +120,7 @@ public class Types {
 
 
     /**
-     * Types of units
+     * Types of actors
      */
     public enum UNIT
     {

@@ -1,4 +1,4 @@
-package core.units;
+package core.actors.buildings;
 
 import core.Types;
 import core.game.Board;

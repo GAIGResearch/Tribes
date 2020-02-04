@@ -1,23 +1,24 @@
-package core.units;
+package core.actors.buildings;
 
 import core.Types;
 import core.game.Board;
 
-public class TowerOfWisdom extends Building {
+public class WaterTemple extends Building {
 
-    private final Types.BUILDING TYPE = Types.BUILDING.TOWER_OF_WISDOM;
-    private final int PRODUCTION = 3;
-    private final int points = 400;
-    private final Types.TERRAIN TERRAIN_CONSTRAINT_1 = Types.TERRAIN.PLAIN;
-    private final Types.TERRAIN TERRAIN_CONSTRAINT_2 = Types.TERRAIN.SHALLOW_WATER;
+    private final Types.BUILDING TYPE = Types.BUILDING.TEMPLE;
+    private final int COST = 20;
+    private final int PRODUCTION = 1;
+    private final int points = 100;
+    private final Types.TERRAIN TERRAIN_CONSTRAINT_1 = Types.TERRAIN.SHALLOW_WATER;
+    private final Types.TERRAIN TERRAIN_CONSTRAINT_2 = Types.TERRAIN.DEEP_WATER;
 
-    public TowerOfWisdom(int x, int y) {
+    public WaterTemple(int x, int y) {
         super(x, y);
     }
 
     @Override
     public Building copy() {
-        return new TowerOfWisdom(getX(), getY());
+        return new WaterTemple(getX(), getY());
     }
 
     @Override
@@ -27,7 +28,7 @@ public class TowerOfWisdom extends Building {
 
     @Override
     public int getCOST() {
-        return 0;
+        return COST;
     }
 
     @Override

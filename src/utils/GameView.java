@@ -12,7 +12,7 @@ import static core.Constants.*;
 public class GameView extends JComponent {
 
     private int cellSize, gridSize;
-    private Board board; //This only counts terrains. Needs to be enhanced with units, resources, etc.
+    private Board board; //This only counts terrains. Needs to be enhanced with actors, resources, etc.
     private Image backgroundImg;
     private InfoView infoView;
 
@@ -49,7 +49,7 @@ public class GameView extends JComponent {
         for(int i = 0; i < gridSize; ++i) {
             for(int j = 0; j < gridSize; ++j) {
 
-                //We paint, in this order: terrain, resources, buildings and units.
+                //We paint, in this order: terrain, resources, buildings and actors.
                 Types.TERRAIN t = board.getTerrainAt(i,j);
                 paintImage(g, i, j, cellSize, (t == null) ? null : t.getImage());
 

@@ -23,9 +23,6 @@ public class Game {
     // Seed for the game state.
     private long seed;
 
-    // Size of the board.
-    private int size;
-
     // List of players of the game
     private Agent[] players;
 
@@ -38,12 +35,10 @@ public class Game {
     /**
      * Constructor of the game
      * @param seed Seed for the game (used only for board generation)
-     * @param size Size of the board.
      */
-    public Game(long seed, int size) {
+    public Game(long seed) {
         this.seed = seed;
-        this.size = size;
-        this.gs = new GameState(seed, size);
+        this.gs = new GameState(seed);
     }
 
 
@@ -55,8 +50,9 @@ public class Game {
      *   Creates the board according to the above information and resets the game so it's ready to start.
      * @param players Players of the game.
      * @param tribes Tribes to play the game with. Players and tribes related by position in array lists.
+     * @param filename Name of the file with the level information.
      */
-    public void init(ArrayList<Agent> players, ArrayList<Tribe> tribes) {
+    public void init(ArrayList<Agent> players, ArrayList<Tribe> tribes, String filename) {
 
         if(players.size() != tribes.size())
         {
@@ -73,40 +69,44 @@ public class Game {
         this.gameStateObservations = new GameState[numPlayers];
         this.gs.assignTribes(tribes);
 
-        resetGame();
+        resetGame(filename);
     }
 
 
     /**
      * Resets the game, providing a seed.
      * @param repeatLevel true if the same level should be played.
+     * @param filename Name of the file with the level information.
      */
-    public void reset(boolean repeatLevel)
+    public void reset(boolean repeatLevel, String filename)
     {
         this.seed = repeatLevel ? seed : System.currentTimeMillis();
-        resetGame();
+        resetGame(filename);
     }
 
     /**
      * Resets the game, providing a seed.
      * @param seed new seed for the game.
+     * @param filename Name of the file with the level information.
      */
-    public void reset(int seed)
+    public void reset(int seed, String filename)
     {
         this.seed = seed;
-        resetGame();
+        resetGame(filename);
     }
-
 
     /**
      * Resets the game, creating the original game state (and level) and assigning the initial
      * game state views that each player will have.
+     * @param filename Name of the file with the level information.
      */
-    private void resetGame()
+    private void resetGame(String filename)
     {
-        this.gs.init();
+        this.gs.init(filename);
         updateAssignedGameStates();
     }
+
+
 
 
     /**
@@ -141,7 +141,7 @@ public class Game {
 
             // Paint game state
             if (VISUALS && frame != null) {
-                frame.paint();
+                frame.paint(getBoard());
                 try {
                     Thread.sleep(FRAME_DELAY);
                 } catch (Exception e) {
@@ -163,7 +163,7 @@ public class Game {
      */
     void tick () {
         if (VERBOSE) {
-            System.out.println("tick: " + gs.getTick());
+            //System.out.println("tick: " + gs.getTick());
         }
 
         Tribe[] tribes = gs.getTribes();
@@ -267,6 +267,16 @@ public class Game {
     private GameState getGameState(int playerIdx) {
         return gs.copy(playerIdx);
     }
+
+    /**
+     * Returns the game board.
+     * @return the game board.
+     */
+    public Board getBoard()
+    {
+        return gs.getBoard();
+    }
+
 
     /**
      * Method to identify the end of the game.

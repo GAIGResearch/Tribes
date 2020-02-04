@@ -13,6 +13,7 @@ public class Board {
     private Types.RESOURCE[][] resources;
     
     // Array for units each tile of the board will have
+    // TODO: We need to know which tribe these units belong to.
     private Types.UNIT[][] units;
 
     // Array for buildings each tile of the board will have
@@ -42,22 +43,22 @@ public class Board {
 
         for (int x = 0; x<this.size; x++){
             for(int y = 0; y<this.size; y++){
-                Types.TERRAIN t = checkTerrain(x,y);
-                Types.UNIT u = checkUnit(x,y);
-                Types.RESOURCE r = checkResource(x,y);
-                Types.BUILDING b = checkBuilding(x,y);
+//                Types.TERRAIN t = checkTerrain(x,y);
+//                Types.UNIT u = checkUnit(x,y);
+//                Types.RESOURCE r = checkResource(x,y);
+//                Types.BUILDING b = checkBuilding(x,y);
                 City c = getCityAt(x,y);
-                copyBoard.setTerrainAt(x,y,t);
-                copyBoard.setUnitAt(x,y,u);
-                copyBoard.setResourceAt(x,y,r);
-                copyBoard.setBuildingAt(x,y,b);
+                copyBoard.setTerrainAt(x,y,terrains[x][y]);
+                copyBoard.setUnitAt(x,y,units[x][y]);
+                copyBoard.setResourceAt(x,y,resources[x][y]);
+                copyBoard.setBuildingAt(x,y,buildings[x][y]);
                 // todo Will copy over city later but need a city copy method in city class
                 //if(c !=null)
                  //   copyBoard.setCityAt(x,y,c.copy());
             }
         }
 
-        return new Board(this.size);
+        return copyBoard;
     }
 
     // Get size of board
@@ -116,6 +117,11 @@ public class Board {
     // Get Resource at pos x,y
     public Types.RESOURCE getResourceAt(int x, int y){
         return resources[x][y];
+    }
+
+    // Get Resource at pos x,y
+    public Types.BUILDING getBuildingAt(int x, int y){
+        return buildings[x][y];
     }
 
     public City getCityAt(int x, int y){
@@ -187,10 +193,10 @@ public class Board {
                 return Types.TERRAIN.DEEP_WATER;
             case CITY:
                 return Types.TERRAIN.CITY;
-            case RUINS:
-                return Types.TERRAIN.RUINS;
             case MOUNTAIN:
                 return Types.TERRAIN.MOUNTAIN;
+            case FOREST:
+                return Types.TERRAIN.FOREST;
         }
         return Types.TERRAIN.PLAIN;
     }
@@ -203,9 +209,7 @@ public class Board {
                 return Types.RESOURCE.FISH;
             case FRUIT:
                 return Types.RESOURCE.FRUIT;
-            case FOREST:
-                return Types.RESOURCE.FOREST;
-            case  ANIMAL:
+            case ANIMAL:
                 return Types.RESOURCE.ANIMAL;
             case WHALES:
                 return Types.RESOURCE.WHALES;
@@ -213,6 +217,8 @@ public class Board {
                 return Types.RESOURCE.ORE;
             case CROPS:
                 return Types.RESOURCE.CROPS;
+            case RUINS:
+                return Types.RESOURCE.RUINS;
         }
         return r;
     }
@@ -237,6 +243,8 @@ public class Board {
                 return Types.BUILDING.ROAD;
             case CUSTOM_HOUSE:
                 return Types.BUILDING.CUSTOM_HOUSE;
+            case LUMBER_HUT:
+                return Types.BUILDING.LUMBER_HUT;
             case SAWMILL:
                 return Types.BUILDING.SAWMILL;
             case WATER_TEMPLE:

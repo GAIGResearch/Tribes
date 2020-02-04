@@ -14,9 +14,6 @@ public class GameState {
     // Seed for the game state.
     private long seed;
 
-    // Size of the board.
-    private int size;
-
     // Current tick of the game.
     private int tick = 0;
 
@@ -26,21 +23,20 @@ public class GameState {
     }
 
     //Another constructor.
-    public GameState(long seed, int size) {
+    public GameState(long seed) {
         this.seed = seed;
-        this.size = size;
-        this.model = new ForwardModel(size);
+        this.model = new ForwardModel();
     }
 
     /**
      * Initializes the ForwardModel in the GameState. If the model is null, it creates a new one.
      * The level is only generated when this initialization method is called.
      */
-    void init() {
+    void init(String filename) {
         if (model == null) {
-            model = new ForwardModel(size);
+            model = new ForwardModel();
         }
-        this.model.init(seed, size);
+        this.model.init(seed, filename);
     }
 
     /**
@@ -112,6 +108,14 @@ public class GameState {
         return copy(-1);  // No reduction happening if no index specified
     }
 
+    /**
+     * Returns the game board.
+     * @return the game board.
+     */
+    public Board getBoard()
+    {
+        return model.getBoard();
+    }
 
     /**
      * Creates a deep copy of this game state, given player index. Sets up the game state so that it contains
@@ -125,7 +129,7 @@ public class GameState {
         // It must call model.copy() to copy the model
 
         // (this code below is incomplete)
-        GameState copy = new GameState(seed, size);
+        GameState copy = new GameState(seed);
         copy.model = model.copy(playerIdx);
 
         return copy;

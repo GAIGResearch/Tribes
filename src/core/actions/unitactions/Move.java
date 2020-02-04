@@ -1,5 +1,6 @@
 package core.actions.unitactions;
 
+import core.game.GameState;
 import core.units.Unit;
 
 public class Move extends UnitAction
@@ -20,5 +21,15 @@ public class Move extends UnitAction
 
     public int getDestY() {
         return destY;
+    }
+
+    @Override
+    public boolean isFeasible(GameState gs) {
+        return false;
+    }
+
+    @Override
+    public void execute(GameState gs) {
+
     }
 }

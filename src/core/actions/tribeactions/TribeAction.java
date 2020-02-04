@@ -1,4 +1,6 @@
 package core.actions.tribeactions;
 
-public abstract class TribeAction {
+import core.actions.Action;
+
+public abstract class TribeAction extends Action {
 }

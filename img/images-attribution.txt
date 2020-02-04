@@ -38,4 +38,6 @@ Archer - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
 Catapult - http://remusprites.carbonmade.com
 Knight - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
 Mind_bearer - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
-
+Boat - https://www.pngguru.com/free-transparent-background-png-clipart-kbwpr
+Ship - https://www.pngguru.com/free-transparent-background-png-clipart-ektio
+Battleship - https://www.pngguru.com/free-transparent-background-png-clipart-zihrn

@@ -131,7 +131,11 @@ public class Types {
         ARCHER (4,"img/unit/archer/"),
         CATAPULT (5,"img/unit//"),
         KNIGHT (6,"img/unit/knight/"),
-        MIND_BEARER (7,"img/unit/mind_bearer/");
+        MIND_BEARER (7,"img/unit/mind_bearer/"),
+        BOAT(8,"img/unit/boat/"),
+        SHIP(9,"img/unit/ship/"),
+        BATTLESHIP(10,"img/unit/battleship/");
+
 
         private int key;
         private String imageFile;

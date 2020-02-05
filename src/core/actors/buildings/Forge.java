@@ -1,45 +1,29 @@
 package core.actors.buildings;
 
+import core.TribesConfig;
 import core.Types;
 
 public class Forge extends Building {
 
-    private final Types.BUILDING TYPE = Types.BUILDING.FORGE;
-    private final int COST = 5;
-    private int production;
     private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.PLAIN;
 
+    // Building Purpose -> The production will set up inside the addBuilding in City
     public Forge(int x, int y) {
-        super(x, y);
+        super(x, y, TribesConfig.FORGE_COST, Types.BUILDING.FORGE, 0);
     }
 
+    // Copy Purpose
     public Forge(int x, int y, int production) {
-        super(x, y);
-        this.production = production;
+        super(x, y, TribesConfig.FORGE_COST, Types.BUILDING.FORGE, production);
     }
 
     public void setProduction(int production) {
-        this.production = production*2;
+        super.setProduction(production*2);
     }
 
     @Override
     public Building copy() {
-        return new Forge(getX(), getY(), this.production);
-    }
-
-    @Override
-    public Types.BUILDING getTYPE() {
-        return TYPE;
-    }
-
-    @Override
-    public int getCOST() {
-        return COST;
-    }
-
-    @Override
-    public int getPRODUCTION() {
-        return production;
+        return new Forge(getX(), getY(), getPRODUCTION());
     }
 
     @Override

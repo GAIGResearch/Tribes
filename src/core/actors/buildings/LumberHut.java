@@ -1,34 +1,25 @@
 package core.actors.buildings;
 
+import core.TribesConfig;
 import core.Types;
 
 public class LumberHut extends Building{
 
-    private final Types.BUILDING TYPE = Types.BUILDING.LUMBER_HUT;
-    private final int COST = 2;
-    private final int PRODUCTION = 1;
-    // TODO: It needs to check if the resource is field tile or not
     private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.FOREST;
 
-
     public LumberHut(int x, int y) {
-        super(x, y);
+        super(x, y, TribesConfig.LUMBER_HUT_COST, Types.BUILDING.LUMBER_HUT, TribesConfig.LUMBER_HUT_PRODUCTION);
     }
 
-    public Types.BUILDING getTYPE() {
-        return TYPE;
-    }
-
-    public int getCOST() {
-        return COST;
-    }
-
-    public int getPRODUCTION() {
-        return PRODUCTION;
-    }
-
+    @Override
     public Types.TERRAIN getTERRAIN_CONSTRAINT() {
         return TERRAIN_CONSTRAINT;
+    }
+
+    // This type of building has no setProduction Ability
+    @Override
+    public void setProduction(int production) {
+
     }
 
     @Override

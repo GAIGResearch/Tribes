@@ -1,45 +1,30 @@
 package core.actors.buildings;
 
+import core.TribesConfig;
 import core.Types;
 
 public class CustomHouse extends Building {
 
-    private final Types.BUILDING TYPE = Types.BUILDING.CUSTOM_HOUSE;
-    private final int COST = 5;
-    private int production;
     private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.PLAIN;
 
+    // Building Purpose -> The production will set up inside the addBuilding in City
     public CustomHouse(int x, int y) {
-        super(x, y);
+        super(x, y, TribesConfig.CUSTOM_COST, Types.BUILDING.CUSTOM_HOUSE, 0);
     }
 
+    // Copy Purpose
     public CustomHouse(int x, int y, int production) {
-        super(x, y);
-        this.production = production;
+        super(x, y, TribesConfig.CUSTOM_COST, Types.BUILDING.CUSTOM_HOUSE, production);
     }
 
+    @Override
     public void setProduction(int production) {
-        this.production = production*2;
+        super.setProduction(production);
     }
 
     @Override
     public Building copy() {
-        return new CustomHouse(getX(), getY(), this.production);
-    }
-
-    @Override
-    public Types.BUILDING getTYPE() {
-        return TYPE;
-    }
-
-    @Override
-    public int getCOST() {
-        return COST;
-    }
-
-    @Override
-    public int getPRODUCTION() {
-        return production;
+        return new CustomHouse(getX(), getY(), getPRODUCTION());
     }
 
     @Override

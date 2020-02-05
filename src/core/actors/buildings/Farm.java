@@ -1,33 +1,25 @@
 package core.actors.buildings;
 
+import core.TribesConfig;
 import core.Types;
 
 public class Farm extends Building{
 
-    private final Types.BUILDING TYPE = Types.BUILDING.FARM;
-    private final int COST = 5;
-    private final int PRODUCTION = 2;
-    // TODO: It needs to check if the resource is field tile or not
     private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.PLAIN;
     private final Types.RESOURCE RESOURCE_CONSTRAINT = Types.RESOURCE.CROPS;
 
 
     public Farm(int x, int y) {
-        super(x, y);
+        super(x, y, TribesConfig.FARM_COST, Types.BUILDING.FARM, TribesConfig.FARM_PRODUCTION);
     }
 
-    public Types.BUILDING getTYPE() {
-        return TYPE;
+    // This type of building has no setProduction Ability
+    @Override
+    public void setProduction(int production) {
+
     }
 
-    public int getCOST() {
-        return COST;
-    }
-
-    public int getPRODUCTION() {
-        return PRODUCTION;
-    }
-
+    @Override
     public Types.TERRAIN getTERRAIN_CONSTRAINT() {
         return TERRAIN_CONSTRAINT;
     }

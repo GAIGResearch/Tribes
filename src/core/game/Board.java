@@ -1,6 +1,7 @@
 package core.game;
 
 import core.Types;
+import core.actions.cityactions.Build;
 import core.units.*;
 
 public class Board {
@@ -16,13 +17,15 @@ public class Board {
     private Unit[][] units;
 
     // Array for buildings each tile of the board will have
-    private Types.BUILDING[][] buildings;
+    private Building[][] buildings;
 
     // Array for cities
     private City[][] cities;
 
+    // Array for tribes
     private Tribe [] tribes;
 
+    // Array for id of each tile
     private int[][] id;
 
 
@@ -35,10 +38,19 @@ public class Board {
         terrains = new Types.TERRAIN[size][size];
         resources = new Types.RESOURCE[size][size];
         units = new Unit[size][size];
-        buildings = new Types.BUILDING[size][size];
+        buildings = new Building[size][size];
         cities = new City[size][size];
         this.size = size;
         this.tribes = new Tribe[4];
+        this.id = new int[size][size];
+
+        //Initialise tile IDs
+        for (int x = 0; x<size; x++){
+            for(int y =0; y<size; y++){
+                id[x][y] = -1;
+            }
+        }
+
     }
 
     // Return deep copy of board
@@ -50,13 +62,13 @@ public class Board {
                 Types.TERRAIN t = checkTerrain(x,y);
                 Unit u = checkUnit(x,y);
                 Types.RESOURCE r = checkResource(x,y);
-                Types.BUILDING b = checkBuilding(x,y);
+                Building b = checkBuilding(x,y);
                 City c = getCityAt(x,y);
                 copyBoard.setTerrainAt(x,y,terrains[x][y]);
                 copyBoard.setUnitAt(x,y,u);
                 copyBoard.setResourceAt(x,y,resources[x][y]);
                 copyBoard.setBuildingAt(x,y,buildings[x][y]);
-                // todo Will copy over city later but need a city copy method in city class
+                // TODO: Will copy over city later but need a city copy method in city class
                 //if(c !=null)
                  //   copyBoard.setCityAt(x,y,c.copy());
             }
@@ -110,7 +122,7 @@ public class Board {
     }
 
     // Set Building at pos x,y
-    public void setBuildingAt(int x, int y, Types.BUILDING b){
+    public void setBuildingAt(int x, int y, Building b){
         buildings[x][y] = b;
     }
 
@@ -124,7 +136,7 @@ public class Board {
     }
 
     // Get Resource at pos x,y
-    public Types.BUILDING getBuildingAt(int x, int y){
+    public Building getBuildingAt(int x, int y){
         return buildings[x][y];
     }
 
@@ -228,50 +240,50 @@ public class Board {
         return r;
     }
 
-    // Helper method to check which Building at which tile for deep copying unit array
-    Types.BUILDING checkBuilding(int x, int y){
-        Types.BUILDING b = null;
-        switch (buildings[x][y]){
+    // Helper method to check which Building at which tile for deep copying building array
+    Building checkBuilding(int x, int y){
+        Building b = getBuildingAt(x,y);
+        switch (b.getTYPE()){
             case TEMPLE:
-                return Types.BUILDING.TEMPLE;
+                return new Temple(x,y);
             case  PORT:
-                return Types.BUILDING.PORT;
+                return new Port(x,y);
             case MINE:
-                return Types.BUILDING.MINE;
+                return new Mine(x,y);
             case  FORGE:
-                return Types.BUILDING.FORGE;
+                return new Forge(x,y);
             case FARM:
-                return Types.BUILDING.FARM;
+                return new Farm(x,y);
             case WINDMILL:
-                return Types.BUILDING.WINDMILL;
+                return new Windmill(x,y);
             case ROAD:
-                return Types.BUILDING.ROAD;
+                return null;
             case CUSTOM_HOUSE:
-                return Types.BUILDING.CUSTOM_HOUSE;
+                return new CustomHouse(x,y);
             case LUMBER_HUT:
-                return Types.BUILDING.LUMBER_HUT;
+                return new LumberHut(x,y);
             case SAWMILL:
-                return Types.BUILDING.SAWMILL;
+                return new Sawmill(x,y);
             case WATER_TEMPLE:
-                return Types.BUILDING.WATER_TEMPLE;
+                return new WaterTemple(x,y);
             case FOREST_TEMPLE:
-                return Types.BUILDING.FOREST_TEMPLE;
+                return new ForestTemple(x,y);
             case MOUNTAIN_TEMPLE:
-                return Types.BUILDING.MOUNTAIN_TEMPLE;
-            case ALTAR_OF_PEACE:
-                return Types.BUILDING.ALTAR_OF_PEACE;
+                return new MountainTemple(x,y);
+            case ALTAR_OF_PEACE: //TODO: Need Altar of Peace class
+                return null;
             case EMPERORS_TOMB:
-                return Types.BUILDING.EMPERORS_TOMB;
-            case EYE_OF_GOD:
-                return Types.BUILDING.EYE_OF_GOD;
+                return new EmperorTomb(x,y);
+            case EYE_OF_GOD: //TODO: Need Eye of God class
+                return null;
             case GATE_OF_POWER:
-                return Types.BUILDING.GATE_OF_POWER;
+                return new GateOfPower(x,y);
             case GRAND_BAZAR:
-                return Types.BUILDING.GRAND_BAZAR;
+                return new GrandBazaar(x,y);
             case PARK_OF_FORTUNE:
-                return Types.BUILDING.PARK_OF_FORTUNE;
+                return new ParkOfFortune(x,y);
             case TOWER_OF_WISDOM:
-                return Types.BUILDING.TOWER_OF_WISDOM;
+                return new TowerOfWisdom(x,y);
         }
         return b;
     }

@@ -1,7 +1,7 @@
 package core.actions.unitactions;
 
 import core.game.GameState;
-import core.units.Unit;
+import core.actors.units.Unit;
 
 public class Recover extends UnitAction
 {

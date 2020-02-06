@@ -2,10 +2,12 @@ package core.actors.units;
 
 import utils.Vector2d;
 
+import static core.TribesConfig.*;
+
 public class Knight extends Unit
 {
     public Knight(Vector2d pos, int kills, boolean isVeteran, int ownerID) {
-        super(4, 1, 3, 15, 1, 8, pos, kills, isVeteran, ownerID);
+        super(KNIGHT_ATTACK, KNIGHT_DEFENCE, KNIGHT_MOVEMENT, KNIGHT_MAX_HP, KNIGHT_RANGE, KNIGHT_COST, pos, kills, isVeteran, ownerID);
     }
 
     @Override

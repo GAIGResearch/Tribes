@@ -12,11 +12,61 @@ public class TribesConfig
     public static int WARRIOR_RANGE = 1;
     public static int WARRIOR_COST = 2;
 
-    //Archer ...
+    //Archer
+    public static int ARCHER_ATTACK = 2;
+    public static int ARCHER_DEFENCE = 1;
+    public static int ARCHER_MOVEMENT = 1;
+    public static int ARCHER_MAX_HP = 10;
+    public static int ARCHER_RANGE = 2;
+    public static int ARCHER_COST = 3;
 
+    //Catapult
+    public static int CATAPULT_ATTACK = 4;
+    public static int CATAPULT_DEFENCE = 0;
+    public static int CATAPULT_MOVEMENT = 1;
+    public static int CATAPULT_MAX_HP = 10;
+    public static int CATAPULT_RANGE = 3;
+    public static int CATAPULT_COST = 8;
 
+    //Swordman
+    public static int SWORDMAN_ATTACK = 3;
+    public static int SWORDMAN_DEFENCE = 3;
+    public static int SWORDMAN_MOVEMENT = 1;
+    public static int SWORDMAN_MAX_HP = 15;
+    public static int SWORDMAN_RANGE = 1;
+    public static int SWORDMAN_COST = 5;
 
+    //MindBender
+    public static int MINDBENDER_ATTACK = 0;
+    public static int MINDBENDER_DEFENCE = 1;
+    public static int MINDBENDER_MOVEMENT = 1;
+    public static int MINDBENDER_MAX_HP = 10;
+    public static int MINDBENDER_RANGE = 1;
+    public static int MINDBENDER_COST = 5;
 
+    //Defender
+    public static int DEFENDER_ATTACK = 1;
+    public static int DEFENDER_DEFENCE = 3;
+    public static int DEFENDER_MOVEMENT = 1;
+    public static int DEFENDER_MAX_HP = 15;
+    public static int DEFENDER_RANGE = 1;
+    public static int DEFENDER_COST = 3;
+
+    //Knight
+    public static int KNIGHT_ATTACK = 4;
+    public static int KNIGHT_DEFENCE = 1;
+    public static int KNIGHT_MOVEMENT = 3;
+    public static int KNIGHT_MAX_HP = 15;
+    public static int KNIGHT_RANGE = 1;
+    public static int KNIGHT_COST = 8;
+
+    //Rider
+    public static int RIDER_ATTACK = 2;
+    public static int RIDER_DEFENCE = 1;
+    public static int RIDER_MOVEMENT = 2;
+    public static int RIDER_MAX_HP = 10;
+    public static int RIDER_RANGE = 1;
+    public static int RIDER_COST = 3;
 
     /* BUILDINGS */
 

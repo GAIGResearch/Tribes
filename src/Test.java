@@ -15,7 +15,7 @@ public class Test {
 
         KeyController ki = new KeyController(true);
         long seed = System.currentTimeMillis();
-        String filename = "SampleLevel.csv";
+        String filename = "SampleLevel2p.csv";
 
         Game game = new Game(seed);
         ArrayList<Agent> players = new ArrayList<>();

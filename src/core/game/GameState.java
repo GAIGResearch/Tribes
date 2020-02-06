@@ -143,4 +143,15 @@ public class GameState {
         return model.getTribes();
     }
 
+
+    /**
+     * Gets the tribe tribeID playing this game.
+     * @param tribeID ID of the tribe to pick
+     * @return the tribe with the ID requested
+     */
+    public Tribe getTribe(int tribeID)
+    {
+        return getTribes()[tribeID];
+    }
+
 }

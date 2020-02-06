@@ -1,7 +1,8 @@
 package core.actions.cityactions;
 
 import core.Types;
-import core.actors.City;
+import core.game.GameState;
+import core.units.City;
 
 public class Build extends CityAction
 {
@@ -27,5 +28,15 @@ public class Build extends CityAction
 
     public int getTargetY() {
         return this.targetY;
+    }
+
+    @Override
+    public boolean isFeasible(GameState gs) {
+        return false;
+    }
+
+    @Override
+    public void execute(GameState gs) {
+
     }
 }

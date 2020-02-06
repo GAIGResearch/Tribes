@@ -1,6 +1,7 @@
 package core.actions.unitactions;
 
-import core.actors.units.Unit;
+import core.game.GameState;
+import core.units.Unit;
 
 public class Convert extends UnitAction
 {
@@ -14,5 +15,15 @@ public class Convert extends UnitAction
 
     public Unit getTarget() {
         return target;
+    }
+
+    @Override
+    public boolean isFeasible(GameState gs) {
+        return false;
+    }
+
+    @Override
+    public void execute(GameState gs) {
+
     }
 }

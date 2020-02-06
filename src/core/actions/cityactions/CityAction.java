@@ -3,7 +3,7 @@ package core.actions.cityactions;
 import core.actions.Action;
 import core.actors.City;
 
-public class CityAction extends Action {
+public abstract class CityAction extends Action {
 
     protected City city;
 

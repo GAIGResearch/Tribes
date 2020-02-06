@@ -1,7 +1,8 @@
 package core.actions.unitactions;
 
-import core.actors.City;
-import core.actors.units.Unit;
+import core.game.GameState;
+import core.units.City;
+import core.units.Unit;
 
 public class Capture extends UnitAction
 {
@@ -15,5 +16,15 @@ public class Capture extends UnitAction
 
     public City getTarget() {
         return target;
+    }
+
+    @Override
+    public boolean isFeasible(GameState gs) {
+        return false;
+    }
+
+    @Override
+    public void execute(GameState gs) {
+
     }
 }

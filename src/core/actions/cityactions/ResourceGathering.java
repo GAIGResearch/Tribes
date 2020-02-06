@@ -1,7 +1,8 @@
 package core.actions.cityactions;
 
 import core.Types;
-import core.actors.City;
+import core.game.GameState;
+import core.units.City;
 
 public class ResourceGathering extends CityAction
 {
@@ -16,5 +17,15 @@ public class ResourceGathering extends CityAction
 
     public Types.RESOURCE getResource() {
         return resource;
+    }
+
+    @Override
+    public boolean isFeasible(GameState gs) {
+        return false;
+    }
+
+    @Override
+    public void execute(GameState gs) {
+
     }
 }

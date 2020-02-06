@@ -1,6 +1,7 @@
-package core.units;
+package core.actors;
 
 import core.Types;
+import core.actors.buildings.Building;
 
 import java.util.LinkedList;
 
@@ -72,17 +73,18 @@ public class City extends Actor{
         }else if (building.getTYPE().equals(Types.BUILDING.FARM) || building.getTYPE().equals(Types.BUILDING.LUMBER_HUT)
                 || building.getTYPE().equals(Types.BUILDING.MINE) || building.getTYPE().equals(Types.BUILDING.PORT)){
             changeProduction(building);
-        }else if (building.getTYPE().equals(Types.BUILDING.TEMPLE) || building.getTYPE().equals(Types.BUILDING.WATER_TEMPLE)
-                || building.getTYPE().equals(Types.BUILDING.MOUNTAIN_TEMPLE) || building.getTYPE().equals(Types.BUILDING.FOREST_TEMPLE)){
+        }else if (building.getTYPE().equals(Types.BUILDING.TEMPLE) || building.getTYPE().equals(Types.BUILDING.WATER_TEMPLE)){
             addLongTimePoints(building.getPoints());
         }else{
             addPoints(building.getPoints());
         }
+
         if (building.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
             addExtraStar(building.getPRODUCTION());
         }else {
             addPopulation(building.getPRODUCTION());
         }
+
         buildings.add(building);
     }
 

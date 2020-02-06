@@ -1,5 +1,5 @@
 import core.game.Game;
-import core.units.Tribe;
+import core.actors.Tribe;
 import players.Agent;
 import players.DoNothingAgent;
 import players.KeyController;

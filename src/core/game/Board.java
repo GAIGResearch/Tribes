@@ -1,8 +1,7 @@
 package core.game;
 
 import core.Types;
-import core.units.City;
-import core.units.Unit;
+import core.actors.City;
 
 public class Board {
 
@@ -12,8 +11,8 @@ public class Board {
     // Array for resource each tile of the board will have
     private Types.RESOURCE[][] resources;
     
-    // Array for units each tile of the board will have
-    // TODO: We need to know which tribe these units belong to.
+    // Array for actors each tile of the board will have
+    // TODO: We need to know which tribe these actors belong to.
     private Types.UNIT[][] units;
 
     // Array for buildings each tile of the board will have
@@ -71,7 +70,7 @@ public class Board {
         return this.terrains;
     }
 
-    // Get units array
+    // Get actors array
     public Types.UNIT[][] getUnits(){
         return this.units;
     }
@@ -137,7 +136,7 @@ public class Board {
             return;
         }
 
-        // Loop through old units array and update new units array with new position
+        // Loop through old actors array and update new actors array with new position
         for(int i =0; i<units.length; i++){
             for(int j =0; x<units.length; x++){
                 if((i !=x && j!=y) && (i != x+direction.x() && j != y+direction.y())){
@@ -151,7 +150,7 @@ public class Board {
             }
         }
 
-        // Update units array
+        // Update actors array
         units = newUnits;
 
     }
@@ -271,7 +270,7 @@ public class Board {
         return b;
     }
 
-    // Setter method for units array
+    // Setter method for actors array
     public void setUnits(Types.UNIT[][] u){
         this.units = u;
     }

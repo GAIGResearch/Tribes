@@ -1,11 +1,13 @@
-package core.units;
+package core.actors.units;
 
 import utils.Vector2d;
+
+import static core.TribesConfig.*;
 
 public class Archer extends Unit
 {
     public Archer(Vector2d pos, int kills, boolean isVeteran, int ownerID) {
-        super(2, 1, 1, 10, 2, 3, pos, kills, isVeteran, ownerID);
+        super(ARCHER_ATTACK, ARCHER_DEFENCE, ARCHER_MOVEMENT, ARCHER_MAX_HP, ARCHER_RANGE, ARCHER_COST, pos, kills, isVeteran, ownerID);
     }
 
     @Override

@@ -1,28 +1,20 @@
-package core.units;
+package core.actors.buildings;
 
+import core.TribesConfig;
 import core.Types;
 
 public class Port extends Building {
 
-    private final Types.BUILDING TYPE = Types.BUILDING.PORT;
-    private final int COST = 10;
-    private final int PRODUCTION = 2;
     private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.SHALLOW_WATER;
 
     public Port(int x, int y) {
-        super(x, y);
+        super(x, y, TribesConfig.PORT_COST, Types.BUILDING.PORT, TribesConfig.PORT_PRODUCTION);
     }
 
-    public Types.BUILDING getTYPE() {
-        return TYPE;
-    }
+    // This type of building has no setProduction Ability
+    @Override
+    public void setProduction(int production) {
 
-    public int getCOST() {
-        return COST;
-    }
-
-    public int getPRODUCTION() {
-        return PRODUCTION;
     }
 
     @Override
@@ -30,6 +22,7 @@ public class Port extends Building {
         return TERRAIN_CONSTRAINT;
     }
 
+    @Override
     public Port copy(){
         return new Port(getX(), getY());
     }

@@ -1,8 +1,8 @@
 package core.actions.unitactions;
 
 import core.game.GameState;
-import core.units.City;
-import core.units.Unit;
+import core.actors.City;
+import core.actors.units.Unit;
 
 public class Examine extends UnitAction
 {

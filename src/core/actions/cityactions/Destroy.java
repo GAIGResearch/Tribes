@@ -1,7 +1,7 @@
 package core.actions.cityactions;
 
 import core.game.GameState;
-import core.units.City;
+import core.actors.City;
 
 public class Destroy extends CityAction
 {

@@ -1,7 +1,10 @@
 package core.actions.unitactions;
 
+import core.actions.Action;
 import core.game.GameState;
 import core.actors.units.Unit;
+
+import java.util.LinkedList;
 
 public class MakeVeteran extends UnitAction
 {
@@ -11,12 +14,20 @@ public class MakeVeteran extends UnitAction
     }
 
     @Override
-    public boolean isFeasible(GameState gs) {
+    public LinkedList<Action> computeActionVariants(final GameState gs) {
+        //TODO: compute MakeVeteran actions
+        return null;
+    }
+
+    @Override
+    public boolean isFeasible(final GameState gs) {
+        //TODO: is feasible this MakeVeteran action
         return false;
     }
 
     @Override
-    public void execute(GameState gs) {
-
+    public boolean execute(GameState gs) {
+        //TODO: execute MakeVeteran action
+        return false;
     }
 }

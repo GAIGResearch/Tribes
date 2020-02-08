@@ -1,7 +1,10 @@
 package core.actions.unitactions;
 
+import core.actions.Action;
 import core.game.GameState;
 import core.actors.units.Unit;
+
+import java.util.LinkedList;
 
 public class Convert extends UnitAction
 {
@@ -10,20 +13,28 @@ public class Convert extends UnitAction
     public Convert(Unit attacker, Unit target)
     {
         super.unit = attacker;
-        this.target = target;
     }
 
+    public void setTarget(Unit target) {this.target = target;}
     public Unit getTarget() {
         return target;
     }
 
     @Override
-    public boolean isFeasible(GameState gs) {
+    public LinkedList<Action> computeActionVariants(final GameState gs) {
+        //TODO: compute all the Convert actions that are possible
+        return null;
+    }
+
+    @Override
+    public boolean isFeasible(final GameState gs) {
+        //TODO: check if this Convert action is possible.
         return false;
     }
 
     @Override
-    public void execute(GameState gs) {
-
+    public boolean execute(GameState gs) {
+        //TODO execute the Convert action
+        return false;
     }
 }

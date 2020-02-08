@@ -5,7 +5,6 @@ import core.game.Board;
 
 public abstract class Building {
 
-
     private int x;
     private int y;
     private int cost;

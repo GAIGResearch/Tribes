@@ -1,30 +1,47 @@
 package core.actions.unitactions;
 
+import core.actions.Action;
 import core.game.GameState;
 import core.actors.City;
 import core.actors.units.Unit;
 
+import java.util.LinkedList;
+
 public class Examine extends UnitAction
 {
-    private City target; // This can be a city or a village.
+    //Location of the ruins to examine.
+    private int ruinsX;
+    private int ruinsY;
 
-    public Examine(Unit invader, City target)
+    public Examine(Unit invader)
     {
         super.unit = invader;
-        this.target = target;
     }
 
-    public City getTarget() {
-        return target;
+    public void setRuinsLoc(int x, int y) {this.ruinsX = x; this.ruinsY = y;}
+    public int geRuinsX() {
+        return ruinsX;
+    }
+    public int getRuinsY() {
+        return ruinsY;
     }
 
     @Override
-    public boolean isFeasible(GameState gs) {
+    public LinkedList<Action> computeActionVariants(final GameState gs) {
+        //TODO: compute all the Examine actions.
+        return null;
+    }
+
+    @Override
+    public boolean isFeasible(final GameState gs)
+    {
+        //TODO: check if this action is feasible.
         return false;
     }
 
     @Override
-    public void execute(GameState gs) {
-
+    public boolean execute(GameState gs) {
+        //TODO: Execute Examine action
+        return false;
     }
 }

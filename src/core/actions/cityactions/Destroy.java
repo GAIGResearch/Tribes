@@ -1,35 +1,35 @@
 package core.actions.cityactions;
 
+import core.actions.Action;
 import core.game.GameState;
 import core.actors.City;
 
+import java.util.LinkedList;
+
 public class Destroy extends CityAction
 {
-    private int targetX;
-    private int targetY;
 
-    public Destroy(City c, int targetX, int targetY)
+    public Destroy(City c)
     {
         super.city = c;
-        this.targetX = targetX;
-        this.targetY = targetY;
-    }
-
-    public int getTargetX() {
-        return this.targetX;
-    }
-
-    public int getTargetY() {
-        return this.targetY;
     }
 
     @Override
-    public boolean isFeasible(GameState gs) {
+    public LinkedList<Action> computeActionVariants(final GameState gs) {
+        //TODO Compute Destroy
+        return null;
+    }
+
+    @Override
+    public boolean isFeasible(final GameState gs)
+    {
+        //TODO: is Feasible Destroy
         return false;
     }
 
     @Override
-    public void execute(GameState gs) {
-
+    public boolean execute(GameState gs) {
+        //TODO: execute destroy.
+        return false;
     }
 }

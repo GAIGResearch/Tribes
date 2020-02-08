@@ -1,5 +1,7 @@
 package core.actors;
 
+import core.TechnologyTree;
+import core.TribesConfig;
 import core.Types;
 
 import java.util.LinkedList;
@@ -8,17 +10,36 @@ public class Tribe extends Actor{
 
     private Types.RESULT winner = Types.RESULT.INCOMPLETE;
     private int score = 0;
-    private LinkedList<Integer> citiesID = new LinkedList<>();
+    private LinkedList<Integer> citiesID;
     private Types.TRIBE tribe;
+    private int stars; //TODO: compute this amount at the beginning of each turn.
+    private TechnologyTree techTree;
+
 
     //ID of this tribe. It corresponds with the ID of the player who controls it.
     private int tribeID;
+
+    public Tribe(Types.TRIBE tribe)
+    {
+        this.tribe = tribe;
+        init();
+    }
 
     public Tribe(int tribeID, int cityID, Types.TRIBE tribe) {
         this.tribeID = tribeID;
         citiesID.add(cityID);
         this.tribe = tribe;
+        init();
     }
+
+    private void init()
+    {
+        techTree = new TechnologyTree();
+        techTree.doResearch(tribe.getInitialTech());
+        citiesID = new LinkedList<>();
+        stars = TribesConfig.INITIAL_STARS;
+    }
+
 
     public void addCity(int id) {
         citiesID.add(id);
@@ -33,6 +54,9 @@ public class Tribe extends Actor{
         }
         System.out.println("Error!! city ID "+ id +" does not belong to this tribe");
     }
+
+    public void setTechTree(TechnologyTree techTree) {this.techTree = techTree;}
+    public TechnologyTree getTechTree() {return techTree;}
 
     public Types.TECHNOLOGY getInitialTechnology(){
         return tribe.getInitialTech();
@@ -65,5 +89,11 @@ public class Tribe extends Actor{
         return tribeID;
     }
 
+    public int getStars() {
+        return stars;
+    }
 
+    public void setStars(int stars) {
+        this.stars = stars;
+    }
 }

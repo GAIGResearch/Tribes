@@ -48,8 +48,8 @@ public class Types {
     public enum TRIBE{
         XIN_XI(0, "Xin-Xi", TECHNOLOGY.CLIMBING),
         IMPERIUS(1, "Imperius", TECHNOLOGY.ORGANIZATION),
-        BARDUR(0, "Bardur", TECHNOLOGY.HUNTING),
-        OUMAJI(0, "Oumaji", TECHNOLOGY.RIDING);
+        BARDUR(2, "Bardur", TECHNOLOGY.HUNTING),
+        OUMAJI(3, "Oumaji", TECHNOLOGY.RIDING);
 
         private int key;
         private String name;

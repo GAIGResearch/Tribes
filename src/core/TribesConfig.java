@@ -68,6 +68,27 @@ public class TribesConfig
     public static int RIDER_RANGE = 1;
     public static int RIDER_COST = 3;
 
+    // Boat
+    public static int BOAT_ATTACK = 1;
+    public static int BOAT_DEFENCE = 1;
+    public static int BOAT_MOVEMENT = 2;
+    public static int BOAT_RANGE = 2;
+    public static int BOAT_COST = 0;
+
+    // Ship
+    public static int SHIP_ATTACK = 2;
+    public static int SHIP_DEFENCE = 2;
+    public static int SHIP_MOVEMENT = 3;
+    public static int SHIP_RANGE = 2;
+    public static int SHIP_COST = 5;
+
+    // Battleship
+    public static int BATTLESHIP_ATTACK = 4;
+    public static int BATTLESHIP_DEFENCE = 3;
+    public static int BATTLESHIP_MOVEMENT = 3;
+    public static int BATTLESHIP_RANGE = 2;
+    public static int BATTLESHIP_COST = 15;
+
     /* BUILDINGS */
 
     // Farm

@@ -12,6 +12,8 @@ public class Archer extends Unit
 
     @Override
     public Archer copy() {
-        return new Archer(getCurrentPosition(), getKills(), isVeteran(), getOwnerID());
+        Archer c = new Archer(getCurrentPosition(), getKills(), isVeteran(), getOwnerID());
+        c.setCurrentHP(getCurrentHP());
+        return c;
     }
 }

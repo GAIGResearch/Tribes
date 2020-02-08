@@ -12,6 +12,8 @@ public class Swordman extends Unit
 
     @Override
     public Swordman copy() {
-        return new Swordman(getCurrentPosition(), getKills(), isVeteran(), getOwnerID());
+        Swordman c = new Swordman(getCurrentPosition(), getKills(), isVeteran(), getOwnerID());
+        c.setCurrentHP(getCurrentHP());
+        return c;
     }
 }

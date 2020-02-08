@@ -4,6 +4,8 @@ import core.Types;
 import core.actions.cityactions.Build;
 import core.units.*;
 
+import java.util.ArrayList;
+
 public class Board {
 
     // Array for the type of terrain that each tile of board will have
@@ -20,7 +22,7 @@ public class Board {
     private Building[][] buildings;
 
     // Array for cities
-    private City[][] cities;
+   // private City[][] cities;
 
     // Array for tribes
     private Tribe [] tribes;
@@ -39,9 +41,27 @@ public class Board {
         resources = new Types.RESOURCE[size][size];
         units = new Unit[size][size];
         buildings = new Building[size][size];
-        cities = new City[size][size];
         this.size = size;
         this.tribes = new Tribe[4];
+        this.id = new int[size][size];
+
+        //Initialise tile IDs
+        for (int x = 0; x<size; x++){
+            for(int y =0; y<size; y++){
+                id[x][y] = -1;
+            }
+        }
+
+    }
+
+    // Extra constructor for deep copy of board
+    public Board (int size, Tribe[] tribes){
+        terrains = new Types.TERRAIN[size][size];
+        resources = new Types.RESOURCE[size][size];
+        units = new Unit[size][size];
+        buildings = new Building[size][size];
+        this.size = size;
+        this.tribes = tribes;
         this.id = new int[size][size];
 
         //Initialise tile IDs
@@ -56,26 +76,43 @@ public class Board {
     // Return deep copy of board
     public Board copyBoard(){
         Board copyBoard = new Board(this.size);
+        Tribe[] copyTribes = new Tribe[4];
+        // Copy tribes and cities
+        for (int i = 0; i< tribes.length; i++){
+            Tribe copyT = new Tribe();
+            copyT.setTribeID(tribes[i].getTribeID());
+            copyT.setScore(tribes[i].getScore());
+            ArrayList<City> cities = tribes[i].getCities();
+            ArrayList<City> copyCities = new ArrayList<>();
+            for (City c:cities) {
+                // TODO: Will copy over tribe city later but need a city copy method in city class
+                // City copyCity =  c.copy();
+                // copycities.add(copyCity)
+            }
+            copyT.setCities(cities);
+        }
 
+        copyBoard.setTribes(copyTribes);
+
+        // Copy board objects
         for (int x = 0; x<this.size; x++){
             for(int y = 0; y<this.size; y++){
                 Types.TERRAIN t = checkTerrain(x,y);
                 Unit u = checkUnit(x,y);
                 Types.RESOURCE r = checkResource(x,y);
                 Building b = checkBuilding(x,y);
-                City c = getCityAt(x,y);
                 copyBoard.setTerrainAt(x,y,terrains[x][y]);
                 copyBoard.setUnitAt(x,y,u);
                 copyBoard.setResourceAt(x,y,resources[x][y]);
                 copyBoard.setBuildingAt(x,y,buildings[x][y]);
-                // TODO: Will copy over city later but need a city copy method in city class
-                //if(c !=null)
-                 //   copyBoard.setCityAt(x,y,c.copy());
+                copyBoard.setBorders();
             }
         }
 
         return copyBoard;
     }
+
+
 
     // Get size of board
     public int getSize() {
@@ -126,9 +163,9 @@ public class Board {
         buildings[x][y] = b;
     }
 
-    public void setCityAt(int x, int y, City city){
-        cities[x][y] = city;
-    }
+//    public void setCityAt(int x, int y, City city){
+//        cities[x][y] = city;
+//    }
 
     // Get Resource at pos x,y
     public Types.RESOURCE getResourceAt(int x, int y){
@@ -140,9 +177,9 @@ public class Board {
         return buildings[x][y];
     }
 
-    public City getCityAt(int x, int y){
-        return cities[x][y];
-    }
+    //public City getCityAt(int x, int y){
+  //      return cities[x][y];
+  //  }
 
     // Moves a unit on the board if unit exists on tile
     void moveUnit(Types.DIRECTIONS direction, int x, int y){
@@ -303,20 +340,28 @@ public class Board {
         this.resources = r;
     }
 
-    //TODO: Once city has owners
-//    // Method to determine city borders, take city and x and y pos of city as params
-//    public void setBorders(City city, int x, int y){
-//        if (city.getTribe().equals(getCityAt(x, y).getTribe())) {
-//            //   set border and city to that tribe
-//        }
-//        for (int i =x; i< x+2; i++){
-//            for(int j = y; j<x+2; j++) {
-//                //todo set border
-//
-//
-//            }
-//        }
-//    }
+    // Method to determine city borders, take city and x and y pos of city as params
+    public void setBorders(){
+        ArrayList<City> tribe1Cities = tribes[0].getCities();
+        ArrayList<City> tribe2Cities = tribes[1].getCities();
+        ArrayList<City> tribe3Cities = tribes[2].getCities();
+        ArrayList<City> tribe4Cities = tribes[3].getCities();
+
+        for (City c: tribe1Cities) {
+            int x = c.getX();
+            int y = c.getY();
+            for (int i =x; i< x+2; i++){
+                for(int j = y; j<x+2; j++) {
+                    //todo set border
+                    id[i][j] = tribes[0].getActorID();
+
+                }
+            }
+
+        }
+
+
+    }
 
     //TODO: Once city has owners
 //    // Method to expand city borders, take city x and x and y pos of city as params
@@ -333,13 +378,26 @@ public class Board {
 //    }
 
 
-    public void occupy(int x, int y){
-        City c = getCityAt(x,y);
+    public void occupy(Tribe t, int x, int y){
+        ArrayList<City> cities = t.getCities();
+        City c = null;
+        for (City city:
+             cities) {
+            if (city.getX() == x && city.getY() == y){
+                c = city;
+                break;
+            }
+        }
         if (c.getIsValley()){
             c.setIsValley(false);
             // TODO: Assign the owner
             c.levelUp();
         }
+    }
+
+    // Setter method for tribes array
+    public void setTribes(Tribe[] t){
+        this.tribes = t;
     }
 
 

@@ -1,30 +1,42 @@
 package core.actions.unitactions;
 
+import core.actions.Action;
 import core.game.GameState;
 import core.actors.City;
 import core.actors.units.Unit;
 
+import java.util.LinkedList;
+
 public class Capture extends UnitAction
 {
-    private City target; // This can be a city or a village.
+    private City targetCity; // This can be a city or a village.
 
-    public Capture(Unit invader, City target)
+    public Capture(Unit invader)
     {
         super.unit = invader;
-        this.target = target;
     }
 
-    public City getTarget() {
-        return target;
+    public void setTargetCity(City targetCity) {this.targetCity = targetCity;}
+    public City getTargetCity() {
+        return targetCity;
     }
 
     @Override
-    public boolean isFeasible(GameState gs) {
+    public LinkedList<Action> computeActionVariants(final GameState gs) {
+        //TODO: compute Capture city actions
+        return null;
+    }
+
+    @Override
+    public boolean isFeasible(final GameState gs)
+    {
+        //todo: check if capturing this city is feasible.
         return false;
     }
 
     @Override
-    public void execute(GameState gs) {
-
+    public boolean execute(GameState gs) {
+        //todo: execute the capture action
+        return false;
     }
 }

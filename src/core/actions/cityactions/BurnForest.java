@@ -1,35 +1,32 @@
 package core.actions.cityactions;
 
+import core.actions.Action;
 import core.game.GameState;
 import core.actors.City;
 
+import java.util.LinkedList;
+
 public class BurnForest extends CityAction
 {
-    private int targetX;
-    private int targetY;
-
-    public BurnForest(City c, int targetX, int targetY)
-    {
+    public BurnForest(City c) {
         super.city = c;
-        this.targetX = targetX;
-        this.targetY = targetY;
-    }
-
-    public int getTargetX() {
-        return this.targetX;
-    }
-
-    public int getTargetY() {
-        return this.targetY;
     }
 
     @Override
-    public boolean isFeasible(GameState gs) {
+    public LinkedList<Action> computeActionVariants(final GameState gs) {
+        //TODO compute burn forest
+        return null;
+    }
+
+    @Override
+    public boolean isFeasible(final GameState gs) {
+        //TODO: is feasible burn forest
         return false;
     }
 
     @Override
-    public void execute(GameState gs) {
-
+    public boolean execute(GameState gs) {
+        //TODO: executes the forest burn
+        return false;
     }
 }

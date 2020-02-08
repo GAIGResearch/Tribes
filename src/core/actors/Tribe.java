@@ -8,16 +8,23 @@ public class Tribe extends Actor{
 
     private Types.RESULT winner = Types.RESULT.INCOMPLETE;
     private int score = 0;
-    private LinkedList<Integer> citiesID = new LinkedList<>();
+    private LinkedList<Integer> citiesID;
     private Types.TRIBE tribe;
 
     //ID of this tribe. It corresponds with the ID of the player who controls it.
     private int tribeID;
 
+    public Tribe(Types.TRIBE tribe)
+    {
+        this.tribe = tribe;
+        citiesID = new LinkedList<>();
+    }
+
     public Tribe(int tribeID, int cityID, Types.TRIBE tribe) {
         this.tribeID = tribeID;
         citiesID.add(cityID);
         this.tribe = tribe;
+        citiesID = new LinkedList<>();
     }
 
     public void addCity(int id) {

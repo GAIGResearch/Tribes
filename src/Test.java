@@ -1,3 +1,4 @@
+import core.Types;
 import core.game.Game;
 import core.actors.Tribe;
 import players.Agent;
@@ -23,11 +24,11 @@ public class Test {
 
         Agent ag1 = new DoNothingAgent(seed);
         players.add(ag1);
-        tribes.add(new Tribe());
+        tribes.add(new Tribe(Types.TRIBE.XIN_XI));
 
         Agent ag2 = new DoNothingAgent(seed);
         players.add(ag2);
-        tribes.add(new Tribe());
+        tribes.add(new Tribe(Types.TRIBE.IMPERIUS));
 
 
         game.init(players, tribes, filename);

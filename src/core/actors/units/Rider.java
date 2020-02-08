@@ -12,6 +12,8 @@ public class Rider extends Unit
 
     @Override
     public Rider copy() {
-        return new Rider(getCurrentPosition(), getKills(), isVeteran(), getOwnerID());
+        Rider c = new Rider(getCurrentPosition(), getKills(), isVeteran(), getOwnerID());
+        c.setCurrentHP(getCurrentHP());
+        return c;
     }
 }

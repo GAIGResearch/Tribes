@@ -1,39 +1,59 @@
 import core.Types;
-import core.game.Game;
+import core.actions.Action;
+import core.actions.tribeactions.ResearchTech;
 import core.actors.Tribe;
-import players.Agent;
-import players.DoNothingAgent;
-import players.KeyController;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
-/**
- * Entry point of the framework.
- */
-public class Test {
+import static core.Types.TECHNOLOGY.*;
 
-    public static void main(String[] args) {
+public class Test
+{
+    public static void testReseachActions()
+    {
+        Tribe t = new Tribe(Types.TRIBE.XIN_XI);
+        t.addCity(0); //We need to add a city or I'm actually unable to research anything.
 
-        KeyController ki = new KeyController(true);
-        long seed = System.currentTimeMillis();
-        String filename = "SampleLevel2p.csv";
+        LinkedList<Action> allResearchable = new ResearchTech(t).computeActionVariants(null);
+        for(Action act : allResearchable)
+        {
+            System.out.println(act.toString());
+        }
 
-        Game game = new Game(seed);
-        ArrayList<Agent> players = new ArrayList<>();
-        ArrayList<Tribe> tribes = new ArrayList<>();
+        ResearchTech rt = new ResearchTech(t);
+        rt.setTech(MINING);
+        System.out.println("Tech feasible: " + rt.toString() + ", " + rt.isFeasible(null));
 
-        Agent ag1 = new DoNothingAgent(seed);
-        players.add(ag1);
-        tribes.add(new Tribe(Types.TRIBE.XIN_XI));
+        rt.setTech(SHIELDS);
+        System.out.println("Tech feasible: " + rt.toString() + ", " + rt.isFeasible(null));
 
-        Agent ag2 = new DoNothingAgent(seed);
-        players.add(ag2);
-        tribes.add(new Tribe(Types.TRIBE.IMPERIUS));
+        t.setStars(10);
 
+        rt.setTech(MINING);
+        System.out.println("Tech feasible: " + rt.toString() + ", " + rt.isFeasible(null));
 
-        game.init(players, tribes, filename);
+        rt.setTech(SHIELDS);
+        System.out.println("Tech feasible: " + rt.toString() + ", " + rt.isFeasible(null));
 
-        Run.runGame(game, ki);
-        System.out.println("Running Tribes...");
+        System.out.println("Managed to research: " + rt.toString() + ", " + rt.execute(null));
+
+        rt.setTech(MINING);
+        System.out.println("Managed to research: " + rt.toString() + ", " + rt.execute(null));
+
+        t.setStars(10);
+
+        allResearchable = new ResearchTech(t).computeActionVariants(null);
+        for(Action act : allResearchable)
+        {
+            System.out.println(act.toString());
+        }
+
     }
+
+
+    public static void main(String[] args)
+    {
+        testReseachActions();
+    }
+
 }

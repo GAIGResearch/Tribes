@@ -20,6 +20,7 @@ public class City extends Actor{
     private int longTermPoints = 0;
     private LinkedList<Integer> unitsID = new LinkedList<>();
     private LinkedList<Building> buildings = new LinkedList<>();
+    int bound;
 
     // The constructor to initial the valley
     public City(int x, int y, int id) {
@@ -30,6 +31,7 @@ public class City extends Actor{
         level = 0;
         isPrism = false;
         this.id = id;
+        bound = 2;
     }
 
     public City(int x, int y, int level, int population, int population_need, boolean isValley, boolean isPrism, int extraStar, LinkedList<Building> buildings, int id, LinkedList<Integer> unitsID) {
@@ -266,5 +268,12 @@ public class City extends Actor{
 
     public void setIsValley(boolean isVal){
          this.isValley = isValley;
+    }
+
+    public int getBound(){
+        return this.bound;
+    }
+    public void setBound(int b){
+        this.bound = b;
     }
 }

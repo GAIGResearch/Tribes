@@ -2,6 +2,9 @@ package core.game;
 
 import core.Types;
 import core.actions.cityactions.Build;
+import core.actors.City;
+import core.actors.buildings.*;
+import core.actors.units.*;
 import core.units.*;
 
 import java.util.ArrayList;
@@ -51,6 +54,8 @@ public class Board {
                 id[x][y] = -1;
             }
         }
+
+        this.setBorders();
 
     }
 
@@ -226,8 +231,8 @@ public class Board {
                 return new Catapult(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
             case "Defender":
                 return new Defender(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
-            case "Swordsman":
-                return new Swordsman(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+            case "Swordman":
+                return new Swordman(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
             //case 'MIND_BEARER':
             //    return new Warrior(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
         }
@@ -302,25 +307,25 @@ public class Board {
             case SAWMILL:
                 return new Sawmill(x,y);
             case WATER_TEMPLE:
-                return new WaterTemple(x,y);
+                return null; // TODO: Need Water Temple class
             case FOREST_TEMPLE:
                 return new ForestTemple(x,y);
             case MOUNTAIN_TEMPLE:
-                return new MountainTemple(x,y);
+                return null; // TODO: Need Mountain Temple class
             case ALTAR_OF_PEACE: //TODO: Need Altar of Peace class
                 return null;
-            case EMPERORS_TOMB:
-                return new EmperorTomb(x,y);
+            case EMPERORS_TOMB: //TODO: Need Emperors tomb class
+                return null;
             case EYE_OF_GOD: //TODO: Need Eye of God class
                 return null;
-            case GATE_OF_POWER:
-                return new GateOfPower(x,y);
-            case GRAND_BAZAR:
-                return new GrandBazaar(x,y);
-            case PARK_OF_FORTUNE:
-                return new ParkOfFortune(x,y);
-            case TOWER_OF_WISDOM:
-                return new TowerOfWisdom(x,y);
+            case GATE_OF_POWER: //TODO: Need Gate of power class
+                return null;
+            case GRAND_BAZAR: //TODO: Need Grand Bazar class
+                return null;
+            case PARK_OF_FORTUNE: //TODO: Need Park of fortune class
+                return null;
+            case TOWER_OF_WISDOM: //TODO: Need tower of wisdom class
+                return null;
         }
         return b;
     }
@@ -348,34 +353,48 @@ public class Board {
         ArrayList<City> tribe4Cities = tribes[3].getCities();
 
         for (City c: tribe1Cities) {
-            int x = c.getX();
-            int y = c.getY();
-            for (int i =x; i< x+2; i++){
-                for(int j = y; j<x+2; j++) {
-                    //todo set border
-                    id[i][j] = tribes[0].getActorID();
+            setBorderHelper(c,c.getBound());
+        }
 
-                }
-            }
+        for (City c: tribe2Cities
+             ) {
+            setBorderHelper(c,c.getBound());
+        }
 
+
+        for (City c: tribe3Cities
+        ) {
+            setBorderHelper(c, c.getBound());
+        }
+
+        for (City c: tribe4Cities
+        ) {
+            setBorderHelper(c, c.getBound());
         }
 
 
     }
 
-    //TODO: Once city has owners
-//    // Method to expand city borders, take city x and x and y pos of city as params
-//    public void expandBorder(City city, int x, int y){
-//        for (int i =x; i< x+2; i++){
-//            for(int j = y; j<x+2; j++) {
-//                //todo set border
-//
-//                if (city.getTribe().equals(getCityAt(x, y).getTribe())) {
-//                    //   set border and city to that tribe
-//                }
-//            }
-//        }
-//    }
+    // Set border helper method to set city bounds
+    public void setBorderHelper(City c, int bound){
+        int x = c.getX();
+        int y = c.getY();
+        for (int i =x-bound; i< x+bound; i++){
+            for(int j = y-bound; j<x+bound; j++) {
+                if(id[i][j] != -1){
+                    id[i][j] = tribes[0].getActorID();
+                }
+            }
+        }
+    }
+
+    // Method to expand city borders, take city x and x and y pos of city as params
+    public void expandBorder(City city, int x, int y){
+
+        city.setBound(city.getBound()+1);
+        setBorderHelper(city,city.getBound());
+
+    }
 
 
     public void occupy(Tribe t, int x, int y){

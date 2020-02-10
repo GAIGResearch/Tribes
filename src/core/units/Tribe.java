@@ -1,6 +1,7 @@
 package core.units;
 
 import core.Types;
+import core.actors.City;
 
 import java.util.ArrayList;
 

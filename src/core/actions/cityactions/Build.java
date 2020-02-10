@@ -1,31 +1,46 @@
 package core.actions.cityactions;
 
 import core.Types;
-import core.units.City;
+import core.actions.Action;
+import core.game.GameState;
+import core.actors.City;
+
+import java.util.LinkedList;
 
 public class Build extends CityAction
 {
     private Types.BUILDING building;
-    private int targetX;
-    private int targetY;
 
-    public Build(City c, int x, int y, Types.BUILDING building)
+    public Build(City c)
     {
         super.city = c;
-        this.building = building;
-        this.targetX = x;
-        this.targetY = y;
     }
 
-    public Types.BUILDING getBuilding() {
-        return building;
+
+    @Override
+    public LinkedList<Action> computeActionVariants(final GameState gs) {
+        //TODO: compute variants for a Build action
+        return null;
     }
 
-    public int getTargetX() {
-        return this.targetX;
+    @Override
+    public boolean isFeasible(final GameState gs) {
+        //TODO: Is feasible to build
+        return false;
     }
 
-    public int getTargetY() {
-        return this.targetY;
+    @Override
+    public boolean execute(GameState gs) {
+        //TODO: Executes the action
+        return false;
     }
+
+
+
+    /** Getters and Setters **/
+    public Types.BUILDING getBuilding() { return building; }
+    public void setBuilding(Types.BUILDING building) {this.building = building;}
+
+
+
 }

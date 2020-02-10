@@ -45,6 +45,23 @@ public class Types {
 
     }
 
+    public enum TRIBE{
+        XIN_XI(0, "Xin-Xi", TECHNOLOGY.CLIMBING),
+        IMPERIUS(1, "Imperius", TECHNOLOGY.ORGANIZATION),
+        BARDUR(2, "Bardur", TECHNOLOGY.HUNTING),
+        OUMAJI(3, "Oumaji", TECHNOLOGY.RIDING);
+
+        private int key;
+        private String name;
+        private TECHNOLOGY initialTech;
+        TRIBE(int numVal, String name, TECHNOLOGY initialTech) {  this.key = numVal;  this.name = name; this.initialTech = initialTech;}
+        public int getKey() {  return key; }
+        public String getName() { return name; }
+        public TECHNOLOGY getInitialTech() {
+            return initialTech;
+        }
+    }
+
     /**
      * Defines the status of the turn for an unit. (May be in Unit.java?)
      */
@@ -120,7 +137,7 @@ public class Types {
 
 
     /**
-     * Types of units
+     * Types of actors
      */
     public enum UNIT
     {

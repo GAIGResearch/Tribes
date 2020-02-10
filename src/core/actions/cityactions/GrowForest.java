@@ -1,24 +1,34 @@
 package core.actions.cityactions;
 
-import core.units.City;
+import core.actions.Action;
+import core.game.GameState;
+import core.actors.City;
+
+import java.util.LinkedList;
 
 public class GrowForest extends CityAction
 {
-    private int targetX;
-    private int targetY;
 
-    public GrowForest(City c, int targetX, int targetY)
+    public GrowForest(City c)
     {
         super.city = c;
-        this.targetX = targetX;
-        this.targetY = targetY;
     }
 
-    public int getTargetX() {
-        return this.targetX;
+    @Override
+    public LinkedList<Action> computeActionVariants(final GameState gs) {
+        //TODO: compute grow forest
+        return null;
     }
 
-    public int getTargetY() {
-        return this.targetY;
+    @Override
+    public boolean isFeasible(final GameState gs) {
+        //TODO: isFeasible grow forest
+        return false;
+    }
+
+    @Override
+    public boolean execute(GameState gs) {
+        //TODO: execute grow forest
+        return false;
     }
 }

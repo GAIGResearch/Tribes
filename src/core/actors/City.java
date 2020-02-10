@@ -1,11 +1,13 @@
-package core.units;
+package core.actors;
 
 import core.Types;
+import core.actors.buildings.Building;
 
 import java.util.LinkedList;
 
 public class City extends Actor{
 
+    private int id;
     private int x;
     private int y;
     private int level;
@@ -16,20 +18,21 @@ public class City extends Actor{
     private int extraStar = 0;
     private int points = 0;
     private int longTermPoints = 0;
-    // TODO: Add the owner(tribe)
+    private LinkedList<Integer> unitsID = new LinkedList<>();
     private LinkedList<Building> buildings = new LinkedList<>();
 
     // The constructor to initial the valley
-    public City(int x, int y) {
+    public City(int x, int y, int id) {
         this.x = x;
         this.y = y;
         isValley = true;
         population_need = 0;
         level = 0;
         isPrism = false;
+        this.id = id;
     }
 
-    public City(int x, int y, int level, int population, int population_need, boolean isValley, boolean isPrism, int extraStar, LinkedList<Building> buildings) {
+    public City(int x, int y, int level, int population, int population_need, boolean isValley, boolean isPrism, int extraStar, LinkedList<Building> buildings, int id, LinkedList<Integer> unitsID) {
         this.x = x;
         this.y = y;
         this.level = level;
@@ -39,20 +42,13 @@ public class City extends Actor{
         this.isPrism = isPrism;
         this.extraStar = extraStar;
         this.buildings = buildings;
+        this.id = id;
+        this.unitsID = unitsID;
     }
 
-    /*
-    TODO: ADD the constructor to initial the city (x, y, owner). isValley = false, isPrism = True,
-    population_need = level+1, level = 1
-     */
-
-    // TODO: Parameter should get the owner and occupy need to assign the owner ->
-    //       Linked to Board to occupy the belonging tiles
-    // Occupy the valley/city
     public void occupy(){
         if (isValley){
             isValley=false;
-            // TODO: Assign the owner
             levelUp();
         }
     }
@@ -72,17 +68,18 @@ public class City extends Actor{
         }else if (building.getTYPE().equals(Types.BUILDING.FARM) || building.getTYPE().equals(Types.BUILDING.LUMBER_HUT)
                 || building.getTYPE().equals(Types.BUILDING.MINE) || building.getTYPE().equals(Types.BUILDING.PORT)){
             changeProduction(building);
-        }else if (building.getTYPE().equals(Types.BUILDING.TEMPLE) || building.getTYPE().equals(Types.BUILDING.WATER_TEMPLE)
-                || building.getTYPE().equals(Types.BUILDING.MOUNTAIN_TEMPLE) || building.getTYPE().equals(Types.BUILDING.FOREST_TEMPLE)){
+        }else if (building.getTYPE().equals(Types.BUILDING.TEMPLE) || building.getTYPE().equals(Types.BUILDING.WATER_TEMPLE)){
             addLongTimePoints(building.getPoints());
         }else{
             addPoints(building.getPoints());
         }
+
         if (building.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
             addExtraStar(building.getPRODUCTION());
         }else {
             addPopulation(building.getPRODUCTION());
         }
+
         buildings.add(building);
     }
 
@@ -168,6 +165,24 @@ public class City extends Actor{
         extraStar += Star;
     }
 
+    public boolean addUnits(int id){
+        if (unitsID.size() < level){
+            unitsID.add(id);
+            return true;
+        }
+        return false;
+    }
+
+    public void removeUnits(int id){
+        for(int i=0; i<unitsID.size(); i++){
+            if (unitsID.get(i) == id){
+                unitsID.remove(i);
+                return;
+            }
+        }
+        System.out.println("Error!! Unit ID "+ id +" does not belong to this tribe");
+    }
+
     public int getLevelUpPoints(){
         if (level == 1){
             return 100;
@@ -229,8 +244,20 @@ public class City extends Actor{
         return turnPoint;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public LinkedList<Integer> getUnitsID() {
+        LinkedList<Integer> copyUnits = new LinkedList<>();
+        for (Integer integer : unitsID) {
+            copyUnits.add(integer);
+        }
+        return copyUnits;
+    }
+
     public City copy(){
-        return new City(x, y, level, population, population_need, isValley, isPrism, extraStar, getBuildings());
+        return new City(x, y, level, population, population_need, isValley, isPrism, extraStar, getBuildings(), id, getUnitsID());
     }
 
     public boolean getIsValley(){

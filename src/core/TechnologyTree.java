@@ -26,6 +26,9 @@ public class TechnologyTree {
 
         boolean decision = false;
 
+        if(isResearched(target))
+            return false;
+
         switch (target) {
             case CLIMBING:
             case FISHING:
@@ -124,7 +127,8 @@ public class TechnologyTree {
         return everythingResearched;
     }
 
-    public void doResearch(Types.TECHNOLOGY target) {
+    public boolean doResearch(Types.TECHNOLOGY target) {
+
         switch (target) {
             case CLIMBING:
             case FISHING:
@@ -137,88 +141,92 @@ public class TechnologyTree {
             case FORESTRY:
                 if (isResearched(Types.TECHNOLOGY.HUNTING)) {
                     researched[target.ordinal()] = true;
-                }
+                }else return false;
                 break;
             case FARMING:
             case SHIELDS:
                 if (isResearched(Types.TECHNOLOGY.ORGANIZATION)) {
                     researched[target.ordinal()] = true;
                     checkEverythingResearched();
-                }
+                }else return false;
                 break;
             case FREE_SPIRIT:
             case ROADS:
                 if (isResearched(Types.TECHNOLOGY.RIDING)) {
                     researched[target.ordinal()] = true;
-                }
+                }else return false;
                 break;
             case MEDITATION:
             case MINING:
                 if (isResearched(Types.TECHNOLOGY.CLIMBING)) {
                     researched[target.ordinal()] = true;
-                }
+                }else return false;
                 break;
             case SAILING:
             case WHALING:
                 if (isResearched(Types.TECHNOLOGY.FISHING)) {
                     researched[target.ordinal()] = true;
-                }
+                }else return false;
                 break;
             case AQUATISM:
                 if (isResearched(Types.TECHNOLOGY.WHALING)) {
                     researched[target.ordinal()] = true;
                     checkEverythingResearched();
-                }
+                }else return false;
                 break;
             case CHIVALRY:
                 if (isResearched(Types.TECHNOLOGY.FREE_SPIRIT)) {
                     researched[target.ordinal()] = true;
                     checkEverythingResearched();
-                }
+                }else return false;
                 break;
             case CONSTRUCTION:
                 if (isResearched(Types.TECHNOLOGY.FARMING)) {
                     researched[target.ordinal()] = true;
                     checkEverythingResearched();
-                }
+                }else return false;
                 break;
             case MATHEMATICS:
                 if (isResearched(Types.TECHNOLOGY.FORESTRY)) {
                     researched[target.ordinal()] = true;
                     checkEverythingResearched();
-                }
+                }else return false;
                 break;
             case NAVIGATION:
                 if (isResearched(Types.TECHNOLOGY.SAILING)) {
                     researched[target.ordinal()] = true;
                     checkEverythingResearched();
-                }
+                }else return false;
                 break;
             case SMITHERY:
                 if (isResearched(Types.TECHNOLOGY.MINING)) {
                     researched[target.ordinal()] = true;
                     checkEverythingResearched();
-                }
+                }else return false;
                 break;
             case SPIRITUALISM:
                 if (isResearched(Types.TECHNOLOGY.ARCHERY)) {
                     researched[target.ordinal()] = true;
                     checkEverythingResearched();
-                }
+                }else return false;
                 break;
             case TRADE:
                 if (isResearched(Types.TECHNOLOGY.ROADS)) {
                     researched[target.ordinal()] = true;
                     checkEverythingResearched();
-                }
+                }else return false;
                 break;
             case PHILOSOPHY:
                 if (isResearched(Types.TECHNOLOGY.MEDITATION)) {
                     researched[target.ordinal()] = true;
                     checkEverythingResearched();
-                }
+                }else return false;
                 break;
+            default:
+                return false;
        }
+
+       return true;
    }
 
 }

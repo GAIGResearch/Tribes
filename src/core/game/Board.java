@@ -388,8 +388,8 @@ public class Board {
         }
     }
 
-    // Method to expand city borders, take city x and x and y pos of city as params
-    public void expandBorder(City city, int x, int y){
+    // Method to expand city borders, take city as param
+    public void expandBorder(City city){
 
         city.setBound(city.getBound()+1);
         setBorderHelper(city,city.getBound());

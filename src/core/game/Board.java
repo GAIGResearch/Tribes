@@ -39,13 +39,13 @@ public class Board {
     private int size;
 
     // Constructor for board
-    public Board (int size){
+    public Board (int size, int numOfPlayers){
         terrains = new Types.TERRAIN[size][size];
         resources = new Types.RESOURCE[size][size];
         units = new Unit[size][size];
         buildings = new Building[size][size];
         this.size = size;
-        this.tribes = new Tribe[4];
+        this.tribes = new Tribe[numOfPlayers];
         this.id = new int[size][size];
 
         //Initialise tile IDs
@@ -59,29 +59,10 @@ public class Board {
 
     }
 
-    // Extra constructor for deep copy of board
-    public Board (int size, Tribe[] tribes){
-        terrains = new Types.TERRAIN[size][size];
-        resources = new Types.RESOURCE[size][size];
-        units = new Unit[size][size];
-        buildings = new Building[size][size];
-        this.size = size;
-        this.tribes = tribes;
-        this.id = new int[size][size];
-
-        //Initialise tile IDs
-        for (int x = 0; x<size; x++){
-            for(int y =0; y<size; y++){
-                id[x][y] = -1;
-            }
-        }
-
-    }
-
     // Return deep copy of board
     public Board copyBoard(){
-        Board copyBoard = new Board(this.size);
-        Tribe[] copyTribes = new Tribe[4];
+        Board copyBoard = new Board(this.size, this.tribes.length);
+        Tribe[] copyTribes = new Tribe[this.tribes.length];
         // Copy tribes and cities
         for (int i = 0; i< tribes.length; i++){
             Tribe copyT = new Tribe();
@@ -233,7 +214,7 @@ public class Board {
                 return new Defender(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
             case "Swordman":
                 return new Swordman(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
-            //case 'MIND_BEARER':
+            //case 'MIND_BEARER': //TODO: Need Mind bearer class
             //    return new Warrior(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
         }
         return u;
@@ -347,32 +328,16 @@ public class Board {
 
     // Method to determine city borders, take city and x and y pos of city as params
     public void setBorders(){
-        ArrayList<City> tribe1Cities = tribes[0].getCities();
-        ArrayList<City> tribe2Cities = tribes[1].getCities();
-        ArrayList<City> tribe3Cities = tribes[2].getCities();
-        ArrayList<City> tribe4Cities = tribes[3].getCities();
 
-        for (City c: tribe1Cities) {
-            setBorderHelper(c,c.getBound());
+        for(int i = 0; i<tribes.length; i++) {
+            ArrayList<City> tribe1Cities = tribes[i].getCities();
+
+
+            for (City c : tribe1Cities) {
+                setBorderHelper(c, c.getBound());
+            }
+
         }
-
-        for (City c: tribe2Cities
-             ) {
-            setBorderHelper(c,c.getBound());
-        }
-
-
-        for (City c: tribe3Cities
-        ) {
-            setBorderHelper(c, c.getBound());
-        }
-
-        for (City c: tribe4Cities
-        ) {
-            setBorderHelper(c, c.getBound());
-        }
-
-
     }
 
     // Set border helper method to set city bounds

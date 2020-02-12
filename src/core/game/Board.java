@@ -419,12 +419,11 @@ public class Board {
     /**
      * Adds a city to a tribe
      * @param c city to add
-     * @param tribeID id of the tribe who will own the city
      */
-    public void addCityToTribe(City c, int tribeID)
+    public void addCityToTribe(City c)
     {
         addActor(c);
-        tribes[tribeID].addCity(c.getActorID());
+        tribes[c.getTribeId()].addCity(c.getActorID());
     }
 
     public void addUnitToBoard(Unit u)

@@ -1,13 +1,14 @@
 package core.game;
 
 import core.Types;
-import core.actions.cityactions.Build;
+import core.actors.Actor;
 import core.actors.City;
-import core.actors.buildings.*;
+import core.actors.Tribe;
 import core.actors.units.*;
-import core.units.*;
 
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class Board {
 
@@ -16,83 +17,76 @@ public class Board {
     
     // Array for resource each tile of the board will have
     private Types.RESOURCE[][] resources;
-    
-    // Array for units each tile of the board will have
-    // TODO: We need to know which tribe these units belong to.
-    private Unit[][] units;
 
     // Array for buildings each tile of the board will have
-    private Building[][] buildings;
+    private Types.BUILDING[][] buildings;
 
-    // Array for cities
-   // private City[][] cities;
+    // Array for units each tile of the board will have
+    private int[][] units;
 
     // Array for tribes
-    private Tribe [] tribes;
+    private Tribe[] tribes;
 
-    // Array for id of each tile
-    private int[][] id;
+    // Array for id of the city that owns each tile. -1 if no city owns the tile.
+    private int[][] tileCityId;
 
-
+    //Actors in the game
+    private TreeMap<Integer, core.actors.Actor> gameActors;
 
     //variable to declare size of board
     private int size;
 
     // Constructor for board
     public Board (int size, int numOfPlayers){
+
         terrains = new Types.TERRAIN[size][size];
         resources = new Types.RESOURCE[size][size];
-        units = new Unit[size][size];
-        buildings = new Building[size][size];
+        buildings = new Types.BUILDING[size][size];
+        units = new int[size][size];
+
         this.size = size;
         this.tribes = new Tribe[numOfPlayers];
-        this.id = new int[size][size];
+        this.tileCityId = new int[size][size];
+        this.gameActors = new TreeMap<>();
 
         //Initialise tile IDs
         for (int x = 0; x<size; x++){
             for(int y =0; y<size; y++){
-                id[x][y] = -1;
+                tileCityId[x][y] = -1;
             }
         }
 
         this.setBorders();
-
     }
 
     // Return deep copy of board
-    public Board copyBoard(){
+    public Board copy(){
         Board copyBoard = new Board(this.size, this.tribes.length);
-        Tribe[] copyTribes = new Tribe[this.tribes.length];
-        // Copy tribes and cities
+        copyBoard.size = this.size;
+        copyBoard.tribes = new Tribe[this.tribes.length];
+
+        // Copy tribes
         for (int i = 0; i< tribes.length; i++){
-            Tribe copyT = new Tribe();
-            copyT.setTribeID(tribes[i].getTribeID());
-            copyT.setScore(tribes[i].getScore());
-            ArrayList<City> cities = tribes[i].getCities();
-            ArrayList<City> copyCities = new ArrayList<>();
-            for (City c:cities) {
-                // TODO: Will copy over tribe city later but need a city copy method in city class
-                // City copyCity =  c.copy();
-                // copycities.add(copyCity)
-            }
-            copyT.setCities(cities);
+            copyBoard.tribes[i] = tribes[i].copy();
         }
 
-        copyBoard.setTribes(copyTribes);
-
-        // Copy board objects
+        // Copy board objects (they are all ids)
         for (int x = 0; x<this.size; x++){
             for(int y = 0; y<this.size; y++){
-                Types.TERRAIN t = checkTerrain(x,y);
-                Unit u = checkUnit(x,y);
-                Types.RESOURCE r = checkResource(x,y);
-                Building b = checkBuilding(x,y);
+                copyBoard.setUnitIdAt(x,y,units[x][y]);
                 copyBoard.setTerrainAt(x,y,terrains[x][y]);
-                copyBoard.setUnitAt(x,y,u);
                 copyBoard.setResourceAt(x,y,resources[x][y]);
                 copyBoard.setBuildingAt(x,y,buildings[x][y]);
-                copyBoard.setBorders();
+                copyBoard.tileCityId[x][y] = tileCityId[x][y];
             }
+        }
+
+        //Deep copy of all actors in the board
+        copyBoard.gameActors = new TreeMap<>();
+        for(Actor act : gameActors.values())
+        {
+            int id = act.getActorID();
+            copyBoard.gameActors.put(id, act.copy());
         }
 
         return copyBoard;
@@ -111,7 +105,7 @@ public class Board {
     }
 
     // Get units array
-    public Unit[][] getUnits(){
+    public int[][] getUnits(){
         return this.units;
     }
 
@@ -126,32 +120,40 @@ public class Board {
     }
 
     // Get Unit at pos x,y
-    public Unit getUnitAt(int x, int y){
+    public int getUnitIDAt(int x, int y){
         return units[x][y];
+    }
+
+    // Get Unit at pos x,y
+    public Unit getUnitAt(int x, int y){
+        return (Unit) (gameActors.get(units[x][y]));
     }
 
     // Set Resource at pos x,y
     public void setResourceAt(int x, int y, Types.RESOURCE r){
         resources[x][y] =  r;
     }
+
     // Set Terrain at pos x,y
     public void setTerrainAt(int x, int y, Types.TERRAIN t){
         terrains[x][y] =  t;
     }
 
-    // Set Terrain at pos x,y
-    public void setUnitAt(int x, int y, Unit u){
-        units[x][y] =  u;
+    // Set unit id at pos x,y
+    public void setUnitIdAt(int x, int y, int unitId){
+        units[x][y] = unitId;
     }
+
+    // Set Terrain at pos x,y
+    public void setUnitIdAt(int x, int y, Unit unit){
+        units[x][y] = unit.getActorID();
+    }
+
 
     // Set Building at pos x,y
-    public void setBuildingAt(int x, int y, Building b){
+    public void setBuildingAt(int x, int y, Types.BUILDING b){
         buildings[x][y] = b;
     }
-
-//    public void setCityAt(int x, int y, City city){
-//        cities[x][y] = city;
-//    }
 
     // Get Resource at pos x,y
     public Types.RESOURCE getResourceAt(int x, int y){
@@ -159,160 +161,158 @@ public class Board {
     }
 
     // Get Resource at pos x,y
-    public Building getBuildingAt(int x, int y){
+    public Types.BUILDING getBuildingAt(int x, int y){
         return buildings[x][y];
     }
 
-    //public City getCityAt(int x, int y){
-  //      return cities[x][y];
-  //  }
 
     // Moves a unit on the board if unit exists on tile
-    void moveUnit(Types.DIRECTIONS direction, int x, int y){
-        Unit[][] newUnits = new Unit[size][size];
-
-        if(units[x][y] == null){
-            System.out.println("Invalid move, there is no unit on this tile");
-            return;
-        }
-
-        // Loop through old units array and update new units array with new position
-        for(int i =0; i<units.length; i++){
-            for(int j =0; x<units.length; x++){
-                if((i !=x && j!=y) && (i != x+direction.x() && j != y+direction.y())){
-                    newUnits[i][j] = checkUnit(i,j);
-                }else if( i == x && j == y){
-                    newUnits[i][j] = null;
-                }else if(i == x+direction.x() && j == y+direction.y()){
-                    Unit oldUnit = checkUnit(x,y);
-                    newUnits[i][j] = oldUnit;
-                }
-            }
-        }
-
-        // Update units array
-        units = newUnits;
-
-    }
-
-    // Helper method to check which unit at which tile for deep copying unit array
-    Unit checkUnit(int x, int y){
-        Unit u = units[x][y];
-        String unitName = u.getClass().getName();
-        switch (unitName){
-            case "Rider":
-                return new Rider(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
-            case "Knight":
-                return new Knight(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
-            case "Archer":
-                return new Archer(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
-            case "Warrior":
-                return new Warrior(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
-            case "Catapult":
-                return new Catapult(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
-            case "Defender":
-                return new Defender(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
-            case "Swordman":
-                return new Swordman(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
-            //case 'MIND_BEARER': //TODO: Need Mind bearer class
-            //    return new Warrior(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
-        }
-        return u;
-    }
-
-    // Helper method to check which terrain at which tile for deep copying unit array
-    Types.TERRAIN checkTerrain(int x, int y){
-        switch (terrains[x][y]){
-            case PLAIN :
-                return Types.TERRAIN.PLAIN;
-            case VILLAGE:
-                return Types.TERRAIN.VILLAGE;
-            case SHALLOW_WATER:
-                return Types.TERRAIN.SHALLOW_WATER;
-            case  DEEP_WATER:
-                return Types.TERRAIN.DEEP_WATER;
-            case CITY:
-                return Types.TERRAIN.CITY;
-            case MOUNTAIN:
-                return Types.TERRAIN.MOUNTAIN;
-            case FOREST:
-                return Types.TERRAIN.FOREST;
-        }
-        return Types.TERRAIN.PLAIN;
-    }
+//    void moveUnit(Types.DIRECTIONS direction, int x, int y){
+//        int[][] newUnits = new int[size][size];
+//
+//        if(units[x][y] == -1){
+//            System.out.println("Invalid move, there is no unit on this tile");
+//            return;
+//        }
+//
+//        // Loop through old units array and update new units array with new position
+//        for(int i =0; i<units.length; i++){
+//            for(int j =0; x<units.length; x++){
+//                if((i !=x && j!=y) && (i != x+direction.x() && j != y+direction.y())){
+//                    newUnits[i][j] = checkUnit(i,j);
+//                }else if( i == x && j == y){
+//                    newUnits[i][j] = null;
+//                }else if(i == x+direction.x() && j == y+direction.y()){
+//                    Unit oldUnit = checkUnit(x,y);
+//                    newUnits[i][j] = oldUnit;
+//                }
+//            }
+//        }
+//
+//        // Update units array
+//        units = newUnits;
+//
+//    }
+//
+//    // Helper method to check which unit at which tile for deep copying unit array
+//    Unit checkUnit(int x, int y){
+//        int unitId = units[x][y];
+//        Unit u = (Unit) gameActors.get(unitId);
+//        String unitName = u.getClass().getName();
+//        switch (unitName){
+//            case "Rider":
+//                return new Rider(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+//            case "Knight":
+//                return new Knight(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+//            case "Archer":
+//                return new Archer(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+//            case "Warrior":
+//                return new Warrior(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+//            case "Catapult":
+//                return new Catapult(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+//            case "Defender":
+//                return new Defender(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+//            case "Swordman":
+//                return new Swordman(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+//            //case 'MIND_BEARER': //TODO: Need Mind bearer class
+//            //    return new Warrior(u.getCurrentPosition(), u.getKills(), u.isVeteran(), u.getOwnerID());
+//        }
+//        return u;
+//    }
 
     // Helper method to check which terrain at which tile for deep copying unit array
-    Types.RESOURCE checkResource(int x, int y){
-        Types.RESOURCE r = null;
-        switch (resources[x][y]){
-            case FISH:
-                return Types.RESOURCE.FISH;
-            case FRUIT:
-                return Types.RESOURCE.FRUIT;
-            case ANIMAL:
-                return Types.RESOURCE.ANIMAL;
-            case WHALES:
-                return Types.RESOURCE.WHALES;
-            case ORE:
-                return Types.RESOURCE.ORE;
-            case CROPS:
-                return Types.RESOURCE.CROPS;
-            case RUINS:
-                return Types.RESOURCE.RUINS;
-        }
-        return r;
-    }
-
-    // Helper method to check which Building at which tile for deep copying building array
-    Building checkBuilding(int x, int y){
-        Building b = getBuildingAt(x,y);
-        switch (b.getTYPE()){
-            case TEMPLE:
-                return new Temple(x,y);
-            case  PORT:
-                return new Port(x,y);
-            case MINE:
-                return new Mine(x,y);
-            case  FORGE:
-                return new Forge(x,y);
-            case FARM:
-                return new Farm(x,y);
-            case WINDMILL:
-                return new Windmill(x,y);
-            case ROAD:
-                return null;
-            case CUSTOM_HOUSE:
-                return new CustomHouse(x,y);
-            case LUMBER_HUT:
-                return new LumberHut(x,y);
-            case SAWMILL:
-                return new Sawmill(x,y);
-            case WATER_TEMPLE:
-                return null; // TODO: Need Water Temple class
-            case FOREST_TEMPLE:
-                return new ForestTemple(x,y);
-            case MOUNTAIN_TEMPLE:
-                return null; // TODO: Need Mountain Temple class
-            case ALTAR_OF_PEACE: //TODO: Need Altar of Peace class
-                return null;
-            case EMPERORS_TOMB: //TODO: Need Emperors tomb class
-                return null;
-            case EYE_OF_GOD: //TODO: Need Eye of God class
-                return null;
-            case GATE_OF_POWER: //TODO: Need Gate of power class
-                return null;
-            case GRAND_BAZAR: //TODO: Need Grand Bazar class
-                return null;
-            case PARK_OF_FORTUNE: //TODO: Need Park of fortune class
-                return null;
-            case TOWER_OF_WISDOM: //TODO: Need tower of wisdom class
-                return null;
-        }
-        return b;
-    }
+//    Types.TERRAIN checkTerrain(int x, int y){
+//        switch (terrains[x][y]){
+//            case PLAIN :
+//                return Types.TERRAIN.PLAIN;
+//            case VILLAGE:
+//                return Types.TERRAIN.VILLAGE;
+//            case SHALLOW_WATER:
+//                return Types.TERRAIN.SHALLOW_WATER;
+//            case  DEEP_WATER:
+//                return Types.TERRAIN.DEEP_WATER;
+//            case CITY:
+//                return Types.TERRAIN.CITY;
+//            case MOUNTAIN:
+//                return Types.TERRAIN.MOUNTAIN;
+//            case FOREST:
+//                return Types.TERRAIN.FOREST;
+//        }
+//        return Types.TERRAIN.PLAIN;
+//    }
+//
+//    // Helper method to check which terrain at which tile for deep copying unit array
+//    Types.RESOURCE checkResource(int x, int y){
+//        Types.RESOURCE r = null;
+//        switch (resources[x][y]){
+//            case FISH:
+//                return Types.RESOURCE.FISH;
+//            case FRUIT:
+//                return Types.RESOURCE.FRUIT;
+//            case ANIMAL:
+//                return Types.RESOURCE.ANIMAL;
+//            case WHALES:
+//                return Types.RESOURCE.WHALES;
+//            case ORE:
+//                return Types.RESOURCE.ORE;
+//            case CROPS:
+//                return Types.RESOURCE.CROPS;
+//            case RUINS:
+//                return Types.RESOURCE.RUINS;
+//        }
+//        return r;
+//    }
+//
+//    // Helper method to check which Building at which tile for deep copying building array
+//    Building checkBuilding(int x, int y){
+//        Building b = getBuildingAt(x,y);
+//        switch (b.getTYPE()){
+//            case TEMPLE:
+//                return new Temple(x,y);
+//            case  PORT:
+//                return new Port(x,y);
+//            case MINE:
+//                return new Mine(x,y);
+//            case  FORGE:
+//                return new Forge(x,y);
+//            case FARM:
+//                return new Farm(x,y);
+//            case WINDMILL:
+//                return new Windmill(x,y);
+//            case ROAD:
+//                return null;
+//            case CUSTOM_HOUSE:
+//                return new CustomHouse(x,y);
+//            case LUMBER_HUT:
+//                return new LumberHut(x,y);
+//            case SAWMILL:
+//                return new Sawmill(x,y);
+//            case WATER_TEMPLE:
+//                return null; // TODO: Need Water Temple class
+//            case FOREST_TEMPLE:
+//                return new ForestTemple(x,y);
+//            case MOUNTAIN_TEMPLE:
+//                return null; // TODO: Need Mountain Temple class
+//            case ALTAR_OF_PEACE: //TODO: Need Altar of Peace class
+//                return null;
+//            case EMPERORS_TOMB: //TODO: Need Emperors tomb class
+//                return null;
+//            case EYE_OF_GOD: //TODO: Need Eye of God class
+//                return null;
+//            case GATE_OF_POWER: //TODO: Need Gate of power class
+//                return null;
+//            case GRAND_BAZAR: //TODO: Need Grand Bazar class
+//                return null;
+//            case PARK_OF_FORTUNE: //TODO: Need Park of fortune class
+//                return null;
+//            case TOWER_OF_WISDOM: //TODO: Need tower of wisdom class
+//                return null;
+//        }
+//        return b;
+//    }
 
     // Setter method for units array
-    public void setUnits(Unit[][] u){
+    public void setUnits(int[][] u){
         this.units = u;
     }
 
@@ -330,10 +330,10 @@ public class Board {
     public void setBorders(){
 
         for(int i = 0; i<tribes.length; i++) {
-            ArrayList<City> tribe1Cities = tribes[i].getCities();
+            ArrayList<Integer> tribe1Cities = tribes[i].getCitiesID();
 
-
-            for (City c : tribe1Cities) {
+            for (int cityId : tribe1Cities) {
+                City c = (City) gameActors.get(cityId);
                 setBorderHelper(c, c.getBound());
             }
 
@@ -346,8 +346,8 @@ public class Board {
         int y = c.getY();
         for (int i =x-bound; i< x+bound; i++){
             for(int j = y-bound; j<x+bound; j++) {
-                if(id[i][j] != -1){
-                    id[i][j] = tribes[0].getActorID();
+                if(tileCityId[i][j] != -1){
+                    tileCityId[i][j] = tribes[0].getActorID();
                 }
             }
         }
@@ -355,7 +355,6 @@ public class Board {
 
     // Method to expand city borders, take city as param
     public void expandBorder(City city){
-
         city.setBound(city.getBound()+1);
         setBorderHelper(city,city.getBound());
 
@@ -363,16 +362,17 @@ public class Board {
 
 
     public void occupy(Tribe t, int x, int y){
-        ArrayList<City> cities = t.getCities();
+        ArrayList<Integer> cities = t.getCitiesID();
+
         City c = null;
-        for (City city:
-             cities) {
+        for (int cityId:cities) {
+            City city = (City) gameActors.get(cityId);
             if (city.getX() == x && city.getY() == y){
                 c = city;
                 break;
             }
         }
-        if (c.getIsValley()){
+        if (c != null && c.getIsValley()){
             c.setIsValley(false);
             // TODO: Assign the owner
             c.levelUp();
@@ -384,5 +384,38 @@ public class Board {
         this.tribes = t;
     }
 
+
+    /**
+     * Adds a new actor to the list of game actors
+     * @param actor the actor to add
+     * @return the unique identifier of this actor for the rest of the game.
+     */
+    public int addActor(core.actors.Actor actor)
+    {
+        int nActors = gameActors.size();
+        gameActors.put(nActors, actor);
+        return nActors;
+    }
+
+    /**
+     * Gets a game actor from its tileCityId.
+     * @param actorId the tileCityId of the actor to retrieve
+     * @return the actor, null if the tileCityId doesn't correspond to an actor (note that it may have
+     * been deleted if the actor was removed from the game).
+     */
+    public core.actors.Actor getActor(int actorId)
+    {
+        return gameActors.get(actorId);
+    }
+
+    /**
+     * Removes an actor from the list of actor
+     * @param actorId tileCityId of the actor to remove
+     * @return true if the actor was removed (false may indicate that it didn't exist).
+     */
+    public boolean removeActor(int actorId)
+    {
+        return gameActors.remove(actorId) != null;
+    }
 
 }

@@ -69,7 +69,7 @@ public class InfoView extends JComponent {
             Types.TERRAIN t = board.getTerrainAt(highlightY, highlightX);
             Types.RESOURCE r = board.getResourceAt(highlightY, highlightX);
             Types.BUILDING b = board.getBuildingAt(highlightY, highlightX);
-            Types.UNIT u = board.getUnitAt(highlightY, highlightX);
+            Types.UNIT u = board.getUnitAt(highlightY, highlightX).getType();
 
             StringBuilder sb = new StringBuilder();
             sb.append(t != null ? t + "\n" : "");

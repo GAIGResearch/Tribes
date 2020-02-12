@@ -23,7 +23,7 @@ public class GameView extends JComponent {
 
     GameView(Board board, InfoView inforView)
     {
-        this.board = board.copyBoard();
+        this.board = board.copy();
         this.cellSize = CELL_SIZE;
         this.infoView = inforView;
         this.gridSize = board.getSize();
@@ -59,7 +59,7 @@ public class GameView extends JComponent {
                 Types.BUILDING b = board.getBuildingAt(i,j);
                 paintImage(g, i, j, cellSize, (b == null) ? null : b.getImage());
 
-                Types.UNIT u = board.getUnitAt(i,j);
+                Types.UNIT u = board.getUnitAt(i,j).getType();
                 paintImage(g, i, j, cellSize, (u == null) ? null : u.getImage(0)); //TODO: This playerID will need to be checked.
 
             }
@@ -110,7 +110,7 @@ public class GameView extends JComponent {
      */
     void paint(Board b)
     {
-        this.board = b.copyBoard();
+        this.board = b.copy();
         this.repaint();
     }
 

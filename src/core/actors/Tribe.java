@@ -4,20 +4,31 @@ import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class Tribe extends Actor{
 
-    private Types.RESULT winner = Types.RESULT.INCOMPLETE;
-    private int score = 0;
-    private LinkedList<Integer> citiesID;
-    private Types.TRIBE tribe;
-    private int stars; //TODO: compute this amount at the beginning of each turn.
-    private TechnologyTree techTree;
-
+    //Cities this tribe owns.
+    private ArrayList<Integer> citiesID;
 
     //ID of this tribe. It corresponds with the ID of the player who controls it.
     private int tribeID;
+
+    //Type of the tribe
+    private Types.TRIBE tribe;
+
+    //Technology progress of this tribe
+    private TechnologyTree techTree;
+
+    //Current number of stars (resources) of this tribe.
+    private int stars; //TODO: compute this amount at the beginning of each turn.
+
+    //Game result for this player.
+    private Types.RESULT winner = Types.RESULT.INCOMPLETE;
+
+    //Score for the tribe.
+    private int score = 0;
+
 
     public Tribe(Types.TRIBE tribe)
     {
@@ -36,9 +47,29 @@ public class Tribe extends Actor{
     {
         techTree = new TechnologyTree();
         techTree.doResearch(tribe.getInitialTech());
-        citiesID = new LinkedList<>();
+        citiesID = new ArrayList<>();
         stars = TribesConfig.INITIAL_STARS;
     }
+
+
+    public Tribe copy()
+    {
+        Tribe tribeCopy = new Tribe(this.tribe);
+        tribeCopy.tribeID = this.tribeID;
+        tribeCopy.techTree = this.techTree.copy();
+        tribeCopy.stars = this.stars;
+        tribeCopy.winner = this.winner;
+        tribeCopy.score = this.score;
+
+        tribeCopy.citiesID = new ArrayList<>();
+        for(int cityID : citiesID)
+        {
+            tribeCopy.citiesID.add(cityID);
+        }
+
+        return tribeCopy;
+    }
+
 
 
     public void addCity(int id) {
@@ -66,12 +97,10 @@ public class Tribe extends Actor{
         this.score += score;
     }
 
-    public LinkedList<Integer> getCitiesID() {
-        LinkedList<Integer> copyCities = new LinkedList<>();
-        for (Integer integer : citiesID) {
-            copyCities.add(integer);
-        }
-        return copyCities;
+
+
+    public ArrayList<Integer> getCitiesID() {
+        return citiesID;
     }
 
     public String getName(){return tribe.getName();}
@@ -96,4 +125,5 @@ public class Tribe extends Actor{
     public void setStars(int stars) {
         this.stars = stars;
     }
+
 }

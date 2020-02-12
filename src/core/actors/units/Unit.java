@@ -1,5 +1,6 @@
 package core.actors.units;
 
+import core.Types;
 import core.actors.Actor;
 import utils.Vector2d;
 
@@ -68,6 +69,8 @@ public abstract class Unit extends Actor
     public int getOwnerID(){
         return  ownerID;
     }
+
+    public abstract Types.UNIT getType();
 
     public abstract Unit copy();
 

@@ -1,6 +1,7 @@
 package core.game;
 
 import core.actions.Action;
+import core.actors.Actor;
 import core.actors.Tribe;
 
 import java.util.ArrayList;
@@ -46,6 +47,39 @@ public class GameState {
     {
         this.model.assignTribes(tribes);
     }
+
+
+    /**
+     * Adds a new actor to the list of game actors
+     * @param actor the actor to add
+     * @return the unique identifier of this actor for the rest of the game.
+     */
+    public int addActor(Actor actor)
+    {
+        return model.getBoard().addActor(actor);
+    }
+
+    /**
+     * Gets a game actor from its id.
+     * @param actorId the id of the actor to retrieve
+     * @return the actor, null if the id doesn't correspond to an actor (note that it may have
+     * been deleted if the actor was removed from the game).
+     */
+    public Actor getActor(int actorId)
+    {
+        return model.getBoard().getActor(actorId);
+    }
+
+    /**
+     * Removes an actor from the list of actor
+     * @param actorId id of the actor to remove
+     * @return true if the actor was removed (false may indicate that it didn't exist).
+     */
+    public boolean removeActor(int actorId)
+    {
+        return model.getBoard().removeActor(actorId);
+    }
+
 
     /**
      * Returns the current tick of the game. One tick encompasses a turn for all

@@ -1,9 +1,11 @@
 package core.game;
 
 import core.actions.Action;
+import core.actors.Actor;
 import core.actors.Tribe;
 
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 public class ForwardModel {
 
@@ -37,7 +39,7 @@ public class ForwardModel {
     {
         //TODO: Init the game, including creating the level.
         LevelLoader ll = new LevelLoader();
-        board = ll.buildLevel(filename);
+        board = ll.buildLevel(filename, tribes.length);
     }
 
 
@@ -62,7 +64,6 @@ public class ForwardModel {
         //TODO: Make an exact copy of this model, reducing if for PO if playerID != -1
         return null;
     }
-
 
     /**
      * Sets the tribes that will play the game. The number of tribes must equal the number of players in Game.

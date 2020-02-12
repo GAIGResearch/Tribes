@@ -1,5 +1,6 @@
 package core.actors.units;
 
+import core.Types;
 import utils.Vector2d;
 
 import static core.TribesConfig.*;
@@ -11,6 +12,11 @@ public class Battleship extends Unit
     public Battleship(Vector2d pos, int kills, boolean isVeteran, int ownerID, int hp) {
         super(BATTLESHIP_ATTACK, BATTLESHIP_DEFENCE, BATTLESHIP_MOVEMENT, hp, BATTLESHIP_RANGE, BATTLESHIP_COST, pos, kills, isVeteran, ownerID);
         this.hp = hp;
+    }
+
+    @Override
+    public Types.UNIT getType() {
+        return Types.UNIT.BATTLESHIP;
     }
 
     @Override

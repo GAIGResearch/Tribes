@@ -22,14 +22,14 @@ public class LevelLoader
      * @param gamelvl
      *            file name containing the level.
      */
-    public Board buildLevel(String gamelvl) {
+    public Board buildLevel(String gamelvl, int numTribes) {
         String[] lines = new IO().readFile(gamelvl);
 
         // Dimensions of the level read from the file.
         size.width = lines.length;
         size.height = lines.length;
 
-        Board board = new Board(size.width);
+        Board board = new Board(size.width, numTribes);
 
         //Go through evert token in the level file
         for (int i = 0; i < size.height; ++i) {

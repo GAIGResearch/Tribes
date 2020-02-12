@@ -7,8 +7,8 @@ import static core.TribesConfig.*;
 
 public class Defender extends Unit
 {
-    public Defender(Vector2d pos, int kills, boolean isVeteran, int ownerID) {
-        super(DEFENDER_ATTACK, DEFENDER_DEFENCE, DEFENDER_MOVEMENT, DEFENDER_MAX_HP, DEFENDER_RANGE, DEFENDER_COST, pos, kills, isVeteran, ownerID);
+    public Defender(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId) {
+        super(DEFENDER_ATTACK, DEFENDER_DEFENCE, DEFENDER_MOVEMENT, DEFENDER_MAX_HP, DEFENDER_RANGE, DEFENDER_COST, pos, kills, isVeteran, cityId, tribeId);
     }
 
     @Override
@@ -18,7 +18,7 @@ public class Defender extends Unit
 
     @Override
     public Defender copy() {
-        Defender c = new Defender(getCurrentPosition(), getKills(), isVeteran(), getOwnerID());
+        Defender c = new Defender(getCurrentPosition(), getKills(), isVeteran(), getCiteID(), getTribeID());
         c.setCurrentHP(getCurrentHP());
         return c;
     }

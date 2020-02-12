@@ -29,18 +29,11 @@ public class Game {
     //Number of players of the game.
     private int numPlayers;
 
-    public Game()
-    {}
-
     /**
      * Constructor of the game
-     * @param seed Seed for the game (used only for board generation)
      */
-    public Game(long seed) {
-        this.seed = seed;
-        this.gs = new GameState(seed);
-    }
-
+    public Game()
+    {}
 
     /**
      * Initializes the game. This method does the following:
@@ -51,14 +44,26 @@ public class Game {
      * @param players Players of the game.
      * @param tribes Tribes to play the game with. Players and tribes related by position in array lists.
      * @param filename Name of the file with the level information.
+     * @param seed Seed for the game (used only for board generation)
      */
-    public void init(ArrayList<Agent> players, ArrayList<Tribe> tribes, String filename) {
+    public void init(ArrayList<Agent> players, ArrayList<Tribe> tribes, String filename, long seed) {
+
+        //Initiate the bare bones of the main game classes
+        this.seed = seed;
+        this.gs = new GameState(seed);
 
         if(players.size() != tribes.size())
         {
-            System.out.printf("ERROR: Number of tribes must equal the number of players.");
+            System.out.println("ERROR: Number of tribes must equal the number of players.");
         }
 
+        Tribe[] tribesArray = new Tribe[tribes.size()];
+        for (int i = 0; i < tribesArray.length; ++i)
+        {
+            tribesArray[i] = tribes.get(i);
+        }
+
+        //Create the players and agents to control them
         numPlayers = players.size();
         this.players = new Agent[numPlayers];
         for(int i = 0; i < numPlayers; ++i)
@@ -67,44 +72,48 @@ public class Game {
             this.players[i].setPlayerID(i);
         }
         this.gameStateObservations = new GameState[numPlayers];
-        this.gs.assignTribes(tribes);
 
-        resetGame(filename, tribes.size());
-    }
+        //Assign the tribes to the players
+//        this.gs.assignTribes(tribes);
 
+        this.gs.init(filename, tribesArray);
 
-    /**
-     * Resets the game, providing a seed.
-     * @param repeatLevel true if the same level should be played.
-     * @param filename Name of the file with the level information.
-     */
-    public void reset(boolean repeatLevel, String filename)
-    {
-        this.seed = repeatLevel ? seed : System.currentTimeMillis();
-        resetGame(filename, numPlayers);
-    }
-
-    /**
-     * Resets the game, providing a seed.
-     * @param seed new seed for the game.
-     * @param filename Name of the file with the level information.
-     */
-    public void reset(int seed, String filename)
-    {
-        this.seed = seed;
-        resetGame(filename, numPlayers);
-    }
-
-    /**
-     * Resets the game, creating the original game state (and level) and assigning the initial
-     * game state views that each player will have.
-     * @param filename Name of the file with the level information.
-     */
-    private void resetGame(String filename, int numPlayers)
-    {
-        this.gs.init(filename, numPlayers);
         updateAssignedGameStates();
     }
+
+
+//    /**
+//     * Resets the game, providing a seed.
+//     * @param repeatLevel true if the same level should be played.
+//     * @param filename Name of the file with the level information.
+//     */
+//    public void reset(boolean repeatLevel, String filename)
+//    {
+//        this.seed = repeatLevel ? seed : System.currentTimeMillis();
+//        resetGame(filename, numPlayers);
+//    }
+//
+//    /**
+//     * Resets the game, providing a seed.
+//     * @param seed new seed for the game.
+//     * @param filename Name of the file with the level information.
+//     */
+//    public void reset(int seed, String filename)
+//    {
+//        this.seed = seed;
+//        resetGame(filename, numPlayers);
+//    }
+
+//    /**
+//     * Resets the game, creating the original game state (and level) and assigning the initial
+//     * game state views that each player will have.
+//     * @param filename Name of the file with the level information.
+//     */
+//    private void resetGame(String filename)
+//    {
+//        this.gs.init(filename);
+//        updateAssignedGameStates();
+//    }
 
 
 

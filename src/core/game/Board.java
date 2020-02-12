@@ -5,6 +5,7 @@ import core.actors.Actor;
 import core.actors.City;
 import core.actors.Tribe;
 import core.actors.units.*;
+import utils.Vector2d;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -42,7 +43,7 @@ public class Board {
         this.gameActors = new TreeMap<>();
     }
 
-    public void init (int size, int numOfPlayers){
+    public void init (int size, Tribe[] tribes){
 
         terrains = new Types.TERRAIN[size][size];
         resources = new Types.RESOURCE[size][size];
@@ -50,7 +51,6 @@ public class Board {
         units = new int[size][size];
 
         this.size = size;
-        this.tribes = new Tribe[numOfPlayers];
         this.tileCityId = new int[size][size];
 
         //Initialise tile IDs
@@ -60,27 +60,20 @@ public class Board {
             }
         }
 
-    }
-
-    /**
-     * Inits the board, setting the borders of all the present cities.
-     */
-    public void init()
-    {
-        this.setBorders();
+        this.assignTribes(tribes);
     }
 
     // Return deep copy of board
     public Board copy(){
         Board copyBoard = new Board();
-        copyBoard.init(this.size, this.tribes.length);
         copyBoard.size = this.size;
         copyBoard.tribes = new Tribe[this.tribes.length];
 
-        // Copy tribes
-        for (int i = 0; i< tribes.length; i++){
-            copyBoard.tribes[i] = tribes[i].copy();
-        }
+        copyBoard.terrains = new Types.TERRAIN[size][size];
+        copyBoard.resources = new Types.RESOURCE[size][size];
+        copyBoard.buildings = new Types.BUILDING[size][size];
+        copyBoard.units = new int[size][size];
+        copyBoard.tileCityId = new int[size][size];
 
         // Copy board objects (they are all ids)
         for (int x = 0; x<this.size; x++){
@@ -91,6 +84,11 @@ public class Board {
                 copyBoard.setBuildingAt(x,y,buildings[x][y]);
                 copyBoard.tileCityId[x][y] = tileCityId[x][y];
             }
+        }
+
+        // Copy tribes
+        for (int i = 0; i< tribes.length; i++){
+            copyBoard.tribes[i] = tribes[i].copy();
         }
 
         //Deep copy of all actors in the board
@@ -113,13 +111,13 @@ public class Board {
      * Sets the tribes that will play the game. The number of tribes must equal the number of players in Game.
      * @param tribes to play with
      */
-    public void assignTribes(ArrayList<Tribe> tribes)
+    private void assignTribes(Tribe[] tribes)
     {
-        int numTribes = tribes.size();
+        int numTribes = tribes.length;
         this.tribes = new Tribe[numTribes];
         for(int i = 0; i < numTribes; ++i)
         {
-            this.tribes[i] = tribes.get(i);
+            this.tribes[i] = tribes[i];
             this.tribes[i].setTribeID(i);
         }
     }
@@ -156,7 +154,11 @@ public class Board {
 
     // Get Unit at pos x,y
     public Unit getUnitAt(int x, int y){
-        return (Unit) (gameActors.get(units[x][y]));
+
+        Actor act = gameActors.get(units[x][y]);
+        if(act != null)
+            return (Unit) act;
+        return null;
     }
 
     // Set Resource at pos x,y
@@ -357,7 +359,7 @@ public class Board {
     }
 
     // Method to determine city borders, take city and x and y pos of city as params
-    public void setBorders(){
+    public void setCityBorders(){
 
         for(int i = 0; i<tribes.length; i++) {
             ArrayList<Integer> tribe1Cities = tribes[i].getCitiesID();
@@ -425,6 +427,13 @@ public class Board {
         tribes[tribeID].addCity(c.getActorID());
     }
 
+    public void addUnitToBoard(Unit u)
+    {
+        addActor(u);
+        Vector2d pos = u.getCurrentPosition();
+        setUnitIdAt(pos.x, pos.y, u);
+    }
+
     /**
      * Adds a new actor to the list of game actors
      * @param actor the actor to add
@@ -432,8 +441,9 @@ public class Board {
      */
     public int addActor(core.actors.Actor actor)
     {
-        int nActors = gameActors.size();
+        int nActors = gameActors.size() + 1;
         gameActors.put(nActors, actor);
+        actor.setActorID(nActors);
         return nActors;
     }
 

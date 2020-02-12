@@ -2,10 +2,12 @@ package core.game;
 
 import core.Types;
 import core.actors.City;
+import core.actors.Tribe;
+import core.actors.units.Unit;
 import utils.IO;
+import utils.Vector2d;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 public class LevelLoader
 {
@@ -19,20 +21,21 @@ public class LevelLoader
 
     /**
      * Builds a level, receiving a file name.
-     *
-     * @param gamelvl
-     *            file name containing the level.
+     * @param tribes tribes to play in this game
+     * @param gamelvl file name containing the level.
      */
-    public Board buildLevel(Board board, String gamelvl, int numPlayers) {
+    public Board buildLevel(Tribe[] tribes, String gamelvl, long seed) {
+
+        Board board = new Board();
         String[] lines = new IO().readFile(gamelvl);
 
         // Dimensions of the level read from the file.
         size.width = lines.length;
         size.height = lines.length;
         int tribeID = 0;
+        int numTribes = tribes.length;
 
-        board.init(size.width, numPlayers);
-
+        board.init(size.width, tribes);
 
         //Go through evert token in the level file
         for (int i = 0; i < size.height; ++i) {
@@ -49,7 +52,7 @@ public class LevelLoader
 
                 if(terrainChar == Types.TERRAIN.CITY.getMapChar())
                 {
-                    if(tribeID==numPlayers)
+                    if(tribeID==numTribes)
                     {
                         //If we've already allocated all the cities to the number of tribes, turn this
                         //extra city into a village.
@@ -59,6 +62,12 @@ public class LevelLoader
                         //A city to create. Add it and assign it to the next tribe.
                         City c = new City(i, j, tribeID);
                         board.addCityToTribe(c, tribeID);
+
+                        //Also, each tribe starts with a unit in the same location where the city is
+                        Types.UNIT unitType = tribes[tribeID].getType().getStartingUnit();
+                        Unit unit = unitType.createUnit(new Vector2d(i,j), 0, false, c.getActorID(), tribeID, unitType);
+                        board.addUnitToBoard(unit);
+
                         tribeID++;
                     }
                 }
@@ -73,11 +82,8 @@ public class LevelLoader
             }
         }
 
-
-        board.init();
-
+        board.setCityBorders();
         return board;
-
     }
 
 

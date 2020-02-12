@@ -20,7 +20,7 @@ public class ForwardModel {
      * Forward model constructor
      */
     ForwardModel() {
-        board = new Board();
+
     }
 
     /**
@@ -28,11 +28,10 @@ public class ForwardModel {
      * Adds avatars to the game and sets them alive.
      * Generates the initial board of the game.
      */
-    void init(long seed, String filename, int numPlayers)
+    void init(Tribe[] tribes, long seed, String filename)
     {
-        //TODO: Init the game, including creating the level.
         LevelLoader ll = new LevelLoader();
-        ll.buildLevel(board, filename, numPlayers);
+        board = ll.buildLevel(tribes, filename, seed);
     }
 
 
@@ -56,15 +55,6 @@ public class ForwardModel {
     {
         //TODO: Make an exact copy of this model, reducing if for PO if playerID != -1
         return null;
-    }
-
-    /**
-     * Sets the tribes that will play the game. The number of tribes must equal the number of players in Game.
-     * @param tribes to play with
-     */
-    public void assignTribes(ArrayList<Tribe> tribes)
-    {
-        board.assignTribes(tribes);
     }
 
     /**

@@ -5,6 +5,7 @@ import java.awt.*;
 
 import core.Constants;
 import core.Types;
+import core.actors.units.Unit;
 import core.game.Board;
 
 import static core.Constants.*;
@@ -59,8 +60,8 @@ public class GameView extends JComponent {
                 Types.BUILDING b = board.getBuildingAt(i,j);
                 paintImage(g, i, j, cellSize, (b == null) ? null : b.getImage());
 
-                Types.UNIT u = board.getUnitAt(i,j).getType();
-                paintImage(g, i, j, cellSize, (u == null) ? null : u.getImage(0)); //TODO: This playerID will need to be checked.
+                Unit u = board.getUnitAt(i,j);
+                paintImage(g, i, j, cellSize, (u == null) ? null : u.getType().getImage(u.getTribeID()));
 
             }
         }

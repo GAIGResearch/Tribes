@@ -9,8 +9,8 @@ public class Boat extends Unit
 {
     private int hp;
 
-    public Boat(Vector2d pos, int kills, boolean isVeteran, int ownerID, int hp) {
-        super(BOAT_ATTACK, BOAT_DEFENCE, BOAT_MOVEMENT, hp, BOAT_RANGE, BOAT_COST, pos, kills, isVeteran, ownerID);
+    public Boat(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId, int hp) {
+        super(BOAT_ATTACK, BOAT_DEFENCE, BOAT_MOVEMENT, hp, BOAT_RANGE, BOAT_COST, pos, kills, isVeteran, cityId, tribeId);
     }
 
     @Override
@@ -20,7 +20,7 @@ public class Boat extends Unit
 
     @Override
     public Boat copy() {
-        Boat c = new Boat(getCurrentPosition(), getKills(), isVeteran(), getOwnerID(), hp);
+        Boat c = new Boat(getCurrentPosition(), getKills(), isVeteran(), getCiteID(), getTribeID(), hp);
         c.setCurrentHP(getCurrentHP());
         return c;
     }

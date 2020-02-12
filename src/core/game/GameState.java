@@ -20,6 +20,7 @@ public class GameState {
     //Default constructor.
     public GameState()
     {
+        this.model = new ForwardModel();
     }
 
     //Another constructor.
@@ -29,25 +30,12 @@ public class GameState {
     }
 
     /**
-     * Initializes the ForwardModel in the GameState. If the model is null, it creates a new one.
+     * Initializes the GameState.
      * The level is only generated when this initialization method is called.
      */
-    void init(String filename, int numPlayers) {
-        if (model == null) {
-            model = new ForwardModel();
-        }
-        this.model.init(seed, filename, numPlayers);
+    void init(String filename, Tribe[] tribes) {
+        this.model.init(tribes, seed, filename);
     }
-
-    /**
-     * Sets the tribes that will play the game. The number of tribes must equal the number of players in Game.
-     * @param tribes to play with
-     */
-    public void assignTribes(ArrayList<Tribe> tribes)
-    {
-        this.model.assignTribes(tribes);
-    }
-
 
     /**
      * Adds a new actor to the list of game actors

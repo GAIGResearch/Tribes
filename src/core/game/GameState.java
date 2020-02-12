@@ -1,6 +1,7 @@
 package core.game;
 
 import core.actions.Action;
+import core.actors.Actor;
 import core.actors.Tribe;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class GameState {
     //Default constructor.
     public GameState()
     {
+        this.model = new ForwardModel();
     }
 
     //Another constructor.
@@ -28,24 +30,44 @@ public class GameState {
     }
 
     /**
-     * Initializes the ForwardModel in the GameState. If the model is null, it creates a new one.
+     * Initializes the GameState.
      * The level is only generated when this initialization method is called.
      */
-    void init(String filename) {
-        if (model == null) {
-            model = new ForwardModel();
-        }
-        this.model.init(seed, filename);
+    void init(String filename, Tribe[] tribes) {
+        this.model.init(tribes, seed, filename);
     }
 
     /**
-     * Sets the tribes that will play the game. The number of tribes must equal the number of players in Game.
-     * @param tribes to play with
+     * Adds a new actor to the list of game actors
+     * @param actor the actor to add
+     * @return the unique identifier of this actor for the rest of the game.
      */
-    public void assignTribes(ArrayList<Tribe> tribes)
+    public int addActor(Actor actor)
     {
-        this.model.assignTribes(tribes);
+        return model.getBoard().addActor(actor);
     }
+
+    /**
+     * Gets a game actor from its id.
+     * @param actorId the id of the actor to retrieve
+     * @return the actor, null if the id doesn't correspond to an actor (note that it may have
+     * been deleted if the actor was removed from the game).
+     */
+    public Actor getActor(int actorId)
+    {
+        return model.getBoard().getActor(actorId);
+    }
+
+    /**
+     * Removes an actor from the list of actor
+     * @param actorId id of the actor to remove
+     * @return true if the actor was removed (false may indicate that it didn't exist).
+     */
+    public boolean removeActor(int actorId)
+    {
+        return model.getBoard().removeActor(actorId);
+    }
+
 
     /**
      * Returns the current tick of the game. One tick encompasses a turn for all

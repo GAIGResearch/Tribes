@@ -7,7 +7,7 @@ import java.util.LinkedList;
 
 public class City extends Actor{
 
-    private int id;
+    private int tribeId;
     private int x;
     private int y;
     private int level;
@@ -18,23 +18,24 @@ public class City extends Actor{
     private int extraStar = 0;
     private int points = 0;
     private int longTermPoints = 0;
+
     private LinkedList<Integer> unitsID = new LinkedList<>();
     private LinkedList<Building> buildings = new LinkedList<>();
     int bound;
 
     // The constructor to initial the valley
-    public City(int x, int y, int id) {
+    public City(int x, int y, int tribeId) {
         this.x = x;
         this.y = y;
         isValley = true;
         population_need = 0;
         level = 0;
         isPrism = false;
-        this.id = id;
+        this.tribeId = tribeId;
         bound = 2;
     }
 
-    public City(int x, int y, int level, int population, int population_need, boolean isValley, boolean isPrism, int extraStar, LinkedList<Building> buildings, int id, LinkedList<Integer> unitsID) {
+    public City(int x, int y, int level, int population, int population_need, boolean isValley, boolean isPrism, int extraStar, LinkedList<Building> buildings, int tribeId, LinkedList<Integer> unitsID) {
         this.x = x;
         this.y = y;
         this.level = level;
@@ -44,7 +45,7 @@ public class City extends Actor{
         this.isPrism = isPrism;
         this.extraStar = extraStar;
         this.buildings = buildings;
-        this.id = id;
+        this.tribeId = tribeId;
         this.unitsID = unitsID;
     }
 
@@ -246,8 +247,8 @@ public class City extends Actor{
         return turnPoint;
     }
 
-    public int getId() {
-        return id;
+    public int getTribeId() {
+        return tribeId;
     }
 
     public LinkedList<Integer> getUnitsID() {
@@ -259,7 +260,7 @@ public class City extends Actor{
     }
 
     public City copy(){
-        return new City(x, y, level, population, population_need, isValley, isPrism, extraStar, getBuildings(), id, getUnitsID());
+        return new City(x, y, level, population, population_need, isValley, isPrism, extraStar, getBuildings(), tribeId, getUnitsID());
     }
 
     public boolean getIsValley(){

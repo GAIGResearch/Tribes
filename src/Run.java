@@ -16,7 +16,7 @@ public class Run {
         WindowInput wi = null;
         GUI frame = null;
         if (VISUALS) {
-            frame = new GUI(g, "Tribes", ki, false);
+            frame = new GUI(g, "Tribes", ki, true);
             wi = new WindowInput();
             wi.windowClosed = false;
             frame.addWindowListener(wi);

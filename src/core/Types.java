@@ -1,5 +1,6 @@
 package core;
 
+import core.actors.units.*;
 import utils.ImageIO;
 import utils.Vector2d;
 
@@ -46,20 +47,24 @@ public class Types {
     }
 
     public enum TRIBE{
-        XIN_XI(0, "Xin-Xi", TECHNOLOGY.CLIMBING),
-        IMPERIUS(1, "Imperius", TECHNOLOGY.ORGANIZATION),
-        BARDUR(2, "Bardur", TECHNOLOGY.HUNTING),
-        OUMAJI(3, "Oumaji", TECHNOLOGY.RIDING);
+        XIN_XI(0, "Xin-Xi", TECHNOLOGY.CLIMBING, UNIT.WARRIOR),
+        IMPERIUS(1, "Imperius", TECHNOLOGY.ORGANIZATION, UNIT.WARRIOR),
+        BARDUR(2, "Bardur", TECHNOLOGY.HUNTING, UNIT.WARRIOR),
+        OUMAJI(3, "Oumaji", TECHNOLOGY.RIDING, UNIT.RIDER);
 
         private int key;
         private String name;
         private TECHNOLOGY initialTech;
-        TRIBE(int numVal, String name, TECHNOLOGY initialTech) {  this.key = numVal;  this.name = name; this.initialTech = initialTech;}
+        private UNIT startingUnit;
+        TRIBE(int numVal, String name, TECHNOLOGY initialTech, UNIT startingUnit) {
+            this.key = numVal;  this.name = name; this.initialTech = initialTech; this.startingUnit = startingUnit;
+        }
         public int getKey() {  return key; }
         public String getName() { return name; }
         public TECHNOLOGY getInitialTech() {
             return initialTech;
         }
+        public UNIT getStartingUnit() {return startingUnit;}
     }
 
     /**
@@ -159,6 +164,18 @@ public class Types {
         UNIT(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
         public int getKey() {  return key; }
         public Image getImage(int playerID) { return ImageIO.GetInstance().getImage(imageFile + playerID + ".png"); }
+
+        public Unit createUnit (Vector2d pos, int kills, boolean isVeteran, int ownerID, int tribeID, UNIT type)
+        {
+            switch (type)
+            {
+                case WARRIOR: return new Warrior(pos, kills, isVeteran, ownerID, tribeID);
+                case RIDER: return new Rider(pos, kills, isVeteran, ownerID, tribeID);
+                default:
+                    System.out.println("WARNING: Types.Unit.createUnit(), type creation not implemented.");
+            }
+            return null;
+        }
 
 
         /*
@@ -267,6 +284,7 @@ Yellow_dark - 929000
         }
 
         public int getKey() {  return key; }
+        public char getMapChar() {return mapChar;}
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
 
 

@@ -1,6 +1,7 @@
 package utils;
 
 import core.Types;
+import core.actors.units.Unit;
 import core.game.Board;
 
 import javax.swing.*;
@@ -69,13 +70,13 @@ public class InfoView extends JComponent {
             Types.TERRAIN t = board.getTerrainAt(highlightY, highlightX);
             Types.RESOURCE r = board.getResourceAt(highlightY, highlightX);
             Types.BUILDING b = board.getBuildingAt(highlightY, highlightX);
-            Types.UNIT u = board.getUnitAt(highlightY, highlightX);
+            Unit u = board.getUnitAt(highlightY, highlightX);
 
             StringBuilder sb = new StringBuilder();
             sb.append(t != null ? t + "\n" : "");
             sb.append(r != null ? r + "\n" : "");
             sb.append(b != null ? b + "\n" : "");
-            sb.append(u != null ? u : "");
+            sb.append(u != null ? u.getType() : "");
 
             textArea.setText(sb.toString());
         }

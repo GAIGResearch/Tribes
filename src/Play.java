@@ -16,9 +16,9 @@ public class Play {
 
         KeyController ki = new KeyController(true);
         long seed = System.currentTimeMillis();
-        String filename = "SampleLevel2p.csv";
+//        String filename = "SampleLevel2p.csv";
+        String filename = "SampleLevel.csv";
 
-        Game game = new Game(seed);
         ArrayList<Agent> players = new ArrayList<>();
         ArrayList<Tribe> tribes = new ArrayList<>();
 
@@ -31,7 +31,18 @@ public class Play {
         tribes.add(new Tribe(Types.TRIBE.IMPERIUS));
 
 
-        game.init(players, tribes, filename);
+        Agent ag3 = new DoNothingAgent(seed);
+        players.add(ag3);
+        tribes.add(new Tribe(Types.TRIBE.BARDUR));
+
+        Agent ag4 = new DoNothingAgent(seed);
+        players.add(ag4);
+        tribes.add(new Tribe(Types.TRIBE.OUMAJI));
+
+
+
+        Game game = new Game();
+        game.init(players, tribes, filename, seed);
 
         Run.runGame(game, ki);
         System.out.println("Running Tribes...");

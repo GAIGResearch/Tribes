@@ -37,7 +37,12 @@ public class Board {
     private int size;
 
     // Constructor for board
-    public Board (int size, int numOfPlayers){
+    public Board()
+    {
+        this.gameActors = new TreeMap<>();
+    }
+
+    public void init (int size, int numOfPlayers){
 
         terrains = new Types.TERRAIN[size][size];
         resources = new Types.RESOURCE[size][size];
@@ -47,7 +52,6 @@ public class Board {
         this.size = size;
         this.tribes = new Tribe[numOfPlayers];
         this.tileCityId = new int[size][size];
-        this.gameActors = new TreeMap<>();
 
         //Initialise tile IDs
         for (int x = 0; x<size; x++){
@@ -56,12 +60,20 @@ public class Board {
             }
         }
 
+    }
+
+    /**
+     * Inits the board, setting the borders of all the present cities.
+     */
+    public void init()
+    {
         this.setBorders();
     }
 
     // Return deep copy of board
     public Board copy(){
-        Board copyBoard = new Board(this.size, this.tribes.length);
+        Board copyBoard = new Board();
+        copyBoard.init(this.size, this.tribes.length);
         copyBoard.size = this.size;
         copyBoard.tribes = new Tribe[this.tribes.length];
 
@@ -93,6 +105,24 @@ public class Board {
     }
 
 
+    public Tribe[] getTribes() {return tribes;}
+    public Tribe getTribe(int tribeId) {return tribes[tribeId];}
+    public int getNumTribes() {return tribes.length;}
+
+    /**
+     * Sets the tribes that will play the game. The number of tribes must equal the number of players in Game.
+     * @param tribes to play with
+     */
+    public void assignTribes(ArrayList<Tribe> tribes)
+    {
+        int numTribes = tribes.size();
+        this.tribes = new Tribe[numTribes];
+        for(int i = 0; i < numTribes; ++i)
+        {
+            this.tribes[i] = tribes.get(i);
+            this.tribes[i].setTribeID(i);
+        }
+    }
 
     // Get size of board
     public int getSize() {
@@ -384,6 +414,16 @@ public class Board {
         this.tribes = t;
     }
 
+    /**
+     * Adds a city to a tribe
+     * @param c city to add
+     * @param tribeID id of the tribe who will own the city
+     */
+    public void addCityToTribe(City c, int tribeID)
+    {
+        addActor(c);
+        tribes[tribeID].addCity(c.getActorID());
+    }
 
     /**
      * Adds a new actor to the list of game actors

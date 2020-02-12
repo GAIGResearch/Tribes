@@ -1,22 +1,14 @@
 package core.game;
 
 import core.actions.Action;
-import core.actors.Actor;
 import core.actors.Tribe;
-
 import java.util.ArrayList;
-import java.util.TreeMap;
+
 
 public class ForwardModel {
 
     // Board of the game
     private Board board;
-
-    // Number of tribes playing the game
-    private int numTribes;
-
-    //Tribes playing this game
-    private Tribe[] tribes;
 
     // Size of the board.
     private int size;
@@ -28,6 +20,7 @@ public class ForwardModel {
      * Forward model constructor
      */
     ForwardModel() {
+        board = new Board();
     }
 
     /**
@@ -35,11 +28,11 @@ public class ForwardModel {
      * Adds avatars to the game and sets them alive.
      * Generates the initial board of the game.
      */
-    void init(long seed, String filename)
+    void init(long seed, String filename, int numPlayers)
     {
         //TODO: Init the game, including creating the level.
         LevelLoader ll = new LevelLoader();
-        board = ll.buildLevel(filename, tribes.length);
+        ll.buildLevel(board, filename, numPlayers);
     }
 
 
@@ -71,13 +64,7 @@ public class ForwardModel {
      */
     public void assignTribes(ArrayList<Tribe> tribes)
     {
-        numTribes = tribes.size();
-        this.tribes = new Tribe[numTribes];
-        for(int i = 0; i < numTribes; ++i)
-        {
-            this.tribes[i] = tribes.get(i);
-            this.tribes[i].setTribeID(i);
-        }
+        board.assignTribes(tribes);
     }
 
     /**
@@ -85,7 +72,7 @@ public class ForwardModel {
      * @return the tribes playing the game
      */
     public Tribe[] getTribes() {
-        return tribes;
+        return board.getTribes();
     }
 
     /**

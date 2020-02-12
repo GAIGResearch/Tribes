@@ -32,11 +32,11 @@ public class GameState {
      * Initializes the ForwardModel in the GameState. If the model is null, it creates a new one.
      * The level is only generated when this initialization method is called.
      */
-    void init(String filename) {
+    void init(String filename, int numPlayers) {
         if (model == null) {
             model = new ForwardModel();
         }
-        this.model.init(seed, filename);
+        this.model.init(seed, filename, numPlayers);
     }
 
     /**

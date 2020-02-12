@@ -267,6 +267,7 @@ Yellow_dark - 929000
         }
 
         public int getKey() {  return key; }
+        public char getMapChar() {return mapChar;}
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
 
 

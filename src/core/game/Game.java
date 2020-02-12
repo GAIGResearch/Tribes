@@ -69,7 +69,7 @@ public class Game {
         this.gameStateObservations = new GameState[numPlayers];
         this.gs.assignTribes(tribes);
 
-        resetGame(filename);
+        resetGame(filename, tribes.size());
     }
 
 
@@ -81,7 +81,7 @@ public class Game {
     public void reset(boolean repeatLevel, String filename)
     {
         this.seed = repeatLevel ? seed : System.currentTimeMillis();
-        resetGame(filename);
+        resetGame(filename, numPlayers);
     }
 
     /**
@@ -92,7 +92,7 @@ public class Game {
     public void reset(int seed, String filename)
     {
         this.seed = seed;
-        resetGame(filename);
+        resetGame(filename, numPlayers);
     }
 
     /**
@@ -100,9 +100,9 @@ public class Game {
      * game state views that each player will have.
      * @param filename Name of the file with the level information.
      */
-    private void resetGame(String filename)
+    private void resetGame(String filename, int numPlayers)
     {
-        this.gs.init(filename);
+        this.gs.init(filename, numPlayers);
         updateAssignedGameStates();
     }
 

@@ -13,21 +13,33 @@ public class Recover extends UnitAction
         super.unit = target;
     }
 
+
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
-        //TODO: Compute all the Recover actions.
-        return null;
+
+        LinkedList<Action> actions = new LinkedList<>();
+        Recover newAction = new Recover(unit);
+        float currentHP = unit.getCurrentHP();
+        if (currentHP < unit.MAX_HP && currentHP > 0){
+            actions.add(newAction);
+        }
+        return actions;
     }
 
     @Override
     public boolean isFeasible(final GameState gs) {
-        //TODO: is feasible this Recover action
-        return false;
+        float currentHP = unit.getCurrentHP();
+        return currentHP < unit.MAX_HP && currentHP > 0;
     }
 
     @Override
     public boolean execute(GameState gs) {
-        //TODO: Execute this Recover action
+        float currentHP = unit.getCurrentHP();
+        if (currentHP < unit.MAX_HP && currentHP > 0) {
+            // TODO: need to have a way to know if the unit is in the territory or not
+            unit.setCurrentHP(Math.min(currentHP + 2, unit.MAX_HP));
+            return true;
+        }
         return false;
     }
 }

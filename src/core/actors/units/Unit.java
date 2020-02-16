@@ -9,10 +9,11 @@ public abstract class Unit extends Actor
     public final int ATK;
     public final int DEF;
     public final int MOV;
-    public final int MAX_HP;
+
     public final int RANGE;
     public final int COST;
 
+    private int maxHP;
     private float currentHP;
     private Vector2d currentPosition;
     private int kills;
@@ -24,11 +25,11 @@ public abstract class Unit extends Actor
         this.ATK = atk;
         this.DEF = def;
         this.MOV = mov;
-        this.MAX_HP = max_hp;
+        this.maxHP = max_hp;
         this.RANGE = range;
         this.COST = cost;
 
-        this.currentHP = MAX_HP;
+        this.currentHP = this.maxHP;
         this.currentPosition = pos;
         this.kills = kills;
         this.isVeteran = isVeteran;
@@ -39,6 +40,10 @@ public abstract class Unit extends Actor
     public void setCurrentHP(float hp){
         currentHP = hp;
     }
+
+    public void setMaxHP(int newHP) { maxHP = newHP; }
+
+    public int getMaxHP() { return maxHP; }
 
     public float getCurrentHP(){
         return currentHP;

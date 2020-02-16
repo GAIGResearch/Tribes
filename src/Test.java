@@ -7,6 +7,7 @@ import core.actors.units.Unit;
 import core.actors.units.Warrior;
 import utils.Vector2d;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import static core.Types.TECHNOLOGY.*;
@@ -53,6 +54,7 @@ public class Test
         }
 
         // Recover Testing
+        // TODO: test in territory will add 4 when gs is add
         Unit warrior = new Warrior(new Vector2d(10, 20), 0, false, 1, 1);
         testRecovery(warrior);
         warrior.setCurrentHP(5);

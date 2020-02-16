@@ -4,6 +4,7 @@ import core.actions.Action;
 import core.game.GameState;
 import core.actors.units.Unit;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Recover extends UnitAction
@@ -35,9 +36,18 @@ public class Recover extends UnitAction
     @Override
     public boolean execute(GameState gs) {
         float currentHP = unit.getCurrentHP();
+        int addHP = 2;
         if (currentHP < unit.MAX_HP && currentHP > 0) {
-            // TODO: need to have a way to know if the unit is in the territory or not
-            unit.setCurrentHP(Math.min(currentHP + 2, unit.MAX_HP));
+            if (gs != null){
+               int cityID = gs.getBoard().getCityIDAt(unit.getCurrentPosition().x, unit.getCurrentPosition().y);
+               if (cityID != -1){
+                   ArrayList<Integer> citesID = gs.getTribe(unit.getTribeID()).getCitiesID();
+                   if (citesID.contains(cityID)){
+                       addHP += 2;
+                   }
+            }
+            }
+            unit.setCurrentHP(Math.min(currentHP + addHP, unit.MAX_HP));
             return true;
         }
         return false;

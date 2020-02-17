@@ -8,6 +8,7 @@ import core.actors.units.*;
 import utils.Vector2d;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -32,7 +33,7 @@ public class Board {
     private int[][] tileCityId;
 
     //Actors in the game
-    private TreeMap<Integer, core.actors.Actor> gameActors;
+    private HashMap<Integer, Actor> gameActors;
 
     //variable to declare size of board
     private int size;
@@ -40,7 +41,7 @@ public class Board {
     // Constructor for board
     public Board()
     {
-        this.gameActors = new TreeMap<>();
+        this.gameActors = new HashMap<>();
     }
 
     public void init (int size, Tribe[] tribes){
@@ -92,7 +93,7 @@ public class Board {
         }
 
         //Deep copy of all actors in the board
-        copyBoard.gameActors = new TreeMap<>();
+        copyBoard.gameActors = new HashMap<>();
         for(Actor act : gameActors.values())
         {
             int id = act.getActorID();

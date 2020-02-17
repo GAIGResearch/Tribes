@@ -161,6 +161,11 @@ public class Board {
         return null;
     }
 
+    // Get CityID at pos x,y
+    public int getCityIDAt(int x, int y){
+        return tileCityId[x][y];
+    }
+
     // Set Resource at pos x,y
     public void setResourceAt(int x, int y, Types.RESOURCE r){
         resources[x][y] =  r;

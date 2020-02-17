@@ -14,7 +14,7 @@ import static core.Types.TECHNOLOGY.*;
 
 public class Test
 {
-    public static void testReseachActions()
+    public static void testResearchActions()
     {
         Tribe t = new Tribe(Types.TRIBE.XIN_XI);
         t.addCity(0); //We need to add a city or I'm actually unable to research anything.
@@ -80,7 +80,7 @@ public class Test
 
     public static void main(String[] args)
     {
-        testReseachActions();
+        testResearchActions();
     }
 
 }

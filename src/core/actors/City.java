@@ -29,10 +29,10 @@ public class City extends Actor{
         this.y = y;
         isValley = true;
         population_need = 0;
-        level = 0;
+        bound = 1; //cities start with 1 tile around it for territory
+        level = 1; //and starting level is 1
         isPrism = false;
         this.tribeId = tribeId;
-        bound = 2;
     }
 
     public City(int x, int y, int level, int population, int population_need, boolean isValley, boolean isPrism, int extraStar, LinkedList<Building> buildings, int tribeId, LinkedList<Integer> unitsID) {

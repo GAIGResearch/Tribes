@@ -376,10 +376,10 @@ public class Board {
     public void setBorderHelper(City c, int bound){
         int x = c.getX();
         int y = c.getY();
-        for (int i =x-bound; i< x+bound; i++){
-            for(int j = y-bound; j<x+bound; j++) {
-                if(tileCityId[i][j] != -1){
-                    tileCityId[i][j] = tribes[0].getActorID();
+        for (int i = x-bound; i <= x+bound; i++){
+            for(int j = y-bound; j <= y+bound; j++) {
+                if(tileCityId[i][j] == -1){
+                    tileCityId[i][j] = c.getActorID();
                 }
             }
         }
@@ -390,6 +390,11 @@ public class Board {
         city.setBound(city.getBound()+1);
         setBorderHelper(city,city.getBound());
 
+    }
+
+    public int getTileCityId(int x, int y)
+    {
+        return tileCityId[x][y];
     }
 
 
@@ -431,6 +436,22 @@ public class Board {
         addActor(u);
         Vector2d pos = u.getCurrentPosition();
         setUnitIdAt(pos.x, pos.y, u);
+    }
+
+
+    /**
+     * Adds a unit to a city, which created it.
+     * @param u unit to add
+     * @param c citiy that created the unit
+     * @return false if the unit coulnd't be added. That should not happen, so it prints a warning.
+     */
+    public boolean addUnitToCity(Unit u, City c)
+    {
+        boolean added = c.addUnits(u.getActorID());
+        if(!added){
+            System.out.println("ERROR: Unit failed to be added to city: u_id: " + u.getActorID() + ", c_id: " + c.getActorID());
+        }
+        return added;
     }
 
     /**

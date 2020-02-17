@@ -13,7 +13,7 @@ public abstract class Unit extends Actor
     public final int RANGE;
     public final int COST;
 
-    private float currentHP;
+    private int currentHP;
     private Vector2d currentPosition;
     private int kills;
     private boolean isVeteran;
@@ -36,11 +36,11 @@ public abstract class Unit extends Actor
         this.tribeID = tribeID;
     }
 
-    public void setCurrentHP(float hp){
+    public void setCurrentHP(int hp){
         currentHP = hp;
     }
 
-    public float getCurrentHP(){
+    public int getCurrentHP(){
         return currentHP;
     }
 

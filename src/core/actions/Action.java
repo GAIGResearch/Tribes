@@ -27,14 +27,14 @@ public abstract class Action
      * Analizes if the current action is feasible given a game state. Requires all parameters of the action to be
      * previously set. Example:
      *
-     *  ResearchTech researchAction = new ReseachTech(myTribe);
+     *  ResearchTech researchAction = new ResearchTech(myTribe);
      *  researchAction.setTech(Types.TECHNOLOGY.ARCHERY);
      *  boolean feasible = researchAction.isFeasible(currentGameState);
      *
      * Implementations of this function MUST NOT modify the GameState gs passed by parameter.
      *
      * @param gs the game state where the action will be or not feasible.
-     * @return wheter the action is feasible.
+     * @return whether the action is feasible.
      */
     public abstract boolean isFeasible(final GameState gs);
 
@@ -43,7 +43,7 @@ public abstract class Action
      * Executes this action in the game state. Requires all parameters of the action to be
      * previously set. Example:
      *
-     *  ResearchTech researchAction = new ReseachTech(myTribe);
+     *  ResearchTech researchAction = new ResearchTech(myTribe);
      *  researchAction.setTech(Types.TECHNOLOGY.ARCHERY);
      *  researchAction.execute(currentGameState);
      *

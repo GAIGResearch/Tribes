@@ -21,7 +21,7 @@ public class Recover extends UnitAction
         LinkedList<Action> actions = new LinkedList<>();
         Recover newAction = new Recover(unit);
         float currentHP = unit.getCurrentHP();
-        if (currentHP < unit.MAX_HP && currentHP > 0){
+        if (currentHP < unit.getMaxHP() && currentHP > 0){
             actions.add(newAction);
         }
         return actions;
@@ -30,14 +30,14 @@ public class Recover extends UnitAction
     @Override
     public boolean isFeasible(final GameState gs) {
         float currentHP = unit.getCurrentHP();
-        return currentHP < unit.MAX_HP && currentHP > 0;
+        return currentHP < unit.getMaxHP() && currentHP > 0;
     }
 
     @Override
     public boolean execute(GameState gs) {
         int currentHP = unit.getCurrentHP();
         int addHP = 2;
-        if (currentHP < unit.MAX_HP && currentHP > 0) {
+        if (currentHP < unit.getMaxHP() && currentHP > 0) {
             if (gs != null){
                int cityID = gs.getBoard().getCityIDAt(unit.getCurrentPosition().x, unit.getCurrentPosition().y);
                if (cityID != -1){
@@ -47,7 +47,7 @@ public class Recover extends UnitAction
                    }
                 }
             }
-            unit.setCurrentHP(Math.min(currentHP + addHP, unit.MAX_HP));
+            unit.setCurrentHP(Math.min(currentHP + addHP, unit.getMaxHP()));
             return true;
         }
         return false;

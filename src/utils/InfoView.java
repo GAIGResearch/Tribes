@@ -136,7 +136,7 @@ public class InfoView extends JComponent {
             {
                 sb.append("Unit: " + u.getType() + "\n");
                 sb.append(" Tribe: " + u.getTribeID() + "\n");
-                sb.append(" Health: " + u.getCurrentHP() + "/" + u.MAX_HP + "\n");
+                sb.append(" Health: " + u.getCurrentHP() + "/" + u.getMaxHP() + "\n");
                 if(u.isVeteran())
                     sb.append(" Veteran unit" + "\n");
                 else
@@ -148,10 +148,7 @@ public class InfoView extends JComponent {
             }
 
             unitTextArea.setText(sb.toString());
-
-
-
-
+            
         }
 
 

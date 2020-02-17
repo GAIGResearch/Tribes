@@ -32,7 +32,7 @@ public class MakeVeteran extends UnitAction
         {
             unit.setVeteran(true);
             unit.setMaxHP(unit.getMaxHP() + 5);
-            unit.setCurrentHP((float)unit.getMaxHP());
+            unit.setCurrentHP(unit.getMaxHP());
             return true;
         }
         return false;

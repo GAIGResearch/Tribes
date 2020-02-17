@@ -35,7 +35,7 @@ public class Recover extends UnitAction
 
     @Override
     public boolean execute(GameState gs) {
-        float currentHP = unit.getCurrentHP();
+        int currentHP = unit.getCurrentHP();
         int addHP = 2;
         if (currentHP < unit.MAX_HP && currentHP > 0) {
             if (gs != null){
@@ -45,7 +45,7 @@ public class Recover extends UnitAction
                    if (citesID.contains(cityID)){
                        addHP += 2;
                    }
-            }
+                }
             }
             unit.setCurrentHP(Math.min(currentHP + addHP, unit.MAX_HP));
             return true;

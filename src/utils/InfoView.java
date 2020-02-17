@@ -127,7 +127,7 @@ public class InfoView extends JComponent {
                     sb.append(" Num units: " + c.getUnitsID().size() + "\n");
                 }
                 cityTextArea.setText(sb.toString());
-            }
+            }else cityTextArea.setText("");
 
             //sb.append(b != null ? b + "\n" : "");
 
@@ -144,11 +144,10 @@ public class InfoView extends JComponent {
                     int kills = Math.max(u.getKills(), 3);
                     sb.append(" " + kills + "/3 kills" + "\n");
                 }
-
             }
 
             unitTextArea.setText(sb.toString());
-            
+
         }
 
 

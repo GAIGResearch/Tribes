@@ -85,28 +85,5 @@ public abstract class Unit extends Actor
     public abstract Types.UNIT getType();
 
     public abstract Unit copy();
-
-    public int getATK() {
-        return ATK;
-    }
-
-    public void setATK(int ATK) {
-        this.ATK = ATK;
-    }
-
-    public int getDEF() {
-        return DEF;
-    }
-
-    public void setDEF(int DEF) {
-        this.DEF = DEF;
-    }
-
-    public int getMOV() {
-        return MOV;
-    }
-
-    public void setMOV(int MOV) {
-        this.MOV = MOV;
-    }
+    
 }

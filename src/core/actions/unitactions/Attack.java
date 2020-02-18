@@ -1,6 +1,7 @@
 package core.actions.unitactions;
 
 import core.actions.Action;
+import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
 
@@ -23,6 +24,11 @@ public class Attack extends UnitAction
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         //TODO compute all the attack actions for super.unit.
+
+        LinkedList<Action> attacks = new LinkedList<>();
+
+        Board b = gs.getBoard();
+
         return null;
     }
 
@@ -37,6 +43,11 @@ public class Attack extends UnitAction
     @Override
     public boolean execute(GameState gs) {
         //TODO execute the atack action in the game.
+
+        if(target.getCurrentHP() <= unit.ATK){
+            unit.addKill();
+            target = null;
+        }
         return false;
     }
 }

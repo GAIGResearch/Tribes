@@ -46,8 +46,8 @@ public class Upgrade extends UnitAction
     public boolean execute(GameState gs) {
         //TODO: executes this Upgrade action
 
+        //TODO: Need to change unit type on upgrade from boat to ship and ship to battleship
         this.unit.setMaxHP(this.unit.getMaxHP() + 5);
-        //TODO : need units base attack value to upgrade attack
         if(this.unit.getType() == Types.UNIT.BOAT) {
             this.unit.setATK(this.unit.getATK()+1);
             this.unit.setDEF(this.unit.getDEF()+1);

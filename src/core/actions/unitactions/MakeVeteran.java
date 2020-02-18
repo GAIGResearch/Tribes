@@ -15,19 +15,26 @@ public class MakeVeteran extends UnitAction
 
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
-        //TODO: compute MakeVeteran actions
-        return null;
+        LinkedList<Action> actions = new LinkedList<>();
+        MakeVeteran newAction = new MakeVeteran(unit);
+        if(isFeasible(gs)){ actions.add(newAction); }
+        return actions;
     }
 
     @Override
     public boolean isFeasible(final GameState gs) {
-        //TODO: is feasible this MakeVeteran action
-        return false;
+        return unit.getKills() >= 3 && !unit.isVeteran();
     }
 
     @Override
     public boolean execute(GameState gs) {
-        //TODO: execute MakeVeteran action
+        if(isFeasible(gs))
+        {
+            unit.setVeteran(true);
+            unit.setMaxHP(unit.getMaxHP() + 5);
+            unit.setCurrentHP(unit.getMaxHP());
+            return true;
+        }
         return false;
     }
 }

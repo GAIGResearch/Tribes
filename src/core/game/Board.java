@@ -8,6 +8,7 @@ import core.actors.units.*;
 import utils.Vector2d;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -32,7 +33,7 @@ public class Board {
     private int[][] tileCityId;
 
     //Actors in the game
-    private TreeMap<Integer, core.actors.Actor> gameActors;
+    private HashMap<Integer, Actor> gameActors;
 
     //variable to declare size of board
     private int size;
@@ -40,7 +41,7 @@ public class Board {
     // Constructor for board
     public Board()
     {
-        this.gameActors = new TreeMap<>();
+        this.gameActors = new HashMap<>();
     }
 
     public void init (int size, Tribe[] tribes){
@@ -92,7 +93,7 @@ public class Board {
         }
 
         //Deep copy of all actors in the board
-        copyBoard.gameActors = new TreeMap<>();
+        copyBoard.gameActors = new HashMap<>();
         for(Actor act : gameActors.values())
         {
             int id = act.getActorID();
@@ -159,6 +160,11 @@ public class Board {
         if(act != null)
             return (Unit) act;
         return null;
+    }
+
+    // Get CityID at pos x,y
+    public int getCityIDAt(int x, int y){
+        return tileCityId[x][y];
     }
 
     // Set Resource at pos x,y
@@ -376,10 +382,10 @@ public class Board {
     public void setBorderHelper(City c, int bound){
         int x = c.getX();
         int y = c.getY();
-        for (int i =x-bound; i< x+bound; i++){
-            for(int j = y-bound; j<x+bound; j++) {
-                if(tileCityId[i][j] != -1){
-                    tileCityId[i][j] = tribes[0].getActorID();
+        for (int i = x-bound; i <= x+bound; i++){
+            for(int j = y-bound; j <= y+bound; j++) {
+                if(tileCityId[i][j] == -1){
+                    tileCityId[i][j] = c.getActorID();
                 }
             }
         }
@@ -390,6 +396,11 @@ public class Board {
         city.setBound(city.getBound()+1);
         setBorderHelper(city,city.getBound());
 
+    }
+
+    public int getTileCityId(int x, int y)
+    {
+        return tileCityId[x][y];
     }
 
 
@@ -431,6 +442,22 @@ public class Board {
         addActor(u);
         Vector2d pos = u.getCurrentPosition();
         setUnitIdAt(pos.x, pos.y, u);
+    }
+
+
+    /**
+     * Adds a unit to a city, which created it.
+     * @param u unit to add
+     * @param c citiy that created the unit
+     * @return false if the unit coulnd't be added. That should not happen, so it prints a warning.
+     */
+    public boolean addUnitToCity(Unit u, City c)
+    {
+        boolean added = c.addUnits(u.getActorID());
+        if(!added){
+            System.out.println("ERROR: Unit failed to be added to city: u_id: " + u.getActorID() + ", c_id: " + c.getActorID());
+        }
+        return added;
     }
 
     /**

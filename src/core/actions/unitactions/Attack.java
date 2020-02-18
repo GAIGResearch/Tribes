@@ -29,7 +29,8 @@ public class Attack extends UnitAction
     @Override
     public boolean isFeasible(final GameState gs)
     {
-        //TODO check if this action is feasible.
+        if(target.getCurrentPosition().x < unit.getCurrentPosition().x  + this.unit.RANGE && target.getCurrentPosition().y < unit.getCurrentPosition().y  + this.unit.RANGE)
+            return true;
         return false;
     }
 

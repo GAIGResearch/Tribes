@@ -31,13 +31,7 @@ public class Upgrade extends UnitAction
 
     @Override
     public boolean isFeasible(final GameState gs) {
-
-        boolean NavigationResearched = gs.getTribe(unit.getTribeID()).getTechTree().isResearched(Types.TECHNOLOGY.NAVIGATION);
-        if(NavigationResearched && this.unit.getType() == Types.UNIT.SHIP){
-            return true;
-        }else if(this.unit.getType() == Types.UNIT.BOAT){
-            return true;
-        }
+        //TODO: Compute if upgrade is feasible or not
 
         return false;
     }
@@ -46,17 +40,7 @@ public class Upgrade extends UnitAction
     public boolean execute(GameState gs) {
         //TODO: executes this Upgrade action
 
-        //TODO: Need to change unit type on upgrade from boat to ship and ship to battleship
-        this.unit.setMaxHP(this.unit.getMaxHP() + 5);
-        if(this.unit.getType() == Types.UNIT.BOAT) {
-            this.unit.setATK(this.unit.getATK()+1);
-            this.unit.setDEF(this.unit.getDEF()+1);
-            this.unit.setMOV(this.unit.getMOV()+1);
-        }else if(this.unit.getType() == Types.UNIT.SHIP){
-            this.unit.setATK(this.unit.getATK()+2);
-            this.unit.setDEF(this.unit.getDEF()+1);
-            this.unit.setMOV(this.unit.getMOV()+1);
-        }
+
         return false;
     }
 }

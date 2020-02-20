@@ -126,4 +126,8 @@ public class Tribe extends Actor{
         this.stars = stars;
     }
 
+    public void addStars(int stars) {this.stars += stars;}
+
+    public void subtractStars(int stars) {this.stars -= stars;}
+
 }

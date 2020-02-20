@@ -3,6 +3,7 @@ package core.actors;
 import core.Types;
 import core.actors.buildings.Building;
 
+import java.awt.*;
 import java.util.LinkedList;
 
 public class City extends Actor{
@@ -15,9 +16,10 @@ public class City extends Actor{
     private int population_need;
     private boolean isValley;
     private boolean isPrism;
-    private int extraStar = 0;
+    private int production = 0;
     private int points = 0;
     private int longTermPoints = 0;
+    private boolean hasWalls = false;
 
     private LinkedList<Integer> unitsID = new LinkedList<>();
     private LinkedList<Building> buildings = new LinkedList<>();
@@ -35,7 +37,7 @@ public class City extends Actor{
         this.tribeId = tribeId;
     }
 
-    public City(int x, int y, int level, int population, int population_need, boolean isValley, boolean isPrism, int extraStar, LinkedList<Building> buildings, int tribeId, LinkedList<Integer> unitsID) {
+    public City(int x, int y, int level, int population, int population_need, boolean isValley, boolean isPrism, int production, LinkedList<Building> buildings, int tribeId, LinkedList<Integer> unitsID) {
         this.x = x;
         this.y = y;
         this.level = level;
@@ -43,7 +45,7 @@ public class City extends Actor{
         this.population_need = population_need;
         this.isValley = isValley;
         this.isPrism = isPrism;
-        this.extraStar = extraStar;
+        this.production = production;
         this.buildings = buildings;
         this.tribeId = tribeId;
         this.unitsID = unitsID;
@@ -59,9 +61,6 @@ public class City extends Actor{
     // Increase population
     public void addPopulation(int number){
         population += number;
-        if (population > population_need){
-            levelUp();
-        }
     }
 
     public void addBuildings(Building building){
@@ -78,7 +77,7 @@ public class City extends Actor{
         }
 
         if (building.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
-            addExtraStar(building.getPRODUCTION());
+            addProduction(building.getPRODUCTION());
         }else {
             addPopulation(building.getPRODUCTION());
         }
@@ -121,7 +120,7 @@ public class City extends Actor{
                     if (existBuilding.getTYPE().equals(Types.BUILDING.FORGE)){
                         addPopulation(2);
                     }else if(existBuilding.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
-                        addExtraStar(2);
+                        addProduction(2);
                     }else{
                         addPopulation(1);
                     }
@@ -138,34 +137,30 @@ public class City extends Actor{
                 original.getTYPE().equals(Types.BUILDING.PORT) && functional.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE);
     }
 
+    public boolean canLevelUp()
+    {
+        return population >= population_need;
+    }
+
     // Level up
     public void levelUp(){
         level++;
         population = population - population_need;
         population_need = level + 1;
-        /*
-        TODO: level up Bonus
-        switch (level){
-            case 1:
-                break;
-            case 2:
-                // TODO: WorkShop -> Extra Star +1 or get explorer unit
-                break;
-            case 3:
-                // TODO: isCityWall to Ture or getStar(num = 5)
-                break;
-            case 4:
-                // TODO: getPopulation(num = 3) or increase border
-                break;
-            default:
-               // TODO: getPark(250 points) or get super unit
-        }
-        */
         addPoints(getLevelUpPoints());
     }
 
-    public void addExtraStar(int Star) {
-        extraStar += Star;
+
+    private int getLevelUpPoints(){
+        if (level == 1){
+            return 100;
+        }
+        return 50 - level * 5;
+    }
+
+
+    public void addProduction(int prod) {
+        production += prod;
     }
 
     public boolean addUnits(int id){
@@ -186,12 +181,6 @@ public class City extends Actor{
         System.out.println("Error!! Unit ID "+ id +" does not belong to this tribe");
     }
 
-    public int getLevelUpPoints(){
-        if (level == 1){
-            return 100;
-        }
-        return 50 - level * 5;
-    }
 
     public int getX() {
         return x;
@@ -205,8 +194,8 @@ public class City extends Actor{
         return level;
     }
 
-    public int getStar(){
-        return level + extraStar;
+    public int getProduction(){
+        return level + production;
     }
 
     public int getPopulation() {
@@ -232,7 +221,7 @@ public class City extends Actor{
         return Types.TERRAIN.CITY;
     }
 
-    public LinkedList<Building> getBuildings() {
+    public LinkedList<Building> copyBuildings() {
         LinkedList<Building> copyList = new LinkedList<>();
         for(Building building : buildings) {
             copyList.add(building.copy());
@@ -251,7 +240,7 @@ public class City extends Actor{
         return tribeId;
     }
 
-    public LinkedList<Integer> getUnitsID() {
+    public LinkedList<Integer> copyUnitsID() {
         LinkedList<Integer> copyUnits = new LinkedList<>();
         for (Integer integer : unitsID) {
             copyUnits.add(integer);
@@ -260,8 +249,21 @@ public class City extends Actor{
     }
 
     public City copy(){
-        return new City(x, y, level, population, population_need, isValley, isPrism, extraStar, getBuildings(), tribeId, getUnitsID());
+        City c = new City(x, y, level, population, population_need, isValley, isPrism, production, copyBuildings(), tribeId, copyUnitsID());
+        c.setWalls(hasWalls);
+        return c;
     }
+
+    public void setWalls(boolean walls)
+    {
+        hasWalls = walls;
+    }
+
+    public boolean hasWalls()
+    {
+        return hasWalls;
+    }
+
 
     public boolean getIsValley(){
         return this.isValley;
@@ -276,5 +278,9 @@ public class City extends Actor{
     }
     public void setBound(int b){
         this.bound = b;
+    }
+
+    public LinkedList<Integer> getUnitsID() {
+        return unitsID;
     }
 }

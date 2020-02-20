@@ -1,10 +1,12 @@
 package core;
 
+import core.actions.Action;
 import core.actors.units.*;
 import utils.ImageIO;
 import utils.Vector2d;
 
 import java.awt.*;
+import java.util.LinkedList;
 
 public class Types {
 
@@ -138,6 +140,56 @@ public class Types {
         BUILDING(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
         public int getKey() {  return key; }
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
+    }
+
+    /**
+     * Types of buildings that can be built by cities
+     */
+    public enum CITY_LEVEL_UP
+    {
+        WORKSHOP(2),
+        EXPLORER(2),
+        CITY_WALL(3),
+        RESOURCES(3),
+        POP_GROWTH(4),
+        BORDER_GROWTH(4),
+        PARK(5),
+        SUPERUNIT(5);
+
+        private int level;
+
+        CITY_LEVEL_UP(int level) {
+        }
+
+        public int getLevel() { return level; }
+
+        public static LinkedList<CITY_LEVEL_UP> getActions (int curLevel)
+        {
+            LinkedList<CITY_LEVEL_UP> actions = new LinkedList<>();
+            switch (curLevel)
+            {
+                case 1:
+                    actions.add(WORKSHOP);
+                    actions.add(EXPLORER);
+                    break;
+                case 2:
+                    actions.add(CITY_WALL);
+                    actions.add(RESOURCES);
+                    break;
+
+                case 3:
+                    actions.add(POP_GROWTH);
+                    actions.add(BORDER_GROWTH);
+                    break;
+
+                default:
+                    actions.add(PARK);
+                    actions.add(SUPERUNIT);
+                    break;
+
+            }
+            return actions;
+        }
     }
 
 

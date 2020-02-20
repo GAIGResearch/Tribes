@@ -72,6 +72,9 @@ public class LevelUp extends CityAction {
                 break;
             case SUPERUNIT:
                 //TODO: Spawn a superunit
+
+                // Can cause push if there's another unit in city; see Push Grid at: https://polytopia.fandom.com/wiki/Giant
+
                 break;
         }
 

@@ -95,7 +95,7 @@ public class TribesConfig
     public static int SUPERUNIT_MOVEMENT = 1;
     public static int SUPERUNIT_MAX_HP = 40;
     public static int SUPERUNIT_RANGE = 1;
-    public static int SUPERUNIT_COST = 0;
+    public static int SUPERUNIT_COST = 10; //Useful for when unit is disbanded.
 
     /* BUILDINGS */
 

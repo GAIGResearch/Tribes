@@ -1,10 +1,12 @@
 package core;
 
+import core.actions.Action;
 import core.actors.units.*;
 import utils.ImageIO;
 import utils.Vector2d;
 
 import java.awt.*;
+import java.util.LinkedList;
 
 public class Types {
 
@@ -140,6 +142,56 @@ public class Types {
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
     }
 
+    /**
+     * Types of buildings that can be built by cities
+     */
+    public enum CITY_LEVEL_UP
+    {
+        WORKSHOP(2),
+        EXPLORER(2),
+        CITY_WALL(3),
+        RESOURCES(3),
+        POP_GROWTH(4),
+        BORDER_GROWTH(4),
+        PARK(5),
+        SUPERUNIT(5);
+
+        private int level;
+
+        CITY_LEVEL_UP(int level) {
+        }
+
+        public int getLevel() { return level; }
+
+        public static LinkedList<CITY_LEVEL_UP> getActions (int curLevel)
+        {
+            LinkedList<CITY_LEVEL_UP> actions = new LinkedList<>();
+            switch (curLevel)
+            {
+                case 1:
+                    actions.add(WORKSHOP);
+                    actions.add(EXPLORER);
+                    break;
+                case 2:
+                    actions.add(CITY_WALL);
+                    actions.add(RESOURCES);
+                    break;
+
+                case 3:
+                    actions.add(POP_GROWTH);
+                    actions.add(BORDER_GROWTH);
+                    break;
+
+                default:
+                    actions.add(PARK);
+                    actions.add(SUPERUNIT);
+                    break;
+
+            }
+            return actions;
+        }
+    }
+
 
     /**
      * Types of actors
@@ -151,12 +203,13 @@ public class Types {
         DEFENDER (2,"img/unit/defender/"),
         SWORDMAN (3,"img/unit/swordman/"),
         ARCHER (4,"img/unit/archer/"),
-        CATAPULT (5,"img/unit//"),
+        CATAPULT (5,"img/unit/"),
         KNIGHT (6,"img/unit/knight/"),
         MIND_BEARER (7,"img/unit/mind_bearer/"),
         BOAT(8,"img/unit/boat/"),
         SHIP(9,"img/unit/ship/"),
-        BATTLESHIP(10,"img/unit/battleship/");
+        BATTLESHIP(10,"img/unit/battleship/"),
+        SUPERUNIT(11, "img/unit/superunit/");
 
 
         private int key;
@@ -171,6 +224,7 @@ public class Types {
             {
                 case WARRIOR: return new Warrior(pos, kills, isVeteran, ownerID, tribeID);
                 case RIDER: return new Rider(pos, kills, isVeteran, ownerID, tribeID);
+                case SUPERUNIT: return new SuperUnit(pos, kills, isVeteran, ownerID, tribeID);
                 default:
                     System.out.println("WARNING: Types.Unit.createUnit(), type creation not implemented.");
             }

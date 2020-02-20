@@ -4,3 +4,4 @@
 *.kotlin_module
 .DS_Store
 img/xcf_nogit/*
+*.xcf

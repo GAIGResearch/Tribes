@@ -203,12 +203,13 @@ public class Types {
         DEFENDER (2,"img/unit/defender/"),
         SWORDMAN (3,"img/unit/swordman/"),
         ARCHER (4,"img/unit/archer/"),
-        CATAPULT (5,"img/unit//"),
+        CATAPULT (5,"img/unit/"),
         KNIGHT (6,"img/unit/knight/"),
         MIND_BEARER (7,"img/unit/mind_bearer/"),
         BOAT(8,"img/unit/boat/"),
         SHIP(9,"img/unit/ship/"),
-        BATTLESHIP(10,"img/unit/battleship/");
+        BATTLESHIP(10,"img/unit/battleship/"),
+        SUPERUNIT(11, "img/unit/superunit/");
 
 
         private int key;
@@ -223,6 +224,7 @@ public class Types {
             {
                 case WARRIOR: return new Warrior(pos, kills, isVeteran, ownerID, tribeID);
                 case RIDER: return new Rider(pos, kills, isVeteran, ownerID, tribeID);
+                case SUPERUNIT: return new SuperUnit(pos, kills, isVeteran, ownerID, tribeID);
                 default:
                     System.out.println("WARNING: Types.Unit.createUnit(), type creation not implemented.");
             }

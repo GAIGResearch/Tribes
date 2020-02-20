@@ -89,6 +89,14 @@ public class TribesConfig
     public static int BATTLESHIP_RANGE = 2;
     public static int BATTLESHIP_COST = 15;
 
+    //Superunit
+    public static int SUPERUNIT_ATTACK = 5;
+    public static int SUPERUNIT_DEFENCE = 4;
+    public static int SUPERUNIT_MOVEMENT = 1;
+    public static int SUPERUNIT_MAX_HP = 40;
+    public static int SUPERUNIT_RANGE = 1;
+    public static int SUPERUNIT_COST = 0;
+
     /* BUILDINGS */
 
     // Farm

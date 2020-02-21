@@ -18,7 +18,7 @@ public class Catapult extends Unit
 
     @Override
     public Catapult copy() {
-        Catapult c = new Catapult(getCurrentPosition(), getKills(), isVeteran(), getCiteID(), getTribeID());
+        Catapult c = new Catapult(getCurrentPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         return c;
     }

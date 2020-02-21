@@ -3,7 +3,6 @@ package utils;
 import javax.swing.*;
 import java.awt.*;
 
-import core.Constants;
 import core.Types;
 import core.actors.units.Unit;
 import core.game.Board;
@@ -61,7 +60,7 @@ public class GameView extends JComponent {
                 paintImage(g, i, j, cellSize, (b == null) ? null : b.getImage());
 
                 Unit u = board.getUnitAt(i,j);
-                paintImage(g, i, j, cellSize, (u == null) ? null : u.getType().getImage(u.getTribeID()));
+                paintImage(g, i, j, cellSize, (u == null) ? null : u.getType().getImage(u.getTribeId()));
 
             }
         }

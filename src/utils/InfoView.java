@@ -141,7 +141,7 @@ public class InfoView extends JComponent {
                     sb.append(" Veteran unit" + "\n");
                 else
                 {
-                    int kills = Math.max(u.getKills(), 3);
+                    int kills = Math.min(u.getKills(), 3);
                     sb.append(" " + kills + "/3 kills" + "\n");
                 }
             }

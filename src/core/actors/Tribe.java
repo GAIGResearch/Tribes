@@ -11,6 +11,9 @@ public class Tribe extends Actor{
     //Cities this tribe owns.
     private ArrayList<Integer> citiesID;
 
+    //Capital City ID
+    private int capitalID;
+
     //ID of this tribe. It corresponds with the ID of the player who controls it.
     private int tribeID;
 
@@ -60,6 +63,7 @@ public class Tribe extends Actor{
         tribeCopy.stars = this.stars;
         tribeCopy.winner = this.winner;
         tribeCopy.score = this.score;
+        tribeCopy.capitalID = this.capitalID;
 
         tribeCopy.citiesID = new ArrayList<>();
         for(int cityID : citiesID)
@@ -130,4 +134,11 @@ public class Tribe extends Actor{
 
     public void subtractStars(int stars) {this.stars -= stars;}
 
+    public void setCapitalID(int capitalID) {
+        this.capitalID = capitalID;
+    }
+
+    public int getCapitalID() {
+        return capitalID;
+    }
 }

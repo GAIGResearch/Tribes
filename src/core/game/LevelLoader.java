@@ -61,6 +61,7 @@ public class LevelLoader
                     {
                         //A city to create. Add it and assign it to the next tribe.
                         City c = new City(i, j, tribeID);
+                        c.setPrism(true);
                         board.addCityToTribe(c);
 
                         //Also, each tribe starts with a unit in the same location where the city is

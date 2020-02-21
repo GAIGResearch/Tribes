@@ -283,4 +283,8 @@ public class City extends Actor{
     public LinkedList<Integer> getUnitsID() {
         return unitsID;
     }
+
+    public void setPrism(boolean prism) {
+        isPrism = prism;
+    }
 }

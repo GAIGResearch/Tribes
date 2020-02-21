@@ -54,7 +54,7 @@ public class LevelUp extends CityAction {
                 city.addProduction(1);
                 break;
             case EXPLORER:
-                //TODO: Create explorer
+                gs.getBoard().launchExplorer(city.getX(), city.getY(), city.getTribeId());
                 break;
             case CITY_WALL:
                 city.setWalls(true);
@@ -78,14 +78,14 @@ public class LevelUp extends CityAction {
                 Vector2d cityPos = new Vector2d(city.getX(), city.getY());
                 Unit unitInCity = gs.getBoard().getUnitAt(city.getX(), city.getY());
 
-                //TODO: This can probably be encapsulated
+                //This can probably be encapsulated
                 Unit superUnit = Types.UNIT.createUnit(cityPos, 0, false, city.getActorID(), city.getTribeId(), Types.UNIT.SUPERUNIT);
                 gs.getBoard().addUnitToBoard(superUnit);
                 gs.getBoard().addUnitToCity(superUnit, city);
 
                 if(unitInCity != null)
                 {
-                    gs.getBoard().pushUnit(unitInCity.getTribeID(), unitInCity, city.getX(), city.getY());
+                    gs.getBoard().pushUnit(unitInCity.getTribeId(), unitInCity, city.getX(), city.getY());
                 }
 
                 break;

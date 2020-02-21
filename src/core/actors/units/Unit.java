@@ -78,7 +78,7 @@ public abstract class Unit extends Actor
         return cityID;
     }
 
-    public int getTribeID(){
+    public int getTribeId(){
         return tribeID;
     }
 

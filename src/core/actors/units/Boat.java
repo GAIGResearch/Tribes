@@ -20,7 +20,7 @@ public class Boat extends Unit
 
     @Override
     public Boat copy() {
-        Boat c = new Boat(getCurrentPosition(), getKills(), isVeteran(), getCityID(), getTribeID(), hp);
+        Boat c = new Boat(getCurrentPosition(), getKills(), isVeteran(), getCityID(), getTribeId(), hp);
         c.setCurrentHP(getCurrentHP());
         return c;
     }

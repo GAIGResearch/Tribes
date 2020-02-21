@@ -135,7 +135,7 @@ public class InfoView extends JComponent {
             if(u != null)
             {
                 sb.append("Unit: " + u.getType() + "\n");
-                sb.append(" Tribe: " + u.getTribeID() + "\n");
+                sb.append(" Tribe: " + u.getTribeId() + "\n");
                 sb.append(" Health: " + u.getCurrentHP() + "/" + u.getMaxHP() + "\n");
                 if(u.isVeteran())
                     sb.append(" Veteran unit" + "\n");

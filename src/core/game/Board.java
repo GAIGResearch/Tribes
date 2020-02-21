@@ -1,5 +1,7 @@
 package core.game;
 
+import core.TechnologyTree;
+import core.TribesConfig;
 import core.Types;
 import core.actors.Actor;
 import core.actors.City;
@@ -9,6 +11,7 @@ import utils.Vector2d;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class Board {
 
@@ -193,7 +196,7 @@ public class Board {
 
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(xF, yF);
-        Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeID(), Types.UNIT.BOAT);
+        Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), Types.UNIT.BOAT);
         addUnitToBoard(boat);
         addUnitToCity(boat, city);
 
@@ -205,6 +208,74 @@ public class Board {
         units[xF][yF] = unit.getActorID();
         unit.setCurrentPosition(new Vector2d(xF, yF));
     }
+
+    public void launchExplorer(int x0, int y0, int tribeId)
+    {
+        int xMove[] = {0,-1,0,1,-1,-1,1,1};
+        int yMove[] = {1,0,-1,0,1,-1,-1,1};
+
+        int curX = x0;
+        int curY = y0;
+
+        for(int i = 0; i < TribesConfig.NUM_STEPS; ++i)
+        {
+            int j = 0;
+            boolean moved = false;
+
+            while(!moved && j < TribesConfig.NUM_STEPS*3)
+            {
+                //Pick a direction at random
+                int idx = new Random().nextInt(xMove.length);
+                int x = curX + xMove[idx];
+                int y = curY + yMove[idx];
+
+                if(traversable(x, y, tribeId))
+                {
+                    moved = true;
+                    curX = x;
+                    curY = y;
+                    tribes[tribeId].clearView(x, y);
+                }
+
+                j++;
+            }
+
+            if(!moved)
+            {
+                //couldn't move in many steps. Let's just warn and progress from now.
+                System.out.println("WARNING: explorer stuck, " + j + " steps without moving.");
+            }
+
+        }
+
+    }
+
+
+    private boolean traversable(int x, int y, int tribeId)
+    {
+        if(x >= 0 && y >= 0 && x < size && y < size)
+        {
+            //we rule out places we can't be.
+            TechnologyTree tt = tribes[tribeId].getTechTree();
+
+            //if mountain and climbing not researched
+            if(terrains[x][y] == Types.TERRAIN.MOUNTAIN && !tt.isResearched(Types.TECHNOLOGY.CLIMBING))
+                return false;
+
+            //Shallow water and no sailing
+            if(terrains[x][y] == Types.TERRAIN.SHALLOW_WATER && !tt.isResearched(Types.TECHNOLOGY.SAILING))
+                return false;
+
+            //Deep water and no navigation
+            if(terrains[x][y] == Types.TERRAIN.DEEP_WATER && !tt.isResearched(Types.TECHNOLOGY.NAVIGATION))
+                return false;
+
+
+        }else return false; //Outside board bounds.
+
+        return true;
+    }
+
 
 
     public Tribe[] getTribes() {return tribes;}

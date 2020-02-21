@@ -1,6 +1,7 @@
 package core.actions.unitactions;
 
 import core.actions.Action;
+import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
 
@@ -22,19 +23,26 @@ public class Convert extends UnitAction
 
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
-        //TODO: compute all the Convert actions that are possible
-        return null;
+        LinkedList<Action> converts = new LinkedList<>();
+
+        Board b = gs.getBoard();
+        if(isFeasible(gs)){
+            Convert a = new Convert(this.unit, this.target);
+            converts.add(a);
+        }
+        return converts;
     }
 
     @Override
     public boolean isFeasible(final GameState gs) {
-        //TODO: check if this Convert action is possible.
+        if(target.getCurrentPosition().x < unit.getCurrentPosition().x  + this.unit.RANGE && target.getCurrentPosition().y < unit.getCurrentPosition().y  + this.unit.RANGE)
+            return true;
         return false;
     }
 
     @Override
     public boolean execute(GameState gs) {
-        //TODO execute the Convert action
-        return false;
+        target.setActorID(unit.getActorID());
+        return true;
     }
 }

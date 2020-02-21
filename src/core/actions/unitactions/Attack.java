@@ -26,7 +26,6 @@ public class Attack extends UnitAction
 
         LinkedList<Action> attacks = new LinkedList<>();
 
-        Board b = gs.getBoard();
         if(isFeasible(gs)){
             Attack a = new Attack(this.unit);
             a.target = this.target;

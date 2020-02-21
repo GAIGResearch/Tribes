@@ -50,6 +50,8 @@ public class Attack extends UnitAction
         if(target.getCurrentHP() <= unit.ATK){
             unit.addKill();
             target = null;
+        }else {
+            target.setCurrentHP(target.getCurrentHP() - unit.ATK);
         }
         return false;
     }

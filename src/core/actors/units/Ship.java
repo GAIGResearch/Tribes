@@ -21,7 +21,7 @@ public class Ship extends Unit
 
     @Override
     public Ship copy() {
-        Ship c = new Ship(getCurrentPosition(), getKills(), isVeteran(), getCiteID(), getTribeID(), hp);
+        Ship c = new Ship(getCurrentPosition(), getKills(), isVeteran(), getCityID(), getTribeID(), hp);
         c.setCurrentHP(getCurrentHP());
         return c;
     }

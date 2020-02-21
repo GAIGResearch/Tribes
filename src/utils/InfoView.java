@@ -116,7 +116,7 @@ public class InfoView extends JComponent {
             if(t == Types.TERRAIN.CITY)
             {
                 //Retrieve the city
-                int cityID = board.getTileCityId(highlightY, highlightX);
+                int cityID = board.getCityIdAt(highlightY, highlightX);
                 City c = (City) board.getActor(cityID);
                 sb = new StringBuilder();
                 if(c != null) {

@@ -1,10 +1,13 @@
 package core.actions.cityactions;
 
+import core.Types;
 import core.actions.Action;
 import core.actors.City;
 import core.actors.Tribe;
+import core.actors.units.Unit;
 import core.game.GameState;
 import core.Types.CITY_LEVEL_UP;
+import utils.Vector2d;
 
 import java.util.LinkedList;
 
@@ -71,9 +74,19 @@ public class LevelUp extends CityAction {
                 tribe.addScore(250);
                 break;
             case SUPERUNIT:
-                //TODO: Spawn a superunit
 
-                // Can cause push if there's another unit in city; see Push Grid at: https://polytopia.fandom.com/wiki/Giant
+                Vector2d cityPos = new Vector2d(city.getX(), city.getY());
+                Unit unitInCity = gs.getBoard().getUnitAt(city.getX(), city.getY());
+
+                //TODO: This can probably be encapsulated
+                Unit superUnit = Types.UNIT.createUnit(cityPos, 0, false, city.getActorID(), city.getTribeId(), Types.UNIT.SUPERUNIT);
+                gs.getBoard().addUnitToBoard(superUnit);
+                gs.getBoard().addUnitToCity(superUnit, city);
+
+                if(unitInCity != null)
+                {
+                    gs.getBoard().pushUnit(unitInCity.getTribeID(), unitInCity, city.getX(), city.getY());
+                }
 
                 break;
         }

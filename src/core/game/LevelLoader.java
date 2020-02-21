@@ -65,7 +65,7 @@ public class LevelLoader
 
                         //Also, each tribe starts with a unit in the same location where the city is
                         Types.UNIT unitType = tribes[tribeID].getType().getStartingUnit();
-                        Unit unit = unitType.createUnit(new Vector2d(i,j), 0, false, c.getActorID(), tribeID, unitType);
+                        Unit unit = Types.UNIT.createUnit(new Vector2d(i,j), 0, false, c.getActorID(), tribeID, unitType);
                         board.addUnitToBoard(unit);
                         board.addUnitToCity(unit, c);
 

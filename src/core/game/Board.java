@@ -9,8 +9,6 @@ import utils.Vector2d;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeMap;
 
 public class Board {
 
@@ -103,6 +101,111 @@ public class Board {
         return copyBoard;
     }
 
+    /**
+     * Pushes a unit out of a city (x,y). The order in which tiles are tried for the new
+     * destination are: S, W, N, E, SW, NW, NE, NW. If none of those positions are available, the
+     * unit disappears.
+     * See Push Grid at: https://polytopia.fandom.com/wiki/Giant
+     * @param tribeId: Id of the tribe the unit belongs to
+     * @param toPush Unit to be pushed
+     * @param startX x coordinate of the starting position of the unit to push
+     * @param startY y coordinate of the starting position of the unit to push
+     */
+
+    public void pushUnit(int tribeId, Unit toPush, int startX, int startY)
+    {
+        int xPush[] = {0,-1,0,1,-1,-1,1,1};
+        int yPush[] = {1,0,-1,0,1,-1,-1,1};
+        int idx = 0;
+        boolean pushed = false;
+
+        while(!pushed && idx < xPush.length)
+        {
+            int x = startX + xPush[idx];
+            int y = startY + yPush[idx];
+
+            if(x >= 0 && y >= 0 && x < size && y < size)
+            {
+                pushed = tryPush(tribeId, toPush, startX, startY, x, y);
+            }
+            idx++;
+        }
+
+        if(!pushed)
+        {
+            //it can't be pushed, unit must disappear
+        }
+
+    }
+
+    private boolean tryPush(int tribeId, Unit toPush, int startX, int startY, int x, int y)
+    {
+        //there's no unit?
+        if(units[x][y] > 0)
+            return false;
+
+        //climbable mountain?
+        Types.TERRAIN terrain = terrains[x][y];
+        if(terrain == Types.TERRAIN.MOUNTAIN)
+        {
+            if (tribes[tribeId].getTechTree().isResearched(Types.TECHNOLOGY.CLIMBING))
+            {
+                moveUnit(toPush, startX, startY, x, y);
+                return true;
+            }else return false; //Can't be pushed if it's a mountain and climbing is not researched.
+        }
+
+
+        //Water with a port this tribe owns?
+        Types.BUILDING b = buildings[x][y];
+        if(terrain == Types.TERRAIN.SHALLOW_WATER)
+        {
+            if(b == Types.BUILDING.PORT)
+            {
+                City c = getCityInBorders(x,y);
+                if(c != null && c.getTribeId() == tribeId)
+                {
+                    embark(toPush, startX, startY, x, y);
+                    return true;
+                }
+
+                if(c == null)
+                {
+                    System.out.println("WARNING: This shouldn't happen. Trying to push an unit to a location outside all borders.");
+                }
+            }
+
+            //Not in any city (shouldn't happen), in an enemy port, or in water but no port.
+            return false;
+        }
+
+        //Otherwise, no problem
+        moveUnit(toPush, startX, startY, x, y);
+        return true;
+    }
+
+
+    private void embark(Unit unit, int x0, int y0, int xF, int yF)
+    {
+        City city = (City) gameActors.get(unit.getCityID());
+        removeUnitFromBoard(unit);
+        removeUnitFromCity(unit, city);
+
+        //We're actually creating a new unit
+        Vector2d newPos = new Vector2d(xF, yF);
+        Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeID(), Types.UNIT.BOAT);
+        addUnitToBoard(boat);
+        addUnitToCity(boat, city);
+
+    }
+
+    private void moveUnit(Unit unit, int x0, int y0, int xF, int yF)
+    {
+        units[x0][y0] = 0;
+        units[xF][yF] = unit.getActorID();
+        unit.setCurrentPosition(new Vector2d(xF, yF));
+    }
+
 
     public Tribe[] getTribes() {return tribes;}
     public Tribe getTribe(int tribeId) {return tribes[tribeId];}
@@ -163,8 +266,11 @@ public class Board {
     }
 
     // Get CityID at pos x,y
-    public int getCityIDAt(int x, int y){
-        return tileCityId[x][y];
+    public City getCityInBorders(int x, int y){
+        if(tileCityId[x][y] == -1)
+            return null;
+        else
+            return (City) gameActors.get(tileCityId[x][y]);
     }
 
     // Set Resource at pos x,y
@@ -398,12 +504,12 @@ public class Board {
 
     }
 
-    public int getTileCityId(int x, int y)
+    public int getCityIdAt(int x, int y)
     {
         return tileCityId[x][y];
     }
 
-
+    //TODO: This function needs changing. A village is not a City object, but a terrain type.
     public void occupy(Tribe t, int x, int y){
         ArrayList<Integer> cities = t.getCitiesID();
 
@@ -415,8 +521,8 @@ public class Board {
                 break;
             }
         }
-        if (c != null && c.getIsValley()){
-            c.setIsValley(false);
+        if (c != null && c.getIsVilage()){
+            c.setIsVillage(false);
             // TODO: Assign the owner
             c.levelUp();
         }
@@ -445,6 +551,13 @@ public class Board {
     }
 
 
+    public void removeUnitFromBoard(Unit u)
+    {
+        Vector2d pos = u.getCurrentPosition();
+        setUnitIdAt(pos.x, pos.y, 0);
+        removeActor(u.getActorID());
+    }
+
     /**
      * Adds a unit to a city, which created it.
      * @param u unit to add
@@ -453,11 +566,16 @@ public class Board {
      */
     public boolean addUnitToCity(Unit u, City c)
     {
-        boolean added = c.addUnits(u.getActorID());
+        boolean added = c.addUnit(u.getActorID());
         if(!added){
             System.out.println("ERROR: Unit failed to be added to city: u_id: " + u.getActorID() + ", c_id: " + c.getActorID());
         }
         return added;
+    }
+
+    public void removeUnitFromCity(Unit u, City city)
+    {
+        city.removeUnit(u.getActorID());
     }
 
     /**

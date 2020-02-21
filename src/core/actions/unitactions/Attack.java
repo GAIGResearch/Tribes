@@ -23,13 +23,17 @@ public class Attack extends UnitAction
 
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
-        //TODO compute all the attack actions for super.unit.
 
         LinkedList<Action> attacks = new LinkedList<>();
 
         Board b = gs.getBoard();
+        if(isFeasible(gs)){
+            Attack a = new Attack(this.unit);
+            a.target = this.target;
+            attacks.add(a);
 
-        return null;
+        }
+        return attacks;
     }
 
     @Override
@@ -42,7 +46,6 @@ public class Attack extends UnitAction
 
     @Override
     public boolean execute(GameState gs) {
-        //TODO execute the atack action in the game.
 
         if(target.getCurrentHP() <= unit.ATK){
             unit.addKill();

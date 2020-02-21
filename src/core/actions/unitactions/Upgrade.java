@@ -23,9 +23,7 @@ public class Upgrade extends UnitAction
         //TODO: Compute all the available Upgrade actions
 
         LinkedList<Action> upgradeActions = new LinkedList<>();
-        if(isFeasible(gs)){
-            upgradeActions.add(new Upgrade(this.unit));
-        }
+
         return upgradeActions;
     }
 

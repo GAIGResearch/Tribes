@@ -85,5 +85,9 @@ public abstract class Unit extends Actor
     public abstract Types.UNIT getType();
 
     public abstract Unit copy();
+
+    public void setTribeID(int tribeID){
+        this.tribeID = tribeID;
+    }
     
 }

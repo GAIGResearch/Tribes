@@ -277,4 +277,7 @@ public class City extends Actor{
     public void setBound(int b){
         this.bound = b;
     }
+    public void setTribeId(int tribeId){
+        this.tribeId = tribeId;
+    }
 }

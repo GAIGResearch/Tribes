@@ -42,7 +42,9 @@ public class Convert extends UnitAction
 
     @Override
     public boolean execute(GameState gs) {
-        target.setActorID(unit.getActorID());
+        if(isFeasible(gs)) {
+            target.setActorID(unit.getActorID());
+        }
         return true;
     }
 }

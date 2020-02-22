@@ -101,7 +101,9 @@ public class Tribe extends Actor{
         this.score += score;
     }
 
-
+    public void subtractScore(int score){
+        this.score -= score;
+    }
 
     public ArrayList<Integer> getCitiesID() {
         return citiesID;

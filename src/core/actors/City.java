@@ -63,6 +63,11 @@ public class City extends Actor{
         population += number;
     }
 
+    // Decrease population
+    public void subtractPopulation(int number){
+        population += number;
+    }
+
     public void addBuildings(Building building){
         if (building.getTYPE().equals(Types.BUILDING.WINDMILL) || building.getTYPE().equals(Types.BUILDING.SAWMILL)
                 || building.getTYPE().equals(Types.BUILDING.FORGE) || building.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
@@ -287,4 +292,17 @@ public class City extends Actor{
     public void setPrism(boolean prism) {
         isPrism = prism;
     }
+
+    public Building removeBuilding(int x, int y){
+        Building removeBuilding = null;
+        for(Building building :buildings){
+            if (building.getX() == x && building.getY() == y){
+                buildings.remove(building);
+                removeBuilding = building;
+
+            }
+        }
+        return removeBuilding;
+    }
+
 }

@@ -1,5 +1,6 @@
 package core.actions.cityactions;
 
+import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actors.City;
@@ -58,7 +59,7 @@ public class ClearForest extends CityAction
     public boolean execute(GameState gs) {
         if (isFeasible(gs)){
             gs.getBoard().setTerrainAt(x, y, Types.TERRAIN.PLAIN);
-            gs.getTribe(city.getTribeId()).addStars(2);
+            gs.getTribe(city.getTribeId()).addStars(TribesConfig.CLEAR_FOREST_STAR);
             return true;
         }
         return false;

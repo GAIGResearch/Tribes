@@ -141,4 +141,8 @@ public class TribesConfig
     /* TRIBES */
     public static int INITIAL_STARS = 5;
 
+    /* ACTIONS */
+    public static int CLEAR_FOREST_STAR = 2;
+    public static int FOREST_COST = 5;
+
 }

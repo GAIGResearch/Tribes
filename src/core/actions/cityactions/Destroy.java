@@ -65,6 +65,7 @@ public class Destroy extends CityAction
         if (isFeasible(gs)){
             Building removedBuilding = city.removeBuilding(x, y);
             if (removedBuilding != null) {
+                gs.getBoard().setBuildingAt(x, y, null);
                 if (removedBuilding.getTYPE() != Types.BUILDING.CUSTOM_HOUSE) {
                     city.subtractPopulation(removedBuilding.getPRODUCTION());
                 }

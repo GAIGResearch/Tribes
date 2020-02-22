@@ -5,6 +5,7 @@ import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actors.Tribe;
+import core.actors.units.Unit;
 import core.game.GameState;
 import core.actors.City;
 import utils.Vector2d;
@@ -64,8 +65,9 @@ public class Spawn extends CityAction
     @Override
     public boolean execute(GameState gs) {
         if (isFeasible(gs)){
-            unit_type.createUnit(new Vector2d(city.getX(), city.getY()), 0, false, city.getActorID(), city.getTribeId(), unit_type);
+            Unit newUnit = unit_type.createUnit(new Vector2d(city.getX(), city.getY()), 0, false, city.getActorID(), city.getTribeId(), unit_type);
             gs.getTribe(city.getTribeId()).subtractStars(unit_type.getCost());
+            gs.getBoard().setUnitIdAt(city.getX(), city.getY(), newUnit);
             return true;
         }
         return false;

@@ -7,10 +7,7 @@ import core.actors.Tribe;
 import core.actors.units.*;
 import utils.Vector2d;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Board {
 
@@ -401,6 +398,19 @@ public class Board {
     public int getTileCityId(int x, int y)
     {
         return tileCityId[x][y];
+    }
+
+    // Get all of tiles belong to the city
+    public LinkedList<Vector2d> getCityTiles(int cityId){
+        LinkedList<Vector2d> tiles = new LinkedList<>();
+        for (int i=0; i<size; i++){
+            for (int j=0; j<size; j++){
+                if (tileCityId[i][j] == cityId){
+                    tiles.add(new Vector2d(i, j));
+                }
+            }
+        }
+        return tiles;
     }
 
 

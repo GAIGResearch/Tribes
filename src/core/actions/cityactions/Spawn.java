@@ -64,7 +64,8 @@ public class Spawn extends CityAction
     public boolean execute(GameState gs) {
         if (isFeasible(gs)){
             unit_type.createUnit(new Vector2d(city.getX(), city.getY()), 0, false, city.getActorID(), city.getTribeId(), unit_type);
+            return true;
         }
-        return true;
+        return false;
     }
 }

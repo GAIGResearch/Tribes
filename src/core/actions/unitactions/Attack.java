@@ -38,6 +38,7 @@ public class Attack extends UnitAction
     @Override
     public boolean isFeasible(final GameState gs)
     {
+        // Check if target in range
         if(target.getCurrentPosition().x < unit.getCurrentPosition().x  + this.unit.RANGE || target.getCurrentPosition().y < unit.getCurrentPosition().y  + this.unit.RANGE)
             return true;
         return false;
@@ -45,6 +46,7 @@ public class Attack extends UnitAction
 
     @Override
     public boolean execute(GameState gs) {
+        //Check if action is feasible before execution
         if(isFeasible(gs)) {
             if (target.getCurrentHP() <= unit.ATK) {
                 unit.addKill();

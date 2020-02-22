@@ -23,8 +23,13 @@ public class ResourceGathering extends CityAction
 
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
-        //TODO: compute resource gathering
-        return null;
+        LinkedList<Action> resources = new LinkedList<>();
+        if(isFeasible(gs)){
+            ResourceGathering resourceGathering = new ResourceGathering(this.city);
+            resourceGathering.setResource(this.resource);
+            resources.add(resourceGathering);
+        }
+        return resources;
     }
 
     @Override

@@ -24,7 +24,6 @@ public class Convert extends UnitAction
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         LinkedList<Action> converts = new LinkedList<>();
-
         Board b = gs.getBoard();
         if(isFeasible(gs)){
             Convert a = new Convert(this.unit, this.target);
@@ -35,6 +34,7 @@ public class Convert extends UnitAction
 
     @Override
     public boolean isFeasible(final GameState gs) {
+        //Check if target in range
         if(target.getCurrentPosition().x < unit.getCurrentPosition().x  + this.unit.RANGE && target.getCurrentPosition().y < unit.getCurrentPosition().y  + this.unit.RANGE)
             return true;
         return false;
@@ -42,9 +42,12 @@ public class Convert extends UnitAction
 
     @Override
     public boolean execute(GameState gs) {
+        //Check if action is feasible before execution
         if(isFeasible(gs)) {
             target.setActorID(unit.getActorID());
+            target.setTribeID(unit.getTribeID());
+            return true;
         }
-        return true;
+        return false;
     }
 }

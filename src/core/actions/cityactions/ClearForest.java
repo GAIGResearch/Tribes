@@ -2,20 +2,20 @@ package core.actions.cityactions;
 
 import core.Types;
 import core.actions.Action;
+import core.actors.City;
 import core.game.Board;
 import core.game.GameState;
-import core.actors.City;
 import utils.Vector2d;
 
 import java.util.LinkedList;
 
-public class BurnForest extends CityAction
+public class ClearForest extends CityAction
 {
 
     private int x;
     private int y;
 
-    public BurnForest(City c) {
+    public ClearForest(City c) {
         super.city = c;
     }
     public void setLocation(int x, int y){
@@ -38,7 +38,7 @@ public class BurnForest extends CityAction
         if (techReq){
             for(Vector2d tile: tiles){
                 if (currentBoard.getTerrainAt(tile.x, tile.y) == Types.TERRAIN.FOREST){
-                    BurnForest action = new BurnForest(city);
+                    ClearForest action = new ClearForest(city);
                     action.setLocation(tile.x, tile.y);
                     actions.add(action);
                 }
@@ -58,6 +58,7 @@ public class BurnForest extends CityAction
     public boolean execute(GameState gs) {
         if (isFeasible(gs)){
             gs.getBoard().setTerrainAt(x, y, Types.TERRAIN.PLAIN);
+            gs.getTribe(city.getTribeId()).addStars(2);
             return true;
         }
         return false;

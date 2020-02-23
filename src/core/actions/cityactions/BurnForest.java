@@ -52,7 +52,7 @@ public class BurnForest extends CityAction
     @Override
     public boolean isFeasible(final GameState gs) {
         boolean isForest = gs.getBoard().getTerrainAt(x, y) == Types.TERRAIN.FOREST;
-        boolean isBelonging = gs.getBoard().getTileCityId(x, y) == city.getActorID();
+        boolean isBelonging = gs.getBoard().getCityIdAt(x, y) == city.getActorID();
         boolean isBuildable = gs.getTribe(city.getTribeId()).getStars() >= TribesConfig.FOREST_COST;
         boolean isResearched = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.CHIVALRY);
         return isForest && isBelonging && isBuildable && isResearched;

@@ -42,8 +42,8 @@ public class Examine extends UnitAction
         if(isFeasible(gs)) {
             Random r = new Random();
             Types.TECHNOLOGY[] techs = Types.TECHNOLOGY.values();
-            TechnologyTree technologyTree = gs.getTribe(unit.getTribeID()).getTechTree();
-            int capital = gs.getTribe(unit.getTribeID()).getCapitalID();
+            TechnologyTree technologyTree = gs.getTribe(unit.getTribeId()).getTechTree();
+            int capital = gs.getTribe(unit.getTribeId()).getCapitalID();
             boolean allTech = technologyTree.getEverythingResearched();
 
             int bonus = r.nextInt(5);
@@ -70,7 +70,7 @@ public class Examine extends UnitAction
                     //TODO: Spawn a Explorer
                     break;
                 case 4:
-                    gs.getTribe(unit.getTribeID()).addStars(10);
+                    gs.getTribe(unit.getTribeId()).addStars(10);
                     break;
             }
             return true;

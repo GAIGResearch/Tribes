@@ -55,7 +55,7 @@ public class Destroy extends CityAction
     public boolean isFeasible(final GameState gs)
     {
         boolean isBuilding = gs.getBoard().getBuildingAt(x, y) != null;
-        boolean isBelonging = gs.getBoard().getTileCityId(x, y) == city.getActorID();
+        boolean isBelonging = gs.getBoard().getCityIdAt(x, y) == city.getActorID();
         boolean isResearched = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.CONSTRUCTION);
         return isBuilding && isBelonging && isResearched;
     }

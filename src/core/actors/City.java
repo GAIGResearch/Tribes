@@ -215,6 +215,12 @@ public class City extends Actor{
         return isCapital;
     }
 
+    public void setCapital(boolean isCapital)
+    {
+        this.isCapital = isCapital;
+    }
+
+
     public int getPopulation_need() {
         return population_need;
     }
@@ -287,10 +293,6 @@ public class City extends Actor{
 
     public LinkedList<Integer> getUnitsID() {
         return unitsID;
-    }
-
-    public void setPrism(boolean prism) {
-        isPrism = prism;
     }
 
     public Building removeBuilding(int x, int y){

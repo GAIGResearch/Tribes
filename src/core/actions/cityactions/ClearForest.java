@@ -51,7 +51,7 @@ public class ClearForest extends CityAction
     @Override
     public boolean isFeasible(final GameState gs) {
         boolean isForest = gs.getBoard().getTerrainAt(x, y) == Types.TERRAIN.FOREST;
-        boolean isBelonging = gs.getBoard().getTileCityId(x, y) == city.getActorID();
+        boolean isBelonging = gs.getBoard().getCityIdAt(x, y) == city.getActorID();
         boolean isResearched = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.FORESTRY);
         return isForest && isBelonging && isResearched;
     }

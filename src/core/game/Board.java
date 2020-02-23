@@ -622,7 +622,7 @@ public class Board {
     public void addCityToTribe(City c)
     {
         addActor(c);
-        if (c.isPrism()){
+        if (c.isCapital()){
             tribes[c.getTribeId()].setCapitalID(c.getActorID());
         }
         tribes[c.getTribeId()].addCity(c.getActorID());

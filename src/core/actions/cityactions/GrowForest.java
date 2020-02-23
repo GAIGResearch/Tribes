@@ -54,7 +54,7 @@ public class GrowForest extends CityAction
     @Override
     public boolean isFeasible(final GameState gs) {
         boolean isPlain = gs.getBoard().getTerrainAt(x, y) == Types.TERRAIN.PLAIN;
-        boolean isBelonging = gs.getBoard().getTileCityId(x, y) == city.getActorID();
+        boolean isBelonging = gs.getBoard().getCityIdAt(x, y) == city.getActorID();
         boolean isBuildable = gs.getTribe(city.getTribeId()).getStars() >= TribesConfig.FOREST_COST;
         boolean isResearched = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.SPIRITUALISM);
         return isPlain && isBelonging && isBuildable && isResearched;

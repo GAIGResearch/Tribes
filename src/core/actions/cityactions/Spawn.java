@@ -35,7 +35,7 @@ public class Spawn extends CityAction
         int star = tribe.getStars();
         if (gs.getBoard().getUnitAt(city.getX(), city.getY()) == null){
             for(Types.UNIT unit: Types.UNIT.values()){
-                // TODO:
+                // TODO: Update 7 to the the key after the unit enum will not be changed
                 if (unit.getCost() <= star && unit.getKey() <= 7){
                     if (unit.getRequirement() == null){
                         Spawn newAction = new Spawn(city);

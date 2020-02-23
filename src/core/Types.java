@@ -1,6 +1,7 @@
 package core;
 
 import core.actions.Action;
+import core.actors.Tribe;
 import core.actors.units.*;
 import utils.ImageIO;
 import utils.Vector2d;
@@ -198,25 +199,33 @@ public class Types {
      */
     public enum UNIT
     {
-        WARRIOR (0,"img/unit/warrior/"),
-        RIDER (1,"img/unit/rider/"),
-        DEFENDER (2,"img/unit/defender/"),
-        SWORDMAN (3,"img/unit/swordman/"),
-        ARCHER (4,"img/unit/archer/"),
-        CATAPULT (5,"img/unit/"),
-        KNIGHT (6,"img/unit/knight/"),
-        MIND_BEARER (7,"img/unit/mind_bearer/"),
-        BOAT(8,"img/unit/boat/"),
-        SHIP(9,"img/unit/ship/"),
-        BATTLESHIP(10,"img/unit/battleship/"),
-        SUPERUNIT(11, "img/unit/superunit/");
+        WARRIOR (0,"img/unit/warrior/", TribesConfig.WARRIOR_COST, null),
+        RIDER (1,"img/unit/rider/", TribesConfig.RIDER_COST, TECHNOLOGY.RIDING),
+        DEFENDER (2,"img/unit/defender/", TribesConfig.DEFENDER_COST, TECHNOLOGY.SHIELDS),
+        SWORDMAN (3,"img/unit/swordman/", TribesConfig.SWORDMAN_COST, TECHNOLOGY.SMITHERY),
+        ARCHER (4,"img/unit/archer/", TribesConfig.ARCHER_COST, TECHNOLOGY.ARCHERY),
+        CATAPULT (5,"img/unit/", TribesConfig.CATAPULT_COST, TECHNOLOGY.MATHEMATICS),
+        KNIGHT (6,"img/unit/knight/", TribesConfig.KNIGHT_COST, TECHNOLOGY.CHIVALRY),
+        MIND_BEARER (7,"img/unit/mind_bearer/", TribesConfig.MINDBENDER_COST, TECHNOLOGY.PHILOSOPHY),
+        BOAT(8,"img/unit/boat/", TribesConfig.BOAT_COST, TECHNOLOGY.SAILING),
+        SHIP(9,"img/unit/ship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.SAILING),
+        BATTLESHIP(10,"img/unit/battleship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.NAVIGATION),
+        SUPERUNIT(11, "img/unit/superunit/", TribesConfig.SUPERUNIT_COST, null);
 
 
         private int key;
         private String imageFile;
-        UNIT(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
+        private int cost;
+        private TECHNOLOGY requirement;
+        UNIT(int numVal, String imageFile, int cost, Types.TECHNOLOGY requirement) {  this.key = numVal;  this.imageFile = imageFile; this.cost = cost; this.requirement = requirement;}
         public int getKey() {  return key; }
         public Image getImage(int playerID) { return ImageIO.GetInstance().getImage(imageFile + playerID + ".png"); }
+        public int getCost() {
+            return cost;
+        }
+        public TECHNOLOGY getRequirement() {
+            return requirement;
+        }
 
         public static Unit createUnit (Vector2d pos, int kills, boolean isVeteran, int ownerID, int tribeID, UNIT type)
         {

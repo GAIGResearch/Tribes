@@ -9,9 +9,7 @@ import core.actors.Tribe;
 import core.actors.units.*;
 import utils.Vector2d;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 public class Board {
 
@@ -580,6 +578,19 @@ public class Board {
         return tileCityId[x][y];
     }
 
+    // Get all of tiles belong to the city
+    public LinkedList<Vector2d> getCityTiles(int cityId){
+        LinkedList<Vector2d> tiles = new LinkedList<>();
+        for (int i=0; i<size; i++){
+            for (int j=0; j<size; j++){
+                if (tileCityId[i][j] == cityId){
+                    tiles.add(new Vector2d(i, j));
+                }
+            }
+        }
+        return tiles;
+    }
+
     //TODO: This function needs changing. A village is not a City object, but a terrain type.
     public void occupy(Tribe t, int x, int y){
         ArrayList<Integer> cities = t.getCitiesID();
@@ -611,6 +622,9 @@ public class Board {
     public void addCityToTribe(City c)
     {
         addActor(c);
+        if (c.isPrism()){
+            tribes[c.getTribeId()].setCapitalID(c.getActorID());
+        }
         tribes[c.getTribeId()].addCity(c.getActorID());
     }
 

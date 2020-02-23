@@ -62,6 +62,11 @@ public class City extends Actor{
         population += number;
     }
 
+    // Decrease population
+    public void subtractPopulation(int number){
+        population += number;
+    }
+
     public void addBuildings(Building building){
         if (building.getTYPE().equals(Types.BUILDING.WINDMILL) || building.getTYPE().equals(Types.BUILDING.SAWMILL)
                 || building.getTYPE().equals(Types.BUILDING.FORGE) || building.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
@@ -71,6 +76,7 @@ public class City extends Actor{
             changeProduction(building);
         }else if (building.getTYPE().equals(Types.BUILDING.TEMPLE) || building.getTYPE().equals(Types.BUILDING.WATER_TEMPLE)){
             addLongTimePoints(building.getPoints());
+            addPoints(building.getPoints());
         }else{
             addPoints(building.getPoints());
         }
@@ -282,4 +288,35 @@ public class City extends Actor{
     public LinkedList<Integer> getUnitsID() {
         return unitsID;
     }
+
+    public void setPrism(boolean prism) {
+        isPrism = prism;
+    }
+
+    public Building removeBuilding(int x, int y){
+        Building removeBuilding = null;
+        for(Building building :buildings){
+            if (building.getX() == x && building.getY() == y){
+                buildings.remove(building);
+                removeBuilding = building;
+
+            }
+        }
+        return removeBuilding;
+    }
+
+    public void subtractLongTermPoints(int points){
+        if (longTermPoints < points){
+            System.out.println("Error in subtract Long Term Points!!! -> Destroy Temple");
+        }
+        longTermPoints -= points;
+    }
+
+    public void subtractProduction(int production){
+        if (this.production < production){
+            System.out.println("Error in subtract Production!!! -> Destroy Custom House");
+        }
+        this.production -= production;
+    }
+
 }

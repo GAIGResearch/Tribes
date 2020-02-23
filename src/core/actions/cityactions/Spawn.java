@@ -35,7 +35,7 @@ public class Spawn extends CityAction
         int star = tribe.getStars();
         if (gs.getBoard().getUnitAt(city.getX(), city.getY()) == null){
             for(Types.UNIT unit: Types.UNIT.values()){
-                // Only can create land units
+                // TODO:
                 if (unit.getCost() <= star && unit.getKey() <= 7){
                     if (unit.getRequirement() == null){
                         Spawn newAction = new Spawn(city);
@@ -67,7 +67,8 @@ public class Spawn extends CityAction
         if (isFeasible(gs)){
             Unit newUnit = unit_type.createUnit(new Vector2d(city.getX(), city.getY()), 0, false, city.getActorID(), city.getTribeId(), unit_type);
             gs.getTribe(city.getTribeId()).subtractStars(unit_type.getCost());
-            gs.getBoard().setUnitIdAt(city.getX(), city.getY(), newUnit);
+            gs.getBoard().addUnitToBoard(newUnit);
+            gs.getBoard().addUnitToCity(newUnit, city);
             return true;
         }
         return false;

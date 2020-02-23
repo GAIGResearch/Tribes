@@ -68,10 +68,20 @@ public class Destroy extends CityAction
                 gs.getBoard().setBuildingAt(x, y, null);
                 if (removedBuilding.getTYPE() != Types.BUILDING.CUSTOM_HOUSE) {
                     city.subtractPopulation(removedBuilding.getPRODUCTION());
+                }else{
+                    city.subtractProduction(removedBuilding.getPRODUCTION());
                 }
-                if (removedBuilding.getTYPE().getKey() >= Types.BUILDING.ALTAR_OF_PEACE.getKey()) {
+                // TODO: Should be check if the building enum is changed
+                if (removedBuilding.getTYPE().getKey() >= Types.BUILDING.TEMPLE.getKey()) {
                     gs.getTribe(city.getTribeId()).subtractScore(removedBuilding.getPoints());
                 }
+
+                boolean isTemple = removedBuilding.getTYPE().getKey() >= Types.BUILDING.TEMPLE.getKey() && removedBuilding.getTYPE().getKey() <= Types.BUILDING.MOUNTAIN_TEMPLE.getKey();
+                if(isTemple){
+                    city.subtractLongTermPoints(removedBuilding.getPoints());
+                }
+
+
                 return true;
             }
         }

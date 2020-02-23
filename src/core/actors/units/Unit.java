@@ -19,10 +19,10 @@ public abstract class Unit extends Actor
     private Vector2d currentPosition;
     private int kills;
     private boolean isVeteran;
-    private int citeID;
+    private int cityID;
     private int tribeID;
 
-    public Unit(int atk, int def, int mov, int max_hp, int range, int cost, Vector2d pos, int kills, boolean isVeteran, int citeID, int tribeID){
+    public Unit(int atk, int def, int mov, int max_hp, int range, int cost, Vector2d pos, int kills, boolean isVeteran, int cityID, int tribeID){
         this.ATK = atk;
         this.DEF = def;
         this.MOV = mov;
@@ -34,7 +34,7 @@ public abstract class Unit extends Actor
         this.currentPosition = pos;
         this.kills = kills;
         this.isVeteran = isVeteran;
-        this.citeID = citeID;
+        this.cityID = cityID;
         this.tribeID = tribeID;
     }
 
@@ -74,11 +74,11 @@ public abstract class Unit extends Actor
         isVeteran = veteran;
     }
 
-    public int getCiteID(){
-        return citeID;
+    public int getCityID(){
+        return cityID;
     }
 
-    public int getTribeID(){
+    public int getTribeId(){
         return tribeID;
     }
 

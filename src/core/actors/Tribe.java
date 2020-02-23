@@ -3,6 +3,7 @@ package core.actors;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
+import core.game.ForwardModel;
 
 import java.util.ArrayList;
 
@@ -32,6 +33,8 @@ public class Tribe extends Actor{
     //Score for the tribe.
     private int score = 0;
 
+    private boolean obsGrid[][];
+
 
     public Tribe(Types.TRIBE tribe)
     {
@@ -54,6 +57,11 @@ public class Tribe extends Actor{
         stars = TribesConfig.INITIAL_STARS;
     }
 
+    public void initObsGrid(int size)
+    {
+        obsGrid = new boolean[size][size];
+    }
+
 
     public Tribe copy()
     {
@@ -74,6 +82,21 @@ public class Tribe extends Actor{
         return tribeCopy;
     }
 
+
+    public void clearView(int x, int y)
+    {
+        int size = obsGrid.length;
+        for(int i = x-1; i <= x+1; ++i)
+            for(int j = y-1; j <= y+1; ++j)
+            {
+                //All these positions should be within my view.
+                if(x >= 0 && y >= 0 && x < size && y < size)
+                {
+                    obsGrid[x][y] = true;
+                }
+
+            }
+    }
 
 
     public void addCity(int id) {
@@ -110,6 +133,8 @@ public class Tribe extends Actor{
     }
 
     public String getName(){return tribe.getName();}
+
+    public boolean[][] getObsGrid() {return obsGrid;}
 
     public Types.TRIBE getType(){return tribe;}
 

@@ -3,7 +3,6 @@ package core.actors;
 import core.Types;
 import core.actors.buildings.Building;
 
-import java.awt.*;
 import java.util.LinkedList;
 
 public class City extends Actor{
@@ -14,8 +13,8 @@ public class City extends Actor{
     private int level;
     private int population = 0;
     private int population_need;
-    private boolean isValley;
-    private boolean isPrism;
+    private boolean isVillage;
+    private boolean isCapital;
     private int production = 0;
     private int points = 0;
     private int longTermPoints = 0;
@@ -29,22 +28,22 @@ public class City extends Actor{
     public City(int x, int y, int tribeId) {
         this.x = x;
         this.y = y;
-        isValley = true;
+        isVillage = true;
         population_need = 0;
         bound = 1; //cities start with 1 tile around it for territory
         level = 1; //and starting level is 1
-        isPrism = false;
+        isCapital = false;
         this.tribeId = tribeId;
     }
 
-    public City(int x, int y, int level, int population, int population_need, boolean isValley, boolean isPrism, int production, LinkedList<Building> buildings, int tribeId, LinkedList<Integer> unitsID) {
+    public City(int x, int y, int level, int population, int population_need, boolean isVillage, boolean isCapital, int production, LinkedList<Building> buildings, int tribeId, LinkedList<Integer> unitsID) {
         this.x = x;
         this.y = y;
         this.level = level;
         this.population = population;
         this.population_need = population_need;
-        this.isValley = isValley;
-        this.isPrism = isPrism;
+        this.isVillage = isVillage;
+        this.isCapital = isCapital;
         this.production = production;
         this.buildings = buildings;
         this.tribeId = tribeId;
@@ -52,8 +51,8 @@ public class City extends Actor{
     }
 
     public void occupy(){
-        if (isValley){
-            isValley=false;
+        if (isVillage){
+            isVillage =false;
             levelUp();
         }
     }
@@ -169,7 +168,7 @@ public class City extends Actor{
         production += prod;
     }
 
-    public boolean addUnits(int id){
+    public boolean addUnit(int id){
         if (unitsID.size() < level){
             unitsID.add(id);
             return true;
@@ -177,14 +176,14 @@ public class City extends Actor{
         return false;
     }
 
-    public void removeUnits(int id){
+    public void removeUnit(int id){
         for(int i=0; i<unitsID.size(); i++){
             if (unitsID.get(i) == id){
                 unitsID.remove(i);
                 return;
             }
         }
-        System.out.println("Error!! Unit ID "+ id +" does not belong to this tribe");
+        System.out.println("Error!! Unit ID "+ id +" does not belong to this city");
     }
 
 
@@ -208,12 +207,12 @@ public class City extends Actor{
         return population;
     }
 
-    public boolean isValley() {
-        return isValley;
+    public boolean isVillage() {
+        return isVillage;
     }
 
-    public boolean isPrism() {
-        return isPrism;
+    public boolean isCapital() {
+        return isCapital;
     }
 
     public int getPopulation_need() {
@@ -221,7 +220,7 @@ public class City extends Actor{
     }
 
     public Types.TERRAIN type(){
-        if (isValley){
+        if (isVillage){
             return Types.TERRAIN.VILLAGE;
         }
         return Types.TERRAIN.CITY;
@@ -255,7 +254,7 @@ public class City extends Actor{
     }
 
     public City copy(){
-        City c = new City(x, y, level, population, population_need, isValley, isPrism, production, copyBuildings(), tribeId, copyUnitsID());
+        City c = new City(x, y, level, population, population_need, isVillage, isCapital, production, copyBuildings(), tribeId, copyUnitsID());
         c.setWalls(hasWalls);
         return c;
     }
@@ -271,12 +270,12 @@ public class City extends Actor{
     }
 
 
-    public boolean getIsValley(){
-        return this.isValley;
+    public boolean getIsVilage(){
+        return this.isVillage;
     }
 
-    public void setIsValley(boolean isVal){
-         this.isValley = isValley;
+    public void setIsVillage(boolean isVillage){
+         this.isVillage = isVillage;
     }
 
     public int getBound(){

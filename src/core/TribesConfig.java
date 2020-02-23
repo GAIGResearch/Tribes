@@ -97,6 +97,9 @@ public class TribesConfig
     public static int SUPERUNIT_RANGE = 1;
     public static int SUPERUNIT_COST = 10; //Useful for when unit is disbanded.
 
+    //Explorer
+    public static int NUM_STEPS = 15;
+
     /* BUILDINGS */
 
     // Farm

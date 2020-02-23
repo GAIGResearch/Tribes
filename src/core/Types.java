@@ -227,7 +227,7 @@ public class Types {
             return requirement;
         }
 
-        public Unit createUnit (Vector2d pos, int kills, boolean isVeteran, int ownerID, int tribeID, UNIT type)
+        public static Unit createUnit (Vector2d pos, int kills, boolean isVeteran, int ownerID, int tribeID, UNIT type)
         {
             switch (type)
             {

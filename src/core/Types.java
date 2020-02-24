@@ -1,10 +1,13 @@
 package core;
 
+import core.actions.Action;
+import core.actors.Tribe;
 import core.actors.units.*;
 import utils.ImageIO;
 import utils.Vector2d;
 
 import java.awt.*;
+import java.util.LinkedList;
 
 public class Types {
 
@@ -140,37 +143,97 @@ public class Types {
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
     }
 
+    /**
+     * Types of buildings that can be built by cities
+     */
+    public enum CITY_LEVEL_UP
+    {
+        WORKSHOP(2),
+        EXPLORER(2),
+        CITY_WALL(3),
+        RESOURCES(3),
+        POP_GROWTH(4),
+        BORDER_GROWTH(4),
+        PARK(5),
+        SUPERUNIT(5);
+
+        private int level;
+
+        CITY_LEVEL_UP(int level) {
+        }
+
+        public int getLevel() { return level; }
+
+        public static LinkedList<CITY_LEVEL_UP> getActions (int curLevel)
+        {
+            LinkedList<CITY_LEVEL_UP> actions = new LinkedList<>();
+            switch (curLevel)
+            {
+                case 1:
+                    actions.add(WORKSHOP);
+                    actions.add(EXPLORER);
+                    break;
+                case 2:
+                    actions.add(CITY_WALL);
+                    actions.add(RESOURCES);
+                    break;
+
+                case 3:
+                    actions.add(POP_GROWTH);
+                    actions.add(BORDER_GROWTH);
+                    break;
+
+                default:
+                    actions.add(PARK);
+                    actions.add(SUPERUNIT);
+                    break;
+
+            }
+            return actions;
+        }
+    }
+
 
     /**
      * Types of actors
      */
     public enum UNIT
     {
-        WARRIOR (0,"img/unit/warrior/"),
-        RIDER (1,"img/unit/rider/"),
-        DEFENDER (2,"img/unit/defender/"),
-        SWORDMAN (3,"img/unit/swordman/"),
-        ARCHER (4,"img/unit/archer/"),
-        CATAPULT (5,"img/unit//"),
-        KNIGHT (6,"img/unit/knight/"),
-        MIND_BEARER (7,"img/unit/mind_bearer/"),
-        BOAT(8,"img/unit/boat/"),
-        SHIP(9,"img/unit/ship/"),
-        BATTLESHIP(10,"img/unit/battleship/");
+        WARRIOR (0,"img/unit/warrior/", TribesConfig.WARRIOR_COST, null),
+        RIDER (1,"img/unit/rider/", TribesConfig.RIDER_COST, TECHNOLOGY.RIDING),
+        DEFENDER (2,"img/unit/defender/", TribesConfig.DEFENDER_COST, TECHNOLOGY.SHIELDS),
+        SWORDMAN (3,"img/unit/swordman/", TribesConfig.SWORDMAN_COST, TECHNOLOGY.SMITHERY),
+        ARCHER (4,"img/unit/archer/", TribesConfig.ARCHER_COST, TECHNOLOGY.ARCHERY),
+        CATAPULT (5,"img/unit/", TribesConfig.CATAPULT_COST, TECHNOLOGY.MATHEMATICS),
+        KNIGHT (6,"img/unit/knight/", TribesConfig.KNIGHT_COST, TECHNOLOGY.CHIVALRY),
+        MIND_BEARER (7,"img/unit/mind_bearer/", TribesConfig.MINDBENDER_COST, TECHNOLOGY.PHILOSOPHY),
+        BOAT(8,"img/unit/boat/", TribesConfig.BOAT_COST, TECHNOLOGY.SAILING),
+        SHIP(9,"img/unit/ship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.SAILING),
+        BATTLESHIP(10,"img/unit/battleship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.NAVIGATION),
+        SUPERUNIT(11, "img/unit/superunit/", TribesConfig.SUPERUNIT_COST, null);
 
 
         private int key;
         private String imageFile;
-        UNIT(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
+        private int cost;
+        private TECHNOLOGY requirement;
+        UNIT(int numVal, String imageFile, int cost, Types.TECHNOLOGY requirement) {  this.key = numVal;  this.imageFile = imageFile; this.cost = cost; this.requirement = requirement;}
         public int getKey() {  return key; }
         public Image getImage(int playerID) { return ImageIO.GetInstance().getImage(imageFile + playerID + ".png"); }
+        public int getCost() {
+            return cost;
+        }
+        public TECHNOLOGY getRequirement() {
+            return requirement;
+        }
 
-        public Unit createUnit (Vector2d pos, int kills, boolean isVeteran, int ownerID, int tribeID, UNIT type)
+        public static Unit createUnit (Vector2d pos, int kills, boolean isVeteran, int ownerID, int tribeID, UNIT type)
         {
             switch (type)
             {
                 case WARRIOR: return new Warrior(pos, kills, isVeteran, ownerID, tribeID);
                 case RIDER: return new Rider(pos, kills, isVeteran, ownerID, tribeID);
+                case SUPERUNIT: return new SuperUnit(pos, kills, isVeteran, ownerID, tribeID);
                 default:
                     System.out.println("WARNING: Types.Unit.createUnit(), type creation not implemented.");
             }

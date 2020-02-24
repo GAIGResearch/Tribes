@@ -3,6 +3,7 @@ package core.actors;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
+import core.game.ForwardModel;
 
 import java.util.ArrayList;
 
@@ -10,6 +11,9 @@ public class Tribe extends Actor{
 
     //Cities this tribe owns.
     private ArrayList<Integer> citiesID;
+
+    //Capital City ID
+    private int capitalID;
 
     //ID of this tribe. It corresponds with the ID of the player who controls it.
     private int tribeID;
@@ -28,6 +32,8 @@ public class Tribe extends Actor{
 
     //Score for the tribe.
     private int score = 0;
+
+    private boolean obsGrid[][];
 
 
     public Tribe(Types.TRIBE tribe)
@@ -51,6 +57,11 @@ public class Tribe extends Actor{
         stars = TribesConfig.INITIAL_STARS;
     }
 
+    public void initObsGrid(int size)
+    {
+        obsGrid = new boolean[size][size];
+    }
+
 
     public Tribe copy()
     {
@@ -60,6 +71,7 @@ public class Tribe extends Actor{
         tribeCopy.stars = this.stars;
         tribeCopy.winner = this.winner;
         tribeCopy.score = this.score;
+        tribeCopy.capitalID = this.capitalID;
 
         tribeCopy.citiesID = new ArrayList<>();
         for(int cityID : citiesID)
@@ -70,6 +82,21 @@ public class Tribe extends Actor{
         return tribeCopy;
     }
 
+
+    public void clearView(int x, int y)
+    {
+        int size = obsGrid.length;
+        for(int i = x-1; i <= x+1; ++i)
+            for(int j = y-1; j <= y+1; ++j)
+            {
+                //All these positions should be within my view.
+                if(x >= 0 && y >= 0 && x < size && y < size)
+                {
+                    obsGrid[x][y] = true;
+                }
+
+            }
+    }
 
 
     public void addCity(int id) {
@@ -97,13 +124,17 @@ public class Tribe extends Actor{
         this.score += score;
     }
 
-
+    public void subtractScore(int score){
+        this.score -= score;
+    }
 
     public ArrayList<Integer> getCitiesID() {
         return citiesID;
     }
 
     public String getName(){return tribe.getName();}
+
+    public boolean[][] getObsGrid() {return obsGrid;}
 
     public Types.TRIBE getType(){return tribe;}
 
@@ -126,4 +157,15 @@ public class Tribe extends Actor{
         this.stars = stars;
     }
 
+    public void addStars(int stars) {this.stars += stars;}
+
+    public void subtractStars(int stars) {this.stars -= stars;}
+
+    public void setCapitalID(int capitalID) {
+        this.capitalID = capitalID;
+    }
+
+    public int getCapitalID() {
+        return capitalID;
+    }
 }

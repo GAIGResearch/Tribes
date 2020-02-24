@@ -116,7 +116,7 @@ public class InfoView extends JComponent {
             if(t == Types.TERRAIN.CITY)
             {
                 //Retrieve the city
-                int cityID = board.getTileCityId(highlightY, highlightX);
+                int cityID = board.getCityIdAt(highlightY, highlightX);
                 City c = (City) board.getActor(cityID);
                 sb = new StringBuilder();
                 if(c != null) {
@@ -135,13 +135,13 @@ public class InfoView extends JComponent {
             if(u != null)
             {
                 sb.append("Unit: " + u.getType() + "\n");
-                sb.append(" Tribe: " + u.getTribeID() + "\n");
+                sb.append(" Tribe: " + u.getTribeId() + "\n");
                 sb.append(" Health: " + u.getCurrentHP() + "/" + u.getMaxHP() + "\n");
                 if(u.isVeteran())
                     sb.append(" Veteran unit" + "\n");
                 else
                 {
-                    int kills = Math.max(u.getKills(), 3);
+                    int kills = Math.min(u.getKills(), 3);
                     sb.append(" " + kills + "/3 kills" + "\n");
                 }
             }

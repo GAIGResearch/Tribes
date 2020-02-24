@@ -39,9 +39,9 @@ public class Recover extends UnitAction
         int addHP = 2;
         if (currentHP < unit.getMaxHP() && currentHP > 0) {
             if (gs != null){
-               int cityID = gs.getBoard().getCityIDAt(unit.getCurrentPosition().x, unit.getCurrentPosition().y);
+               int cityID = gs.getBoard().getCityIdAt(unit.getCurrentPosition().x, unit.getCurrentPosition().y);
                if (cityID != -1){
-                   ArrayList<Integer> citesID = gs.getTribe(unit.getTribeID()).getCitiesID();
+                   ArrayList<Integer> citesID = gs.getTribe(unit.getTribeId()).getCitiesID();
                    if (citesID.contains(cityID)){
                        addHP += 2;
                    }

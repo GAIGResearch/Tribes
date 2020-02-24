@@ -89,6 +89,17 @@ public class TribesConfig
     public static int BATTLESHIP_RANGE = 2;
     public static int BATTLESHIP_COST = 15;
 
+    //Superunit
+    public static int SUPERUNIT_ATTACK = 5;
+    public static int SUPERUNIT_DEFENCE = 4;
+    public static int SUPERUNIT_MOVEMENT = 1;
+    public static int SUPERUNIT_MAX_HP = 40;
+    public static int SUPERUNIT_RANGE = 1;
+    public static int SUPERUNIT_COST = 10; //Useful for when unit is disbanded.
+
+    //Explorer
+    public static int NUM_STEPS = 15;
+
     /* BUILDINGS */
 
     // Farm
@@ -132,5 +143,9 @@ public class TribesConfig
 
     /* TRIBES */
     public static int INITIAL_STARS = 5;
+
+    /* ACTIONS */
+    public static int CLEAR_FOREST_STAR = 2;
+    public static int FOREST_COST = 5;
 
 }

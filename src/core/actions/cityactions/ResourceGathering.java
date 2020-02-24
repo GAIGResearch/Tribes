@@ -2,6 +2,7 @@ package core.actions.cityactions;
 
 import core.Types;
 import core.actions.Action;
+import core.actors.Tribe;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.City;
@@ -24,12 +25,20 @@ public class ResourceGathering extends CityAction
 
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
+        Board b = gs.getBoard();
         LinkedList<Action> resources = new LinkedList<>();
-        if(isFeasible(gs)){
-            ResourceGathering resourceGathering = new ResourceGathering(this.city);
-            resourceGathering.setResource(this.resource);
-            resources.add(resourceGathering);
+
+        for(int x = this.city.getX()- this.city.getBound(); x < x+ this.city.getBound(); x++){
+            for(int y = this.city.getX()- this.city.getBound(); y < y+ this.city.getBound(); y++) {
+                Types.RESOURCE r = b.getResourceAt(x,y);
+                ResourceGathering resource = new ResourceGathering(this.city);
+                resource.setResource(r);
+                if(resource.isFeasible(gs)){
+                    resources.add(resource);
+                }
+            }
         }
+
         return resources;
     }
 
@@ -37,26 +46,43 @@ public class ResourceGathering extends CityAction
     public boolean isFeasible(final GameState gs)
     {
         Board b = gs.getBoard();
+        Tribe t = b.getTribe(this.city.getTribeId());
         // Check if resource in range
         for(int x = this.city.getX()- this.city.getBound(); x < x+ this.city.getBound(); x++){
             for(int y = this.city.getX()- this.city.getBound(); y < y+ this.city.getBound(); y++){
                 if(b.getResourceAt(x,y) == this.resource){
                     switch (this.resource){
+                        case ANIMAL:
+                            if(t.getTechTree().isResearched(Types.TECHNOLOGY.HUNTING) && t.getStars() >=2)
+                                return true;
+                            else
+                                return false;
                         case FISH:
-                            if(b.getTribe(this.city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.FISHING))
+                            if(t.getTechTree().isResearched(Types.TECHNOLOGY.FISHING) && t.getStars() >=2)
                                 return true;
                             else
                                 return false;
                         case ORE:
-                            if(b.getTribe(this.city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.MINING))
+                            if(t.getTechTree().isResearched(Types.TECHNOLOGY.MINING) && t.getStars() >=5)
                                 return true;
                             else
                                 return false;
                             case WHALES:
-                            if(b.getTribe(this.city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.WHALING))
+                            if(t.getTechTree().isResearched(Types.TECHNOLOGY.WHALING))
                                 return true;
                             else
                                 return false;
+                        case FRUIT:
+                            if(t.getTechTree().isResearched(Types.TECHNOLOGY.ORGANIZATION) && t.getStars() >=2)
+                                return true;
+                            else
+                                return false;
+                        case CROPS:
+                            if(t.getTechTree().isResearched(Types.TECHNOLOGY.FARMING) && t.getStars() >=2 ||t.getTechTree().isResearched(Types.TECHNOLOGY.ORGANIZATION) && t.getStars() >=2 )
+                                return true;
+                            else
+                                return false;
+
                     }
                 }
                     return true;
@@ -72,20 +98,20 @@ public class ResourceGathering extends CityAction
         if(isFeasible(gs)){
             switch (this.resource){
                 case CROPS:
+                case ORE:
+                    this.city.addPopulation(2);
+                    return true;
                 case FISH:
                 case ANIMAL:
                 case FRUIT:
-                    this.city.addExtraStar(2);
+                    this.city.addPopulation(1);
                     return true;
-                case ORE:
-                case WHALES:
-                    this.city.addExtraStar(5);
-                    return true;
-                case RUINS:
-                    this.city.addExtraStar(10);
+                case WHALES: //Whaling is the only resource which provides extra stars
+                    Board b = gs.getBoard();
+                    Tribe t  = b.getTribe(this.city.getTribeId());
+                    t.addStars(5);
                     return true;
             }
-
         }
         return false;
     }

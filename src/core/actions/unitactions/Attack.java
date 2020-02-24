@@ -25,12 +25,16 @@ public class Attack extends UnitAction
     public LinkedList<Action> computeActionVariants(final GameState gs) {
 
         LinkedList<Action> attacks = new LinkedList<>();
+        Board b = gs.getBoard();
 
-        if(isFeasible(gs)){
-            Attack a = new Attack(this.unit);
-            a.target = this.target;
-            attacks.add(a);
-
+        for(int x = this.unit.getCurrentPosition().x- this.unit.RANGE; x <= x+ this.unit.RANGE; x++) {
+            for (int y = this.unit.getCurrentPosition().y - this.unit.RANGE; y <= y + this.unit.RANGE; y++) {
+                Attack a = new Attack(this.unit);
+                a.setTarget(b.getUnitAt(x,y));
+                if(a.isFeasible(gs)){
+                    attacks.add(a);
+                }
+            }
         }
         return attacks;
     }
@@ -39,7 +43,9 @@ public class Attack extends UnitAction
     public boolean isFeasible(final GameState gs)
     {
         // Check if target in range
-        if(target.getCurrentPosition().x < unit.getCurrentPosition().x  + this.unit.RANGE || target.getCurrentPosition().y < unit.getCurrentPosition().y  + this.unit.RANGE)
+        if(target == null)
+            return false;
+        if(target.getCurrentPosition().x <= unit.getCurrentPosition().x  + this.unit.RANGE || target.getCurrentPosition().y < unit.getCurrentPosition().y  + this.unit.RANGE)
             return true;
         return false;
     }

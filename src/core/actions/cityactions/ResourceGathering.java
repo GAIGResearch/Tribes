@@ -6,6 +6,7 @@ import core.actors.Tribe;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.City;
+import utils.Vector2d;
 
 import java.util.LinkedList;
 
@@ -27,18 +28,21 @@ public class ResourceGathering extends CityAction
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         Board b = gs.getBoard();
         LinkedList<Action> resources = new LinkedList<>();
-
-        for(int x = this.city.getX()- this.city.getBound(); x < x+ this.city.getBound(); x++){
-            for(int y = this.city.getX()- this.city.getBound(); y < y+ this.city.getBound(); y++) {
-                Types.RESOURCE r = b.getResourceAt(x,y);
-                ResourceGathering resource = new ResourceGathering(this.city);
-                resource.setResource(r);
-                if(resource.isFeasible(gs)){
-                    resources.add(resource);
-                }
+        LinkedList<Vector2d> cityTiles = b.getCityTiles(b.getCityIdAt(this.city.getX(),this.city.getY()));
+        // lopp through bounds of city and add resource actions if they are feasible
+        // TODO: Find more effecient method other than asking board for city tiles
+        for(int i = 0; i<cityTiles.size(); i++) {
+            Vector2d pos = cityTiles.get(i);
+            Types.RESOURCE r = b.getResourceAt(pos.x, pos.y);
+            if (r == null)
+                continue;
+            ResourceGathering resource = new ResourceGathering(this.city);
+            resource.setResource(r);
+            if (resource.isFeasible(gs)) {
+                resources.add(resource);
             }
-        }
 
+        }
         return resources;
     }
 
@@ -48,9 +52,7 @@ public class ResourceGathering extends CityAction
         Board b = gs.getBoard();
         Tribe t = b.getTribe(this.city.getTribeId());
         // Check if resource in range
-        for(int x = this.city.getX()- this.city.getBound(); x < x+ this.city.getBound(); x++){
-            for(int y = this.city.getX()- this.city.getBound(); y < y+ this.city.getBound(); y++){
-                if(b.getResourceAt(x,y) == this.resource){
+                if(b.getResourceAt(targetX,targetY) == this.resource){
                     switch (this.resource){
                         case ANIMAL:
                             if(t.getTechTree().isResearched(Types.TECHNOLOGY.HUNTING) && t.getStars() >=2)
@@ -82,12 +84,8 @@ public class ResourceGathering extends CityAction
                                 return true;
                             else
                                 return false;
-
                     }
                 }
-                    return true;
-                }
-            }
         return false;
     }
 
@@ -109,7 +107,7 @@ public class ResourceGathering extends CityAction
                 case WHALES: //Whaling is the only resource which provides extra stars
                     Board b = gs.getBoard();
                     Tribe t  = b.getTribe(this.city.getTribeId());
-                    t.addStars(5);
+                    t.addStars(10);
                     return true;
             }
         }

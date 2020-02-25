@@ -16,8 +16,8 @@ public class MakeVeteran extends UnitAction
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         LinkedList<Action> actions = new LinkedList<>();
-        MakeVeteran newAction = new MakeVeteran(unit);
-        if(isFeasible(gs)){ actions.add(newAction); }
+        MakeVeteran action = new MakeVeteran(unit);
+        if(isFeasible(gs)){ actions.add(action); }
         return actions;
     }
 

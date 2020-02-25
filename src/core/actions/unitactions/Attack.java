@@ -42,23 +42,27 @@ public class Attack extends UnitAction
     @Override
     public boolean isFeasible(final GameState gs)
     {
-        // Check if target in range
+        // Check if target is not null
         if(target == null)
             return false;
-        if(target.getCurrentPosition().x <= unit.getCurrentPosition().x  + this.unit.RANGE || target.getCurrentPosition().y < unit.getCurrentPosition().y  + this.unit.RANGE)
-            return true;
-        return false;
+
+        return true;
     }
 
     @Override
     public boolean execute(GameState gs) {
         //Check if action is feasible before execution
         if(isFeasible(gs)) {
-            if (target.getCurrentHP() <= unit.ATK) {
+            float attackForce =this.unit.ATK*(this.unit.getCurrentHP()/this.unit.getMaxHP());
+            float defenceForce =target.DEF*(target.getCurrentHP()/target.getMaxHP());
+            float accelerator = 4.5f;
+            float totalDamage =attackForce+defenceForce;
+            int attackResult = Math.round((attackForce/totalDamage)*this.unit.ATK*accelerator);
+            if (target.getCurrentHP() <= attackResult) {
                 unit.addKill();
                 target = null;
             } else {
-                target.setCurrentHP(target.getCurrentHP() - unit.ATK);
+                target.setCurrentHP(target.getCurrentHP() - attackResult);
             }
             return true;
         }

@@ -39,6 +39,8 @@ public class ResourceGathering extends CityAction
             ResourceGathering resource = new ResourceGathering(this.city);
             resource.setResource(r);
             if (resource.isFeasible(gs)) {
+                resource.targetX = pos.x;
+                resource.targetY = pos.y;
                 resources.add(resource);
             }
 

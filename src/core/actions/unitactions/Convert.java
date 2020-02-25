@@ -25,17 +25,25 @@ public class Convert extends UnitAction
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         LinkedList<Action> converts = new LinkedList<>();
         Board b = gs.getBoard();
-        if(isFeasible(gs)){
-            Convert a = new Convert(this.unit, this.target);
-            converts.add(a);
-        }
+        for(int x = this.unit.getCurrentPosition().x- this.unit.RANGE; x <= x+ this.unit.RANGE; x++) {
+            for (int y = this.unit.getCurrentPosition().y - this.unit.RANGE; y <= y + this.unit.RANGE; y++) {
+                Convert c = new Convert(this.unit, b.getUnitAt(x,y));
+                if(c.isFeasible(gs)){
+                    converts.add(c);
+                }
+            }
+            }
         return converts;
+
     }
+
+
+
 
     @Override
     public boolean isFeasible(final GameState gs) {
         //Check if target in range
-        if(target.getCurrentPosition().x < unit.getCurrentPosition().x  + this.unit.RANGE && target.getCurrentPosition().y < unit.getCurrentPosition().y  + this.unit.RANGE)
+        if(target!=null)
             return true;
         return false;
     }
@@ -44,8 +52,7 @@ public class Convert extends UnitAction
     public boolean execute(GameState gs) {
         //Check if action is feasible before execution
         if(isFeasible(gs)) {
-            target.setActorID(unit.getActorID());
-            target.setTribeID(unit.getTribeID());
+            target.setTribeID(this.unit.getTribeId());
             return true;
         }
         return false;

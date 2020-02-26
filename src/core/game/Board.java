@@ -15,7 +15,7 @@ public class Board {
 
     // Array for the type of terrain that each tile of board will have
     private Types.TERRAIN[][] terrains;
-    
+
     // Array for resource each tile of the board will have
     private Types.RESOURCE[][] resources;
 
@@ -31,6 +31,9 @@ public class Board {
     // Array for id of the city that owns each tile. -1 if no city owns the tile.
     private int[][] tileCityId;
 
+    // Array that indicates presence of roads, cities, ports or naval links
+    private boolean[][] tradeNetwork;
+
     //Actors in the game
     private HashMap<Integer, Actor> gameActors;
 
@@ -38,24 +41,25 @@ public class Board {
     private int size;
 
     // Constructor for board
-    public Board()
-    {
+    public Board() {
         this.gameActors = new HashMap<>();
     }
 
-    public void init (int size, Tribe[] tribes){
+    public void init(int size, Tribe[] tribes) {
+
+        this.size = size;
 
         terrains = new Types.TERRAIN[size][size];
         resources = new Types.RESOURCE[size][size];
         buildings = new Types.BUILDING[size][size];
         units = new int[size][size];
-
-        this.size = size;
         this.tileCityId = new int[size][size];
+        this.tradeNetwork = new boolean[size][size];
+
 
         //Initialise tile IDs
-        for (int x = 0; x<size; x++){
-            for(int y =0; y<size; y++){
+        for (int x = 0; x < size; x++) {
+            for (int y = 0; y < size; y++) {
                 tileCityId[x][y] = -1;
             }
         }
@@ -64,7 +68,7 @@ public class Board {
     }
 
     // Return deep copy of board
-    public Board copy(){
+    public Board copy() {
         Board copyBoard = new Board();
         copyBoard.size = this.size;
         copyBoard.tribes = new Tribe[this.tribes.length];
@@ -74,27 +78,28 @@ public class Board {
         copyBoard.buildings = new Types.BUILDING[size][size];
         copyBoard.units = new int[size][size];
         copyBoard.tileCityId = new int[size][size];
+        copyBoard.tradeNetwork = new boolean[size][size];
 
         // Copy board objects (they are all ids)
-        for (int x = 0; x<this.size; x++){
-            for(int y = 0; y<this.size; y++){
-                copyBoard.setUnitIdAt(x,y,units[x][y]);
-                copyBoard.setTerrainAt(x,y,terrains[x][y]);
-                copyBoard.setResourceAt(x,y,resources[x][y]);
-                copyBoard.setBuildingAt(x,y,buildings[x][y]);
+        for (int x = 0; x < this.size; x++) {
+            for (int y = 0; y < this.size; y++) {
+                copyBoard.setUnitIdAt(x, y, units[x][y]);
+                copyBoard.setTerrainAt(x, y, terrains[x][y]);
+                copyBoard.setResourceAt(x, y, resources[x][y]);
+                copyBoard.setBuildingAt(x, y, buildings[x][y]);
                 copyBoard.tileCityId[x][y] = tileCityId[x][y];
+                copyBoard.tradeNetwork[x][y] = tradeNetwork[x][y];
             }
         }
 
         // Copy tribes
-        for (int i = 0; i< tribes.length; i++){
+        for (int i = 0; i < tribes.length; i++) {
             copyBoard.tribes[i] = tribes[i].copy();
         }
 
         //Deep copy of all actors in the board
         copyBoard.gameActors = new HashMap<>();
-        for(Actor act : gameActors.values())
-        {
+        for (Actor act : gameActors.values()) {
             int id = act.getActorId();
             copyBoard.gameActors.put(id, act.copy());
         }
@@ -107,71 +112,61 @@ public class Board {
      * destination are: S, W, N, E, SW, NW, NE, NW. If none of those positions are available, the
      * unit disappears.
      * See Push Grid at: https://polytopia.fandom.com/wiki/Giant
+     *
      * @param tribeId: Id of the tribe the unit belongs to
-     * @param toPush Unit to be pushed
-     * @param startX x coordinate of the starting position of the unit to push
-     * @param startY y coordinate of the starting position of the unit to push
+     * @param toPush   Unit to be pushed
+     * @param startX   x coordinate of the starting position of the unit to push
+     * @param startY   y coordinate of the starting position of the unit to push
      */
 
-    public void pushUnit(int tribeId, Unit toPush, int startX, int startY)
-    {
-        int xPush[] = {0,-1,0,1,-1,-1,1,1};
-        int yPush[] = {1,0,-1,0,1,-1,-1,1};
+    public void pushUnit(int tribeId, Unit toPush, int startX, int startY) {
+        int xPush[] = {0, -1, 0, 1, -1, -1, 1, 1};
+        int yPush[] = {1, 0, -1, 0, 1, -1, -1, 1};
         int idx = 0;
         boolean pushed = false;
 
-        while(!pushed && idx < xPush.length)
-        {
+        while (!pushed && idx < xPush.length) {
             int x = startX + xPush[idx];
             int y = startY + yPush[idx];
 
-            if(x >= 0 && y >= 0 && x < size && y < size)
-            {
+            if (x >= 0 && y >= 0 && x < size && y < size) {
                 pushed = tryPush(tribeId, toPush, startX, startY, x, y);
             }
             idx++;
         }
 
-        if(!pushed)
-        {
+        if (!pushed) {
             //it can't be pushed, unit must disappear
         }
 
     }
 
-    private boolean tryPush(int tribeId, Unit toPush, int startX, int startY, int x, int y)
-    {
+    private boolean tryPush(int tribeId, Unit toPush, int startX, int startY, int x, int y) {
         //there's no unit?
-        if(units[x][y] > 0)
+        if (units[x][y] > 0)
             return false;
 
         //climbable mountain?
         Types.TERRAIN terrain = terrains[x][y];
-        if(terrain == Types.TERRAIN.MOUNTAIN)
-        {
-            if (tribes[tribeId].getTechTree().isResearched(Types.TECHNOLOGY.CLIMBING))
-            {
+        if (terrain == Types.TERRAIN.MOUNTAIN) {
+            if (tribes[tribeId].getTechTree().isResearched(Types.TECHNOLOGY.CLIMBING)) {
                 moveUnit(toPush, startX, startY, x, y);
                 return true;
-            }else return false; //Can't be pushed if it's a mountain and climbing is not researched.
+            } else return false; //Can't be pushed if it's a mountain and climbing is not researched.
         }
 
 
         //Water with a port this tribe owns?
         Types.BUILDING b = buildings[x][y];
-        if(terrain == Types.TERRAIN.SHALLOW_WATER)
-        {
-            if(b == Types.BUILDING.PORT)
-            {
-                City c = getCityInBorders(x,y);
-                if(c != null && c.getTribeId() == tribeId)
-                {
+        if (terrain == Types.TERRAIN.SHALLOW_WATER) {
+            if (b == Types.BUILDING.PORT) {
+                City c = getCityInBorders(x, y);
+                if (c != null && c.getTribeId() == tribeId) {
                     embark(toPush, startX, startY, x, y);
                     return true;
                 }
 
-                if(c == null)
-                {
+                if (c == null) {
                     System.out.println("WARNING: This shouldn't happen. Trying to push an unit to a location outside all borders.");
                 }
             }
@@ -186,8 +181,7 @@ public class Board {
     }
 
 
-    private void embark(Unit unit, int x0, int y0, int xF, int yF)
-    {
+    private void embark(Unit unit, int x0, int y0, int xF, int yF) {
         City city = (City) gameActors.get(unit.getCityID());
         removeUnitFromBoard(unit);
         removeUnitFromCity(unit, city);
@@ -198,35 +192,30 @@ public class Board {
         addUnit(city, boat);
     }
 
-    private void moveUnit(Unit unit, int x0, int y0, int xF, int yF)
-    {
+    private void moveUnit(Unit unit, int x0, int y0, int xF, int yF) {
         units[x0][y0] = 0;
         units[xF][yF] = unit.getActorId();
         unit.setCurrentPosition(new Vector2d(xF, yF));
     }
 
-    public void launchExplorer(int x0, int y0, int tribeId, Random rnd)
-    {
-        int xMove[] = {0,-1,0,1,-1,-1,1,1};
-        int yMove[] = {1,0,-1,0,1,-1,-1,1};
+    public void launchExplorer(int x0, int y0, int tribeId, Random rnd) {
+        int xMove[] = {0, -1, 0, 1, -1, -1, 1, 1};
+        int yMove[] = {1, 0, -1, 0, 1, -1, -1, 1};
 
         int curX = x0;
         int curY = y0;
 
-        for(int i = 0; i < TribesConfig.NUM_STEPS; ++i)
-        {
+        for (int i = 0; i < TribesConfig.NUM_STEPS; ++i) {
             int j = 0;
             boolean moved = false;
 
-            while(!moved && j < TribesConfig.NUM_STEPS*3)
-            {
+            while (!moved && j < TribesConfig.NUM_STEPS * 3) {
                 //Pick a direction at random
                 int idx = rnd.nextInt(xMove.length);
                 int x = curX + xMove[idx];
                 int y = curY + yMove[idx];
 
-                if(traversable(x, y, tribeId))
-                {
+                if (traversable(x, y, tribeId)) {
                     moved = true;
                     curX = x;
                     curY = y;
@@ -236,8 +225,7 @@ public class Board {
                 j++;
             }
 
-            if(!moved)
-            {
+            if (!moved) {
                 //couldn't move in many steps. Let's just warn and progress from now.
                 System.out.println("WARNING: explorer stuck, " + j + " steps without moving.");
             }
@@ -247,47 +235,47 @@ public class Board {
     }
 
 
-    private boolean traversable(int x, int y, int tribeId)
-    {
-        if(x >= 0 && y >= 0 && x < size && y < size)
-        {
+    private boolean traversable(int x, int y, int tribeId) {
+        if (x >= 0 && y >= 0 && x < size && y < size) {
             //we rule out places we can't be.
             TechnologyTree tt = tribes[tribeId].getTechTree();
 
             //if mountain and climbing not researched
-            if(terrains[x][y] == Types.TERRAIN.MOUNTAIN && !tt.isResearched(Types.TECHNOLOGY.CLIMBING))
+            if (terrains[x][y] == Types.TERRAIN.MOUNTAIN && !tt.isResearched(Types.TECHNOLOGY.CLIMBING))
                 return false;
 
             //Shallow water and no sailing
-            if(terrains[x][y] == Types.TERRAIN.SHALLOW_WATER && !tt.isResearched(Types.TECHNOLOGY.SAILING))
+            if (terrains[x][y] == Types.TERRAIN.SHALLOW_WATER && !tt.isResearched(Types.TECHNOLOGY.SAILING))
                 return false;
 
             //Deep water and no navigation
-            if(terrains[x][y] == Types.TERRAIN.DEEP_WATER && !tt.isResearched(Types.TECHNOLOGY.NAVIGATION))
+            if (terrains[x][y] == Types.TERRAIN.DEEP_WATER && !tt.isResearched(Types.TECHNOLOGY.NAVIGATION))
                 return false;
 
 
-        }else return false; //Outside board bounds.
+        } else return false; //Outside board bounds.
 
         return true;
     }
 
 
+    public Tribe[] getTribes() {
+        return tribes;
+    }
 
-    public Tribe[] getTribes() {return tribes;}
-    public Tribe getTribe(int tribeId) {return tribes[tribeId];}
-    public int getNumTribes() {return tribes.length;}
+    public Tribe getTribe(int tribeId) {
+        return tribes[tribeId];
+    }
 
     /**
      * Sets the tribes that will play the game. The number of tribes must equal the number of players in Game.
+     *
      * @param tribes to play with
      */
-    private void assignTribes(Tribe[] tribes)
-    {
+    private void assignTribes(Tribe[] tribes) {
         int numTribes = tribes.length;
         this.tribes = new Tribe[numTribes];
-        for(int i = 0; i < numTribes; ++i)
-        {
+        for (int i = 0; i < numTribes; ++i) {
             this.tribes[i] = tribes[i];
             this.tribes[i].setTribeId(i);
         }
@@ -298,19 +286,19 @@ public class Board {
         return size;
     }
 
-    // Get terrains array
-    public Types.TERRAIN[][] getTerrains(){
-        return this.terrains;
+    // Get Trade Network at pos x,y
+    public boolean isInTradeNetwork(int x, int y) {
+        return tradeNetwork[x][y];
+    }
+
+    public void setTradeNetwork(int x, int y, boolean trade)
+    {
+        tradeNetwork[x][y] = trade;
     }
 
     // Get units array
     public int[][] getUnits(){
         return this.units;
-    }
-
-    // Get Resources array
-    public Types.RESOURCE[][] getResources(){
-        return this.resources;
     }
 
     // Get Terrain at pos x,y
@@ -381,15 +369,6 @@ public class Board {
         this.units = u;
     }
 
-    // Setter method for terrains array
-    public void setTerrains(Types.TERRAIN[][] t){
-        this.terrains = t;
-    }
-
-    // Setter method for resources array
-    public void setResources(Types.RESOURCE[][] r){
-        this.resources = r;
-    }
 
     // Method to determine city borders, take city and x and y pos of city as params
     public void setCityBorders(){
@@ -447,33 +426,44 @@ public class Board {
      * @param t tribe that captures
      * @param x position of the city to capture
      * @param y position of the city to capture
+     * @return true if city was captured.
      */
-    public void capture(Tribe t, int x, int y){
+    public boolean capture(Tribe t, int x, int y){
 
         Types.TERRAIN ter = terrains[x][y];
+        City c;
         if(ter == Types.TERRAIN.VILLAGE)
         {
             //Not a city. Needs to be created, assigned and its border calculated.
-            City c = new City(x, y, t.getTribeId());
+            c = new City(x, y, t.getTribeId());
             addCityToTribe(c);
             setBorderHelper(c, c.getBound());
 
         }else if(ter == Types.TERRAIN.CITY)
         {
             //The city exists, needs to change owner.
-            City c = (City) gameActors.get(tileCityId[x][y]);
+            c = (City) gameActors.get(tileCityId[x][y]);
             int cityId = c.getActorId();
             int prevTribeId = c.getTribeId();
             c.setTribeId(t.getTribeId());
             tribes[t.getTribeId()].addCity(cityId);
             tribes[prevTribeId].removeCity(cityId);
 
-            //TODO: this also requires recomputing the trade network
-
         }else
         {
             System.out.println("Warning: Tribe " + t.getTribeId() + " trying to caputre a non-city.");
+            return false;
         }
+
+        this.recomputeTradeNetwork();
+        return true;
+    }
+
+    /**
+     * Recomputes the trade network for the game..
+     */
+    private void recomputeTradeNetwork() {
+        //TODO: build the trade network for all players.
     }
 
     // Setter method for tribes array
@@ -492,6 +482,7 @@ public class Board {
             tribes[c.getTribeId()].setCapitalID(c.getActorId());
         }
         tribes[c.getTribeId()].addCity(c.getActorId());
+        tradeNetwork[c.getPosition().x][c.getPosition().y] = true;
     }
 
 

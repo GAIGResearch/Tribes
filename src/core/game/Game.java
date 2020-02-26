@@ -9,6 +9,7 @@ import utils.GUI;
 import utils.WindowInput;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import static core.Constants.*;
 
@@ -22,6 +23,9 @@ public class Game {
 
     // Seed for the game state.
     private long seed;
+
+    //Random number generator for the game.
+    private Random rnd;
 
     // List of players of the game
     private Agent[] players;
@@ -50,7 +54,8 @@ public class Game {
 
         //Initiate the bare bones of the main game classes
         this.seed = seed;
-        this.gs = new GameState(seed);
+        this.rnd = new Random(seed);
+        this.gs = new GameState(rnd);
 
         if(players.size() != tribes.size())
         {

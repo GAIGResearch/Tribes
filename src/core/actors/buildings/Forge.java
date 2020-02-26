@@ -23,7 +23,7 @@ public class Forge extends Building {
 
     @Override
     public Building copy() {
-        return new Forge(getX(), getY(), getPRODUCTION());
+        return new Forge(position.x, position.y, getPRODUCTION());
     }
 
     @Override

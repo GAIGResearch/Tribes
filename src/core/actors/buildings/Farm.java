@@ -31,6 +31,6 @@ public class Farm extends Building{
 
     @Override
     public Building copy() {
-        return new Farm(getX(), getY());
+        return new Farm(position.x, position.y);
     }
 }

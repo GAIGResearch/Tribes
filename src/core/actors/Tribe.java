@@ -3,7 +3,7 @@ package core.actors;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
-import core.game.ForwardModel;
+import utils.graph.Graph;
 
 import java.util.ArrayList;
 
@@ -14,9 +14,6 @@ public class Tribe extends Actor{
 
     //Capital City ID
     private int capitalID;
-
-    //ID of this tribe. It corresponds with the ID of the player who controls it.
-    private int tribeID;
 
     //Type of the tribe
     private Types.TRIBE tribe;
@@ -33,7 +30,11 @@ public class Tribe extends Actor{
     //Score for the tribe.
     private int score = 0;
 
+    //Indicates if the position in the board is visible
     private boolean obsGrid[][];
+
+    //Trade network of this tribe
+    private Graph tradeNetwork;
 
 
     public Tribe(Types.TRIBE tribe)
@@ -43,7 +44,7 @@ public class Tribe extends Actor{
     }
 
     public Tribe(int tribeID, int cityID, Types.TRIBE tribe) {
-        this.tribeID = tribeID;
+        this.tribeId = tribeID;
         citiesID.add(cityID);
         this.tribe = tribe;
         init();
@@ -66,12 +67,14 @@ public class Tribe extends Actor{
     public Tribe copy()
     {
         Tribe tribeCopy = new Tribe(this.tribe);
-        tribeCopy.tribeID = this.tribeID;
-        tribeCopy.techTree = this.techTree.copy();
+        tribeCopy.tribeId = this.tribeId;
         tribeCopy.stars = this.stars;
         tribeCopy.winner = this.winner;
         tribeCopy.score = this.score;
         tribeCopy.capitalID = this.capitalID;
+
+        tribeCopy.techTree = this.techTree.copy();
+        tribeCopy.tradeNetwork = this.tradeNetwork.copy();
 
         tribeCopy.citiesID = new ArrayList<>();
         for(int cityID : citiesID)
@@ -136,18 +139,12 @@ public class Tribe extends Actor{
 
     public boolean[][] getObsGrid() {return obsGrid;}
 
+    public boolean isVisible(int x, int y) {return obsGrid[x][y];}
+
     public Types.TRIBE getType(){return tribe;}
 
     public Types.RESULT getWinner() {return winner;}
     public int getScore() {return score;}
-
-    public void setTribeID(int tribeID) {
-        this.tribeID = tribeID;
-    }
-
-    public int getTribeID() {
-        return tribeID;
-    }
 
     public int getStars() {
         return stars;
@@ -167,5 +164,29 @@ public class Tribe extends Actor{
 
     public int getCapitalID() {
         return capitalID;
+    }
+
+    public boolean hasCity(int cityId) {
+        return this.citiesID.contains(cityId);
+    }
+
+    public void updateNetwork(boolean[][] tradeNetwork, int[][] tileCityId, Types.BUILDING[][] buildings)
+    {
+        //TODO: compute the trade network for this tribe
+
+        //We need to start from the capital. If capital is not owned, there's no trade network
+        if(!citiesID.contains(capitalID))
+        {
+
+        }
+
+        //HOW-TO: Execute Dijkstra from the capital city to all cities owned by this tribe
+        //  - For roads and cities, they're set to True in tradeNetwork
+        //  - None of the traversed tiles can be owned by an opponent tribe or there's no route.
+        //  - Two ports from this tribe are connected if separated by 0, 1, 2 or 3 WATER tiles (of any type)
+
+        //Also: a connection between two cities only gives population bonus if the connection is completed by
+        //the tribe that owns the cities!
+
     }
 }

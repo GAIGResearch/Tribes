@@ -24,6 +24,6 @@ public class LumberHut extends Building{
 
     @Override
     public Building copy() {
-        return new LumberHut(getX(), getY());
+        return new LumberHut(position.x, position.y);
     }
 }

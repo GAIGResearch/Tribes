@@ -29,6 +29,7 @@ public class Tribe extends Actor{
     //Score for the tribe.
     private int score = 0;
 
+    //Indicates if the position in the board is visible
     private boolean obsGrid[][];
 
 
@@ -132,6 +133,8 @@ public class Tribe extends Actor{
 
     public boolean[][] getObsGrid() {return obsGrid;}
 
+    public boolean isVisible(int x, int y) {return obsGrid[x][y];}
+
     public Types.TRIBE getType(){return tribe;}
 
     public Types.RESULT getWinner() {return winner;}
@@ -155,5 +158,9 @@ public class Tribe extends Actor{
 
     public int getCapitalID() {
         return capitalID;
+    }
+
+    public boolean hasCity(int cityId) {
+        return this.citiesID.contains(cityId);
     }
 }

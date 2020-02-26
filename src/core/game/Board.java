@@ -556,4 +556,75 @@ public class Board {
         return gameActors.remove(actorId) != null;
     }
 
+    /**
+     * Returns a list of positions where roads can be built by a certain tribe.
+     * @param tribeId id of the tribe that could build roads
+     * @return the list of positions where a road could be build
+     */
+    public ArrayList<Vector2d> getBuildRoadPositions(int tribeId)
+    {
+        ArrayList<Vector2d> positions = new ArrayList<>();
+        for (int i=0; i<size; i++){
+            for (int j=0; j<size; j++){
+                if(canBuildRoadAt(tribeId, i, j))
+                    positions.add(new Vector2d(i,j));
+            }
+        }
+        return positions;
+    }
+
+    /**
+     * Returns true if tribeId can build a road in (x,y)
+     * It does not check for tribe stars or technology, *only* for board features (territory, terrain and visibility)
+     * @param tribeId id of the tribe that could build roads
+     * @return the list of positions where a road could be build
+     */
+    public boolean canBuildRoadAt(int tribeId, int x, int y)
+    {
+        // Visible tile?
+        if(tribes[tribeId].isVisible(x, y))
+        {
+            // Only on certain terrain types.
+            if(terrains[x][y] == Types.TERRAIN.VILLAGE || terrains[x][y] == Types.TERRAIN.PLAIN || terrains[x][y] == Types.TERRAIN.FOREST)
+            {
+                //Only on tiles that are neutral or in my cities
+                int cityId = tileCityId[x][y];
+                if(cityId == -1 || tribes[tribeId].hasCity(cityId))
+                {
+                    //There should be no road already here
+                    if(!tradeNetwork[x][y])
+                    {
+                        //Finally, there should be no enemy unit at this position
+                        if(!enemyUnitAt(tribeId, x, y))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean enemyUnitAt(int tribeId, int x, int y)
+    {
+        //It may be that there's no unit here
+        if(units[x][y] == 0)
+            return false;
+        else
+        {
+            //Or it is from my tribe.
+            Unit u = (Unit) gameActors.get(units[x][y]);
+            if(u.getTribeId() == tribeId)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void addRoad(int x, int y)
+    {
+        setTradeNetwork(x, y, true);
+    }
 }

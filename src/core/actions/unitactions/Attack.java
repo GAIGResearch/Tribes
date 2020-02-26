@@ -26,11 +26,15 @@ public class Attack extends UnitAction
 
         LinkedList<Action> attacks = new LinkedList<>();
         Board b = gs.getBoard();
+        boolean[][] obsGrid = b.getTribe(this.unit.getTribeId()).getObsGrid();
 
         for(int x = this.unit.getCurrentPosition().x- this.unit.RANGE; x <= x+ this.unit.RANGE; x++) {
             for (int y = this.unit.getCurrentPosition().y - this.unit.RANGE; y <= y + this.unit.RANGE; y++) {
                 Attack a = new Attack(this.unit);
                 a.setTarget(b.getUnitAt(x,y));
+                if(!obsGrid[x][y]){
+                    continue;
+                }
                 if(a.isFeasible(gs)){
                     attacks.add(a);
                 }

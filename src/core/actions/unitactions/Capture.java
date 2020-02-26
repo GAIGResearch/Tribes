@@ -1,11 +1,13 @@
 package core.actions.unitactions;
 
 import core.actions.Action;
+import core.actors.Tribe;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.City;
 import core.actors.units.Unit;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Capture extends UnitAction
@@ -24,12 +26,14 @@ public class Capture extends UnitAction
 
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
-
+        Board b = gs.getBoard();
         LinkedList<Action> captures = new LinkedList<>();
+        Tribe t = b.getTribe(this.unit.getTribeId());
+        ArrayList<Integer> cityIds = t.getCitiesID();
+        //TODO: Get City, check if city and unit pos is same
         if(isFeasible(gs)){
-            Capture c = new Capture(this.unit);
-            c.setTargetCity(this.targetCity);
-            captures.add(c);
+
+
         }
 
         return captures;
@@ -42,7 +46,7 @@ public class Capture extends UnitAction
         Board b = gs.getBoard();
         if(b.getUnitAt(targetCity.getX(),targetCity.getY()) != null)
             return false;
-        else if(targetCity.getX() > unit.getCurrentPosition().x  + this.unit.RANGE ||targetCity.getY() > unit.getCurrentPosition().y  + this.unit.RANGE)
+        else if(targetCity.getX() != unit.getCurrentPosition().x || targetCity.getY() !=unit.getCurrentPosition().y)
             return false;
 
         return true;
@@ -52,8 +56,7 @@ public class Capture extends UnitAction
     public boolean execute(GameState gs) {
         //todo: execute the capture action
         if(isFeasible(gs)) {
-            targetCity.setActorID(this.unit.getActorID());
-            targetCity.setTribeId(unit.getTribeID());
+            targetCity.setTribeId(this.unit.getTribeId());
             return true;
         }
         return false;

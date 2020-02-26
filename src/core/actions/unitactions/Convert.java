@@ -25,9 +25,13 @@ public class Convert extends UnitAction
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         LinkedList<Action> converts = new LinkedList<>();
         Board b = gs.getBoard();
+        boolean[][] obsGrid = b.getTribe(this.unit.getTribeId()).getObsGrid();
         for(int x = this.unit.getCurrentPosition().x- this.unit.RANGE; x <= x+ this.unit.RANGE; x++) {
             for (int y = this.unit.getCurrentPosition().y - this.unit.RANGE; y <= y + this.unit.RANGE; y++) {
                 Convert c = new Convert(this.unit, b.getUnitAt(x,y));
+                if(!obsGrid[x][y]){
+                    continue;
+                }
                 if(c.isFeasible(gs)){
                     converts.add(c);
                 }
@@ -43,7 +47,7 @@ public class Convert extends UnitAction
     @Override
     public boolean isFeasible(final GameState gs) {
         //Check if target in range
-        if(target!=null)
+        if(target!=null|| target.getTribeId() == this.unit.getTribeId())
             return true;
         return false;
     }

@@ -21,6 +21,11 @@ public class Graph<T> {
             mainNode = n;
     }
 
+    public void addNode(Node n)
+    {
+        nodes.put((T) n.getId(), n);
+    }
+
     public void addEdge(T id0, T id1)
     {
         Node n0 = nodes.get(id0);
@@ -31,7 +36,7 @@ public class Graph<T> {
                     + id0 + " (" + n0 + ") to " + id1 + " (" + n1 + ")");
             return;
         }
-        n0.addNeighbour(n1);
+        n0.addNeighbour(id1);
     }
 
     public void removeEdge(T id0, T id1)
@@ -44,10 +49,17 @@ public class Graph<T> {
                     + id0 + " (" + n0 + ") to " + id1 + " (" + n1 + ")");
             return;
         }
-        n0.removeNeighbour(n1);
+        n0.removeNeighbour(id1);
     }
 
 
-
-
+    public Graph copy() {
+        Graph gr = new Graph();
+        mainNode = gr.mainNode.copy();
+        for(Node n : nodes.values())
+        {
+            gr.addNode(n.copy());
+        }
+        return gr;
+    }
 }

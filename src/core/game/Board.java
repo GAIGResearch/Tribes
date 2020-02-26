@@ -32,7 +32,7 @@ public class Board {
     private int[][] tileCityId;
 
     // Array that indicates presence of roads, cities, ports or naval links
-    private boolean[][] tradeNetwork;
+    private boolean[][] roads;
 
     //Actors in the game
     private HashMap<Integer, Actor> gameActors;
@@ -54,7 +54,7 @@ public class Board {
         buildings = new Types.BUILDING[size][size];
         units = new int[size][size];
         this.tileCityId = new int[size][size];
-        this.tradeNetwork = new boolean[size][size];
+        this.roads = new boolean[size][size];
 
 
         //Initialise tile IDs
@@ -78,7 +78,7 @@ public class Board {
         copyBoard.buildings = new Types.BUILDING[size][size];
         copyBoard.units = new int[size][size];
         copyBoard.tileCityId = new int[size][size];
-        copyBoard.tradeNetwork = new boolean[size][size];
+        copyBoard.roads = new boolean[size][size];
 
         // Copy board objects (they are all ids)
         for (int x = 0; x < this.size; x++) {
@@ -88,7 +88,7 @@ public class Board {
                 copyBoard.setResourceAt(x, y, resources[x][y]);
                 copyBoard.setBuildingAt(x, y, buildings[x][y]);
                 copyBoard.tileCityId[x][y] = tileCityId[x][y];
-                copyBoard.tradeNetwork[x][y] = tradeNetwork[x][y];
+                copyBoard.roads[x][y] = roads[x][y];
             }
         }
 
@@ -286,14 +286,10 @@ public class Board {
         return size;
     }
 
-    // Get Trade Network at pos x,y
-    public boolean isInTradeNetwork(int x, int y) {
-        return tradeNetwork[x][y];
-    }
 
     public void setTradeNetwork(int x, int y, boolean trade)
     {
-        tradeNetwork[x][y] = trade;
+        roads[x][y] = trade;
     }
 
     // Get units array
@@ -463,7 +459,10 @@ public class Board {
      * Recomputes the trade network for the game..
      */
     private void recomputeTradeNetwork() {
-        //TODO: build the trade network for all players.
+        for(Tribe t : tribes)
+        {
+            t.updateNetwork(roads, tileCityId, buildings);
+        }
     }
 
     // Setter method for tribes array
@@ -482,7 +481,9 @@ public class Board {
             tribes[c.getTribeId()].setCapitalID(c.getActorId());
         }
         tribes[c.getTribeId()].addCity(c.getActorId());
-        tradeNetwork[c.getPosition().x][c.getPosition().y] = true;
+
+        //By default, cities are considered to be roads for trade network purposes.
+        roads[c.getPosition().x][c.getPosition().y] = true;
     }
 
 
@@ -592,7 +593,7 @@ public class Board {
                 if(cityId == -1 || tribes[tribeId].hasCity(cityId))
                 {
                     //There should be no road already here
-                    if(!tradeNetwork[x][y])
+                    if(!roads[x][y])
                     {
                         //Finally, there should be no enemy unit at this position
                         if(!enemyUnitAt(tribeId, x, y))

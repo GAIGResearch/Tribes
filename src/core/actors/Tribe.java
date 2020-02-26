@@ -3,6 +3,7 @@ package core.actors;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
+import utils.graph.Graph;
 
 import java.util.ArrayList;
 
@@ -31,6 +32,9 @@ public class Tribe extends Actor{
 
     //Indicates if the position in the board is visible
     private boolean obsGrid[][];
+
+    //Trade network of this tribe
+    private Graph tradeNetwork;
 
 
     public Tribe(Types.TRIBE tribe)
@@ -64,11 +68,13 @@ public class Tribe extends Actor{
     {
         Tribe tribeCopy = new Tribe(this.tribe);
         tribeCopy.tribeId = this.tribeId;
-        tribeCopy.techTree = this.techTree.copy();
         tribeCopy.stars = this.stars;
         tribeCopy.winner = this.winner;
         tribeCopy.score = this.score;
         tribeCopy.capitalID = this.capitalID;
+
+        tribeCopy.techTree = this.techTree.copy();
+        tribeCopy.tradeNetwork = this.tradeNetwork.copy();
 
         tribeCopy.citiesID = new ArrayList<>();
         for(int cityID : citiesID)
@@ -162,5 +168,25 @@ public class Tribe extends Actor{
 
     public boolean hasCity(int cityId) {
         return this.citiesID.contains(cityId);
+    }
+
+    public void updateNetwork(boolean[][] tradeNetwork, int[][] tileCityId, Types.BUILDING[][] buildings)
+    {
+        //TODO: compute the trade network for this tribe
+
+        //We need to start from the capital. If capital is not owned, there's no trade network
+        if(!citiesID.contains(capitalID))
+        {
+
+        }
+
+        //HOW-TO: Execute Dijkstra from the capital city to all cities owned by this tribe
+        //  - For roads and cities, they're set to True in tradeNetwork
+        //  - None of the traversed tiles can be owned by an opponent tribe or there's no route.
+        //  - Two ports from this tribe are connected if separated by 0, 1, 2 or 3 WATER tiles (of any type)
+
+        //Also: a connection between two cities only gives population bonus if the connection is completed by
+        //the tribe that owns the cities!
+
     }
 }

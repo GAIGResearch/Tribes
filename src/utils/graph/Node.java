@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Node<T>
 {
     private T id;
-    private ArrayList<Node> neighbours;
+    private ArrayList<T> neighbours;
 
     public Node (T id)
     {
@@ -13,13 +13,25 @@ public class Node<T>
         this.neighbours = new ArrayList<>();
     }
 
-    public void addNeighbour(Node neigh)
+    public void addNeighbour(T neighbourId)
     {
-        this.neighbours.add(neigh);
+        this.neighbours.add(neighbourId);
     }
 
-    public void removeNeighbour(Node neigh)
+    public void removeNeighbour(T neighbourId)
     {
-        this.neighbours.remove(neigh);
+        this.neighbours.remove(neighbourId);
+    }
+
+    public T getId() {return id;}
+
+    public Node copy()
+    {
+        Node other = new Node(this.id);
+        for(T id : neighbours)
+        {
+            other.addNeighbour(id);
+        }
+        return other;
     }
 }

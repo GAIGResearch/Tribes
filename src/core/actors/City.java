@@ -7,13 +7,11 @@ import java.util.LinkedList;
 
 public class City extends Actor{
 
-    private int tribeId;
     private int x;
     private int y;
     private int level;
     private int population = 0;
     private int population_need;
-    private boolean isVillage;
     private boolean isCapital;
     private int production = 0;
     private int points = 0;
@@ -28,7 +26,6 @@ public class City extends Actor{
     public City(int x, int y, int tribeId) {
         this.x = x;
         this.y = y;
-        isVillage = true;
         population_need = 0;
         bound = 1; //cities start with 1 tile around it for territory
         level = 1; //and starting level is 1
@@ -36,25 +33,17 @@ public class City extends Actor{
         this.tribeId = tribeId;
     }
 
-    public City(int x, int y, int level, int population, int population_need, boolean isVillage, boolean isCapital, int production, LinkedList<Building> buildings, int tribeId, LinkedList<Integer> unitsID) {
+    public City(int x, int y, int level, int population, int population_need, boolean isCapital, int production, LinkedList<Building> buildings, int tribeId, LinkedList<Integer> unitsID) {
         this.x = x;
         this.y = y;
         this.level = level;
         this.population = population;
         this.population_need = population_need;
-        this.isVillage = isVillage;
         this.isCapital = isCapital;
         this.production = production;
         this.buildings = buildings;
         this.tribeId = tribeId;
         this.unitsID = unitsID;
-    }
-
-    public void occupy(){
-        if (isVillage){
-            isVillage =false;
-            levelUp();
-        }
     }
 
     // Increase population
@@ -207,9 +196,6 @@ public class City extends Actor{
         return population;
     }
 
-    public boolean isVillage() {
-        return isVillage;
-    }
 
     public boolean isCapital() {
         return isCapital;
@@ -220,17 +206,10 @@ public class City extends Actor{
         this.isCapital = isCapital;
     }
 
-
     public int getPopulation_need() {
         return population_need;
     }
 
-    public Types.TERRAIN type(){
-        if (isVillage){
-            return Types.TERRAIN.VILLAGE;
-        }
-        return Types.TERRAIN.CITY;
-    }
 
     public LinkedList<Building> copyBuildings() {
         LinkedList<Building> copyList = new LinkedList<>();
@@ -247,10 +226,6 @@ public class City extends Actor{
         return turnPoint;
     }
 
-    public int getTribeId() {
-        return tribeId;
-    }
-
     public LinkedList<Integer> copyUnitsID() {
         LinkedList<Integer> copyUnits = new LinkedList<>();
         for (Integer integer : unitsID) {
@@ -260,7 +235,7 @@ public class City extends Actor{
     }
 
     public City copy(){
-        City c = new City(x, y, level, population, population_need, isVillage, isCapital, production, copyBuildings(), tribeId, copyUnitsID());
+        City c = new City(x, y, level, population, population_need, isCapital, production, copyBuildings(), tribeId, copyUnitsID());
         c.setWalls(hasWalls);
         return c;
     }
@@ -273,15 +248,6 @@ public class City extends Actor{
     public boolean hasWalls()
     {
         return hasWalls;
-    }
-
-
-    public boolean getIsVilage(){
-        return this.isVillage;
-    }
-
-    public void setIsVillage(boolean isVillage){
-         this.isVillage = isVillage;
     }
 
     public int getBound(){

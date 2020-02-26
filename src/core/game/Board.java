@@ -95,7 +95,7 @@ public class Board {
         copyBoard.gameActors = new HashMap<>();
         for(Actor act : gameActors.values())
         {
-            int id = act.getActorID();
+            int id = act.getActorId();
             copyBoard.gameActors.put(id, act.copy());
         }
 
@@ -203,7 +203,7 @@ public class Board {
     private void moveUnit(Unit unit, int x0, int y0, int xF, int yF)
     {
         units[x0][y0] = 0;
-        units[xF][yF] = unit.getActorID();
+        units[xF][yF] = unit.getActorId();
         unit.setCurrentPosition(new Vector2d(xF, yF));
     }
 
@@ -291,7 +291,7 @@ public class Board {
         for(int i = 0; i < numTribes; ++i)
         {
             this.tribes[i] = tribes[i];
-            this.tribes[i].setTribeID(i);
+            this.tribes[i].setTribeId(i);
         }
     }
 
@@ -359,7 +359,7 @@ public class Board {
 
     // Set Terrain at pos x,y
     public void setUnitIdAt(int x, int y, Unit unit){
-        units[x][y] = unit.getActorID();
+        units[x][y] = unit.getActorId();
     }
 
 
@@ -560,7 +560,7 @@ public class Board {
         for (int i = x-bound; i <= x+bound; i++){
             for(int j = y-bound; j <= y+bound; j++) {
                 if(tileCityId[i][j] == -1){
-                    tileCityId[i][j] = c.getActorID();
+                    tileCityId[i][j] = c.getActorId();
                 }
             }
         }
@@ -591,22 +591,37 @@ public class Board {
         return tiles;
     }
 
-    //TODO: This function needs changing. A village is not a City object, but a terrain type.
-    public void occupy(Tribe t, int x, int y){
-        ArrayList<Integer> cities = t.getCitiesID();
+    /**
+     * Captures a city or village for tribe t
+     * @param t tribe that captures
+     * @param x position of the city to capture
+     * @param y position of the city to capture
+     */
+    public void capture(Tribe t, int x, int y){
 
-        City c = null;
-        for (int cityId:cities) {
-            City city = (City) gameActors.get(cityId);
-            if (city.getX() == x && city.getY() == y){
-                c = city;
-                break;
-            }
-        }
-        if (c != null && c.getIsVilage()){
-            c.setIsVillage(false);
-            // TODO: Assign the owner
-            c.levelUp();
+        Types.TERRAIN ter = terrains[x][y];
+        if(ter == Types.TERRAIN.VILLAGE)
+        {
+            //Not a city. Needs to be created, assigned and its border calculated.
+            City c = new City(x, y, t.getTribeId());
+            addCityToTribe(c);
+            setBorderHelper(c, c.getBound());
+
+        }else if(ter == Types.TERRAIN.CITY)
+        {
+            //The city exists, needs to change owner.
+            City c = (City) gameActors.get(tileCityId[x][y]);
+            int cityId = c.getActorId();
+            int prevTribeId = c.getTribeId();
+            c.setTribeId(t.getTribeId());
+            tribes[t.getTribeId()].addCity(cityId);
+            tribes[prevTribeId].removeCity(cityId);
+
+            //TODO: this also requires recomputing the trade network
+
+        }else
+        {
+            System.out.println("Warning: Tribe " + t.getTribeId() + " trying to caputre a non-city.");
         }
     }
 
@@ -623,9 +638,9 @@ public class Board {
     {
         addActor(c);
         if (c.isCapital()){
-            tribes[c.getTribeId()].setCapitalID(c.getActorID());
+            tribes[c.getTribeId()].setCapitalID(c.getActorId());
         }
-        tribes[c.getTribeId()].addCity(c.getActorID());
+        tribes[c.getTribeId()].addCity(c.getActorId());
     }
 
     public void addUnitToBoard(Unit u)
@@ -640,7 +655,7 @@ public class Board {
     {
         Vector2d pos = u.getCurrentPosition();
         setUnitIdAt(pos.x, pos.y, 0);
-        removeActor(u.getActorID());
+        removeActor(u.getActorId());
     }
 
     /**
@@ -651,16 +666,16 @@ public class Board {
      */
     public boolean addUnitToCity(Unit u, City c)
     {
-        boolean added = c.addUnit(u.getActorID());
+        boolean added = c.addUnit(u.getActorId());
         if(!added){
-            System.out.println("ERROR: Unit failed to be added to city: u_id: " + u.getActorID() + ", c_id: " + c.getActorID());
+            System.out.println("ERROR: Unit failed to be added to city: u_id: " + u.getActorId() + ", c_id: " + c.getActorId());
         }
         return added;
     }
 
     public void removeUnitFromCity(Unit u, City city)
     {
-        city.removeUnit(u.getActorID());
+        city.removeUnit(u.getActorId());
     }
 
     /**
@@ -672,7 +687,7 @@ public class Board {
     {
         int nActors = gameActors.size() + 1;
         gameActors.put(nActors, actor);
-        actor.setActorID(nActors);
+        actor.setActorId(nActors);
         return nActors;
     }
 

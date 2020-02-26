@@ -34,7 +34,7 @@ public class ClearForest extends CityAction
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         LinkedList<Action> actions = new LinkedList<>();
         Board currentBoard = gs.getBoard();
-        LinkedList<Vector2d> tiles = currentBoard.getCityTiles(city.getActorID());
+        LinkedList<Vector2d> tiles = currentBoard.getCityTiles(city.getActorId());
         boolean techReq = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.FORESTRY);
         if (techReq){
             for(Vector2d tile: tiles){
@@ -51,7 +51,7 @@ public class ClearForest extends CityAction
     @Override
     public boolean isFeasible(final GameState gs) {
         boolean isForest = gs.getBoard().getTerrainAt(x, y) == Types.TERRAIN.FOREST;
-        boolean isBelonging = gs.getBoard().getCityIdAt(x, y) == city.getActorID();
+        boolean isBelonging = gs.getBoard().getCityIdAt(x, y) == city.getActorId();
         boolean isResearched = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.FORESTRY);
         return isForest && isBelonging && isResearched;
     }

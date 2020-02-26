@@ -3,7 +3,6 @@ package core.actors;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
-import core.game.ForwardModel;
 
 import java.util.ArrayList;
 
@@ -14,9 +13,6 @@ public class Tribe extends Actor{
 
     //Capital City ID
     private int capitalID;
-
-    //ID of this tribe. It corresponds with the ID of the player who controls it.
-    private int tribeID;
 
     //Type of the tribe
     private Types.TRIBE tribe;
@@ -43,7 +39,7 @@ public class Tribe extends Actor{
     }
 
     public Tribe(int tribeID, int cityID, Types.TRIBE tribe) {
-        this.tribeID = tribeID;
+        this.tribeId = tribeID;
         citiesID.add(cityID);
         this.tribe = tribe;
         init();
@@ -66,7 +62,7 @@ public class Tribe extends Actor{
     public Tribe copy()
     {
         Tribe tribeCopy = new Tribe(this.tribe);
-        tribeCopy.tribeID = this.tribeID;
+        tribeCopy.tribeId = this.tribeId;
         tribeCopy.techTree = this.techTree.copy();
         tribeCopy.stars = this.stars;
         tribeCopy.winner = this.winner;
@@ -140,14 +136,6 @@ public class Tribe extends Actor{
 
     public Types.RESULT getWinner() {return winner;}
     public int getScore() {return score;}
-
-    public void setTribeID(int tribeID) {
-        this.tribeID = tribeID;
-    }
-
-    public int getTribeID() {
-        return tribeID;
-    }
 
     public int getStars() {
         return stars;

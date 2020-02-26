@@ -34,7 +34,7 @@ public class BurnForest extends CityAction
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         LinkedList<Action> actions = new LinkedList<>();
         Board currentBoard = gs.getBoard();
-        LinkedList<Vector2d> tiles = currentBoard.getCityTiles(city.getActorID());
+        LinkedList<Vector2d> tiles = currentBoard.getCityTiles(city.getActorId());
         boolean techReq = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.CHIVALRY);
         boolean costReq = gs.getTribe(city.getTribeId()).getStars() >= TribesConfig.FOREST_COST;
         if (techReq && costReq){
@@ -52,7 +52,7 @@ public class BurnForest extends CityAction
     @Override
     public boolean isFeasible(final GameState gs) {
         boolean isForest = gs.getBoard().getTerrainAt(x, y) == Types.TERRAIN.FOREST;
-        boolean isBelonging = gs.getBoard().getCityIdAt(x, y) == city.getActorID();
+        boolean isBelonging = gs.getBoard().getCityIdAt(x, y) == city.getActorId();
         boolean isBuildable = gs.getTribe(city.getTribeId()).getStars() >= TribesConfig.FOREST_COST;
         boolean isResearched = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.CHIVALRY);
         return isForest && isBelonging && isBuildable && isResearched;

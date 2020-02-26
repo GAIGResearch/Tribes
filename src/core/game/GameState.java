@@ -167,7 +167,7 @@ public class GameState {
 
 
     /**
-     * Gets the tribe tribeID playing this game.
+     * Gets the tribe tribeId playing this game.
      * @param tribeID ID of the tribe to pick
      * @return the tribe with the ID requested
      */

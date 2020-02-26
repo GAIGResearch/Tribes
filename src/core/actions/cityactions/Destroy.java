@@ -1,10 +1,8 @@
 package core.actions.cityactions;
 
-import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actors.buildings.Building;
-import core.actors.buildings.CustomHouse;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.City;
@@ -37,7 +35,7 @@ public class Destroy extends CityAction
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         LinkedList<Action> actions = new LinkedList<>();
         Board currentBoard = gs.getBoard();
-        LinkedList<Vector2d> tiles = currentBoard.getCityTiles(city.getActorID());
+        LinkedList<Vector2d> tiles = currentBoard.getCityTiles(city.getActorId());
         boolean techReq = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.CONSTRUCTION);
         if (techReq){
             for(Vector2d tile: tiles){
@@ -55,7 +53,7 @@ public class Destroy extends CityAction
     public boolean isFeasible(final GameState gs)
     {
         boolean isBuilding = gs.getBoard().getBuildingAt(x, y) != null;
-        boolean isBelonging = gs.getBoard().getCityIdAt(x, y) == city.getActorID();
+        boolean isBelonging = gs.getBoard().getCityIdAt(x, y) == city.getActorId();
         boolean isResearched = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.CONSTRUCTION);
         return isBuilding && isBelonging && isResearched;
     }

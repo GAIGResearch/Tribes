@@ -1,7 +1,6 @@
 package core.actions.cityactions;
 
 import core.TechnologyTree;
-import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actors.Tribe;
@@ -65,7 +64,7 @@ public class Spawn extends CityAction
     @Override
     public boolean execute(GameState gs) {
         if (isFeasible(gs)){
-            Unit newUnit = unit_type.createUnit(new Vector2d(city.getX(), city.getY()), 0, false, city.getActorID(), city.getTribeId(), unit_type);
+            Unit newUnit = unit_type.createUnit(new Vector2d(city.getX(), city.getY()), 0, false, city.getActorId(), city.getTribeId(), unit_type);
             gs.getTribe(city.getTribeId()).subtractStars(unit_type.getCost());
             gs.getBoard().addUnitToBoard(newUnit);
             gs.getBoard().addUnitToCity(newUnit, city);

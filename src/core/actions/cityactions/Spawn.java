@@ -67,9 +67,8 @@ public class Spawn extends CityAction
         if (isFeasible(gs)){
             Vector2d cityPos = city.getPosition();
             Unit newUnit = unit_type.createUnit(new Vector2d(cityPos.x, cityPos.y), 0, false, city.getActorId(), city.getTribeId(), unit_type);
+            gs.getBoard().addUnit(city, newUnit);
             gs.getTribe(city.getTribeId()).subtractStars(unit_type.getCost());
-            gs.getBoard().addUnitToBoard(newUnit);
-            gs.getBoard().addUnitToCity(newUnit, city);
             return true;
         }
         return false;

@@ -82,8 +82,7 @@ public class LevelUp extends CityAction {
 
                 //This can probably be encapsulated
                 Unit superUnit = Types.UNIT.createUnit(cityPos, 0, false, city.getActorId(), city.getTribeId(), Types.UNIT.SUPERUNIT);
-                gs.getBoard().addUnitToBoard(superUnit);
-                gs.getBoard().addUnitToCity(superUnit, city);
+                gs.getBoard().addUnit(city, superUnit);
 
                 if(unitInCity != null)
                 {

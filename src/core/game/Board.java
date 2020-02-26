@@ -195,9 +195,7 @@ public class Board {
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(xF, yF);
         Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), Types.UNIT.BOAT);
-        addUnitToBoard(boat);
-        addUnitToCity(boat, city);
-
+        addUnit(city, boat);
     }
 
     private void moveUnit(Unit unit, int x0, int y0, int xF, int yF)
@@ -496,13 +494,6 @@ public class Board {
         tribes[c.getTribeId()].addCity(c.getActorId());
     }
 
-    public void addUnitToBoard(Unit u)
-    {
-        addActor(u);
-        Vector2d pos = u.getCurrentPosition();
-        setUnitIdAt(pos.x, pos.y, u);
-    }
-
 
     public void removeUnitFromBoard(Unit u)
     {
@@ -513,16 +504,25 @@ public class Board {
 
     /**
      * Adds a unit to a city, which created it.
+     * @param c citi that created the unit
      * @param u unit to add
-     * @param c citiy that created the unit
      * @return false if the unit coulnd't be added. That should not happen, so it prints a warning.
      */
-    public boolean addUnitToCity(Unit u, City c)
+    public boolean addUnit(City c, Unit u)
     {
+        //First, add the actor to the list of game state actors
+        addActor(u);
+
+        //Place it in the board
+        Vector2d pos = u.getCurrentPosition();
+        setUnitIdAt(pos.x, pos.y, u);
+
+        //Finally, add the unit to the city that created it
         boolean added = c.addUnit(u.getActorId());
         if(!added){
             System.out.println("ERROR: Unit failed to be added to city: u_id: " + u.getActorId() + ", c_id: " + c.getActorId());
         }
+
         return added;
     }
 

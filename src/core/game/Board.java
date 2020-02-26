@@ -207,7 +207,7 @@ public class Board {
         unit.setCurrentPosition(new Vector2d(xF, yF));
     }
 
-    public void launchExplorer(int x0, int y0, int tribeId)
+    public void launchExplorer(int x0, int y0, int tribeId, Random rnd)
     {
         int xMove[] = {0,-1,0,1,-1,-1,1,1};
         int yMove[] = {1,0,-1,0,1,-1,-1,1};
@@ -223,7 +223,7 @@ public class Board {
             while(!moved && j < TribesConfig.NUM_STEPS*3)
             {
                 //Pick a direction at random
-                int idx = new Random().nextInt(xMove.length);
+                int idx = rnd.nextInt(xMove.length);
                 int x = curX + xMove[idx];
                 int y = curY + yMove[idx];
 

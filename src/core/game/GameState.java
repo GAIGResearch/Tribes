@@ -5,14 +5,15 @@ import core.actors.Actor;
 import core.actors.Tribe;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class GameState {
 
     // Forward model for the game.
     ForwardModel model;
 
-    // Seed for the game state.
-    private long seed;
+    // Random generator for the game state.
+    private Random rnd;
 
     // Current tick of the game.
     private int tick = 0;
@@ -24,8 +25,8 @@ public class GameState {
     }
 
     //Another constructor.
-    public GameState(long seed) {
-        this.seed = seed;
+    public GameState(Random rnd) {
+        this.rnd = rnd;
         this.model = new ForwardModel();
     }
 
@@ -34,7 +35,7 @@ public class GameState {
      * The level is only generated when this initialization method is called.
      */
     void init(String filename, Tribe[] tribes) {
-        this.model.init(tribes, seed, filename);
+        this.model.init(tribes, rnd, filename);
     }
 
     /**
@@ -150,7 +151,7 @@ public class GameState {
         // It must call model.copy() to copy the model
 
         // (this code below is incomplete)
-        GameState copy = new GameState(seed);
+        GameState copy = new GameState(new Random()); //copies of the game state can't have the same random generator.
         copy.model = model.copy(playerIdx);
 
         return copy;
@@ -176,4 +177,7 @@ public class GameState {
         return getTribes()[tribeID];
     }
 
+    public Random getRandomGenerator() {
+        return rnd;
+    }
 }

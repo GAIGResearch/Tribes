@@ -6,6 +6,7 @@ import core.actors.Tribe;
 import utils.Vector2d;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class ForwardModel {
@@ -31,10 +32,10 @@ public class ForwardModel {
      * Adds avatars to the game and sets them alive.
      * Generates the initial board of the game.
      */
-    void init(Tribe[] tribes, long seed, String filename)
+    void init(Tribe[] tribes, Random rnd, String filename)
     {
         LevelLoader ll = new LevelLoader();
-        board = ll.buildLevel(tribes, filename, seed);
+        board = ll.buildLevel(tribes, filename, rnd);
 
         //init the observability grid of the tribes
         for(Tribe tribe : tribes)

@@ -8,6 +8,7 @@ import utils.IO;
 import utils.Vector2d;
 
 import java.awt.*;
+import java.util.Random;
 
 public class LevelLoader
 {
@@ -24,7 +25,7 @@ public class LevelLoader
      * @param tribes tribes to play in this game
      * @param gamelvl file name containing the level.
      */
-    public Board buildLevel(Tribe[] tribes, String gamelvl, long seed) {
+    public Board buildLevel(Tribe[] tribes, String gamelvl, Random rnd) {
 
         Board board = new Board();
         String[] lines = new IO().readFile(gamelvl);

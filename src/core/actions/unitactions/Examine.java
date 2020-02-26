@@ -40,7 +40,7 @@ public class Examine extends UnitAction
     @Override
     public boolean execute(GameState gs) {
         if(isFeasible(gs)) {
-            Random r = new Random();
+            Random r = gs.getRandomGenerator();
             Types.TECHNOLOGY[] techs = Types.TECHNOLOGY.values();
             TechnologyTree technologyTree = gs.getTribe(unit.getTribeId()).getTechTree();
             int capital = gs.getTribe(unit.getTribeId()).getCapitalID();

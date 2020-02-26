@@ -57,7 +57,7 @@ public class LevelUp extends CityAction {
                 break;
             case EXPLORER:
 
-                gs.getBoard().launchExplorer(cityPos.x, cityPos.y, city.getTribeId());
+                gs.getBoard().launchExplorer(cityPos.x, cityPos.y, city.getTribeId(), gs.getRandomGenerator());
                 break;
             case CITY_WALL:
                 city.setWalls(true);

@@ -12,11 +12,11 @@ public class ForestTemple extends Building {
 
     @Override
     public boolean is_buildable(Board board) {
-        return board.getTerrainAt(getX(), getY()).equals(Types.TERRAIN.FOREST);
+        return board.getTerrainAt(position.x, position.y).equals(Types.TERRAIN.FOREST);
     }
 
     @Override
     public Building copy() {
-        return new ForestTemple(getX(), getY());
+        return new ForestTemple(position.x, position.y);
     }
 }

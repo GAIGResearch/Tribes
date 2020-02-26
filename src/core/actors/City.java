@@ -2,13 +2,13 @@ package core.actors;
 
 import core.Types;
 import core.actors.buildings.Building;
+import utils.Vector2d;
 
 import java.util.LinkedList;
 
 public class City extends Actor{
 
-    private int x;
-    private int y;
+    private Vector2d position;
     private int level;
     private int population = 0;
     private int population_need;
@@ -24,8 +24,7 @@ public class City extends Actor{
 
     // The constructor to initial the valley
     public City(int x, int y, int tribeId) {
-        this.x = x;
-        this.y = y;
+        this.position = new Vector2d(x,y);
         population_need = 0;
         bound = 1; //cities start with 1 tile around it for territory
         level = 1; //and starting level is 1
@@ -34,8 +33,7 @@ public class City extends Actor{
     }
 
     public City(int x, int y, int level, int population, int population_need, boolean isCapital, int production, LinkedList<Building> buildings, int tribeId, LinkedList<Integer> unitsID) {
-        this.x = x;
-        this.y = y;
+        this.position = new Vector2d(x,y);
         this.level = level;
         this.population = population;
         this.population_need = population_need;
@@ -88,13 +86,11 @@ public class City extends Actor{
     }
 
     public void setProduction(Building building){
-        int x = building.getX();
-        int y = building.getY();
+        Vector2d pos = building.getPosition();
         int production = 0;
         for(Building existBuilding: buildings){
-            int exist_x = existBuilding.getX();
-            int exist_y = existBuilding.getY();
-            if ( (exist_x >= x-1 && exist_x <= x+1) && (exist_y >= y-1 && exist_y <= y+1)){
+            Vector2d existingPos = existBuilding.getPosition();
+            if ( (existingPos.x >= pos.x-1 && existingPos.x <= pos.x+1) && (existingPos.y >= pos.y-1 && existingPos.y <= pos.y+1)){
                 if (checkMatchedBuilding(existBuilding, building)){
                     production++;
                 }
@@ -104,12 +100,10 @@ public class City extends Actor{
     }
 
     public void changeProduction(Building building){
-        int x = building.getX();
-        int y = building.getY();
+        Vector2d pos = building.getPosition();
         for(Building existBuilding: buildings){
-            int exist_x = existBuilding.getX();
-            int exist_y = existBuilding.getY();
-            if ( (exist_x >= x-1 && exist_x <= x+1) && (exist_y >= y-1 && exist_y <= y+1)){
+            Vector2d existingPos = existBuilding.getPosition();
+            if ( (existingPos.x >= pos.x-1 && existingPos.x <= pos.x+1) && (existingPos.y >= pos.y-1 && existingPos.y <= pos.y+1)){
                 if (checkMatchedBuilding(building, existBuilding)){
                     if (existBuilding.getTYPE().equals(Types.BUILDING.FORGE)){
                         addPopulation(2);
@@ -176,12 +170,8 @@ public class City extends Actor{
     }
 
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
+    public Vector2d getPosition() {
+        return position;
     }
 
     public int getLevel() {
@@ -235,7 +225,7 @@ public class City extends Actor{
     }
 
     public City copy(){
-        City c = new City(x, y, level, population, population_need, isCapital, production, copyBuildings(), tribeId, copyUnitsID());
+        City c = new City(position.x, position.y, level, population, population_need, isCapital, production, copyBuildings(), tribeId, copyUnitsID());
         c.setWalls(hasWalls);
         return c;
     }
@@ -264,7 +254,7 @@ public class City extends Actor{
     public Building removeBuilding(int x, int y){
         Building removeBuilding = null;
         for(Building building :buildings){
-            if (building.getX() == x && building.getY() == y){
+            if (building.getPosition().x == x && building.getPosition().y == y){
                 buildings.remove(building);
                 removeBuilding = building;
 

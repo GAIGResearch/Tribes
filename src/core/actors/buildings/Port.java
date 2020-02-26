@@ -24,7 +24,7 @@ public class Port extends Building {
 
     @Override
     public Port copy(){
-        return new Port(getX(), getY());
+        return new Port(position.x, position.y);
     }
 
 }

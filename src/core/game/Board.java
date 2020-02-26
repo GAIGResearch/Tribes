@@ -409,10 +409,9 @@ public class Board {
 
     // Set border helper method to set city bounds
     public void setBorderHelper(City c, int bound){
-        int x = c.getX();
-        int y = c.getY();
-        for (int i = x-bound; i <= x+bound; i++){
-            for(int j = y-bound; j <= y+bound; j++) {
+        Vector2d cityPos = c.getPosition();
+        for (int i = cityPos.x-bound; i <= cityPos.x+bound; i++){
+            for(int j = cityPos.y-bound; j <= cityPos.y+bound; j++) {
                 if(tileCityId[i][j] == -1){
                     tileCityId[i][j] = c.getActorId();
                 }

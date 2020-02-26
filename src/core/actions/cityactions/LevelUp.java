@@ -48,13 +48,16 @@ public class LevelUp extends CityAction {
     @Override
     public boolean execute(GameState gs) {
 
+        Vector2d cityPos = city.getPosition();
+
         switch(bonus)
         {
             case WORKSHOP:
                 city.addProduction(1);
                 break;
             case EXPLORER:
-                gs.getBoard().launchExplorer(city.getX(), city.getY(), city.getTribeId());
+
+                gs.getBoard().launchExplorer(cityPos.x, cityPos.y, city.getTribeId());
                 break;
             case CITY_WALL:
                 city.setWalls(true);
@@ -75,8 +78,7 @@ public class LevelUp extends CityAction {
                 break;
             case SUPERUNIT:
 
-                Vector2d cityPos = new Vector2d(city.getX(), city.getY());
-                Unit unitInCity = gs.getBoard().getUnitAt(city.getX(), city.getY());
+                Unit unitInCity = gs.getBoard().getUnitAt(cityPos.x, cityPos.y);
 
                 //This can probably be encapsulated
                 Unit superUnit = Types.UNIT.createUnit(cityPos, 0, false, city.getActorId(), city.getTribeId(), Types.UNIT.SUPERUNIT);
@@ -85,7 +87,7 @@ public class LevelUp extends CityAction {
 
                 if(unitInCity != null)
                 {
-                    gs.getBoard().pushUnit(unitInCity.getTribeId(), unitInCity, city.getX(), city.getY());
+                    gs.getBoard().pushUnit(unitInCity.getTribeId(), unitInCity, cityPos.x, cityPos.y);
                 }
 
                 break;

@@ -32,7 +32,8 @@ public class Spawn extends CityAction
         Tribe tribe = gs.getTribe(city.getTribeId());
         TechnologyTree t = tribe.getTechTree();
         int star = tribe.getStars();
-        if (gs.getBoard().getUnitAt(city.getX(), city.getY()) == null){
+        Vector2d cityPos = city.getPosition();
+        if (gs.getBoard().getUnitAt(cityPos.x, cityPos.y) == null){
             for(Types.UNIT unit: Types.UNIT.values()){
                 // TODO: Update 7 to the the key after the unit enum will not be changed
                 if (unit.getCost() <= star && unit.getKey() <= 7){
@@ -64,7 +65,8 @@ public class Spawn extends CityAction
     @Override
     public boolean execute(GameState gs) {
         if (isFeasible(gs)){
-            Unit newUnit = unit_type.createUnit(new Vector2d(city.getX(), city.getY()), 0, false, city.getActorId(), city.getTribeId(), unit_type);
+            Vector2d cityPos = city.getPosition();
+            Unit newUnit = unit_type.createUnit(new Vector2d(cityPos.x, cityPos.y), 0, false, city.getActorId(), city.getTribeId(), unit_type);
             gs.getTribe(city.getTribeId()).subtractStars(unit_type.getCost());
             gs.getBoard().addUnitToBoard(newUnit);
             gs.getBoard().addUnitToCity(newUnit, city);

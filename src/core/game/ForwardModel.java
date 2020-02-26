@@ -3,6 +3,8 @@ package core.game;
 import core.actions.Action;
 import core.actors.City;
 import core.actors.Tribe;
+import utils.Vector2d;
+
 import java.util.ArrayList;
 
 
@@ -40,7 +42,8 @@ public class ForwardModel {
             tribe.initObsGrid(board.getSize());
             int startingCityId = tribe.getCitiesID().get(0);
             City c = (City) board.getActor(startingCityId);
-            tribe.clearView(c.getX(), c.getY());
+            Vector2d cityPos = c.getPosition();
+            tribe.clearView(cityPos.x, cityPos.y);
         }
     }
 

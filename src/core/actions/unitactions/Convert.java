@@ -27,8 +27,8 @@ public class Convert extends UnitAction
         Board b = gs.getBoard();
         boolean[][] obsGrid = b.getTribe(this.unit.getTribeId()).getObsGrid();
         // Loop through unit range, check if tile observable and action feasible, if so add action
-        for(int x = this.unit.getCurrentPosition().x- this.unit.RANGE; x <= x+ this.unit.RANGE; x++) {
-            for (int y = this.unit.getCurrentPosition().y - this.unit.RANGE; y <= y + this.unit.RANGE; y++) {
+        for(int x = this.unit.getPosition().x- this.unit.RANGE; x <= x+ this.unit.RANGE; x++) {
+            for (int y = this.unit.getPosition().y - this.unit.RANGE; y <= y + this.unit.RANGE; y++) {
                 Convert c = new Convert(this.unit, b.getUnitAt(x,y));
                 if(!obsGrid[x][y]){
                     continue;

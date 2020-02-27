@@ -55,7 +55,7 @@ public class Graph<T> {
 
     public Graph copy() {
         Graph gr = new Graph();
-        mainNode = gr.mainNode.copy();
+        mainNode = (gr.mainNode == null)? null : gr.mainNode.copy();
         for(Node n : nodes.values())
         {
             gr.addNode(n.copy());

@@ -45,6 +45,7 @@ public class Game {
      *   Initializes the array to hold the player game states.
      *   Assigns the tribes that will play the game.
      *   Creates the board according to the above information and resets the game so it's ready to start.
+     *   Turn order: by default, turns run following the order in the tribes array.
      * @param players Players of the game.
      * @param tribes Tribes to play the game with. Players and tribes related by position in array lists.
      * @param filename Name of the file with the level information.
@@ -138,9 +139,7 @@ public class Game {
         Types.RESULT[] results = null;
 
         while(!isEnded() || VISUALS && wi != null && !wi.windowClosed && !isEnded()) {
-            // Loop while window is still open, even if the game ended.
-            // If not playing with visuals, loop while the game's not ended.
-            tick();
+
 
             // Check end of game
             if (firstEnd && isEnded()) {
@@ -155,13 +154,19 @@ public class Game {
 
             // Paint game state
             if (VISUALS && frame != null) {
-                frame.paint(getBoard());
+                frame.paint(getGameState(-1));                                                  //Full Observability
+//                frame.paint(getGameState(gs.getTick() % gs.getTribes().length));        //Partial Obs
                 try {
                     Thread.sleep(FRAME_DELAY);
                 } catch (Exception e) {
                     System.out.println("EXCEPTION " + e);
                 }
             }
+
+            // Loop while window is still open, even if the game ended.
+            // If not playing with visuals, loop while the game's not ended.
+            tick();
+
         }
 
         // The loop may have been broken out of before the game ended. Handle end-of-game:

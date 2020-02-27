@@ -6,6 +6,7 @@ import java.awt.*;
 import core.Types;
 import core.actors.units.Unit;
 import core.game.Board;
+import core.game.GameState;
 
 import static core.Constants.*;
 
@@ -13,8 +14,11 @@ public class GameView extends JComponent {
 
     private int cellSize, gridSize;
     private Board board; //This only counts terrains. Needs to be enhanced with actors, resources, etc.
+    private GameState gameState;
     private Image backgroundImg;
     private InfoView infoView;
+
+    private int highlightX, highlightY;
 
     /**
      * Dimensions of the window.
@@ -29,6 +33,9 @@ public class GameView extends JComponent {
         this.gridSize = board.getSize();
         this.dimension = new Dimension(gridSize * cellSize, gridSize * cellSize);
         backgroundImg = Types.TERRAIN.PLAIN.getImage();
+        highlightX = -1;
+        highlightY = -1;
+        inforView.setGameView(this);
     }
 
 
@@ -40,6 +47,9 @@ public class GameView extends JComponent {
 
     private void paintWithGraphics(Graphics2D g)
     {
+        if(gameState == null)
+            return;
+
         //For a better graphics, enable this: (be aware this could bring performance issues depending on your HW & OS).
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -51,7 +61,10 @@ public class GameView extends JComponent {
 
                 //We paint, in this order: terrain, resources, buildings and actors.
                 Types.TERRAIN t = board.getTerrainAt(i,j);
-                paintImage(g, i, j, cellSize, (t == null) ? null : t.getImage());
+                if(t == null)
+                    paintFog(g, i, j, cellSize);
+                else
+                    paintImage(g, i, j, cellSize, t.getImage());
 
                 Types.RESOURCE r = board.getResourceAt(i,j);
                 paintImage(g, i, j, cellSize, (r == null) ? null : r.getImage());
@@ -66,34 +79,35 @@ public class GameView extends JComponent {
         }
 
         //If there is a highlighted tile, highlight it.
-        int highlightedX = infoView.getHighlightX();
-        if(highlightedX != -1)
+        if(highlightX != -1)
         {
-            int highlightedY = infoView.getHighlightY();
-
             Stroke oldStroke = g.getStroke();
 
             g.setColor(Color.BLUE);
             g.setStroke(new BasicStroke(3));
 
-            g.drawRect(highlightedX*cellSize, highlightedY*cellSize, cellSize -1, cellSize -1);
+            g.drawRect(highlightX*cellSize, highlightY*cellSize, cellSize -1, cellSize -1);
 
             g.setStroke(oldStroke);
             g.setColor(Color.BLACK);
 
         }
 
-
         g.setColor(Color.BLACK);
         //player.draw(g); //if we want to give control to the agent to paint something (for debug), start here.
     }
 
+    private static void paintFog(Graphics2D gphx, int i, int j, int cellSize)
+    {
+        Rectangle rect = new Rectangle(j*cellSize, i*cellSize, cellSize, cellSize);
+        gphx.setColor(Color.black);
+        gphx.fill(rect);
+    }
 
     private static void paintImage(Graphics2D gphx, int i, int j, int cellSize, Image img)
     {
         if (img != null) {
             Rectangle rect = new Rectangle(j*cellSize, i*cellSize, cellSize, cellSize);
-
             int w = img.getWidth(null);
             int h = img.getHeight(null);
             float scaleX = (float)rect.width/w;
@@ -106,11 +120,14 @@ public class GameView extends JComponent {
 
     /**
      * Paints the board
-     * @param b board from the game
+     * @param gs current game state
      */
-    void paint(Board b)
+    void paint(GameState gs)
     {
-        this.board = b.copy();
+        //The tribe Id of which the turn gs at this point
+        //int gameTurn = 0;// gs.getTick() % gs.getTribes().length;
+        gameState = gs; //.copy(gameTurn);
+        board = gameState.getBoard();
         this.repaint();
     }
 
@@ -121,6 +138,16 @@ public class GameView extends JComponent {
     public Dimension getPreferredSize() {
         return dimension;
     }
+
+
+    public void setHighlight(int x, int y)
+    {
+        highlightX = x;
+        highlightY = y;
+    }
+
+    public int getHighlightX() {return highlightX;}
+    public int getHighlightY() {return highlightY;}
 
 
 }

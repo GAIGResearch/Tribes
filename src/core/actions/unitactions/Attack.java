@@ -28,8 +28,8 @@ public class Attack extends UnitAction
         Board b = gs.getBoard();
         boolean[][] obsGrid = b.getTribe(this.unit.getTribeId()).getObsGrid();
         // Loop through unit range, check if tile observable and action feasible, if so add action
-        for(int x = this.unit.getCurrentPosition().x- this.unit.RANGE; x <= x+ this.unit.RANGE; x++) {
-            for (int y = this.unit.getCurrentPosition().y - this.unit.RANGE; y <= y + this.unit.RANGE; y++) {
+        for(int x = this.unit.getPosition().x- this.unit.RANGE; x <= x+ this.unit.RANGE; x++) {
+            for (int y = this.unit.getPosition().y - this.unit.RANGE; y <= y + this.unit.RANGE; y++) {
                 Attack a = new Attack(this.unit);
                 a.setTarget(b.getUnitAt(x,y));
                 if(!obsGrid[x][y]){
@@ -57,8 +57,8 @@ public class Attack extends UnitAction
     public boolean execute(GameState gs) {
         //Check if action is feasible before execution
         if(isFeasible(gs)) {
-            float attackForce =this.unit.ATK*(this.unit.getCurrentHP()/this.unit.getMaxHP());
-            float defenceForce =target.DEF*(target.getCurrentHP()/target.getMaxHP());
+            float attackForce =this.unit.ATK*((float)this.unit.getCurrentHP()/this.unit.getMaxHP());
+            float defenceForce =target.DEF*((float)target.getCurrentHP()/target.getMaxHP());
             float accelerator = 4.5f;
             float totalDamage =attackForce+defenceForce;
             int attackResult = Math.round((attackForce/totalDamage)*this.unit.ATK*accelerator);

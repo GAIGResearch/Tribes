@@ -4,6 +4,7 @@ import core.Constants;
 import core.Types;
 import core.game.Board;
 import core.game.Game;
+import core.game.GameState;
 import players.KeyController;
 
 import javax.swing.*;
@@ -83,7 +84,11 @@ public class GUI extends JFrame {
         mainPanel.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                infoView.setHighlight(e.getX() / Constants.CELL_SIZE, e.getY() / Constants.CELL_SIZE);
+                //Only provide information if clicking on a visible tile
+                int x = e.getX() / Constants.CELL_SIZE;
+                int y = e.getY() / Constants.CELL_SIZE;
+
+                view.setHighlight(x,y);
             }
 
             @Override
@@ -170,9 +175,9 @@ public class GUI extends JFrame {
     /**
      * Paints the GUI, to be called at every game tick.
      */
-    public void paint(Board b) {
-        view.paint(b);
-        tribeView.paint(b);
-        infoView.paint(b);
+    public void paint(GameState gs) {
+        view.paint(gs);
+        tribeView.paint(gs);
+        infoView.paint(gs);
     }
 }

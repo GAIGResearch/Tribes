@@ -34,7 +34,7 @@ public class Examine extends UnitAction
 
     @Override
     public boolean isFeasible(final GameState gs) {
-        return gs.getBoard().getResourceAt(unit.getCurrentPosition().x, unit.getCurrentPosition().y) == Types.RESOURCE.RUINS;
+        return gs.getBoard().getResourceAt(unit.getPosition().x, unit.getPosition().y) == Types.RESOURCE.RUINS;
     }
 
     @Override

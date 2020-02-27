@@ -21,8 +21,9 @@ public class Battleship extends Unit
 
     @Override
     public Battleship copy() {
-        Battleship c = new Battleship(getCurrentPosition(), getKills(), isVeteran(), getCityID(), getTribeId(), hp);
+        Battleship c = new Battleship(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId(), hp);
         c.setCurrentHP(getCurrentHP());
+        c.setActorId(getActorId());
         return c;
     }
 }

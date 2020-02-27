@@ -8,7 +8,6 @@ import java.util.LinkedList;
 
 public class City extends Actor{
 
-    private Vector2d position;
     private int level;
     private int population = 0;
     private int population_need;
@@ -169,10 +168,6 @@ public class City extends Actor{
         System.out.println("Error!! Unit ID "+ id +" does not belong to this city");
     }
 
-
-    public Vector2d getPosition() {
-        return position;
-    }
 
     public int getLevel() {
         return level;

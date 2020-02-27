@@ -4,6 +4,7 @@ import core.Types;
 import core.actors.City;
 import core.actors.units.Unit;
 import core.game.Board;
+import core.game.GameState;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +19,7 @@ public class InfoView extends JComponent {
 
     private JTextArea terrainTextArea, cityTextArea, unitTextArea, tribeTextArea;
 
-    private int highlightX, highlightY;
+    private GameView gameView;
 
     private Board board;
 
@@ -27,9 +28,6 @@ public class InfoView extends JComponent {
     InfoView()
     {
         this.size = new Dimension(100, 200);
-        highlightX = -1;
-        highlightY = -1;
-
 
         // Create frame layout
         GridBagLayout gbl = new GridBagLayout();
@@ -100,6 +98,8 @@ public class InfoView extends JComponent {
     {
         //For a better graphics, enable this: (be aware this could bring performance issues depending on your HW & OS).
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        int highlightX = gameView.getHighlightX();
+        int highlightY = gameView.getHighlightY();
 
         if(highlightX != -1)
         {
@@ -154,10 +154,10 @@ public class InfoView extends JComponent {
     }
 
 
-    void paint(Board b)
+    void paint(GameState gs)
     {
         this.repaint();
-        this.board = b;
+        this.board = gs.getBoard();
     }
 
     /**
@@ -169,13 +169,7 @@ public class InfoView extends JComponent {
     }
 
 
-    public void setHighlight(int x, int y)
-    {
-        highlightX = x;
-        highlightY = y;
+    public void setGameView(GameView gameView) {
+        this.gameView = gameView;
     }
-
-    public int getHighlightX() {return highlightX;}
-    public int getHighlightY() {return highlightY;}
-
 }

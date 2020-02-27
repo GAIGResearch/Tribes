@@ -29,7 +29,7 @@ public class Capture extends UnitAction
         // get city from board, check if action is feasible and add to list
         Board b = gs.getBoard();
         LinkedList<Action> captures = new LinkedList<>();
-        City c = b.getCityInBorders(this.unit.getCurrentPosition().x, this.unit.getCurrentPosition().y);
+        City c = b.getCityInBorders(this.unit.getPosition().x, this.unit.getPosition().y);
         Capture capture = new Capture(this.unit);
         capture.setTargetCity(c);
         if(isFeasible(gs)){
@@ -46,7 +46,7 @@ public class Capture extends UnitAction
         Board b = gs.getBoard();
         if(b.getUnitAt(targetCity.getPosition().x,targetCity.getPosition().y) != null || targetCity == null)
             return false;
-        else if(targetCity.getPosition().x != unit.getCurrentPosition().x || targetCity.getPosition().y !=unit.getCurrentPosition().y)
+        else if(targetCity.getPosition().x != unit.getPosition().x || targetCity.getPosition().y !=unit.getPosition().y)
             return false;
         else if(targetCity.getTribeId() == this.unit.getTribeId())
             return false;

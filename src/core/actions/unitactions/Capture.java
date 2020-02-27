@@ -57,8 +57,10 @@ public class Capture extends UnitAction
     @Override
     public boolean execute(GameState gs) {
         // Change city tribe id to execute action
+        Board b = gs.getBoard();
+        Tribe t = b.getTribe(this.unit.getTribeId());
         if(isFeasible(gs)) {
-            targetCity.setTribeId(this.unit.getTribeId());
+            b.capture(t,this.targetCity.getPosition().x,this.targetCity.getPosition().y);
             return true;
         }
         return false;

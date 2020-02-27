@@ -26,14 +26,14 @@ public class Capture extends UnitAction
 
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
+        // get city from board, check if action is feasible and add to list
         Board b = gs.getBoard();
         LinkedList<Action> captures = new LinkedList<>();
-        Tribe t = b.getTribe(this.unit.getTribeId());
-        ArrayList<Integer> cityIds = t.getCitiesID();
-        //TODO: Get City, check if city and unit pos is same
+        City c = b.getCityInBorders(this.unit.getCurrentPosition().x, this.unit.getCurrentPosition().y);
+        Capture capture = new Capture(this.unit);
+        capture.setTargetCity(c);
         if(isFeasible(gs)){
-
-
+            captures.add(capture);
         }
 
         return captures;
@@ -42,11 +42,13 @@ public class Capture extends UnitAction
     @Override
     public boolean isFeasible(final GameState gs)
     {
-        //todo: check if capturing this city is feasible.
+        // If unit not in city, city belongs to the units tribe or if city is null then action is not feasible
         Board b = gs.getBoard();
-        if(b.getUnitAt(targetCity.getX(),targetCity.getY()) != null)
+        if(b.getUnitAt(targetCity.getPosition().x,targetCity.getPosition().y) != null || targetCity == null)
             return false;
-        else if(targetCity.getX() != unit.getCurrentPosition().x || targetCity.getY() !=unit.getCurrentPosition().y)
+        else if(targetCity.getPosition().x != unit.getCurrentPosition().x || targetCity.getPosition().y !=unit.getCurrentPosition().y)
+            return false;
+        else if(targetCity.getTribeId() == this.unit.getTribeId())
             return false;
 
         return true;
@@ -54,7 +56,7 @@ public class Capture extends UnitAction
 
     @Override
     public boolean execute(GameState gs) {
-        //todo: execute the capture action
+        // Change city tribe id to execute action
         if(isFeasible(gs)) {
             targetCity.setTribeId(this.unit.getTribeId());
             return true;

@@ -1,9 +1,7 @@
 package utils;
 
 import core.Constants;
-import core.Types;
 import core.actions.tribeactions.EndTurnAction;
-import core.game.Board;
 import core.game.Game;
 import core.game.GameState;
 import players.ActionController;
@@ -24,7 +22,8 @@ public class GUI extends JFrame implements Runnable {
     private ActionController ac;
 
     private GameView view;
-//    private TribeView tribeView;
+    private TribeView tribeView;
+    private TechView techView;
     private InfoView infoView;
 
     private boolean finishedUpdate = true;
@@ -149,6 +148,13 @@ public class GUI extends JFrame implements Runnable {
         activeTribe = new JLabel("Tribe acting: ");
         activeTribe.setFont(textFont);
 
+        JTabbedPane tribeResearchInfo = new JTabbedPane();
+        tribeView = new TribeView();
+        techView = new TechView();
+        tribeResearchInfo.setPreferredSize(new Dimension(400, 300));
+        tribeResearchInfo.add("Tribe Info", tribeView);
+        tribeResearchInfo.add("Tech Tree", new JScrollPane(techView));
+
         c.gridy = 0;
         sidePanel.add(appTitle, c);
 
@@ -174,7 +180,12 @@ public class GUI extends JFrame implements Runnable {
         sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
 
         c.gridy++;
-//        sidePanel.add(tribeView, c);
+        sidePanel.add(tribeResearchInfo, c);
+
+        c.gridy++;
+        sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+
+        c.gridy++;
         JButton endTurn = new JButton("End Turn");
         endTurn.addActionListener(e -> ac.addAction(new EndTurnAction(), gs));
         sidePanel.add(endTurn, c);
@@ -201,7 +212,8 @@ public class GUI extends JFrame implements Runnable {
     public void run() {
         finishedUpdate = false;
         view.paint(gs);
-//        tribeView.paint(gs);
+        tribeView.paint(gs);
+        techView.paint(gs);
         infoView.paint(gs);
         appTurn.setText("Turn: " + gs.getTick());
         if (gs.getActiveTribe() != null) {

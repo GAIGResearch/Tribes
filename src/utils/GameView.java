@@ -32,7 +32,6 @@ public class GameView extends JComponent {
         this.gridSize = board.getSize();
         this.dimension = new Dimension(gridSize * cellSize, gridSize * cellSize);
         backgroundImg = Types.TERRAIN.PLAIN.getImage();
-        inforView.setGameView(this);
     }
 
 
@@ -92,7 +91,7 @@ public class GameView extends JComponent {
                 // We then paint cities and units.
                 Types.TERRAIN t = board.getTerrainAt(i,j);
                 if (t == Types.TERRAIN.CITY) {
-                    drawCityDecorations(g, i, j, t.getImage());
+                    drawCityDecorations(g, i, j);
                 }
 
                 Unit u = board.getUnitAt(i,j);
@@ -124,7 +123,7 @@ public class GameView extends JComponent {
         }
     }
 
-    private void drawCityDecorations(Graphics2D g, int i, int j, Image img) {
+    private void drawCityDecorations(Graphics2D g, int i, int j) {
         int cityID = board.getCityIdAt(i,j);
         City c = (City) board.getActor(cityID);
         int level = c.getLevel();

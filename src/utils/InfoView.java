@@ -7,11 +7,10 @@ import core.game.Board;
 import core.game.GameState;
 
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
 
-import static core.Constants.CELL_SIZE;
-
-
+@SuppressWarnings({"SuspiciousNameCombination", "StringConcatenationInsideStringBufferAppend"})
 public class InfoView extends JComponent {
 
     // Dimensions of the window.
@@ -21,9 +20,6 @@ public class InfoView extends JComponent {
     private int highlightX0, highlightY0;
     private int highlightX1, highlightY1;
     private int highlightX2, highlightY2;
-    private JTextArea terrainTextArea, cityTextArea, unitTextArea, tribeTextArea;
-
-    private GameView gameView;
 
     private Board board;
 
@@ -44,6 +40,8 @@ public class InfoView extends JComponent {
         textArea.setFont(textFont);
         textArea.setEditable(false);
         textArea.setBackground(Color.lightGray);
+        DefaultCaret caret = (DefaultCaret)textArea.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 
         this.setLayout(new FlowLayout());
         JScrollPane scrollPane = new JScrollPane(textArea);
@@ -144,7 +142,7 @@ public class InfoView extends JComponent {
     }
 
     private String getUnitInfo(Unit u) {
-        String img = u.getType().getImageStr(u.getTribeId());
+//        String img = u.getType().getImageStr(u.getTribeId());
 
         StringBuilder sb = new StringBuilder();
         sb.append("<h1>" + Types.TRIBE.values()[u.getTribeId()] + " " + u.getType() + "</h1>");
@@ -224,9 +222,5 @@ public class InfoView extends JComponent {
 
     public int getHighlightX() {return highlightX0;}
     public int getHighlightY() {return highlightY0;}
-
-    public void setGameView(GameView gameView) {
-        this.gameView = gameView;
-    }
 
 }

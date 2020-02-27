@@ -60,6 +60,5 @@ public class Capture extends UnitAction
         Board b = gs.getBoard();
         Tribe t = b.getTribe(this.unit.getTribeId());
         return b.capture(t,this.targetCity.getPosition().x,this.targetCity.getPosition().y);
-
     }
 }

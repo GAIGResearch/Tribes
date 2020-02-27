@@ -28,8 +28,8 @@ public class ResourceGathering extends CityAction
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         Board b = gs.getBoard();
         LinkedList<Action> resources = new LinkedList<>();
-        LinkedList<Vector2d> cityTiles = b.getCityTiles(b.getCityIdAt(this.city.getX(),this.city.getY()));
-        // lopp through bounds of city and add resource actions if they are feasible
+        LinkedList<Vector2d> cityTiles = b.getCityTiles(b.getCityIdAt(this.city.getPosition().x,this.city.getPosition().y));
+        // loop through bounds of city and add resource actions if they are feasible
         // TODO: Find more effecient method other than asking board for city tiles
         for(int i = 0; i<cityTiles.size(); i++) {
             Vector2d pos = cityTiles.get(i);

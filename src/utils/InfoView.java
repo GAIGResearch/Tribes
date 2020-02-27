@@ -29,7 +29,7 @@ public class InfoView extends JComponent {
 
     InfoView()
     {
-        this.size = new Dimension(400, 200);
+        this.size = new Dimension(400, 300);
 
         highlightX0 = -1;
         highlightY0 = -1;
@@ -132,7 +132,10 @@ public class InfoView extends JComponent {
                 }
             }
 
-            textArea.setText(s);
+            if (!textArea.getText().equals(s)) {
+                textArea.setText(s);
+            }
+
 //            String[] splitLine = s.split("\n");
 //            for (int i = 0; i < splitLine.length; i++) {
 //                g.drawString(splitLine[i], 10, 10 + i * fontSize);
@@ -145,7 +148,7 @@ public class InfoView extends JComponent {
 
         StringBuilder sb = new StringBuilder();
         sb.append("<h1>" + Types.TRIBE.values()[u.getTribeId()] + " " + u.getType() + "</h1>");
-        sb.append("<table border=\"0\"><tr><td><img src=\"file:" + img + "\"/></p></td><td>");
+//        sb.append("<table border=\"0\"><tr><td><img src=\"file:" + img + "\"/></p></td><td>");
         sb.append("From city " + u.getCityID() + "<br/>");
         if (u.isVeteran()) {
             sb.append("<b>Veteran unit.</b>");
@@ -153,7 +156,7 @@ public class InfoView extends JComponent {
             int kills = Math.min(u.getKills(), 3);
             sb.append("" + kills + "/3 kills to become a veteran.");
         }
-        sb.append("</td></tr></table>");
+//        sb.append("</td></tr></table>");
         sb.append("<ul>");
         sb.append("<li><b>Health:</b> " + u.getCurrentHP() + "/" + u.getMaxHP() + "</li>");
         sb.append("<li><b>Attack:</b> " + u.ATK + "</li>");
@@ -171,13 +174,13 @@ public class InfoView extends JComponent {
         StringBuilder sb = new StringBuilder();
         if(c != null) {
             sb.append("<h1>" + Types.TRIBE.values()[c.getTribeId()] + " city " + cityID + "</h1>");
-            sb.append("<table border=\"0\"><tr><td><img width=\"" + CELL_SIZE + "\" src=\"file:" + Types.TERRAIN.CITY.getImageStr() + "\"/></p></td><td>");
+//            sb.append("<table border=\"0\"><tr><td><img width=\"" + CELL_SIZE + "\" src=\"file:" + Types.TERRAIN.CITY.getImageStr() + "\"/></p></td><td>");
             sb.append("<ul>");
             sb.append("<li><b>Is Capital:</b> " + c.isCapital() + "</li>");
             sb.append("<li><b>Points:</b> " + c.getPoints() + "</li>");
             sb.append("<li><b>Production:</b> " + c.getProduction() + "</li>");
             sb.append("</ul>");
-            sb.append("</td></tr></table>");
+//            sb.append("</td></tr></table>");
         }
         return sb.toString();
     }

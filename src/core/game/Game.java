@@ -140,7 +140,6 @@ public class Game {
 
         while(!isEnded() || VISUALS && wi != null && !wi.windowClosed && !isEnded()) {
 
-
             // Check end of game
             if (firstEnd && isEnded()) {
                 firstEnd = false;
@@ -152,31 +151,11 @@ public class Game {
                 }
             }
 
-            // Paint game state
-            if (VISUALS && frame != null) {
-
-                // GUI might take several frames to update with animations,
-                // wait for that to be done before doing next update. Using thread to run the update asynchronous,
-                // while the next action is being computed
-                while (!frame.nextMove()) {
-                    try {
-                        Thread.sleep(1);
-                    } catch (Exception e) {
-                        System.out.println("EXCEPTION " + e);
-                    }
-                }
-
-                frame.update(getGameState(-1));
-//                frame.update(getGameState(gs.getTick() % gs.getTribes().length));        //Partial Obs
-                Thread gui = new Thread(frame);
-                gui.start();
-            }
-
-            System.out.println(gs.getTick());
+//            System.out.println(gs.getTick());
 
             // Loop while window is still open, even if the game ended.
             // If not playing with visuals, loop while the game's not ended.
-            tick();
+            tick(frame);
 
         }
 
@@ -191,7 +170,7 @@ public class Game {
     /**
      * Ticks the game forward. Asks agents for actions and applies returned actions to obtain the next game state.
      */
-    void tick () {
+    void tick (GUI frame) {
         if (VERBOSE) {
             //System.out.println("tick: " + gs.getTick());
         }
@@ -201,7 +180,7 @@ public class Game {
             Tribe tribe = tribes[i];
 
             //play the full turn for this player
-            processTurn(i, tribe);
+            processTurn(i, tribe, frame);
 
             //it may be that this player won the game, no more playing.
             if(isEnded())
@@ -220,7 +199,7 @@ public class Game {
      * @param playerID ID of the player whose turn is being processed.
      * @param tribe tribe that corresponds to this player.
      */
-    void processTurn(int playerID, Tribe tribe)
+    void processTurn(int playerID, Tribe tribe, GUI frame)
     {
         //Take the player for this turn
         Agent ag = players[playerID];
@@ -245,6 +224,27 @@ public class Game {
             gs.computePlayerActions(tribe);
 
             updateAssignedGameStates();
+
+            // Update GUI after every action
+            // Paint game state
+            if (VISUALS && frame != null) {
+
+                // GUI might take several frames to update with animations,
+                // wait for that to be done before doing next update. Using thread to run the update asynchronous,
+                // while the next action is being computed
+                while (!frame.nextMove()) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (Exception e) {
+                        System.out.println("EXCEPTION " + e);
+                    }
+                }
+
+                frame.update(getGameState(-1));
+//                frame.update(getGameState(gs.getTick() % gs.getTribes().length));        //Partial Obs
+                Thread gui = new Thread(frame);
+                gui.start();
+            }
 
             //the timer needs to be updated to the remaining time, not counting action computation.
             ect.setMaxTimeMillis(remaining);

@@ -154,10 +154,10 @@ public class InfoView extends JComponent {
         sb.append("</td></tr></table>");
         sb.append("<ul>");
         sb.append("<li><b>Health:</b> " + u.getCurrentHP() + "/" + u.getMaxHP() + "</li>");
-//        sb.append("<li><b>Attack:</b> " + u.getAttack() + "</li>");
-//        sb.append("<li><b>Defence:</b> " + u.getDefence() + "</li>");
-//        sb.append("<li><b>Movement:</b> " + u.getMovement() + "</li>");
-//        sb.append("<li><b>Range:</b> " + u.getRange() + "</li>");
+        sb.append("<li><b>Attack:</b> " + u.ATK + "</li>");
+        sb.append("<li><b>Defence:</b> " + u.DEF + "</li>");
+        sb.append("<li><b>Movement:</b> " + u.MOV + "</li>");
+        sb.append("<li><b>Range:</b> " + u.RANGE + "</li>");
         sb.append("</ul>");
         return sb.toString();
     }

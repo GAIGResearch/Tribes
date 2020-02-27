@@ -33,7 +33,7 @@ public class HealOthers extends UnitAction
     public boolean execute(GameState gs) {
         //TODO: execute HealOthers
         //implement adjacency, action points
-        
+
         return false;
     }
 }

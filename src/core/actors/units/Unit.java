@@ -6,9 +6,9 @@ import utils.Vector2d;
 
 public abstract class Unit extends Actor
 {
-    public final int ATK;
-    public final int DEF;
-    public final int MOV;
+    public int ATK;
+    public int DEF;
+    public int MOV;
 
     public final int RANGE;
     public final int COST;
@@ -81,4 +81,8 @@ public abstract class Unit extends Actor
 
     public abstract Unit copy();
 
+    public void setTribeID(int tribeID){
+        this.tribeID = tribeID;
+    }
+    
 }

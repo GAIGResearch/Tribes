@@ -1,6 +1,7 @@
 package core.actions.unitactions;
 
 import core.actions.Action;
+import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
 
@@ -22,19 +23,43 @@ public class Convert extends UnitAction
 
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
-        //TODO: compute all the Convert actions that are possible
-        return null;
+        LinkedList<Action> converts = new LinkedList<>();
+        Board b = gs.getBoard();
+        boolean[][] obsGrid = b.getTribe(this.unit.getTribeId()).getObsGrid();
+        // Loop through unit range, check if tile observable and action feasible, if so add action
+        for(int x = this.unit.getCurrentPosition().x- this.unit.RANGE; x <= x+ this.unit.RANGE; x++) {
+            for (int y = this.unit.getCurrentPosition().y - this.unit.RANGE; y <= y + this.unit.RANGE; y++) {
+                Convert c = new Convert(this.unit, b.getUnitAt(x,y));
+                if(!obsGrid[x][y]){
+                    continue;
+                }
+                if(c.isFeasible(gs)){
+                    converts.add(c);
+                }
+            }
+            }
+        return converts;
+
     }
+
+
+
 
     @Override
     public boolean isFeasible(final GameState gs) {
-        //TODO: check if this Convert action is possible.
+        //Check if target in range
+        if(target!=null|| target.getTribeId() == this.unit.getTribeId())
+            return true;
         return false;
     }
 
     @Override
     public boolean execute(GameState gs) {
-        //TODO execute the Convert action
+        //Check if action is feasible before execution
+        if(isFeasible(gs)) {
+            target.setTribeID(this.unit.getTribeId());
+            return true;
+        }
         return false;
     }
 }

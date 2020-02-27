@@ -277,4 +277,7 @@ public class City extends Actor{
         this.production -= production;
     }
 
+    public void setTribeId(int tribeId) {
+        this.tribeId = tribeId;
+    }
 }

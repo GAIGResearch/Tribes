@@ -74,7 +74,9 @@ public class Tribe extends Actor{
         tribeCopy.capitalID = this.capitalID;
 
         tribeCopy.techTree = this.techTree.copy();
-        tribeCopy.tradeNetwork = this.tradeNetwork.copy();
+        if (tradeNetwork != null) {
+            tribeCopy.tradeNetwork = this.tradeNetwork.copy();
+        }
 
         tribeCopy.citiesID = new ArrayList<>();
         for(int cityID : citiesID)

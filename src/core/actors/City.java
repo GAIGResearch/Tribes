@@ -27,7 +27,7 @@ public class City extends Actor{
         this.position = new Vector2d(x,y);
         population_need = 0;
         bound = 1; //cities start with 1 tile around it for territory
-        level = 1; //and starting level is 1
+        level = 4; //and starting level is 1
         isCapital = false;
         this.tribeId = tribeId;
     }

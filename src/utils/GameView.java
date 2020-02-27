@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 import core.Types;
+import core.actors.City;
 import core.actors.units.Unit;
 import core.game.Board;
 
@@ -48,8 +49,7 @@ public class GameView extends JComponent {
 
         for(int i = 0; i < gridSize; ++i) {
             for(int j = 0; j < gridSize; ++j) {
-
-                //We paint, in this order: terrain, resources, buildings and actors.
+                // We paint all base terrains, resources and buildings first
                 Types.TERRAIN t = board.getTerrainAt(i,j);
                 paintImage(g, i, j, cellSize, (t == null) ? null : t.getImage());
 
@@ -58,17 +58,12 @@ public class GameView extends JComponent {
 
                 Types.BUILDING b = board.getBuildingAt(i,j);
                 paintImage(g, i, j, cellSize, (b == null) ? null : b.getImage());
-
-                Unit u = board.getUnitAt(i,j);
-                paintImage(g, i, j, cellSize, (u == null) ? null : u.getType().getImage(u.getTribeId()));
-
             }
         }
 
         //If there is a highlighted tile, highlight it.
         int highlightedX = infoView.getHighlightX();
-        if(highlightedX != -1)
-        {
+        if (highlightedX != -1) {
             int highlightedY = infoView.getHighlightY();
 
             Stroke oldStroke = g.getStroke();
@@ -80,9 +75,20 @@ public class GameView extends JComponent {
 
             g.setStroke(oldStroke);
             g.setColor(Color.BLACK);
-
         }
 
+        for(int i = 0; i < gridSize; ++i) {
+            for(int j = 0; j < gridSize; ++j) {
+                // We then paint cities and units.
+                Types.TERRAIN t = board.getTerrainAt(i,j);
+                if (t == Types.TERRAIN.CITY) {
+                    drawCityDecorations(g, i, j, t.getImage());
+                }
+
+                Unit u = board.getUnitAt(i,j);
+                paintImage(g, i, j, cellSize, (u == null) ? null : u.getType().getImage(u.getTribeId()));
+            }
+        }
 
         g.setColor(Color.BLACK);
         //player.draw(g); //if we want to give control to the agent to paint something (for debug), start here.
@@ -100,6 +106,42 @@ public class GameView extends JComponent {
             float scaleY = (float)rect.height/h;
 
             gphx.drawImage(img, rect.x, rect.y, (int) (w*scaleX), (int) (h*scaleY), null);
+        }
+    }
+
+    private void drawCityDecorations(Graphics2D g, int i, int j, Image img) {
+        int cityID = board.getCityIdAt(i,j);
+        City c = (City) board.getActor(cityID);
+        int level = c.getLevel();
+        int progress = c.getPopulation();
+        int units = c.getUnitsID().size();
+
+        int sectionWidth = 10;
+
+        // Draw level
+        g.setColor(Color.WHITE);
+        int w = level * sectionWidth;
+        int h = cellSize/4;
+        Rectangle bgRect = new Rectangle(j*cellSize + cellSize/2 - w/2, (i+1)*cellSize - h/2, w, h);
+        g.fillRoundRect(bgRect.x, bgRect.y, bgRect.width, bgRect.height, 5, 5);
+
+        // Draw population
+        g.setColor(new Color(53, 183, 255));
+        int pw = progress * sectionWidth;
+        Rectangle pgRect = new Rectangle(bgRect.x, bgRect.y, pw, bgRect.height);
+        g.fillRoundRect(pgRect.x, pgRect.y, pgRect.width, pgRect.height, 5, 5);
+
+        // Draw unit counts
+        g.setColor(Color.black);
+        int radius = h/2;
+        int unitHeight = bgRect.y + h/2 - radius/2;
+        for (int u = 0; u < units; u++) {
+            g.fillOval(bgRect.x + sectionWidth * u + sectionWidth/2 - radius/2, unitHeight, radius, radius);
+        }
+
+        for (int l = 0; l < level - 1; l++) {
+            int lx = bgRect.x + sectionWidth * (l + 1);
+            g.drawLine(lx, bgRect.y, lx, bgRect.y + bgRect.height);
         }
     }
 

@@ -155,13 +155,23 @@ public class Game {
 
             // Paint game state
             if (VISUALS && frame != null) {
-                frame.paint(getBoard());
-                try {
-                    Thread.sleep(FRAME_DELAY);
-                } catch (Exception e) {
-                    System.out.println("EXCEPTION " + e);
+
+                // GUI might take several frames to update with animations,
+                // wait for that to be done before doing next update. Using thread to run the update asynchronous,
+                // while the next action is being computed
+                while (!frame.nextMove()) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (Exception e) {
+                        System.out.println("EXCEPTION " + e);
+                    }
                 }
+
+                frame.update(getBoard());
+                Thread gui = new Thread(frame);
+                gui.start();
             }
+            System.out.println(gs.getTick());
         }
 
         // The loop may have been broken out of before the game ended. Handle end-of-game:

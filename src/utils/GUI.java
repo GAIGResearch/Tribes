@@ -13,15 +13,20 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-public class GUI extends JFrame {
+import static core.Constants.FRAME_DELAY;
+
+public class GUI extends JFrame implements Runnable {
     private JLabel appTurn;
 
     private Game game;
+    private Board board;
     private KeyController ki;
 
     private GameView view;
     private TribeView tribeView;
     private InfoView infoView;
+
+    private boolean finishedUpdate = true;
 
     /**
      * Constructor
@@ -170,9 +175,25 @@ public class GUI extends JFrame {
     /**
      * Paints the GUI, to be called at every game tick.
      */
-    public void paint(Board b) {
-        view.paint(b);
-        tribeView.paint(b);
-        infoView.paint(b);
+    public void update(Board b) {
+        this.board = b;
+    }
+
+    public boolean nextMove() {
+        return finishedUpdate;
+    }
+
+    @Override
+    public void run() {
+        finishedUpdate = false;
+        view.paint(board);
+        tribeView.paint(board);
+        infoView.paint(board);
+        try {
+            Thread.sleep(FRAME_DELAY*2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        finishedUpdate = true;
     }
 }

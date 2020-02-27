@@ -82,7 +82,7 @@ public abstract class Unit extends Actor
     public abstract Unit copy();
 
     public void setTribeID(int tribeID){
-        this.tribeID = tribeID;
+        this.tribeId = tribeID;
     }
     
 }

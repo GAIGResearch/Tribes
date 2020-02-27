@@ -12,7 +12,7 @@ public class Monument extends Building{
 
     @Override
     public boolean is_buildable(Board board) {
-        return board.getTerrainAt(position.x, position.y).equals(Types.TERRAIN.PLAIN) || board.getTerrainAt(position.x, position.y).equals(Types.TERRAIN.SHALLOW_WATER);
+        return board.getTerrainAt(position.x, position.y) == Types.TERRAIN.PLAIN || board.getTerrainAt(position.x, position.y) == Types.TERRAIN.SHALLOW_WATER;
     }
 
     @Override

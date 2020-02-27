@@ -12,8 +12,8 @@ public class Temple extends Building {
 
     @Override
     public boolean is_buildable(Board board) {
-        return board.getTerrainAt(position.x, position.y).equals(Types.TERRAIN.PLAIN) || board.getTerrainAt(position.x, position.y).equals(Types.TERRAIN.MOUNTAIN) ||
-                board.getTerrainAt(position.x, position.y).equals(Types.TERRAIN.SHALLOW_WATER) || board.getTerrainAt(position.x, position.y).equals(Types.TERRAIN.DEEP_WATER);
+        return board.getTerrainAt(position.x, position.y) == Types.TERRAIN.PLAIN || board.getTerrainAt(position.x, position.y) == Types.TERRAIN.MOUNTAIN ||
+                board.getTerrainAt(position.x, position.y) == Types.TERRAIN.SHALLOW_WATER || board.getTerrainAt(position.x, position.y) == Types.TERRAIN.DEEP_WATER;
     }
 
     @Override

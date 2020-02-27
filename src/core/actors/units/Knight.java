@@ -18,8 +18,9 @@ public class Knight extends Unit
 
     @Override
     public Knight copy() {
-        Knight c = new Knight(getCurrentPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
+        Knight c = new Knight(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
         c.setCurrentHP(getCurrentHP());
+        c.setActorId(getActorId());
         return c;
     }
 }

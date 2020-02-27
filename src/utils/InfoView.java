@@ -4,6 +4,7 @@ import core.Types;
 import core.actors.City;
 import core.actors.units.Unit;
 import core.game.Board;
+import core.game.GameState;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,6 +21,9 @@ public class InfoView extends JComponent {
     private int highlightX0, highlightY0;
     private int highlightX1, highlightY1;
     private int highlightX2, highlightY2;
+    private JTextArea terrainTextArea, cityTextArea, unitTextArea, tribeTextArea;
+
+    private GameView gameView;
 
     private Board board;
 
@@ -55,8 +59,6 @@ public class InfoView extends JComponent {
 
     private void paintWithGraphics(Graphics2D g)
     {
-        int fontSize = getFont().getSize();
-
         //For a better graphics, enable this: (be aware this could bring performance issues depending on your HW & OS).
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -180,9 +182,9 @@ public class InfoView extends JComponent {
         return sb.toString();
     }
 
-    void paint(Board b)
+    void paint(GameState gs)
     {
-        this.board = b;
+        this.board = gs.getBoard();
         this.repaint();
     }
 
@@ -193,7 +195,6 @@ public class InfoView extends JComponent {
     public Dimension getPreferredSize() {
         return size;
     }
-
 
     public void setHighlight(int x, int y)
     {
@@ -220,5 +221,9 @@ public class InfoView extends JComponent {
 
     public int getHighlightX() {return highlightX0;}
     public int getHighlightY() {return highlightY0;}
+
+    public void setGameView(GameView gameView) {
+        this.gameView = gameView;
+    }
 
 }

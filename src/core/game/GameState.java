@@ -2,15 +2,15 @@ package core.game;
 
 import core.actions.Action;
 import core.actors.Actor;
+import core.actors.City;
 import core.actors.Tribe;
+import utils.IO;
+import utils.Vector2d;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class GameState {
-
-    // Forward model for the game.
-    ForwardModel model;
 
     // Random generator for the game state.
     private Random rnd;
@@ -18,16 +18,18 @@ public class GameState {
     // Current tick of the game.
     private int tick = 0;
 
+    // Board of the game
+    private Board board;
+
+
     //Default constructor.
     public GameState()
     {
-        this.model = new ForwardModel();
     }
 
     //Another constructor.
     public GameState(Random rnd) {
         this.rnd = rnd;
-        this.model = new ForwardModel();
     }
 
     /**
@@ -35,7 +37,19 @@ public class GameState {
      * The level is only generated when this initialization method is called.
      */
     void init(String filename, Tribe[] tribes) {
-        this.model.init(tribes, rnd, filename);
+
+        String[] lines = new IO().readFile(filename);
+        LevelLoader ll = new LevelLoader();
+        board = ll.buildLevel(tribes, lines, rnd);
+
+        for(Tribe tribe : tribes)
+        {
+            int startingCityId = tribe.getCitiesID().get(0);
+            City c = (City) board.getActor(startingCityId);
+            Vector2d cityPos = c.getPosition();
+            tribe.clearView(cityPos.x, cityPos.y);
+        }
+
     }
 
     /**
@@ -45,7 +59,7 @@ public class GameState {
      */
     public int addActor(Actor actor)
     {
-        return model.getBoard().addActor(actor);
+        return board.addActor(actor);
     }
 
     /**
@@ -56,7 +70,7 @@ public class GameState {
      */
     public Actor getActor(int actorId)
     {
-        return model.getBoard().getActor(actorId);
+        return board.getActor(actorId);
     }
 
     /**
@@ -66,7 +80,7 @@ public class GameState {
      */
     public boolean removeActor(int actorId)
     {
-        return model.getBoard().removeActor(actorId);
+        return board.removeActor(actorId);
     }
 
 
@@ -119,7 +133,8 @@ public class GameState {
      */
     public void next(Action action)
     {
-        model.next(action);
+        //TODO: MAIN function of this class.
+        // Takes the action passed as parameter and runs it in the game.
     }
 
     /**
@@ -136,7 +151,7 @@ public class GameState {
      */
     public Board getBoard()
     {
-        return model.getBoard();
+        return board;
     }
 
     /**
@@ -145,15 +160,11 @@ public class GameState {
      * @param playerIdx player index that indicates who is this copy for.
      * @return a copy of this game state.
      */
-    GameState copy(int playerIdx)
+    public GameState copy(int playerIdx)
     {
-        //TODO: Make an exact copy of this game state.
-        // It must call model.copy() to copy the model
-
-        // (this code below is incomplete)
         GameState copy = new GameState(new Random()); //copies of the game state can't have the same random generator.
-        copy.model = model.copy(playerIdx);
-
+        copy.board = board.copy(playerIdx!=-1, playerIdx);
+        copy.tick = this.tick;
         return copy;
     }
 
@@ -163,7 +174,7 @@ public class GameState {
      */
     public Tribe[] getTribes()
     {
-        return model.getTribes();
+        return board.getTribes();
     }
 
 
@@ -174,7 +185,7 @@ public class GameState {
      */
     public Tribe getTribe(int tribeID)
     {
-        return getTribes()[tribeID];
+        return board.getTribes()[tribeID];
     }
 
     public Random getRandomGenerator() {

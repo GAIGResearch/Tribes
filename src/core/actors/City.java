@@ -5,10 +5,10 @@ import core.actors.buildings.Building;
 import utils.Vector2d;
 
 import java.util.LinkedList;
+import static core.Types.BUILDING.*;
 
 public class City extends Actor{
 
-    private Vector2d position;
     private int level;
     private int population = 0;
     private int population_need;
@@ -55,20 +55,20 @@ public class City extends Actor{
     }
 
     public void addBuildings(Building building){
-        if (building.getTYPE().equals(Types.BUILDING.WINDMILL) || building.getTYPE().equals(Types.BUILDING.SAWMILL)
-                || building.getTYPE().equals(Types.BUILDING.FORGE) || building.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
+        if (building.getTYPE() == WINDMILL || building.getTYPE() == SAWMILL ||
+                building.getTYPE() == FORGE || building.getTYPE() == CUSTOM_HOUSE){
             setProduction(building);
-        }else if (building.getTYPE().equals(Types.BUILDING.FARM) || building.getTYPE().equals(Types.BUILDING.LUMBER_HUT)
-                || building.getTYPE().equals(Types.BUILDING.MINE) || building.getTYPE().equals(Types.BUILDING.PORT)){
+        }else if (building.getTYPE() == FARM || building.getTYPE() == LUMBER_HUT ||
+                building.getTYPE() == MINE || building.getTYPE() == PORT){
             changeProduction(building);
-        }else if (building.getTYPE().equals(Types.BUILDING.TEMPLE) || building.getTYPE().equals(Types.BUILDING.WATER_TEMPLE)){
+        }else if (building.getTYPE() == TEMPLE || building.getTYPE() == WATER_TEMPLE){
             addLongTimePoints(building.getPoints());
             addPoints(building.getPoints());
         }else{
             addPoints(building.getPoints());
         }
 
-        if (building.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
+        if (building.getTYPE() == CUSTOM_HOUSE){
             addProduction(building.getPRODUCTION());
         }else {
             addPopulation(building.getPRODUCTION());
@@ -105,9 +105,9 @@ public class City extends Actor{
             Vector2d existingPos = existBuilding.getPosition();
             if ( (existingPos.x >= pos.x-1 && existingPos.x <= pos.x+1) && (existingPos.y >= pos.y-1 && existingPos.y <= pos.y+1)){
                 if (checkMatchedBuilding(building, existBuilding)){
-                    if (existBuilding.getTYPE().equals(Types.BUILDING.FORGE)){
+                    if (existBuilding.getTYPE() == FORGE){
                         addPopulation(2);
-                    }else if(existBuilding.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
+                    }else if(existBuilding.getTYPE() == CUSTOM_HOUSE){
                         addProduction(2);
                     }else{
                         addPopulation(1);
@@ -119,10 +119,10 @@ public class City extends Actor{
     }
 
     public boolean checkMatchedBuilding(Building original, Building functional){
-        return original.getTYPE().equals(Types.BUILDING.FARM) && functional.getTYPE().equals(Types.BUILDING.WINDMILL) ||
-                original.getTYPE().equals(Types.BUILDING.LUMBER_HUT) && functional.getTYPE().equals(Types.BUILDING.SAWMILL) ||
-                original.getTYPE().equals(Types.BUILDING.MINE) && functional.getTYPE().equals(Types.BUILDING.FORGE) ||
-                original.getTYPE().equals(Types.BUILDING.PORT) && functional.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE);
+        return (original.getTYPE() == FARM && functional.getTYPE() == Types.BUILDING.WINDMILL) ||
+                (original.getTYPE() == LUMBER_HUT && functional.getTYPE() == SAWMILL) ||
+                (original.getTYPE() == MINE && functional.getTYPE() == FORGE) ||
+                (original.getTYPE() == PORT && functional.getTYPE() == CUSTOM_HOUSE);
     }
 
     public boolean canLevelUp()
@@ -169,10 +169,6 @@ public class City extends Actor{
         System.out.println("Error!! Unit ID "+ id +" does not belong to this city");
     }
 
-
-    public Vector2d getPosition() {
-        return position;
-    }
 
     public int getLevel() {
         return level;
@@ -277,4 +273,7 @@ public class City extends Actor{
         this.production -= production;
     }
 
+    public void setTribeId(int tribeId) {
+        this.tribeId = tribeId;
+    }
 }

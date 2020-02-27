@@ -56,6 +56,8 @@ public class Board {
         this.tileCityId = new int[size][size];
         this.roads = new boolean[size][size];
 
+        for(Tribe t : tribes)
+            t.initObsGrid(size);
 
         //Initialise tile IDs
         for (int x = 0; x < size; x++) {
@@ -69,6 +71,11 @@ public class Board {
 
     // Return deep copy of board
     public Board copy() {
+        return copy(false, -1);
+    }
+
+    // Return deep copy of board
+    public Board copy(boolean partialObs, int playerId) {
         Board copyBoard = new Board();
         copyBoard.size = this.size;
         copyBoard.tribes = new Tribe[this.tribes.length];
@@ -83,12 +90,16 @@ public class Board {
         // Copy board objects (they are all ids)
         for (int x = 0; x < this.size; x++) {
             for (int y = 0; y < this.size; y++) {
-                copyBoard.setUnitIdAt(x, y, units[x][y]);
-                copyBoard.setTerrainAt(x, y, terrains[x][y]);
-                copyBoard.setResourceAt(x, y, resources[x][y]);
-                copyBoard.setBuildingAt(x, y, buildings[x][y]);
-                copyBoard.tileCityId[x][y] = tileCityId[x][y];
-                copyBoard.roads[x][y] = roads[x][y];
+
+                if(!partialObs || tribes[playerId].isVisible(x,y))
+                {
+                    copyBoard.setUnitIdAt(x, y, units[x][y]);
+                    copyBoard.setTerrainAt(x, y, terrains[x][y]);
+                    copyBoard.setResourceAt(x, y, resources[x][y]);
+                    copyBoard.setBuildingAt(x, y, buildings[x][y]);
+                    copyBoard.tileCityId[x][y] = tileCityId[x][y];
+                    copyBoard.roads[x][y] = roads[x][y];
+                }
             }
         }
 
@@ -101,7 +112,12 @@ public class Board {
         copyBoard.gameActors = new HashMap<>();
         for (Actor act : gameActors.values()) {
             int id = act.getActorId();
-            copyBoard.gameActors.put(id, act.copy());
+
+            //When do we copy? if it's the tribe (id==playerId), full observable or actor visible if part. obs.
+            if(id == playerId || !partialObs || tribes[playerId].isVisible(act.getPosition().x, act.getPosition().y))
+            {
+                copyBoard.gameActors.put(id, act.copy());
+            }
         }
 
         return copyBoard;
@@ -195,7 +211,7 @@ public class Board {
     private void moveUnit(Unit unit, int x0, int y0, int xF, int yF) {
         units[x0][y0] = 0;
         units[xF][yF] = unit.getActorId();
-        unit.setCurrentPosition(new Vector2d(xF, yF));
+        unit.setPosition(xF, yF);
     }
 
     public void launchExplorer(int x0, int y0, int tribeId, Random rnd) {
@@ -482,6 +498,9 @@ public class Board {
         }
         tribes[c.getTribeId()].addCity(c.getActorId());
 
+        //cities provide visibility, which needs updating
+        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, 2);
+
         //By default, cities are considered to be roads for trade network purposes.
         roads[c.getPosition().x][c.getPosition().y] = true;
     }
@@ -489,7 +508,7 @@ public class Board {
 
     public void removeUnitFromBoard(Unit u)
     {
-        Vector2d pos = u.getCurrentPosition();
+        Vector2d pos = u.getPosition();
         setUnitIdAt(pos.x, pos.y, 0);
         removeActor(u.getActorId());
     }
@@ -506,7 +525,7 @@ public class Board {
         addActor(u);
 
         //Place it in the board
-        Vector2d pos = u.getCurrentPosition();
+        Vector2d pos = u.getPosition();
         setUnitIdAt(pos.x, pos.y, u);
 
         //Finally, add the unit to the city that created it

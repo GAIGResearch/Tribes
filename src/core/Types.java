@@ -206,7 +206,7 @@ public class Types {
         ARCHER (4,"img/unit/archer/", TribesConfig.ARCHER_COST, TECHNOLOGY.ARCHERY),
         CATAPULT (5,"img/unit/", TribesConfig.CATAPULT_COST, TECHNOLOGY.MATHEMATICS),
         KNIGHT (6,"img/unit/knight/", TribesConfig.KNIGHT_COST, TECHNOLOGY.CHIVALRY),
-        MIND_BEARER (7,"img/unit/mind_bearer/", TribesConfig.MINDBENDER_COST, TECHNOLOGY.PHILOSOPHY),
+        MIND_BENDRER(7,"img/unit/mind_bender/", TribesConfig.MINDBENDER_COST, TECHNOLOGY.PHILOSOPHY),
         BOAT(8,"img/unit/boat/", TribesConfig.BOAT_COST, TECHNOLOGY.SAILING),
         SHIP(9,"img/unit/ship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.SAILING),
         BATTLESHIP(10,"img/unit/battleship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.NAVIGATION),

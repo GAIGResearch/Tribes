@@ -1,6 +1,7 @@
 package utils;
 
 import core.game.Board;
+import core.game.GameState;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,7 +46,7 @@ public class TribeView extends JComponent {
     /**
 
      */
-    void paint(Board b)
+    void paint(GameState gameState)
     {
         this.repaint();
     }

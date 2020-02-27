@@ -18,8 +18,9 @@ public class Rider extends Unit
 
     @Override
     public Rider copy() {
-        Rider c = new Rider(getCurrentPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
+        Rider c = new Rider(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
         c.setCurrentHP(getCurrentHP());
+        c.setActorId(getActorId());
         return c;
     }
 }

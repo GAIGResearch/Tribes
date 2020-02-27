@@ -3,6 +3,7 @@ package core.actors;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
+import utils.Vector2d;
 import utils.graph.Graph;
 
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ public class Tribe extends Actor{
         techTree.doResearch(tribe.getInitialTech());
         citiesID = new ArrayList<>();
         stars = TribesConfig.INITIAL_STARS;
+        this.tradeNetwork = new Graph();
     }
 
     public void initObsGrid(int size)
@@ -78,6 +80,11 @@ public class Tribe extends Actor{
             tribeCopy.tradeNetwork = this.tradeNetwork.copy();
         }
 
+        tribeCopy.obsGrid = new boolean[obsGrid.length][obsGrid.length];
+        for(int i = 0; i < obsGrid.length; ++i)
+            for(int j = 0; j < obsGrid.length; ++j)
+                tribeCopy.obsGrid[i][j] = obsGrid[i][j];
+
         tribeCopy.citiesID = new ArrayList<>();
         for(int cityID : citiesID)
         {
@@ -90,16 +97,20 @@ public class Tribe extends Actor{
 
     public void clearView(int x, int y)
     {
+        clearView(x, y, 1);
+    }
+
+    public void clearView(int x, int y, int range)
+    {
         int size = obsGrid.length;
-        for(int i = x-1; i <= x+1; ++i)
-            for(int j = y-1; j <= y+1; ++j)
+        for(int i = x-range; i <= x+range; ++i)
+            for(int j = y-range; j <= y+range; ++j)
             {
                 //All these positions should be within my view.
-                if(x >= 0 && y >= 0 && x < size && y < size)
+                if(i >= 0 && j >= 0 && i < size && j < size)
                 {
-                    obsGrid[x][y] = true;
+                    obsGrid[i][j] = true;
                 }
-
             }
     }
 
@@ -141,7 +152,10 @@ public class Tribe extends Actor{
 
     public boolean[][] getObsGrid() {return obsGrid;}
 
-    public boolean isVisible(int x, int y) {return obsGrid[x][y];}
+    public boolean isVisible(int x, int y)
+    {
+        return obsGrid[x][y];
+    }
 
     public Types.TRIBE getType(){return tribe;}
 
@@ -170,6 +184,12 @@ public class Tribe extends Actor{
 
     public boolean hasCity(int cityId) {
         return this.citiesID.contains(cityId);
+    }
+
+    public void setPosition(int x, int y) {position = null;} //this doesn't make sense
+    public Vector2d getPosition()
+    {
+        return null;
     }
 
     public void updateNetwork(boolean[][] tradeNetwork, int[][] tileCityId, Types.BUILDING[][] buildings)

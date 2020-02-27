@@ -4,6 +4,7 @@ import core.Constants;
 import core.Types;
 import core.game.Board;
 import core.game.Game;
+import core.game.GameState;
 import players.KeyController;
 
 import javax.swing.*;
@@ -18,8 +19,7 @@ import static core.Constants.FRAME_DELAY;
 public class GUI extends JFrame implements Runnable {
     private JLabel appTurn;
 
-    private Game game;
-    private Board board;
+    private GameState gs;
     private KeyController ki;
 
     private GameView view;
@@ -34,7 +34,6 @@ public class GUI extends JFrame implements Runnable {
      */
     public GUI(Game game, String title, KeyController ki, boolean closeAppOnClosingWindow) {
         super(title);
-        this.game = game;
         this.ki = ki;
 
 
@@ -88,7 +87,11 @@ public class GUI extends JFrame implements Runnable {
         mainPanel.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                infoView.setHighlight(e.getX() / Constants.CELL_SIZE, e.getY() / Constants.CELL_SIZE);
+                //Only provide information if clicking on a visible tile
+                int x = e.getX() / Constants.CELL_SIZE;
+                int y = e.getY() / Constants.CELL_SIZE;
+
+                infoView.setHighlight(x,y);
             }
 
             @Override
@@ -175,8 +178,8 @@ public class GUI extends JFrame implements Runnable {
     /**
      * Paints the GUI, to be called at every game tick.
      */
-    public void update(Board b) {
-        this.board = b;
+    public void update(GameState gs) {
+        this.gs = gs;
     }
 
     public boolean nextMove() {
@@ -186,9 +189,9 @@ public class GUI extends JFrame implements Runnable {
     @Override
     public void run() {
         finishedUpdate = false;
-        view.paint(board);
-        tribeView.paint(board);
-        infoView.paint(board);
+        view.paint(gs);
+        tribeView.paint(gs);
+        infoView.paint(gs);
         try {
             Thread.sleep(FRAME_DELAY*2);
         } catch (InterruptedException e) {

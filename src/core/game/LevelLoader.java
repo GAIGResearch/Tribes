@@ -23,12 +23,11 @@ public class LevelLoader
     /**
      * Builds a level, receiving a file name.
      * @param tribes tribes to play in this game
-     * @param gamelvl file name containing the level.
+     * @param lines lines containing the level
      */
-    public Board buildLevel(Tribe[] tribes, String gamelvl, Random rnd) {
+    public Board buildLevel(Tribe[] tribes, String[] lines, Random rnd) {
 
         Board board = new Board();
-        String[] lines = new IO().readFile(gamelvl);
 
         // Dimensions of the level read from the file.
         size.width = lines.length;

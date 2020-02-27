@@ -39,10 +39,7 @@ public class Convert extends UnitAction
             }
             }
         return converts;
-
     }
-
-
 
 
     @Override
@@ -57,7 +54,7 @@ public class Convert extends UnitAction
     public boolean execute(GameState gs) {
         //Check if action is feasible before execution
         if(isFeasible(gs)) {
-            target.setTribeID(this.unit.getTribeId());
+            target.setTribeId(this.unit.getTribeId());
             return true;
         }
         return false;

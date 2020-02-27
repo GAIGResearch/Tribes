@@ -59,10 +59,7 @@ public class Capture extends UnitAction
         // Change city tribe id to execute action
         Board b = gs.getBoard();
         Tribe t = b.getTribe(this.unit.getTribeId());
-        if(isFeasible(gs)) {
-            b.capture(t,this.targetCity.getPosition().x,this.targetCity.getPosition().y);
-            return true;
-        }
-        return false;
+        return b.capture(t,this.targetCity.getPosition().x,this.targetCity.getPosition().y);
+
     }
 }

@@ -1,12 +1,19 @@
 package core.game;
 
 import core.actions.Action;
+import core.actions.cityactions.CityActionBuilder;
+import core.actions.tribeactions.TribeActionBuilder;
+import core.actions.unitactions.UnitActionBuilder;
 import core.actors.Actor;
 import core.actors.City;
 import core.actors.Tribe;
+import core.actors.units.Unit;
 import utils.IO;
 import utils.Vector2d;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Random;
 
 public class GameState {
@@ -22,6 +29,9 @@ public class GameState {
 
     // Player currently making a move.
     private int activeTribeID = -1;
+
+    //Indicates if this tribe can end its turn.
+    private boolean[] canEndTurn;
 
 
     //Default constructor.
@@ -51,6 +61,8 @@ public class GameState {
             Vector2d cityPos = c.getPosition();
             tribe.clearView(cityPos.x, cityPos.y);
         }
+
+        canEndTurn = new boolean[tribes.length];
 
     }
 
@@ -116,6 +128,60 @@ public class GameState {
         // This function should fill a member variable in this class that provides the actions per unit/city.
         // It also needs to update a flag that indicates that actions are computed for this tribe in particular.
 
+        ArrayList<Integer> cities = tribe.getCitiesID();
+        ArrayList<Integer> allUnits = new ArrayList<>();
+        CityActionBuilder cab = new CityActionBuilder();
+
+        HashMap<City, ArrayList<Action>> cityActions = new HashMap<>();
+        HashMap<Unit, ArrayList<Action>> unitActions = new HashMap<>();
+        ArrayList<Action> tribeActions = new ArrayList<>();
+
+        int numCities = cities.size();
+        boolean done = false;
+        int i = 0;
+
+        while (!done && i < numCities)
+        {
+            City c = (City) board.getActor(cities.get(i));
+            ArrayList<Action> actions = cab.getActions(this, c);
+
+            done = cab.cityLevelsUp();
+            if(!done)
+            {
+                //TODO: This misses the converted units that do not belong to any city. FIX!!!
+                LinkedList<Integer> unitIds = c.getUnitsID();
+                allUnits.addAll(unitIds);
+            }
+
+            cityActions.put(c, actions);
+            ++i;
+
+        }
+
+        if(done)
+        {
+            //A city is levelling up. We're done with this city.
+            canEndTurn[this.activeTribeID] = false;
+            return;
+        }else{
+            canEndTurn[this.activeTribeID] = true;
+        }
+
+        //Units!
+        UnitActionBuilder uab = new UnitActionBuilder();
+        for(Integer unitId : allUnits)
+        {
+            Unit u = (Unit) board.getActor(unitId);
+            ArrayList<Action> actions = uab.getActions(this, u);
+            unitActions.put(u, actions);
+        }
+
+        //This tribe
+        TribeActionBuilder tab = new TribeActionBuilder();
+        ArrayList<Action> actions = tab.getActions(this, tribe);
+        tribeActions.addAll(actions);
+
+        int a = 0;
     }
 
     /**
@@ -169,6 +235,13 @@ public class GameState {
         copy.board = board.copy(playerIdx!=-1, playerIdx);
         copy.tick = this.tick;
         copy.activeTribeID = activeTribeID;
+
+        int numTribes = getTribes().length;
+        copy.canEndTurn = new boolean[numTribes];
+        for(int i = 0; i < numTribes; ++i)
+            copy.canEndTurn[i] = canEndTurn[i];
+
+
         return copy;
     }
 

@@ -11,7 +11,7 @@ public class Convert extends UnitAction
 {
     private Unit target;
 
-    public Convert(Unit attacker, Unit target)
+    public Convert(Unit attacker)
     {
         super.unit = attacker;
     }
@@ -29,7 +29,8 @@ public class Convert extends UnitAction
         // Loop through unit range, check if tile observable and action feasible, if so add action
         for(int x = this.unit.getPosition().x- this.unit.RANGE; x <= x+ this.unit.RANGE; x++) {
             for (int y = this.unit.getPosition().y - this.unit.RANGE; y <= y + this.unit.RANGE; y++) {
-                Convert c = new Convert(this.unit, b.getUnitAt(x,y));
+                Convert c = new Convert(this.unit);
+                c.setTarget(b.getUnitAt(x,y));
                 if(!obsGrid[x][y]){
                     continue;
                 }

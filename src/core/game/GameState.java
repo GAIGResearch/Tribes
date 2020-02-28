@@ -7,7 +7,6 @@ import core.actors.Tribe;
 import utils.IO;
 import utils.Vector2d;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 public class GameState {
@@ -20,6 +19,9 @@ public class GameState {
 
     // Board of the game
     private Board board;
+
+    // Player currently making a move.
+    private int activeTribeID = -1;
 
 
     //Default constructor.
@@ -109,6 +111,7 @@ public class GameState {
      */
     public void computePlayerActions(Tribe tribe)
     {
+        this.activeTribeID = tribe.getTribeId();
         //TODO: Compute all actions that 'tribe' can execute in this game state.
         // This function should fill a member variable in this class that provides the actions per unit/city.
         // It also needs to update a flag that indicates that actions are computed for this tribe in particular.
@@ -165,6 +168,7 @@ public class GameState {
         GameState copy = new GameState(new Random()); //copies of the game state can't have the same random generator.
         copy.board = board.copy(playerIdx!=-1, playerIdx);
         copy.tick = this.tick;
+        copy.activeTribeID = activeTribeID;
         return copy;
     }
 
@@ -186,6 +190,16 @@ public class GameState {
     public Tribe getTribe(int tribeID)
     {
         return board.getTribes()[tribeID];
+    }
+
+    public Tribe getActiveTribe() {
+        if (activeTribeID != -1) {
+            return board.getTribe(activeTribeID);
+        } else return null;
+    }
+
+    public int getActiveTribeID() {
+        return activeTribeID;
     }
 
     public Random getRandomGenerator() {

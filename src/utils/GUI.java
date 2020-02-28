@@ -1,43 +1,45 @@
 package utils;
 
 import core.Constants;
-import core.Types;
-import core.game.Board;
+import core.actions.tribeactions.EndTurnAction;
 import core.game.Game;
 import core.game.GameState;
+import players.ActionController;
 import players.KeyController;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 
-public class GUI extends JFrame {
+import static core.Constants.FRAME_DELAY;
+
+public class GUI extends JFrame implements Runnable {
     private JLabel appTurn;
+    private JLabel activeTribe;
 
-    private Game game;
+    private GameState gs;
     private KeyController ki;
+    private ActionController ac;
 
     private GameView view;
     private TribeView tribeView;
+    private TechView techView;
     private InfoView infoView;
+
+    private boolean finishedUpdate = true;
 
     /**
      * Constructor
      * @param title Title of the window.
      */
-    public GUI(Game game, String title, KeyController ki, boolean closeAppOnClosingWindow) {
+    public GUI(Game game, String title, KeyController ki, ActionController ac, boolean closeAppOnClosingWindow) {
         super(title);
-        this.game = game;
         this.ki = ki;
-
+        this.ac = ac;
 
         infoView = new InfoView();
-        tribeView = new TribeView();
+//        tribeView = new TribeView();
         view = new GameView(game.getBoard(), infoView);
-
 
         // Create frame layout
         GridBagLayout gbl = new GridBagLayout();
@@ -88,7 +90,7 @@ public class GUI extends JFrame {
                 int x = e.getX() / Constants.CELL_SIZE;
                 int y = e.getY() / Constants.CELL_SIZE;
 
-                view.setHighlight(x,y);
+                infoView.setHighlight(x,y);
             }
 
             @Override
@@ -143,6 +145,15 @@ public class GUI extends JFrame {
 
         appTurn = new JLabel("Turn: 0");
         appTurn.setFont(textFont);
+        activeTribe = new JLabel("Tribe acting: ");
+        activeTribe.setFont(textFont);
+
+        JTabbedPane tribeResearchInfo = new JTabbedPane();
+        tribeView = new TribeView();
+        techView = new TechView();
+        tribeResearchInfo.setPreferredSize(new Dimension(400, 300));
+        tribeResearchInfo.add("Tribe Info", tribeView);
+        tribeResearchInfo.add("Tech Tree", new JScrollPane(techView));
 
         c.gridy = 0;
         sidePanel.add(appTitle, c);
@@ -157,13 +168,27 @@ public class GUI extends JFrame {
         sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
 
         c.gridy++;
+        sidePanel.add(activeTribe, c);
+
+        c.gridy++;
+        sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+
+        c.gridy++;
         sidePanel.add(infoView, c);
 
         c.gridy++;
         sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
 
         c.gridy++;
-        sidePanel.add(tribeView, c);
+        sidePanel.add(tribeResearchInfo, c);
+
+        c.gridy++;
+        sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+
+        c.gridy++;
+        JButton endTurn = new JButton("End Turn");
+        endTurn.addActionListener(e -> ac.addAction(new EndTurnAction(), gs));
+        sidePanel.add(endTurn, c);
 
         c.gridy++;
         sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
@@ -175,9 +200,31 @@ public class GUI extends JFrame {
     /**
      * Paints the GUI, to be called at every game tick.
      */
-    public void paint(GameState gs) {
+    public void update(GameState gs) {
+        this.gs = gs;
+    }
+
+    public boolean nextMove() {
+        return finishedUpdate;
+    }
+
+    @Override
+    public void run() {
+        finishedUpdate = false;
         view.paint(gs);
         tribeView.paint(gs);
+        techView.paint(gs);
         infoView.paint(gs);
+        appTurn.setText("Turn: " + gs.getTick());
+        if (gs.getActiveTribe() != null) {
+            activeTribe.setText("Tribe acting: " + gs.getActiveTribe().getName());
+        }
+        try {
+            Thread.sleep(1);
+//            Thread.sleep(FRAME_DELAY);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        finishedUpdate = true;
     }
 }

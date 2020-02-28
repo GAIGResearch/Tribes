@@ -220,6 +220,7 @@ public class Types {
         UNIT(int numVal, String imageFile, int cost, Types.TECHNOLOGY requirement) {  this.key = numVal;  this.imageFile = imageFile; this.cost = cost; this.requirement = requirement;}
         public int getKey() {  return key; }
         public Image getImage(int playerID) { return ImageIO.GetInstance().getImage(imageFile + playerID + ".png"); }
+        public String getImageStr(int playerID) { return imageFile + playerID + ".png"; }
         public int getCost() {
             return cost;
         }
@@ -349,6 +350,7 @@ Yellow_dark - 929000
         public int getKey() {  return key; }
         public char getMapChar() {return mapChar;}
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
+        public String getImageStr() { return imageFile; }
 
 
         /**

@@ -8,6 +8,7 @@ import java.util.LinkedList;
 
 public class EndTurnAction extends TribeAction {
 
+    public EndTurnAction(){}
     public EndTurnAction(Tribe tribe)
     {
         this.tribe = tribe;

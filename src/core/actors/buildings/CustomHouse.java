@@ -26,9 +26,4 @@ public class CustomHouse extends Building {
     public Building copy() {
         return new CustomHouse(getX(), getY(), getPRODUCTION());
     }
-
-    @Override
-    public Types.TERRAIN getTERRAIN_CONSTRAINT() {
-        return TERRAIN_CONSTRAINT;
-    }
 }

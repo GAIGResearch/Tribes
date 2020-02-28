@@ -15,19 +15,7 @@ public class Mine extends Building{
 
     // This type of building has no setProduction Ability
     @Override
-    public void setProduction(int production) {
-
-    }
-
-    @Override
-    public Types.TERRAIN getTERRAIN_CONSTRAINT() {
-        return TERRAIN_CONSTRAINT;
-    }
-
-    @Override
-    public Types.RESOURCE getRESOURCE_CONSTRAINT() {
-        return RESOURCE_CONSTRAINT;
-    }
+    public void setProduction(int production){}
 
     @Override
     public Building copy() {

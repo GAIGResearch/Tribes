@@ -1,7 +1,6 @@
 package core.actors.buildings;
 
 import core.Types;
-import core.game.Board;
 
 public abstract class Building {
 
@@ -59,23 +58,6 @@ public abstract class Building {
     }
 
     public int getPoints(){ return points;}
-
-    public Types.TERRAIN getTERRAIN_CONSTRAINT() {
-        return null;
-    }
-
-    public Types.RESOURCE getRESOURCE_CONSTRAINT(){return null;}
-
-    public boolean is_buildable(Board board){
-        boolean condition = true;
-        if (getTERRAIN_CONSTRAINT() != null){
-            condition = board.getTerrainAt(x, y).equals(getTERRAIN_CONSTRAINT());
-        }
-        if (getTERRAIN_CONSTRAINT() != null && condition){
-            condition = board.getResourceAt(x, y).equals(getRESOURCE_CONSTRAINT());
-        }
-        return condition;
-    }
 
     public void setProduction(int production){
         this.production = production;

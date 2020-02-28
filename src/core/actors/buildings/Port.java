@@ -13,14 +13,7 @@ public class Port extends Building {
 
     // This type of building has no setProduction Ability
     @Override
-    public void setProduction(int production) {
-
-    }
-
-    @Override
-    public Types.TERRAIN getTERRAIN_CONSTRAINT() {
-        return TERRAIN_CONSTRAINT;
-    }
+    public void setProduction(int production){}
 
     @Override
     public Port copy(){

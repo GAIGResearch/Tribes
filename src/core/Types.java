@@ -115,32 +115,36 @@ public class Types {
      */
     public enum BUILDING
     {
-        PORT (0,"img/building/port.png"),
-        MINE (1,"img/building/mine.png"),
-        FORGE (2,"img/building/forge.png"),
-        FARM (3, "img/building/farm.png"),
-        WINDMILL (4,"img/building/windmill.png"),
-        ROAD (5,"none.png"),
-        CUSTOM_HOUSE (6,"img/building/custom_house.png"),
-        LUMBER_HUT(7,"img/building/lumner_hut.png"),
-        SAWMILL (8,"img/building/sawmill.png"),
-        TEMPLE (9, "img/building/temple.png"),
-        WATER_TEMPLE (10,"img/building/temple.png"),
-        FOREST_TEMPLE (11,"img/building/temple.png"),
-        MOUNTAIN_TEMPLE (12,"img/building/temple.png"),
-        ALTAR_OF_PEACE (13,"img/building/monument.png"),
-        EMPERORS_TOMB (14,"img/building/monument.png"),
-        EYE_OF_GOD (15,"img/building/monument.png"),
-        GATE_OF_POWER (16,"img/building/monument.png"),
-        GRAND_BAZAR (17,"img/building/monument.png"),
-        PARK_OF_FORTUNE (18,"img/building/monument.png"),
-        TOWER_OF_WISDOM (19, "img/building/monument.png");
+        PORT (0,"img/building/port.png", TECHNOLOGY.SAILING),
+        MINE (1,"img/building/mine.png", TECHNOLOGY.MINING),
+        FORGE (2,"img/building/forge.png", TECHNOLOGY.SMITHERY),
+        FARM (3, "img/building/farm.png", TECHNOLOGY.FARMING),
+        WINDMILL (4,"img/building/windmill.png", TECHNOLOGY.CONSTRUCTION),
+        ROAD (5,"none.png", TECHNOLOGY.ROADS),
+        CUSTOM_HOUSE (6,"img/building/custom_house.png", TECHNOLOGY.TRADE),
+        LUMBER_HUT(7,"img/building/lumner_hut.png", TECHNOLOGY.FORESTRY),
+        SAWMILL (8,"img/building/sawmill.png", TECHNOLOGY.MATHEMATICS),
+        TEMPLE (9, "img/building/temple.png", TECHNOLOGY.FREE_SPIRIT),
+        WATER_TEMPLE (10,"img/building/temple.png", TECHNOLOGY.AQUATISM),
+        FOREST_TEMPLE (11,"img/building/temple.png", TECHNOLOGY.SPIRITUALISM),
+        MOUNTAIN_TEMPLE (12,"img/building/temple.png", TECHNOLOGY.MEDITATION),
+        ALTAR_OF_PEACE (13,"img/building/monument.png", null),
+        EMPERORS_TOMB (14,"img/building/monument.png", null),
+        EYE_OF_GOD (15,"img/building/monument.png", null),
+        GATE_OF_POWER (16,"img/building/monument.png", null),
+        GRAND_BAZAR (17,"img/building/monument.png", null),
+        PARK_OF_FORTUNE (18,"img/building/monument.png", null),
+        TOWER_OF_WISDOM (19, "img/building/monument.png", null);
 
         private int key;
         private String imageFile;
-        BUILDING(int numVal, String imageFile) {  this.key = numVal;  this.imageFile = imageFile;}
+        private TECHNOLOGY requirement;
+        BUILDING(int numVal, String imageFile, Types.TECHNOLOGY requirement) {  this.key = numVal;  this.imageFile = imageFile; this.requirement = requirement;}
         public int getKey() {  return key; }
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
+        public TECHNOLOGY getRequirement() {
+            return requirement;
+        }
     }
 
     /**

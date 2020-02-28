@@ -6,6 +6,7 @@ import core.actions.Action;
 import core.actors.City;
 import core.game.GameState;
 import core.actors.units.Unit;
+import utils.Vector2d;
 
 import java.util.LinkedList;
 import java.util.Random;
@@ -44,7 +45,9 @@ public class Examine extends UnitAction
             Types.TECHNOLOGY[] techs = Types.TECHNOLOGY.values();
             TechnologyTree technologyTree = gs.getTribe(unit.getTribeId()).getTechTree();
             int capital = gs.getTribe(unit.getTribeId()).getCapitalID();
+            Vector2d cityPos = gs.getActor(capital).getPosition();
             boolean allTech = technologyTree.getEverythingResearched();
+
 
             int bonus = r.nextInt(5);
             while (allTech && bonus == 1) {
@@ -53,7 +56,16 @@ public class Examine extends UnitAction
 
             switch (bonus) {
                 case 0:
-                    //TODO: Spawn a superunit
+                    Unit unitInCity = gs.getBoard().getUnitAt(cityPos.x, cityPos.y);
+
+                    //This can probably be encapsulated
+                    Unit superUnit = Types.UNIT.createUnit(cityPos, 0, false, capital, unit.getTribeId(), Types.UNIT.SUPERUNIT);
+                    gs.getBoard().addUnit((City)gs.getActor(capital), superUnit);
+
+                    if(unitInCity != null)
+                    {
+                        gs.getBoard().pushUnit(unitInCity.getTribeId(), unitInCity, cityPos.x, cityPos.y);
+                    }
                     break;
                 case 1:
                     int randomPick = r.nextInt(techs.length);
@@ -67,7 +79,7 @@ public class Examine extends UnitAction
                     c.addPopulation(3);
                     break;
                 case 3:
-                    //TODO: Spawn a Explorer
+                    gs.getBoard().launchExplorer(cityPos.x, cityPos.y, unit.getTribeId(), gs.getRandomGenerator());
                     break;
                 case 4:
                     gs.getTribe(unit.getTribeId()).addStars(10);

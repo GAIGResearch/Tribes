@@ -6,8 +6,8 @@ import core.game.Board;
 
 public class Temple extends Building {
 
-    public Temple(int x, int y) {
-        super(x, y, TribesConfig.TEMPLE_COST, Types.BUILDING.TEMPLE, TribesConfig.TEMPLE_PRODUCTION, TribesConfig.TEMPLE_POINT);
+    public Temple(int x, int y, int cost, Types.BUILDING type) {
+        super(x, y, cost, type, TribesConfig.TEMPLE_PRODUCTION, TribesConfig.TEMPLE_POINT);
     }
 
     @Override
@@ -18,6 +18,6 @@ public class Temple extends Building {
 
     @Override
     public Building copy() {
-        return new Temple(getX(), getY());
+        return new Temple(getX(), getY(), getCOST(), getTYPE());
     }
 }

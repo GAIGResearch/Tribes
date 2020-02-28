@@ -69,7 +69,6 @@ public class Build extends CityAction
                     board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.FARM);
                     city.addBuildings(new Farm(targetPos.x, targetPos.y));
                     return true;
-                    //should i check here if city is ready to lvl up?
                 case MINE:
                     tribe.subtractStars(TribesConfig.MINE_COST);
                     board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.MINE);
@@ -86,17 +85,29 @@ public class Build extends CityAction
                 case FORGE:
                     tribe.subtractStars(TribesConfig.FORGE_COST);
                     board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.FORGE);
-                    //add buildings doesn't check for adjacency
                     city.addBuildings(new Forge(targetPos.x, targetPos.y));
                     return true;
                 case TEMPLE:
-                    //mountain and forest temple missing from addBuildings, i omit them deliberately until resolved
                     tribe.subtractStars(TribesConfig.TEMPLE_COST);
                     board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.TEMPLE);
-                    city.addBuildings(new Temple(targetPos.x, targetPos.y));
+                    city.addBuildings(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_COST, Types.BUILDING.TEMPLE));
+                    return true;
+                case MOUNTAIN_TEMPLE:
+                    tribe.subtractStars(TribesConfig.TEMPLE_COST);
+                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.MOUNTAIN_TEMPLE);
+                    city.addBuildings(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_COST, Types.BUILDING.MOUNTAIN_TEMPLE));
+                    return true;
+                case WATER_TEMPLE:
+                    tribe.subtractStars(TribesConfig.TEMPLE_COST);
+                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.WATER_TEMPLE);
+                    city.addBuildings(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_COST, Types.BUILDING.WATER_TEMPLE));
+                    return true;
+                case FOREST_TEMPLE:
+                    tribe.subtractStars(TribesConfig.TEMPLE_FOREST_COST);
+                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.FOREST_TEMPLE);
+                    city.addBuildings(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_FOREST_COST, Types.BUILDING.FOREST_TEMPLE));
                     return true;
                 case SAWMILL:
-                    //again check for adjacency, also uniqueness in isFeasible
                     tribe.subtractStars(TribesConfig.SAW_MILL_COST);
                     board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.SAWMILL);
                     city.addBuildings(new Sawmill(targetPos.x, targetPos.y));

@@ -129,12 +129,12 @@ public class Types {
         FOREST_TEMPLE (11,"img/building/temple.png", TECHNOLOGY.SPIRITUALISM, new TERRAIN[]{TERRAIN.FOREST}),
         MOUNTAIN_TEMPLE (12,"img/building/temple.png", TECHNOLOGY.MEDITATION, new TERRAIN[]{TERRAIN.MOUNTAIN}),
         ALTAR_OF_PEACE (13,"img/building/monument.png", null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
-        EMPERORS_TOMB (14,"img/building/monument.png", TECHNOLOGY.TRADE, new TERRAIN[]{TERRAIN.PLAIN}),
-        EYE_OF_GOD (15,"img/building/monument.png", TECHNOLOGY.NAVIGATION, new TERRAIN[]{TERRAIN.PLAIN}),
-        GATE_OF_POWER (16,"img/building/monument.png", null, new TERRAIN[]{TERRAIN.PLAIN}),
-        GRAND_BAZAR (17,"img/building/monument.png", TECHNOLOGY.ROADS, new TERRAIN[]{TERRAIN.PLAIN}),
+        EMPERORS_TOMB (14,"img/building/monument.png", TECHNOLOGY.TRADE, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        EYE_OF_GOD (15,"img/building/monument.png", TECHNOLOGY.NAVIGATION, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        GATE_OF_POWER (16,"img/building/monument.png", null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        GRAND_BAZAR (17,"img/building/monument.png", TECHNOLOGY.ROADS, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
         PARK_OF_FORTUNE (18,"img/building/monument.png", null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
-        TOWER_OF_WISDOM (19, "img/building/monument.png", TECHNOLOGY.PHILOSOPHY, new TERRAIN[]{TERRAIN.PLAIN});
+        TOWER_OF_WISDOM (19, "img/building/monument.png", TECHNOLOGY.PHILOSOPHY, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN});
 
         private int key;
         private String imageFile;

@@ -4,6 +4,7 @@ import core.actions.Action;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
+import utils.Vector2d;
 
 import java.util.LinkedList;
 
@@ -27,16 +28,22 @@ public class Attack extends UnitAction
         LinkedList<Action> attacks = new LinkedList<>();
         Board b = gs.getBoard();
         boolean[][] obsGrid = b.getTribe(this.unit.getTribeId()).getObsGrid();
+        Vector2d position = unit.getPosition();
+
         // Loop through unit range, check if tile observable and action feasible, if so add action
-        for(int x = this.unit.getPosition().x- this.unit.RANGE; x <= x+ this.unit.RANGE; x++) {
-            for (int y = this.unit.getPosition().y - this.unit.RANGE; y <= y + this.unit.RANGE; y++) {
-                Attack a = new Attack(this.unit);
-                a.setTarget(b.getUnitAt(x,y));
-                if(!obsGrid[x][y]){
-                    continue;
-                }
-                if(a.isFeasible(gs)){
-                    attacks.add(a);
+        for(int i = position.x - this.unit.RANGE; i <= position.x + this.unit.RANGE; i++) {
+            for (int j = position.y - this.unit.RANGE; j <= position.y + this.unit.RANGE; j++) {
+
+                //Not attacking itself
+                if(i != position.x || j != position.y) {
+                    Attack a = new Attack(this.unit);
+                    a.setTarget(b.getUnitAt(i, j));
+                    if (!obsGrid[i][j]) {
+                        continue;
+                    }
+                    if (a.isFeasible(gs)) {
+                        attacks.add(a);
+                    }
                 }
             }
         }

@@ -27,7 +27,7 @@ public class Move extends UnitAction
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         //TODO: compute all the possible Move actions for super.unit.
-        return null;
+        return new LinkedList<>();
     }
 
     @Override

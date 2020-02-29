@@ -11,7 +11,7 @@ import core.actors.units.Unit;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class Upgrade extends UnitAction
+public class    Upgrade extends UnitAction
 {
     public Upgrade(Unit target)
     {

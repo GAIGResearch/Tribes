@@ -145,17 +145,19 @@ public class GameState {
             City c = (City) board.getActor(cities.get(i));
             ArrayList<Action> actions = cab.getActions(this, c);
 
+            if(actions.size() > 0)
+            {
+                cityActions.put(c, actions);
+            }
+
             done = cab.cityLevelsUp();
             if(!done)
             {
                 //TODO: This misses the converted units that do not belong to any city. FIX!!!
                 LinkedList<Integer> unitIds = c.getUnitsID();
                 allUnits.addAll(unitIds);
+                i++;
             }
-
-            cityActions.put(c, actions);
-            ++i;
-
         }
 
         if(done)
@@ -173,7 +175,8 @@ public class GameState {
         {
             Unit u = (Unit) board.getActor(unitId);
             ArrayList<Action> actions = uab.getActions(this, u);
-            unitActions.put(u, actions);
+            if(actions.size() > 0)
+                unitActions.put(u, actions);
         }
 
         //This tribe
@@ -244,6 +247,21 @@ public class GameState {
 
         return copy;
     }
+
+    public boolean canEndTurn(int tribeId)
+    {
+        return canEndTurn[tribeId];
+    }
+
+    /**
+     * The player has decided to end the turn
+     * @param tribeId
+     */
+    public void endTurn(int tribeId)
+    {
+        //TODO: need to manage a turn ending here.
+    }
+
 
     /**
      * Gets the tribes playing this game.

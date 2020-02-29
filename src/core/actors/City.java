@@ -77,6 +77,11 @@ public class City extends Actor{
         buildings.add(building);
     }
 
+
+    public void removePoints(int points) {
+        this.points -= points;
+    }
+
     private void addPoints(int points) {
         this.points += points;
     }

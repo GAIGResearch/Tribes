@@ -2,14 +2,19 @@ package utils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
+import com.sun.javafx.geom.RoundRectangle2D;
 import core.Types;
+import core.actions.unitactions.*;
 import core.actors.City;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
+import core.actions.Action;
 
 import static core.Constants.*;
+import static core.Types.getActionPosition;
 
 public class GameView extends JComponent {
 
@@ -18,6 +23,11 @@ public class GameView extends JComponent {
     private GameState gameState;
     private Image backgroundImg;
     private InfoView infoView;
+
+    private int shadowOffset = 1;
+    private int roundRectArc = 5;
+    private Color progressColor = new Color(53, 183, 255);
+    private Image starImg, starShadow, capitalImg, capitalShadow;
 
     /**
      * Dimensions of the window.
@@ -32,6 +42,10 @@ public class GameView extends JComponent {
         this.gridSize = board.getSize();
         this.dimension = new Dimension(gridSize * cellSize, gridSize * cellSize);
         backgroundImg = Types.TERRAIN.PLAIN.getImage();
+        starImg = ImageIO.GetInstance().getImage("img/decorations/star.png");
+        starShadow = ImageIO.GetInstance().getImage("img/decorations/starShadow.png");
+        capitalImg = ImageIO.GetInstance().getImage("img/decorations/capital.png");
+        capitalShadow = ImageIO.GetInstance().getImage("img/decorations/capitalShadow.png");
     }
 
 
@@ -59,29 +73,24 @@ public class GameView extends JComponent {
                 if(t == null)
                     paintFog(g, i, j, cellSize);
                 else
-                    paintImage(g, i, j, cellSize, t.getImage());
+                    paintImage(g, j*cellSize, i*cellSize, t.getImage(), cellSize);
 
                 Types.RESOURCE r = board.getResourceAt(i,j);
-                paintImage(g, i, j, cellSize, (r == null) ? null : r.getImage());
+                paintImage(g, j*cellSize, i*cellSize, (r == null) ? null : r.getImage(), cellSize);
 
                 Types.BUILDING b = board.getBuildingAt(i,j);
-                paintImage(g, i, j, cellSize, (b == null) ? null : b.getImage());
+                paintImage(g, j*cellSize, i*cellSize, (b == null) ? null : b.getImage(), cellSize);
             }
         }
 
         //If there is a highlighted tile, highlight it.
-
         int highlightX = infoView.getHighlightX();
+        int highlightY = infoView.getHighlightY();
         if (highlightX != -1) {
-            int highlightY = infoView.getHighlightY();
-
             Stroke oldStroke = g.getStroke();
-
             g.setColor(Color.BLUE);
             g.setStroke(new BasicStroke(3));
-
             g.drawRect(highlightX * cellSize, highlightY * cellSize, cellSize - 1, cellSize - 1);
-
             g.setStroke(oldStroke);
             g.setColor(Color.BLACK);
         }
@@ -95,9 +104,50 @@ public class GameView extends JComponent {
                 }
 
                 Unit u = board.getUnitAt(i,j);
-                paintImage(g, i, j, cellSize, (u == null) ? null : u.getType().getImage(u.getTribeId()));
+                if (u != null) {
+
+                    int imgSize = (int) (cellSize * 0.75);
+                    String imgFile = u.getType().getImageFile();
+                    boolean exhausted = false; //u.isExhausted(); // TODO: does unit have available actions?
+
+                    if (exhausted) {
+                        String exhaustedStr = imgFile + imgFile.split("/")[2] + "Exhausted.png";
+                        Image exhaustedImg = ImageIO.GetInstance().getImage(exhaustedStr);
+                        paintImage(g, j * cellSize + cellSize / 2 - imgSize / 2 - shadowOffset, i * cellSize + cellSize / 2 - imgSize / 2 - shadowOffset,
+                                exhaustedImg, imgSize);
+                    } else {
+                        String highlightStr = imgFile + imgFile.split("/")[2] + "Highlight.png";
+                        String shadowStr = imgFile + imgFile.split("/")[2] + "Shadow.png";
+                        Image highlight = ImageIO.GetInstance().getImage(highlightStr);
+                        Image shadow = ImageIO.GetInstance().getImage(shadowStr);
+                        paintImage(g, j * cellSize + cellSize / 2 - imgSize / 2 - shadowOffset, i * cellSize + cellSize / 2 - imgSize / 2 - shadowOffset,
+                                highlight, imgSize);
+                        paintImage(g, j * cellSize + cellSize / 2 - imgSize / 2 + shadowOffset, i * cellSize + cellSize / 2 - imgSize / 2 + shadowOffset,
+                                shadow, imgSize);
+                        paintImage(g, j * cellSize + cellSize / 2 - imgSize / 2, i * cellSize + cellSize / 2 - imgSize / 2,
+                                u.getType().getImage(u.getTribeId()), imgSize);
+                    }
+                }
             }
         }
+
+        // Draw actions
+//        ArrayList<Action> possibleActions = gameState.getPossibleActions();  // TODO: get possible actions
+//        for (Action a: possibleActions) {
+//            // Only draw actions for highlighted unit
+//            if (a instanceof UnitAction && ((UnitAction) a).getUnit().getPosition().x == highlightX
+//                    && ((UnitAction) a).getUnit().getPosition().y == highlightY) {
+//                Image actionImg = Types.ACTION.getImage(a);
+//
+//                if (actionImg != null) {
+//                    Vector2d pos = getActionPosition(a);
+//
+//                    if (pos != null) {
+//                        paintImage(g, pos.x * cellSize, pos.y + cellSize, actionImg, cellSize);
+//                    }
+//                }
+//            }
+//        }
 
         g.setColor(Color.BLACK);
         //player.draw(g); //if we want to give control to the agent to paint something (for debug), start here.
@@ -110,10 +160,10 @@ public class GameView extends JComponent {
         gphx.fill(rect);
     }
 
-    private static void paintImage(Graphics2D gphx, int i, int j, int cellSize, Image img)
+    private static void paintImage(Graphics2D gphx, int x, int y, Image img, int imgSize)
     {
         if (img != null) {
-            Rectangle rect = new Rectangle(j*cellSize, i*cellSize, cellSize, cellSize);
+            Rectangle rect = new Rectangle(x, y, imgSize, imgSize);
             int w = img.getWidth(null);
             int h = img.getHeight(null);
             float scaleX = (float)rect.width/w;
@@ -130,33 +180,83 @@ public class GameView extends JComponent {
         int progress = c.getPopulation();
         int units = c.getUnitsID().size();
 
-        int sectionWidth = 10;
+        // Draw capital img + city name/ID + number of stars
+        Color col = Types.TRIBE.values()[c.getTribeId()].getColorDark();
+        String cityName = ""+cityID;
+        String production = "" + c.getProduction();
+
+        int nameWidth = 20;
+        int h = cellSize/4;
+        Rectangle nameRect = new Rectangle(j*cellSize + cellSize/2 - nameWidth/2,(i+1)*cellSize - h*3/2, nameWidth, h);
+        drawRectShadowHighlight(g, nameRect);
+        g.setColor(col);
+        g.fillRect(nameRect.x, nameRect.y, nameRect.width, nameRect.height);
+        g.setColor(Color.WHITE);
+        g.drawString(cityName, nameRect.x + nameRect.width/2 - 4*cityName.length(), nameRect.y+h-2);
+
+        // Draw number of stars
+        paintImage(g, nameRect.x + nameRect.width + shadowOffset, nameRect.y + shadowOffset, starShadow, h);
+        paintImage(g, nameRect.x + nameRect.width, nameRect.y, starImg, h);
+        drawStringShadow(g, production, nameRect.x + nameRect.width + h, nameRect.y+h-2);
+        g.setColor(Color.WHITE);
+        g.drawString(production, nameRect.x + nameRect.width + h, nameRect.y+h-2);
+
+        // Draw capital sign
+        if (c.isCapital()) {
+            paintImage(g, nameRect.x - h + shadowOffset, nameRect.y + shadowOffset, capitalShadow, h);
+            paintImage(g, nameRect.x - h, nameRect.y, capitalImg, h);
+        }
 
         // Draw level
-        g.setColor(Color.WHITE);
+        int sectionWidth = 10;
         int w = level * sectionWidth;
-        int h = cellSize/4;
-        Rectangle bgRect = new Rectangle(j*cellSize + cellSize/2 - w/2, (i+1)*cellSize - h/2, w, h);
-        g.fillRoundRect(bgRect.x, bgRect.y, bgRect.width, bgRect.height, 5, 5);
+        RoundRectangle2D bgRect = new RoundRectangle2D(j*cellSize + cellSize/2.0f - w/2.0f,
+                (i+1)*cellSize - h/2.0f, w, h, roundRectArc, roundRectArc);
+        drawRoundRectShadowHighlight(g, bgRect);
+        g.setColor(Color.WHITE);
+        g.fillRoundRect((int)bgRect.x, (int)bgRect.y, (int)bgRect.width, (int)bgRect.height,
+                (int)bgRect.arcWidth, (int)bgRect.arcHeight);
 
-        // Draw population
-        g.setColor(new Color(53, 183, 255));
+        // Draw population/progress
+        g.setColor(progressColor);
         int pw = progress * sectionWidth;
-        Rectangle pgRect = new Rectangle(bgRect.x, bgRect.y, pw, bgRect.height);
-        g.fillRoundRect(pgRect.x, pgRect.y, pgRect.width, pgRect.height, 5, 5);
+        Rectangle pgRect = new Rectangle((int)bgRect.x, (int)bgRect.y, pw, (int)bgRect.height);
+        g.fillRoundRect(pgRect.x, pgRect.y, pgRect.width, pgRect.height, (int)bgRect.arcWidth, (int)bgRect.arcHeight);
 
         // Draw unit counts
         g.setColor(Color.black);
         int radius = h/2;
-        int unitHeight = bgRect.y + h/2 - radius/2;
+        int unitHeight = (int)bgRect.y + h/2 - radius/2;
         for (int u = 0; u < units; u++) {
-            g.fillOval(bgRect.x + sectionWidth * u + sectionWidth/2 - radius/2, unitHeight, radius, radius);
+            g.fillOval((int)bgRect.x + sectionWidth * u + sectionWidth/2 - radius/2, unitHeight, radius, radius);
         }
 
+        // Draw section separations
         for (int l = 0; l < level - 1; l++) {
-            int lx = bgRect.x + sectionWidth * (l + 1);
-            g.drawLine(lx, bgRect.y, lx, bgRect.y + bgRect.height);
+            int lx = (int)bgRect.x + sectionWidth * (l + 1);
+            g.drawLine(lx, (int)bgRect.y, lx, (int)bgRect.y + (int)bgRect.height);
         }
+    }
+
+    private void drawRoundRectShadowHighlight(Graphics2D g, RoundRectangle2D rect) {
+        g.setColor(new Color(0, 0, 0, 122));
+        g.fillRoundRect((int)rect.x + shadowOffset, (int)rect.y + shadowOffset, (int)rect.width, (int)rect.height,
+                (int)rect.arcWidth, (int)rect.arcHeight);
+        g.setColor(new Color(255, 255, 255, 122));
+        g.fillRoundRect((int)rect.x - shadowOffset, (int)rect.y - shadowOffset, (int)rect.width, (int)rect.height,
+                (int)rect.arcWidth, (int)rect.arcHeight);
+    }
+
+    private void drawRectShadowHighlight(Graphics2D g, Rectangle rect) {
+        g.setColor(new Color(0, 0, 0, 122));
+        g.fillRect(rect.x + shadowOffset, rect.y + shadowOffset, rect.width, rect.height);
+        g.setColor(new Color(255, 255, 255, 122));
+        g.fillRect(rect.x - shadowOffset, rect.y - shadowOffset, rect.width, rect.height);
+    }
+
+    private void drawStringShadow (Graphics2D g, String s, int x, int y) {
+        g.setColor(new Color(0, 0, 0, 122));
+        g.drawString(s, x+shadowOffset, y+shadowOffset);
     }
 
 

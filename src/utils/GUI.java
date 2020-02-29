@@ -1,17 +1,22 @@
 package utils;
 
 import core.Constants;
+import core.Types;
 import core.actions.tribeactions.EndTurnAction;
+import core.actions.unitactions.*;
 import core.game.Game;
 import core.game.GameState;
+import core.actions.Action;
 import players.ActionController;
 import players.KeyController;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
-import static core.Constants.FRAME_DELAY;
+import static core.Types.getActionPosition;
+
 
 public class GUI extends JFrame implements Runnable {
     private JLabel appTurn;
@@ -90,7 +95,15 @@ public class GUI extends JFrame implements Runnable {
                 int x = e.getX() / Constants.CELL_SIZE;
                 int y = e.getY() / Constants.CELL_SIZE;
 
-                infoView.setHighlight(x,y);
+                // If unit highlighted and action at new click valid for unit, execute action
+                Action candidate = getActionAt(x, y, infoView.getHighlightX(), infoView.getHighlightY());
+                if (candidate != null) {
+                    ac.addAction(candidate, gs);
+                    infoView.resetHighlight();
+                } else {
+                    // Otherwise highlight new cell
+                    infoView.setHighlight(x,y);
+                }
             }
 
             @Override
@@ -206,6 +219,23 @@ public class GUI extends JFrame implements Runnable {
 
     public boolean nextMove() {
         return finishedUpdate;
+    }
+
+    /**
+     * Retrieves action at specific location given by (actionX, actionY) coordinates, to be performed by
+     * unit at coordinates (unitX, unitY).
+     */
+    private Action getActionAt(int actionX, int actionY, int unitX, int unitY) {
+//        ArrayList<Action> possibleActions = gs.getPossibleActions();  // TODO: get possible actions
+//        for (Action a: possibleActions) {
+//            // Only draw actions for highlighted unit
+//            if (a instanceof UnitAction && ((UnitAction) a).getUnit().getPosition().x == unitX
+//                    && ((UnitAction) a).getUnit().getPosition().y == unitY) {
+//                Vector2d pos = getActionPosition(a);
+//                if (pos != null && pos.x == actionX && pos.y == actionY) return a;
+//            }
+//        }
+        return null;
     }
 
     @Override

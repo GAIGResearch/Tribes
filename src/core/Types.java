@@ -1,7 +1,7 @@
 package core;
 
 import core.actions.Action;
-import core.actors.Tribe;
+import core.actions.unitactions.*;
 import core.actors.units.*;
 import utils.ImageIO;
 import utils.Vector2d;
@@ -50,17 +50,25 @@ public class Types {
     }
 
     public enum TRIBE{
-        XIN_XI(0, "Xin-Xi", TECHNOLOGY.CLIMBING, UNIT.WARRIOR),
-        IMPERIUS(1, "Imperius", TECHNOLOGY.ORGANIZATION, UNIT.WARRIOR),
-        BARDUR(2, "Bardur", TECHNOLOGY.HUNTING, UNIT.WARRIOR),
-        OUMAJI(3, "Oumaji", TECHNOLOGY.RIDING, UNIT.RIDER);
+        XIN_XI(0, "Xin-Xi", TECHNOLOGY.CLIMBING, UNIT.WARRIOR,
+                new Color(251, 2, 7), new Color(253, 130, 123), new Color(174, 66, 48)),
+        IMPERIUS(1, "Imperius", TECHNOLOGY.ORGANIZATION, UNIT.WARRIOR,
+                new Color(0, 0, 255), new Color(102, 125, 255), new Color(50, 73, 177)),
+        BARDUR(2, "Bardur", TECHNOLOGY.HUNTING, UNIT.WARRIOR,
+                new Color(76, 76, 76), new Color(176, 178, 178), new Color(70, 58, 58)),
+        OUMAJI(3, "Oumaji", TECHNOLOGY.RIDING, UNIT.RIDER,
+                new Color(255, 255, 10), new Color(242, 255, 100), new Color(146, 144, 0));
 
         private int key;
         private String name;
         private TECHNOLOGY initialTech;
         private UNIT startingUnit;
-        TRIBE(int numVal, String name, TECHNOLOGY initialTech, UNIT startingUnit) {
+        private Color color, color_light, color_dark;
+        TRIBE(int numVal, String name, TECHNOLOGY initialTech, UNIT startingUnit, Color color, Color color_light, Color color_dark) {
             this.key = numVal;  this.name = name; this.initialTech = initialTech; this.startingUnit = startingUnit;
+            this.color = color;
+            this.color_light = color_light;
+            this.color_dark = color_dark;
         }
         public int getKey() {  return key; }
         public String getName() { return name; }
@@ -68,7 +76,36 @@ public class Types {
             return initialTech;
         }
         public UNIT getStartingUnit() {return startingUnit;}
+        public Color getColor() {return color;}
+        public Color getColorLight() {return color_light;}
+        public Color getColorDark() {return color_dark;}
     }
+
+
+
+
+        /*
+         * Tribes colours as used in the unit scripts
+        0 -
+Red - FB0207
+Red_light - FD827B
+Red_dark - ae4230
+
+1 -
+Bule - 0000FF
+Blue_light - 667DFF
+Blue_dark - 3249b1
+
+2 -
+Grey - 4C4C4C
+Grey_light - B0B2B2
+Grey_dark - 463a3a
+
+3 -
+Yellow - FFFF0A
+Yellow_light - F2FF64
+Yellow_dark - 929000
+         */
 
     /**
      * Defines the status of the turn for an unit. (May be in Unit.java?)
@@ -225,6 +262,7 @@ public class Types {
         public int getKey() {  return key; }
         public Image getImage(int playerID) { return ImageIO.GetInstance().getImage(imageFile + playerID + ".png"); }
         public String getImageStr(int playerID) { return imageFile + playerID + ".png"; }
+        public String getImageFile() { return imageFile; }
         public int getCost() {
             return cost;
         }
@@ -244,31 +282,6 @@ public class Types {
             }
             return null;
         }
-
-
-        /*
-         * Tribes colours as used in the unit scripts
-        0 -
-Red - FB0207
-Red_light - FD827B
-Red_dark - ae4230
-
-1 -
-Bule - 0000FF
-Blue_light - 667DFF
-Blue_dark - 3249b1
-
-2 -
-Grey - 4C4C4C
-Grey_light - B0B2B2
-Grey_dark - 463a3a
-
-3 -
-Yellow - FFFF0A
-Yellow_light - F2FF64
-Yellow_dark - 929000
-         */
-
     }
 
 
@@ -380,4 +393,48 @@ Yellow_dark - 929000
         }
     }
 
+    public enum ACTION {
+        MOVE("img/actions/move.png"),
+        ATTACK("img/actions/attack.png"),
+        CAPTURE("img/actions/capture.png"),
+        DISBAND("img/actions/disband.png"),
+        HEAL("img/actions/heal.png"),
+        UPGRADE("img/actions/upgrade.png");
+
+        private String imgPath;
+
+        ACTION(String imgPath) {
+            this.imgPath = imgPath;
+        }
+
+        public static Image getImage(Action a) {
+            if (a instanceof Move) {
+                return ImageIO.GetInstance().getImage(MOVE.imgPath);
+            } else if (a instanceof Attack) {
+                return ImageIO.GetInstance().getImage(ATTACK.imgPath);
+            } else if (a instanceof Capture || a instanceof Convert) {
+                return ImageIO.GetInstance().getImage(CAPTURE.imgPath);
+            } else if (a instanceof Disband) {
+                return ImageIO.GetInstance().getImage(DISBAND.imgPath);
+            } else if (a instanceof Recover) {
+                return ImageIO.GetInstance().getImage(HEAL.imgPath);
+            } else if (a instanceof Upgrade) {
+                return ImageIO.GetInstance().getImage(UPGRADE.imgPath);
+            }
+            return null;
+        }
+    }
+
+    public static Vector2d getActionPosition(Action a) {
+        Vector2d pos = null;
+        if (a instanceof Move) {
+            pos = new Vector2d(((Move) a).getDestX(), ((Move) a).getDestY());
+        } else if (a instanceof Attack) {
+            pos = ((Attack) a).getTarget().getPosition();
+        } else if (a instanceof Capture || a instanceof Convert || a instanceof Disband || a instanceof Recover ||
+                a instanceof Upgrade) {
+            pos = ((UnitAction) a).getUnit().getPosition();
+        }
+        return pos;
+    }
 }

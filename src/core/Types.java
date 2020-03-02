@@ -203,18 +203,18 @@ public class Types {
      */
     public enum UNIT
     {
-        WARRIOR (0,"img/unit/warrior/", TribesConfig.WARRIOR_COST, null),
-        RIDER (1,"img/unit/rider/", TribesConfig.RIDER_COST, TECHNOLOGY.RIDING),
-        DEFENDER (2,"img/unit/defender/", TribesConfig.DEFENDER_COST, TECHNOLOGY.SHIELDS),
-        SWORDMAN (3,"img/unit/swordman/", TribesConfig.SWORDMAN_COST, TECHNOLOGY.SMITHERY),
-        ARCHER (4,"img/unit/archer/", TribesConfig.ARCHER_COST, TECHNOLOGY.ARCHERY),
-        CATAPULT (5,"img/unit/", TribesConfig.CATAPULT_COST, TECHNOLOGY.MATHEMATICS),
-        KNIGHT (6,"img/unit/knight/", TribesConfig.KNIGHT_COST, TECHNOLOGY.CHIVALRY),
-        MIND_BENDRER(7,"img/unit/mind_bender/", TribesConfig.MINDBENDER_COST, TECHNOLOGY.PHILOSOPHY),
-        BOAT(8,"img/unit/boat/", TribesConfig.BOAT_COST, TECHNOLOGY.SAILING),
-        SHIP(9,"img/unit/ship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.SAILING),
-        BATTLESHIP(10,"img/unit/battleship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.NAVIGATION),
-        SUPERUNIT(11, "img/unit/superunit/", TribesConfig.SUPERUNIT_COST, null);
+        WARRIOR (0,"img/unit/warrior/", TribesConfig.WARRIOR_COST, null), //+10
+        RIDER (1,"img/unit/rider/", TribesConfig.RIDER_COST, TECHNOLOGY.RIDING), //+15
+        DEFENDER (2,"img/unit/defender/", TribesConfig.DEFENDER_COST, TECHNOLOGY.SHIELDS), // +15
+        SWORDMAN (3,"img/unit/swordman/", TribesConfig.SWORDMAN_COST, TECHNOLOGY.SMITHERY), //+25
+        ARCHER (4,"img/unit/archer/", TribesConfig.ARCHER_COST, TECHNOLOGY.ARCHERY),//+15
+        CATAPULT (5,"img/unit/", TribesConfig.CATAPULT_COST, TECHNOLOGY.MATHEMATICS), //+40
+        KNIGHT (6,"img/unit/knight/", TribesConfig.KNIGHT_COST, TECHNOLOGY.CHIVALRY), //+40
+        MIND_BENDRER(7,"img/unit/mind_bender/", TribesConfig.MINDBENDER_COST, TECHNOLOGY.PHILOSOPHY), //+25
+        BOAT(8,"img/unit/boat/", TribesConfig.BOAT_COST, TECHNOLOGY.SAILING), //+0
+        SHIP(9,"img/unit/ship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.SAILING),//+0
+        BATTLESHIP(10,"img/unit/battleship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.NAVIGATION),//+0
+        SUPERUNIT(11, "img/unit/superunit/", TribesConfig.SUPERUNIT_COST, null); //+50
 
 
         private int key;

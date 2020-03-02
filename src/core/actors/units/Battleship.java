@@ -7,11 +7,8 @@ import static core.TribesConfig.*;
 
 public class Battleship extends Unit
 {
-    private int hp;
-
-    public Battleship(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId, int hp) {
-        super(BATTLESHIP_ATTACK, BATTLESHIP_DEFENCE, BATTLESHIP_MOVEMENT, hp, BATTLESHIP_RANGE, BATTLESHIP_COST, pos, kills, isVeteran, cityId, tribeId);
-        this.hp = hp;
+    public Battleship(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId) {
+        super(BATTLESHIP_ATTACK, BATTLESHIP_DEFENCE, BATTLESHIP_MOVEMENT, -1, BATTLESHIP_RANGE, BATTLESHIP_COST, pos, kills, isVeteran, cityId, tribeId);
     }
 
     @Override
@@ -21,7 +18,7 @@ public class Battleship extends Unit
 
     @Override
     public Battleship copy() {
-        Battleship c = new Battleship(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId(), hp);
+        Battleship c = new Battleship(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         return c;

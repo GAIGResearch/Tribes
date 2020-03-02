@@ -205,6 +205,7 @@ public class Board {
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(xF, yF);
         Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), Types.UNIT.BOAT);
+        boat.setCurrentHP(unit.getCurrentHP());
         addUnit(city, boat);
     }
 

@@ -14,8 +14,7 @@ public class City extends Actor{
     private int population_need;
     private boolean isCapital;
     private int production = 0;
-    private int points = 0;
-    private int longTermPoints = 0;
+    private int pointsPerTurn = 0;
     private boolean hasWalls = false;
 
     private LinkedList<Integer> unitsID = new LinkedList<>();
@@ -54,7 +53,7 @@ public class City extends Actor{
         population += number;
     }
 
-    public void addBuildings(Building building){
+    public void addBuilding(Building building){
         if (building.getTYPE() == WINDMILL || building.getTYPE() == SAWMILL ||
                 building.getTYPE() == FORGE || building.getTYPE() == CUSTOM_HOUSE){
             setProduction(building);
@@ -62,10 +61,7 @@ public class City extends Actor{
                 building.getTYPE() == MINE || building.getTYPE() == PORT){
             changeProduction(building);
         }else if (building.getTYPE() == TEMPLE || building.getTYPE() == WATER_TEMPLE){
-            addLongTimePoints(building.getPoints());
-            addPoints(building.getPoints());
-        }else{
-            addPoints(building.getPoints());
+            addPointsPerTurn(building.getPoints());
         }
 
         if (building.getTYPE() == CUSTOM_HOUSE){
@@ -77,17 +73,8 @@ public class City extends Actor{
         buildings.add(building);
     }
 
-
-    public void removePoints(int points) {
-        this.points -= points;
-    }
-
-    private void addPoints(int points) {
-        this.points += points;
-    }
-
-    private void addLongTimePoints(int points){
-        this.longTermPoints = points;
+    private void addPointsPerTurn(int points){
+        this.pointsPerTurn = points;
     }
 
     public void setProduction(Building building){
@@ -140,15 +127,6 @@ public class City extends Actor{
         level++;
         population = population - population_need;
         population_need = level + 1;
-        addPoints(getLevelUpPoints());
-    }
-
-
-    private int getLevelUpPoints(){
-        if (level == 1){
-            return 100;
-        }
-        return 50 - level * 5;
     }
 
 
@@ -212,9 +190,7 @@ public class City extends Actor{
 
     // Get the point for each turn
     public int getPoints() {
-        int turnPoint = points + longTermPoints;
-        points = 0;
-        return turnPoint;
+        return pointsPerTurn;
     }
 
     public LinkedList<Integer> copyUnitsID() {
@@ -265,10 +241,10 @@ public class City extends Actor{
     }
 
     public void subtractLongTermPoints(int points){
-        if (longTermPoints < points){
+        if (pointsPerTurn < points){
             System.out.println("Error in subtract Long Term Points!!! -> Destroy Temple");
         }
-        longTermPoints -= points;
+        pointsPerTurn -= points;
     }
 
     public void subtractProduction(int production){

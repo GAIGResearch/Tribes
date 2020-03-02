@@ -49,9 +49,7 @@ public class Disband extends UnitAction
             t.addStars(starsGained);
             b.removeUnitFromBoard(unit);
             b.removeUnitFromCity(unit, c);
-
-            //TODO: Need unit points to remove them when disbanding a unit
-            //c.removePoints(unit.POINTS);
+            t.subtractScore(unit.getType().getPoints());
             return true;
         }
 

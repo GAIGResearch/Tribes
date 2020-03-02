@@ -21,11 +21,6 @@ public class Sawmill extends Building {
     }
 
     @Override
-    public Types.TERRAIN getTERRAIN_CONSTRAINT() {
-        return TERRAIN_CONSTRAINT;
-    }
-
-    @Override
     public Building copy() {
         return new Sawmill(position.x, position.y, getPRODUCTION());
     }

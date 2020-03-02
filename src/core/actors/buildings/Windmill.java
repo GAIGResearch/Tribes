@@ -23,11 +23,6 @@ public class Windmill extends Building {
     }
 
     @Override
-    public Types.TERRAIN getTERRAIN_CONSTRAINT() {
-        return TERRAIN_CONSTRAINT;
-    }
-
-    @Override
     public Building copy() {
         return new Windmill(position.x, position.y, getPRODUCTION());
     }

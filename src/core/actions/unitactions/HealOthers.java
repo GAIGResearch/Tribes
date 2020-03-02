@@ -20,7 +20,6 @@ public class HealOthers extends UnitAction
         LinkedList<Action> actions = new LinkedList<>();
         HealOthers action = new HealOthers(unit);
 
-
         if(isFeasible(gs)){ actions.add(action); }
         return actions;
     }

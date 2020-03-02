@@ -32,7 +32,7 @@ public class Capture extends UnitAction
         City c = b.getCityInBorders(this.unit.getPosition().x, this.unit.getPosition().y);
         Capture capture = new Capture(this.unit);
         capture.setTargetCity(c);
-        if(isFeasible(gs)){
+        if(capture.isFeasible(gs)){
             captures.add(capture);
         }
 
@@ -44,7 +44,7 @@ public class Capture extends UnitAction
     {
         // If unit not in city, city belongs to the units tribe or if city is null then action is not feasible
         Board b = gs.getBoard();
-        if(b.getUnitAt(targetCity.getPosition().x,targetCity.getPosition().y) != null || targetCity == null)
+        if(targetCity == null || b.getUnitAt(targetCity.getPosition().x,targetCity.getPosition().y) == null)
             return false;
         else if(targetCity.getPosition().x != unit.getPosition().x || targetCity.getPosition().y !=unit.getPosition().y)
             return false;

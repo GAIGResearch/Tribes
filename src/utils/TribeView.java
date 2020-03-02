@@ -39,8 +39,8 @@ public class TribeView extends JComponent {
 
     private void paintWithGraphics(Graphics2D g)
     {
-        //For a better graphics, enable this: (be aware this could bring performance issues depending on your HW & OS).
         if (gs != null) {
+            //For a better graphics, enable this: (be aware this could bring performance issues depending on your HW & OS).
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             Tribe[] tribes = gs.getTribes();
 

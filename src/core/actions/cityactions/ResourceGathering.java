@@ -38,9 +38,9 @@ public class ResourceGathering extends CityAction
                 continue;
             ResourceGathering resource = new ResourceGathering(this.city);
             resource.setResource(r);
+            resource.targetX = pos.x;
+            resource.targetY = pos.y;
             if (resource.isFeasible(gs)) {
-                resource.targetX = pos.x;
-                resource.targetY = pos.y;
                 resources.add(resource);
             }
 
@@ -54,40 +54,40 @@ public class ResourceGathering extends CityAction
         Board b = gs.getBoard();
         Tribe t = b.getTribe(this.city.getTribeId());
         // Check if resource in range
-                if(b.getResourceAt(targetX,targetY) == this.resource){
-                    switch (this.resource){
-                        case ANIMAL:
-                            if(t.getTechTree().isResearched(Types.TECHNOLOGY.HUNTING) && t.getStars() >=2)
-                                return true;
-                            else
-                                return false;
-                        case FISH:
-                            if(t.getTechTree().isResearched(Types.TECHNOLOGY.FISHING) && t.getStars() >=2)
-                                return true;
-                            else
-                                return false;
-                        case ORE:
-                            if(t.getTechTree().isResearched(Types.TECHNOLOGY.MINING) && t.getStars() >=5)
-                                return true;
-                            else
-                                return false;
-                            case WHALES:
-                            if(t.getTechTree().isResearched(Types.TECHNOLOGY.WHALING))
-                                return true;
-                            else
-                                return false;
-                        case FRUIT:
-                            if(t.getTechTree().isResearched(Types.TECHNOLOGY.ORGANIZATION) && t.getStars() >=2)
-                                return true;
-                            else
-                                return false;
-                        case CROPS:
-                            if(t.getTechTree().isResearched(Types.TECHNOLOGY.FARMING) && t.getStars() >=2 ||t.getTechTree().isResearched(Types.TECHNOLOGY.ORGANIZATION) && t.getStars() >=2 )
-                                return true;
-                            else
-                                return false;
-                    }
-                }
+        if(b.getResourceAt(targetX,targetY) == this.resource){
+            switch (this.resource){
+                case ANIMAL:
+                    if(t.getTechTree().isResearched(Types.TECHNOLOGY.HUNTING) && t.getStars() >=2)
+                        return true;
+                    else
+                        return false;
+                case FISH:
+                    if(t.getTechTree().isResearched(Types.TECHNOLOGY.FISHING) && t.getStars() >=2)
+                        return true;
+                    else
+                        return false;
+                case ORE:
+                    if(t.getTechTree().isResearched(Types.TECHNOLOGY.MINING) && t.getStars() >=5)
+                        return true;
+                    else
+                        return false;
+                    case WHALES:
+                    if(t.getTechTree().isResearched(Types.TECHNOLOGY.WHALING))
+                        return true;
+                    else
+                        return false;
+                case FRUIT:
+                    if(t.getTechTree().isResearched(Types.TECHNOLOGY.ORGANIZATION) && t.getStars() >=2)
+                        return true;
+                    else
+                        return false;
+                case CROPS:
+                    if(t.getTechTree().isResearched(Types.TECHNOLOGY.FARMING) && t.getStars() >=2 ||t.getTechTree().isResearched(Types.TECHNOLOGY.ORGANIZATION) && t.getStars() >=2 )
+                        return true;
+                    else
+                        return false;
+            }
+        }
         return false;
     }
 

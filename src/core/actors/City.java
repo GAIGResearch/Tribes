@@ -25,7 +25,7 @@ public class City extends Actor{
     // The constructor to initial the valley
     public City(int x, int y, int tribeId) {
         this.position = new Vector2d(x,y);
-        population_need = 0;
+        population_need = 2; //level 1 requires population_need = 2
         bound = 1; //cities start with 1 tile around it for territory
         level = 1; //and starting level is 1
         isCapital = false;
@@ -75,6 +75,11 @@ public class City extends Actor{
         }
 
         buildings.add(building);
+    }
+
+
+    public void removePoints(int points) {
+        this.points -= points;
     }
 
     private void addPoints(int points) {

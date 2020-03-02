@@ -33,15 +33,26 @@ public class GameState {
     //Indicates if this tribe can end its turn.
     private boolean[] canEndTurn;
 
+    //Actions per city, unit and tribe. These are computed when computePlayerActions() is called
+    private HashMap<City, ArrayList<Action>> cityActions;
+    private HashMap<Unit, ArrayList<Action>> unitActions;
+    private ArrayList<Action> tribeActions;
 
-    //Default constructor.
-    public GameState()
-    {
-    }
+    /**
+     * This variable indicates if the computed actions in this class are updated.
+     * It will take the value of the tribeId for which the actions are computed, and -1 if they are
+     * not computed or next() is called (as that makes the computed actions obsolete).
+     */
+    private int computedActionTribeIdFlag;
 
-    //Another constructor.
+
+    //Constructor.
     public GameState(Random rnd) {
         this.rnd = rnd;
+        computedActionTribeIdFlag = -1;
+        this.cityActions = new HashMap<>();
+        this.unitActions = new HashMap<>();
+        this.tribeActions = new ArrayList<>();
     }
 
     /**
@@ -124,17 +135,21 @@ public class GameState {
     public void computePlayerActions(Tribe tribe)
     {
         this.activeTribeID = tribe.getTribeId();
-        //TODO: Compute all actions that 'tribe' can execute in this game state.
-        // This function should fill a member variable in this class that provides the actions per unit/city.
-        // It also needs to update a flag that indicates that actions are computed for this tribe in particular.
+
+        if(computedActionTribeIdFlag != -1)
+        {
+            //Actions already computed and next() hasn't been called. No need to recompute again.
+            return;
+        }
+
+        computedActionTribeIdFlag = tribe.getTribeId();
+        this.cityActions = new HashMap<>();
+        this.unitActions = new HashMap<>();
+        this.tribeActions = new ArrayList<>();
 
         ArrayList<Integer> cities = tribe.getCitiesID();
         ArrayList<Integer> allUnits = new ArrayList<>();
         CityActionBuilder cab = new CityActionBuilder();
-
-        HashMap<City, ArrayList<Action>> cityActions = new HashMap<>();
-        HashMap<Unit, ArrayList<Action>> unitActions = new HashMap<>();
-        ArrayList<Action> tribeActions = new ArrayList<>();
 
         int numCities = cities.size();
         boolean done = false;
@@ -207,6 +222,13 @@ public class GameState {
     {
         //TODO: MAIN function of this class.
         // Takes the action passed as parameter and runs it in the game.
+
+        //At least it'll have these two things:
+        if(action != null)
+        {
+            action.execute(this);
+            computedActionTribeIdFlag = -1;
+        }
     }
 
     /**
@@ -296,4 +318,26 @@ public class GameState {
     public Random getRandomGenerator() {
         return rnd;
     }
+
+
+    public HashMap<City, ArrayList<Action>> getCityActions() {
+        return cityActions;
+    }
+
+    public HashMap<Unit, ArrayList<Action>> getUnitActions() {
+        return unitActions;
+    }
+
+    public ArrayList<Action> getTribeActions() {
+        return tribeActions;
+    }
+
+    public ArrayList<Action> getCityActions(City c) {
+        return cityActions.get(c);
+    }
+
+    public ArrayList<Action> getUnitActions(Unit u) {
+        return unitActions.get(u);
+    }
+
 }

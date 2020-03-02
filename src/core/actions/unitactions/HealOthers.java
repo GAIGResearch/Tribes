@@ -16,7 +16,7 @@ public class HealOthers extends UnitAction
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         //TODO: compute all healothers actions
-        return null;
+        return new LinkedList<>();
     }
 
     @Override

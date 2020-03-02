@@ -20,7 +20,7 @@ public class Build extends CityAction
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         //TODO: compute variants for a Build action
-        return null;
+        return new LinkedList<>();
     }
 
     @Override

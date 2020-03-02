@@ -1,12 +1,19 @@
 package core.game;
 
 import core.actions.Action;
+import core.actions.cityactions.CityActionBuilder;
+import core.actions.tribeactions.TribeActionBuilder;
+import core.actions.unitactions.UnitActionBuilder;
 import core.actors.Actor;
 import core.actors.City;
 import core.actors.Tribe;
+import core.actors.units.Unit;
 import utils.IO;
 import utils.Vector2d;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Random;
 
 public class GameState {
@@ -23,15 +30,29 @@ public class GameState {
     // Player currently making a move.
     private int activeTribeID = -1;
 
+    //Indicates if this tribe can end its turn.
+    private boolean[] canEndTurn;
 
-    //Default constructor.
-    public GameState()
-    {
-    }
+    //Actions per city, unit and tribe. These are computed when computePlayerActions() is called
+    private HashMap<City, ArrayList<Action>> cityActions;
+    private HashMap<Unit, ArrayList<Action>> unitActions;
+    private ArrayList<Action> tribeActions;
 
-    //Another constructor.
+    /**
+     * This variable indicates if the computed actions in this class are updated.
+     * It will take the value of the tribeId for which the actions are computed, and -1 if they are
+     * not computed or next() is called (as that makes the computed actions obsolete).
+     */
+    private int computedActionTribeIdFlag;
+
+
+    //Constructor.
     public GameState(Random rnd) {
         this.rnd = rnd;
+        computedActionTribeIdFlag = -1;
+        this.cityActions = new HashMap<>();
+        this.unitActions = new HashMap<>();
+        this.tribeActions = new ArrayList<>();
     }
 
     /**
@@ -51,6 +72,8 @@ public class GameState {
             Vector2d cityPos = c.getPosition();
             tribe.clearView(cityPos.x, cityPos.y);
         }
+
+        canEndTurn = new boolean[tribes.length];
 
     }
 
@@ -112,10 +135,71 @@ public class GameState {
     public void computePlayerActions(Tribe tribe)
     {
         this.activeTribeID = tribe.getTribeId();
-        //TODO: Compute all actions that 'tribe' can execute in this game state.
-        // This function should fill a member variable in this class that provides the actions per unit/city.
-        // It also needs to update a flag that indicates that actions are computed for this tribe in particular.
 
+        if(computedActionTribeIdFlag != -1)
+        {
+            //Actions already computed and next() hasn't been called. No need to recompute again.
+            return;
+        }
+
+        computedActionTribeIdFlag = tribe.getTribeId();
+        this.cityActions = new HashMap<>();
+        this.unitActions = new HashMap<>();
+        this.tribeActions = new ArrayList<>();
+
+        ArrayList<Integer> cities = tribe.getCitiesID();
+        ArrayList<Integer> allUnits = new ArrayList<>();
+        CityActionBuilder cab = new CityActionBuilder();
+
+        int numCities = cities.size();
+        boolean done = false;
+        int i = 0;
+
+        while (!done && i < numCities)
+        {
+            City c = (City) board.getActor(cities.get(i));
+            ArrayList<Action> actions = cab.getActions(this, c);
+
+            if(actions.size() > 0)
+            {
+                cityActions.put(c, actions);
+            }
+
+            done = cab.cityLevelsUp();
+            if(!done)
+            {
+                //TODO: This misses the converted units that do not belong to any city. FIX!!!
+                LinkedList<Integer> unitIds = c.getUnitsID();
+                allUnits.addAll(unitIds);
+                i++;
+            }
+        }
+
+        if(done)
+        {
+            //A city is levelling up. We're done with this city.
+            canEndTurn[this.activeTribeID] = false;
+            return;
+        }else{
+            canEndTurn[this.activeTribeID] = true;
+        }
+
+        //Units!
+        UnitActionBuilder uab = new UnitActionBuilder();
+        for(Integer unitId : allUnits)
+        {
+            Unit u = (Unit) board.getActor(unitId);
+            ArrayList<Action> actions = uab.getActions(this, u);
+            if(actions.size() > 0)
+                unitActions.put(u, actions);
+        }
+
+        //This tribe
+        TribeActionBuilder tab = new TribeActionBuilder();
+        ArrayList<Action> actions = tab.getActions(this, tribe);
+        tribeActions.addAll(actions);
+
+        int a = 0;
     }
 
     /**
@@ -138,6 +222,13 @@ public class GameState {
     {
         //TODO: MAIN function of this class.
         // Takes the action passed as parameter and runs it in the game.
+
+        //At least it'll have these two things:
+        if(action != null)
+        {
+            action.execute(this);
+            computedActionTribeIdFlag = -1;
+        }
     }
 
     /**
@@ -169,8 +260,30 @@ public class GameState {
         copy.board = board.copy(playerIdx!=-1, playerIdx);
         copy.tick = this.tick;
         copy.activeTribeID = activeTribeID;
+
+        int numTribes = getTribes().length;
+        copy.canEndTurn = new boolean[numTribes];
+        for(int i = 0; i < numTribes; ++i)
+            copy.canEndTurn[i] = canEndTurn[i];
+
+
         return copy;
     }
+
+    public boolean canEndTurn(int tribeId)
+    {
+        return canEndTurn[tribeId];
+    }
+
+    /**
+     * The player has decided to end the turn
+     * @param tribeId
+     */
+    public void endTurn(int tribeId)
+    {
+        //TODO: need to manage a turn ending here.
+    }
+
 
     /**
      * Gets the tribes playing this game.
@@ -205,4 +318,26 @@ public class GameState {
     public Random getRandomGenerator() {
         return rnd;
     }
+
+
+    public HashMap<City, ArrayList<Action>> getCityActions() {
+        return cityActions;
+    }
+
+    public HashMap<Unit, ArrayList<Action>> getUnitActions() {
+        return unitActions;
+    }
+
+    public ArrayList<Action> getTribeActions() {
+        return tribeActions;
+    }
+
+    public ArrayList<Action> getCityActions(City c) {
+        return cityActions.get(c);
+    }
+
+    public ArrayList<Action> getUnitActions(Unit u) {
+        return unitActions.get(u);
+    }
+
 }

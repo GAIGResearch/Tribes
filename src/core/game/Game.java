@@ -276,7 +276,6 @@ public class Game {
         return results;
     }
 
-
     /**
      * Updates the state observations for all players with copies of the
      * current game state, adapted for PO.

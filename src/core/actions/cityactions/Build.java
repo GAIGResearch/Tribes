@@ -32,7 +32,7 @@ public class Build extends CityAction
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         LinkedList<Action> actions = new LinkedList<>();
         Board board = gs.getBoard();
-        LinkedList<Vector2d> tiles = board.getCityTiles(city.getActorID());
+        LinkedList<Vector2d> tiles = board.getCityTiles(city.getActorId());
 
         for(Vector2d tile : tiles){
             for(Types.BUILDING building: Types.BUILDING.values()){
@@ -52,7 +52,7 @@ public class Build extends CityAction
 
     @Override
     public boolean isFeasible(final GameState gs) {
-        //TODO: Add monuments
+        //TODO: Add monuments.
         Tribe tribe = gs.getTribe(city.getTribeId());
         Board board = gs.getBoard();
         TechnologyTree t = tribe.getTechTree();
@@ -60,77 +60,27 @@ public class Build extends CityAction
 
         switch (buildingType) {
             case PORT:
-                if(stars >= TribesConfig.PORT_COST && t.isResearched(Types.BUILDING.PORT.getTechnologyRequirement())){
-                    for(Types.TERRAIN goodTerrain : Types.BUILDING.PORT.getTerrainRequirements()){
-                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
-                            return false;
-                        }
-                    }
-                    return true;
-                }
+                if(isBuildable(gs, TribesConfig.PORT_COST, false)) { return true; }
             case FARM:
-                if(stars >= TribesConfig.FARM_COST && t.isResearched(Types.BUILDING.FARM.getTechnologyRequirement())){
-                    for(Types.TERRAIN goodTerrain : Types.BUILDING.FARM.getTerrainRequirements()){
-                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
-                            return false;
-                        }
-                    }
-                    return true;
-                }
+                if(isBuildable(gs, TribesConfig.FARM_COST, false)) { return true; }
             case MINE:
-                if(stars >= TribesConfig.MINE_COST && t.isResearched(Types.BUILDING.MINE.getTechnologyRequirement())){
-                    for(Types.TERRAIN goodTerrain : Types.BUILDING.MINE.getTerrainRequirements()){
-                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
-                            return false;
-                        }
-                    }
-                    return true;
-                }
+                if(isBuildable(gs, TribesConfig.MINE_COST, false)) { return true; }
             case LUMBER_HUT:
-                if(stars >= TribesConfig.LUMBER_HUT_COST && t.isResearched(Types.BUILDING.LUMBER_HUT.getTechnologyRequirement())){
-                    for(Types.TERRAIN goodTerrain : Types.BUILDING.LUMBER_HUT.getTerrainRequirements()){
-                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
-                            return false;
-                        }
-                    }
-                    return true;
-                }
+                if(isBuildable(gs, TribesConfig.LUMBER_HUT_COST, false)) { return true; }
             case TEMPLE:
-                if(stars >= TribesConfig.TEMPLE_COST && t.isResearched(Types.BUILDING.TEMPLE.getTechnologyRequirement())){
-                    for(Types.TERRAIN goodTerrain : Types.BUILDING.TEMPLE.getTerrainRequirements()){
-                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
-                            return false;
-                        }
-                    }
-                    return true;
-                }
             case WATER_TEMPLE:
-                if(stars >= TribesConfig.TEMPLE_COST && t.isResearched(Types.BUILDING.WATER_TEMPLE.getTechnologyRequirement())){
-                    for(Types.TERRAIN goodTerrain : Types.BUILDING.WATER_TEMPLE.getTerrainRequirements()){
-                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
-                            return false;
-                        }
-                    }
-                    return true;
-                }
             case MOUNTAIN_TEMPLE:
-                if(stars >= TribesConfig.TEMPLE_COST && t.isResearched(Types.BUILDING.MOUNTAIN_TEMPLE.getTechnologyRequirement())){
-                    for(Types.TERRAIN goodTerrain : Types.BUILDING.MOUNTAIN_TEMPLE.getTerrainRequirements()){
-                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
-                            return false;
-                        }
-                    }
-                    return true;
-                }
+                if(isBuildable(gs, TribesConfig.TEMPLE_COST, false)) { return true; }
             case FOREST_TEMPLE:
-                if(stars >= TribesConfig.TEMPLE_FOREST_COST && t.isResearched(Types.BUILDING.FOREST_TEMPLE.getTechnologyRequirement())){
-                    for(Types.TERRAIN goodTerrain : Types.BUILDING.FOREST_TEMPLE.getTerrainRequirements()){
-                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
-                            return false;
-                        }
-                    }
-                    return true;
-                }
+                if(isBuildable(gs, TribesConfig.TEMPLE_FOREST_COST, false)) { return true; }
+            case SAWMILL:
+                if(isBuildable(gs, TribesConfig.SAW_MILL_COST, true)) { return true; }
+            case CUSTOM_HOUSE:
+                if(isBuildable(gs, TribesConfig.CUSTOM_COST, true)) { return true; }
+            case WINDMILL:
+                if(isBuildable(gs, TribesConfig.WIND_MILL_COST, true)) { return true; }
+            case FORGE:
+                if(isBuildable(gs, TribesConfig.FORGE_COST, true)) { return true; }
         }
         return false;
     }
@@ -138,6 +88,7 @@ public class Build extends CityAction
     @Override
     public boolean execute(GameState gs) {
         //TODO: Add monuments, roads
+        //TODO: Make sure all the side effects for Buildings are counted.
         Tribe tribe = gs.getTribe(city.getTribeId());
         Board board = gs.getBoard();
 
@@ -210,5 +161,32 @@ public class Build extends CityAction
             }
         }
         return false;
+    }
+
+    private boolean isBuildable(final GameState gs, int cost, boolean checkIfUnique) {
+        Tribe tribe = gs.getTribe(city.getTribeId());
+        Board board = gs.getBoard();
+        TechnologyTree techTree = tribe.getTechTree();
+        int stars = tribe.getStars();
+
+        //Cost constraint
+        if(stars < cost) { return false; }
+
+        //Technology constraint
+        if(!techTree.isResearched(buildingType.getTechnologyRequirement())) { return false; }
+
+        //Terrain constraint
+        for(Types.TERRAIN goodTerrain : buildingType.getTerrainRequirements()) {
+            if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){ return false; }
+        }
+
+        //Uniqueness constrain
+        if(checkIfUnique) {
+            for(Vector2d tile : board.getCityTiles(city.getActorId())) {
+                if(board.getBuildingAt(tile.x, tile.y) == buildingType) { return false; }
+            }
+        }
+
+        return true;
     }
 }

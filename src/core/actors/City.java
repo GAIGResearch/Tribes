@@ -53,7 +53,7 @@ public class City extends Actor{
         population += number;
     }
 
-    public void addBuildings(Building building){
+    public void addBuilding(Building building){
         if (building.getTYPE() == WINDMILL || building.getTYPE() == SAWMILL ||
                 building.getTYPE() == FORGE || building.getTYPE() == CUSTOM_HOUSE){
             setProduction(building);

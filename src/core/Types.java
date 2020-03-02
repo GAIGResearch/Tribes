@@ -1,7 +1,5 @@
 package core;
 
-import core.actions.Action;
-import core.actors.Tribe;
 import core.actors.units.*;
 import utils.ImageIO;
 import utils.Vector2d;
@@ -234,7 +232,7 @@ public class Types {
         ARCHER (4,"img/unit/archer/", TribesConfig.ARCHER_COST, TECHNOLOGY.ARCHERY, TribesConfig.ARCHER_POINTS),//+15
         CATAPULT (5,"img/unit/", TribesConfig.CATAPULT_COST, TECHNOLOGY.MATHEMATICS, TribesConfig.CATAPULT_POINTS), //+40
         KNIGHT (6,"img/unit/knight/", TribesConfig.KNIGHT_COST, TECHNOLOGY.CHIVALRY, TribesConfig.KNIGHT_POINTS), //+40
-        MIND_BENDRER(7,"img/unit/mind_bender/", TribesConfig.MINDBENDER_COST, TECHNOLOGY.PHILOSOPHY, TribesConfig.MINDBENDER_POINTS), //+25
+        MIND_BENDER(7,"img/unit/mind_bender/", TribesConfig.MINDBENDER_COST, TECHNOLOGY.PHILOSOPHY, TribesConfig.MINDBENDER_POINTS), //+25
         BOAT(8,"img/unit/boat/", TribesConfig.BOAT_COST, TECHNOLOGY.SAILING, TribesConfig.BOAT_POINTS), //+0
         SHIP(9,"img/unit/ship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.SAILING, TribesConfig.SHIP_POINTS),//+0
         BATTLESHIP(10,"img/unit/battleship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.NAVIGATION, TribesConfig.BATTLESHIP_POINTS),//+0
@@ -273,7 +271,7 @@ public class Types {
                 case ARCHER: return new Archer(pos, kills, isVeteran, ownerID, tribeID);
                 case CATAPULT: return new Catapult(pos, kills, isVeteran, ownerID, tribeID);
                 case KNIGHT: return new Knight(pos, kills, isVeteran, ownerID, tribeID);
-                case MIND_BENDRER: return new MindBender(pos, kills, isVeteran, ownerID, tribeID);
+                case MIND_BENDER: return new MindBender(pos, kills, isVeteran, ownerID, tribeID);
                 case BOAT: return new Boat(pos, kills, isVeteran, ownerID, tribeID);
                 case SHIP: return new Ship(pos, kills, isVeteran, ownerID, tribeID);
                 case BATTLESHIP: return new Battleship(pos, kills, isVeteran, ownerID, tribeID);

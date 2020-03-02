@@ -19,6 +19,7 @@ public abstract class Unit extends Actor
     private int kills;
     private boolean isVeteran;
     private int cityID;
+    private Types.TURN_STATUS status;
 
     public Unit(int atk, int def, int mov, int max_hp, int range, int cost, Vector2d pos, int kills, boolean isVeteran, int cityID, int tribeID){
         this.ATK = atk;
@@ -34,6 +35,7 @@ public abstract class Unit extends Actor
         this.isVeteran = isVeteran;
         this.cityID = cityID;
         this.tribeId = tribeID;
+        this.status = Types.TURN_STATUS.FRESH;
     }
 
     public void setCurrentHP(int hp){
@@ -69,6 +71,10 @@ public abstract class Unit extends Actor
     }
 
     public abstract Types.UNIT getType();
+
+    public Types.TURN_STATUS getStatus() { return status; }
+
+    public void setStatus(Types.TURN_STATUS status) { this.status = status; }
 
     public abstract Unit copy();
 

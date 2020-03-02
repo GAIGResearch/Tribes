@@ -8,6 +8,8 @@ import java.util.LinkedList;
 
 public class HealOthers extends UnitAction
 {
+    private LinkedList<Unit> targets;
+
     public HealOthers(Unit healer)
     {
         super.unit = healer;
@@ -16,7 +18,9 @@ public class HealOthers extends UnitAction
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         LinkedList<Action> actions = new LinkedList<>();
-        MakeVeteran action = new MakeVeteran(unit);
+        HealOthers action = new HealOthers(unit);
+
+
         if(isFeasible(gs)){ actions.add(action); }
         return actions;
     }

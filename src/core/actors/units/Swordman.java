@@ -21,6 +21,7 @@ public class Swordman extends Unit
         Swordman c = new Swordman(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
+        c.setStatus(getStatus());
         return c;
     }
 }

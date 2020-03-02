@@ -21,6 +21,7 @@ public class Rider extends Unit
         Rider c = new Rider(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
+        c.setStatus(getStatus());
         return c;
     }
 }

@@ -24,6 +24,7 @@ public class Ship extends Unit
         Ship c = new Ship(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId(), hp);
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
+        c.setStatus(getStatus());
         return c;
     }
 }

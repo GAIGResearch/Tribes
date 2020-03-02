@@ -24,6 +24,7 @@ public class Battleship extends Unit
         Battleship c = new Battleship(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId(), hp);
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
+        c.setStatus(getStatus());
         return c;
     }
 }

@@ -2,11 +2,12 @@ package utils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sun.javafx.geom.RoundRectangle2D;
+//import com.sun.javafx.geom.RoundRectangle2D;
 import core.Types;
 import core.actions.unitactions.*;
 import core.actors.City;
@@ -215,18 +216,18 @@ public class GameView extends JComponent {
         // Draw level
         int sectionWidth = 10;
         int w = level * sectionWidth;
-        RoundRectangle2D bgRect = new RoundRectangle2D(j*cellSize + cellSize/2.0f - w/2.0f,
+        RoundRectangle2D.Double bgRect = new RoundRectangle2D.Double(j*cellSize + cellSize/2.0f - w/2.0f,
                 (i+1)*cellSize - h/2.0f, w, h, roundRectArc, roundRectArc);
         drawRoundRectShadowHighlight(g, bgRect);
         g.setColor(Color.WHITE);
         g.fillRoundRect((int)bgRect.x, (int)bgRect.y, (int)bgRect.width, (int)bgRect.height,
-                (int)bgRect.arcWidth, (int)bgRect.arcHeight);
+                roundRectArc, roundRectArc);
 
         // Draw population/progress
         g.setColor(progressColor);
         int pw = progress * sectionWidth;
         Rectangle pgRect = new Rectangle((int)bgRect.x, (int)bgRect.y, pw, (int)bgRect.height);
-        g.fillRoundRect(pgRect.x, pgRect.y, pgRect.width, pgRect.height, (int)bgRect.arcWidth, (int)bgRect.arcHeight);
+        g.fillRoundRect(pgRect.x, pgRect.y, pgRect.width, pgRect.height, roundRectArc, roundRectArc);
 
         // Draw unit counts
         g.setColor(Color.black);
@@ -243,13 +244,13 @@ public class GameView extends JComponent {
         }
     }
 
-    private void drawRoundRectShadowHighlight(Graphics2D g, RoundRectangle2D rect) {
+    private void drawRoundRectShadowHighlight(Graphics2D g, RoundRectangle2D.Double rect) {
         g.setColor(new Color(0, 0, 0, 122));
         g.fillRoundRect((int)rect.x + shadowOffset, (int)rect.y + shadowOffset, (int)rect.width, (int)rect.height,
-                (int)rect.arcWidth, (int)rect.arcHeight);
+                roundRectArc, roundRectArc);
         g.setColor(new Color(255, 255, 255, 122));
         g.fillRoundRect((int)rect.x - shadowOffset, (int)rect.y - shadowOffset, (int)rect.width, (int)rect.height,
-                (int)rect.arcWidth, (int)rect.arcHeight);
+                roundRectArc, roundRectArc);
     }
 
     private void drawRectShadowHighlight(Graphics2D g, Rectangle rect) {

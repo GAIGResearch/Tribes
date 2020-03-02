@@ -77,6 +77,11 @@ public class Test
         System.out.println(warrior.getCurrentHP());
     }
 
+    public static void testBuild()
+    {
+
+    }
+
 
     public static void main(String[] args)
     {

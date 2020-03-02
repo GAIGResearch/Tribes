@@ -8,6 +8,7 @@ import java.util.LinkedList;
 
 public class EndTurnAction extends TribeAction {
 
+    public EndTurnAction(){}
     public EndTurnAction(Tribe tribe)
     {
         this.tribe = tribe;
@@ -15,19 +16,23 @@ public class EndTurnAction extends TribeAction {
 
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
-        //TODO: compute EndTurnActions
-        return null;
+        LinkedList<Action> endTurns = new LinkedList<>();
+        if(isFeasible(gs))
+            endTurns.add(new EndTurnAction(this.tribe));
+        return endTurns;
     }
 
     @Override
     public boolean isFeasible(final GameState gs) {
-        //TODO: Check if this EndTurnAction is feasible.
-        return false;
+        return gs.canEndTurn(tribe.getTribeId());
     }
 
     @Override
     public boolean execute(GameState gs) {
-        //TODO: executes an EndTurnAction.
+        if(isFeasible(gs))
+        {
+            gs.endTurn(tribe.getTribeId());
+        }
         return false;
     }
 }

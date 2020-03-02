@@ -8,6 +8,7 @@ import utils.IO;
 import utils.Vector2d;
 
 import java.awt.*;
+import java.util.Random;
 
 public class LevelLoader
 {
@@ -22,12 +23,11 @@ public class LevelLoader
     /**
      * Builds a level, receiving a file name.
      * @param tribes tribes to play in this game
-     * @param gamelvl file name containing the level.
+     * @param lines lines containing the level
      */
-    public Board buildLevel(Tribe[] tribes, String gamelvl, long seed) {
+    public Board buildLevel(Tribe[] tribes, String[] lines, Random rnd) {
 
         Board board = new Board();
-        String[] lines = new IO().readFile(gamelvl);
 
         // Dimensions of the level read from the file.
         size.width = lines.length;
@@ -66,9 +66,8 @@ public class LevelLoader
 
                         //Also, each tribe starts with a unit in the same location where the city is
                         Types.UNIT unitType = tribes[tribeID].getType().getStartingUnit();
-                        Unit unit = Types.UNIT.createUnit(new Vector2d(i,j), 0, false, c.getActorID(), tribeID, unitType);
-                        board.addUnitToBoard(unit);
-                        board.addUnitToCity(unit, c);
+                        Unit unit = Types.UNIT.createUnit(new Vector2d(i,j), 0, false, c.getActorId(), tribeID, unitType);
+                        board.addUnit(c, unit);
 
                         tribeID++;
                     }

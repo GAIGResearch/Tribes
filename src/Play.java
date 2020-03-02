@@ -1,9 +1,8 @@
 import core.Types;
+import core.actions.Action;
 import core.game.Game;
 import core.actors.Tribe;
-import players.Agent;
-import players.DoNothingAgent;
-import players.KeyController;
+import players.*;
 
 import java.util.ArrayList;
 
@@ -15,6 +14,8 @@ public class Play {
     public static void main(String[] args) {
 
         KeyController ki = new KeyController(true);
+        ActionController ac = new ActionController();
+
         long seed = System.currentTimeMillis();
 //        String filename = "SampleLevel2p.csv";
         String filename = "SampleLevel.csv";
@@ -35,16 +36,14 @@ public class Play {
         players.add(ag3);
         tribes.add(new Tribe(Types.TRIBE.BARDUR));
 
-        Agent ag4 = new DoNothingAgent(seed);
+        Agent ag4 = new HumanAgent(ac);
         players.add(ag4);
         tribes.add(new Tribe(Types.TRIBE.OUMAJI));
-
-
 
         Game game = new Game();
         game.init(players, tribes, filename, seed);
 
-        Run.runGame(game, ki);
+        Run.runGame(game, ki, ac);
         System.out.println("Running Tribes...");
     }
 }

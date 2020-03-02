@@ -22,7 +22,7 @@ public class Sawmill extends Building {
 
     @Override
     public Building copy() {
-        return new Sawmill(getX(), getY(), getPRODUCTION());
+        return new Sawmill(position.x, position.y, getPRODUCTION());
     }
 
 

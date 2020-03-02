@@ -4,8 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 
 import core.Types;
+import core.actors.City;
 import core.actors.units.Unit;
 import core.game.Board;
+import core.game.GameState;
 
 import static core.Constants.*;
 
@@ -13,6 +15,7 @@ public class GameView extends JComponent {
 
     private int cellSize, gridSize;
     private Board board; //This only counts terrains. Needs to be enhanced with actors, resources, etc.
+    private GameState gameState;
     private Image backgroundImg;
     private InfoView infoView;
 
@@ -40,6 +43,9 @@ public class GameView extends JComponent {
 
     private void paintWithGraphics(Graphics2D g)
     {
+        if(gameState == null)
+            return;
+
         //For a better graphics, enable this: (be aware this could bring performance issues depending on your HW & OS).
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -48,52 +54,66 @@ public class GameView extends JComponent {
 
         for(int i = 0; i < gridSize; ++i) {
             for(int j = 0; j < gridSize; ++j) {
-
-                //We paint, in this order: terrain, resources, buildings and actors.
+                // We paint all base terrains, resources and buildings first
                 Types.TERRAIN t = board.getTerrainAt(i,j);
-                paintImage(g, i, j, cellSize, (t == null) ? null : t.getImage());
+                if(t == null)
+                    paintFog(g, i, j, cellSize);
+                else
+                    paintImage(g, i, j, cellSize, t.getImage());
 
                 Types.RESOURCE r = board.getResourceAt(i,j);
                 paintImage(g, i, j, cellSize, (r == null) ? null : r.getImage());
 
                 Types.BUILDING b = board.getBuildingAt(i,j);
                 paintImage(g, i, j, cellSize, (b == null) ? null : b.getImage());
-
-                Unit u = board.getUnitAt(i,j);
-                paintImage(g, i, j, cellSize, (u == null) ? null : u.getType().getImage(u.getTribeId()));
-
             }
         }
 
         //If there is a highlighted tile, highlight it.
-        int highlightedX = infoView.getHighlightX();
-        if(highlightedX != -1)
-        {
-            int highlightedY = infoView.getHighlightY();
+
+        int highlightX = infoView.getHighlightX();
+        if (highlightX != -1) {
+            int highlightY = infoView.getHighlightY();
 
             Stroke oldStroke = g.getStroke();
 
             g.setColor(Color.BLUE);
             g.setStroke(new BasicStroke(3));
 
-            g.drawRect(highlightedX*cellSize, highlightedY*cellSize, cellSize -1, cellSize -1);
+            g.drawRect(highlightX * cellSize, highlightY * cellSize, cellSize - 1, cellSize - 1);
 
             g.setStroke(oldStroke);
             g.setColor(Color.BLACK);
-
         }
 
+        for(int i = 0; i < gridSize; ++i) {
+            for(int j = 0; j < gridSize; ++j) {
+                // We then paint cities and units.
+                Types.TERRAIN t = board.getTerrainAt(i,j);
+                if (t == Types.TERRAIN.CITY) {
+                    drawCityDecorations(g, i, j);
+                }
+
+                Unit u = board.getUnitAt(i,j);
+                paintImage(g, i, j, cellSize, (u == null) ? null : u.getType().getImage(u.getTribeId()));
+            }
+        }
 
         g.setColor(Color.BLACK);
         //player.draw(g); //if we want to give control to the agent to paint something (for debug), start here.
     }
 
+    private static void paintFog(Graphics2D gphx, int i, int j, int cellSize)
+    {
+        Rectangle rect = new Rectangle(j*cellSize, i*cellSize, cellSize, cellSize);
+        gphx.setColor(Color.black);
+        gphx.fill(rect);
+    }
 
     private static void paintImage(Graphics2D gphx, int i, int j, int cellSize, Image img)
     {
         if (img != null) {
             Rectangle rect = new Rectangle(j*cellSize, i*cellSize, cellSize, cellSize);
-
             int w = img.getWidth(null);
             int h = img.getHeight(null);
             float scaleX = (float)rect.width/w;
@@ -103,14 +123,53 @@ public class GameView extends JComponent {
         }
     }
 
+    private void drawCityDecorations(Graphics2D g, int i, int j) {
+        int cityID = board.getCityIdAt(i,j);
+        City c = (City) board.getActor(cityID);
+        int level = c.getLevel();
+        int progress = c.getPopulation();
+        int units = c.getUnitsID().size();
+
+        int sectionWidth = 10;
+
+        // Draw level
+        g.setColor(Color.WHITE);
+        int w = level * sectionWidth;
+        int h = cellSize/4;
+        Rectangle bgRect = new Rectangle(j*cellSize + cellSize/2 - w/2, (i+1)*cellSize - h/2, w, h);
+        g.fillRoundRect(bgRect.x, bgRect.y, bgRect.width, bgRect.height, 5, 5);
+
+        // Draw population
+        g.setColor(new Color(53, 183, 255));
+        int pw = progress * sectionWidth;
+        Rectangle pgRect = new Rectangle(bgRect.x, bgRect.y, pw, bgRect.height);
+        g.fillRoundRect(pgRect.x, pgRect.y, pgRect.width, pgRect.height, 5, 5);
+
+        // Draw unit counts
+        g.setColor(Color.black);
+        int radius = h/2;
+        int unitHeight = bgRect.y + h/2 - radius/2;
+        for (int u = 0; u < units; u++) {
+            g.fillOval(bgRect.x + sectionWidth * u + sectionWidth/2 - radius/2, unitHeight, radius, radius);
+        }
+
+        for (int l = 0; l < level - 1; l++) {
+            int lx = bgRect.x + sectionWidth * (l + 1);
+            g.drawLine(lx, bgRect.y, lx, bgRect.y + bgRect.height);
+        }
+    }
+
 
     /**
      * Paints the board
-     * @param b board from the game
+     * @param gs current game state
      */
-    void paint(Board b)
+    void paint(GameState gs)
     {
-        this.board = b.copy();
+        //The tribe Id of which the turn gs at this point
+        //int gameTurn = 0;// gs.getTick() % gs.getTribes().length;
+        gameState = gs; //.copy(gameTurn);
+        board = gameState.getBoard();
         this.repaint();
     }
 
@@ -121,6 +180,4 @@ public class GameView extends JComponent {
     public Dimension getPreferredSize() {
         return dimension;
     }
-
-
 }

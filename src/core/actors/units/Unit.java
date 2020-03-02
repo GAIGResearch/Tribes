@@ -6,9 +6,9 @@ import utils.Vector2d;
 
 public abstract class Unit extends Actor
 {
-    public final int ATK;
-    public final int DEF;
-    public final int MOV;
+    public int ATK;
+    public int DEF;
+    public int MOV;
 
     public final int RANGE;
     public final int COST;
@@ -16,11 +16,9 @@ public abstract class Unit extends Actor
     private int maxHP;
     private int currentHP;
 
-    private Vector2d currentPosition;
     private int kills;
     private boolean isVeteran;
     private int cityID;
-    private int tribeID;
 
     public Unit(int atk, int def, int mov, int max_hp, int range, int cost, Vector2d pos, int kills, boolean isVeteran, int cityID, int tribeID){
         this.ATK = atk;
@@ -31,11 +29,11 @@ public abstract class Unit extends Actor
         this.COST = cost;
 
         this.currentHP = this.maxHP;
-        this.currentPosition = pos;
+        this.position = pos;
         this.kills = kills;
         this.isVeteran = isVeteran;
         this.cityID = cityID;
-        this.tribeID = tribeID;
+        this.tribeId = tribeID;
     }
 
     public void setCurrentHP(int hp){
@@ -48,14 +46,6 @@ public abstract class Unit extends Actor
 
     public int getCurrentHP(){
         return currentHP;
-    }
-
-    public void setCurrentPosition(Vector2d position){
-        currentPosition = position;
-    }
-
-    public Vector2d getCurrentPosition(){
-        return currentPosition;
     }
 
     public int getKills() {
@@ -76,10 +66,6 @@ public abstract class Unit extends Actor
 
     public int getCityID(){
         return cityID;
-    }
-
-    public int getTribeId(){
-        return tribeID;
     }
 
     public abstract Types.UNIT getType();

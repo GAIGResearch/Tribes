@@ -2,6 +2,7 @@ package core.actors.buildings;
 
 import core.TribesConfig;
 import core.Types;
+import core.game.Board;
 
 public class Monument extends Building{
 
@@ -10,7 +11,12 @@ public class Monument extends Building{
     }
 
     @Override
+    public boolean is_buildable(Board board) {
+        return board.getTerrainAt(position.x, position.y) == Types.TERRAIN.PLAIN || board.getTerrainAt(position.x, position.y) == Types.TERRAIN.SHALLOW_WATER;
+    }
+
+    @Override
     public Building copy() {
-        return new Monument(getX(), getY(), getTYPE());
+        return new Monument(position.x, position.y, getTYPE());
     }
 }

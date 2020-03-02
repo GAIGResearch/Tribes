@@ -24,6 +24,6 @@ public class CustomHouse extends Building {
 
     @Override
     public Building copy() {
-        return new CustomHouse(getX(), getY(), getPRODUCTION());
+        return new CustomHouse(position.x, position.y, getPRODUCTION());
     }
 }

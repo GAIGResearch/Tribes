@@ -1,32 +1,58 @@
 package core.game;
 
 import core.actions.Action;
+import core.actions.cityactions.CityActionBuilder;
+import core.actions.tribeactions.TribeActionBuilder;
+import core.actions.unitactions.UnitActionBuilder;
 import core.actors.Actor;
+import core.actors.City;
 import core.actors.Tribe;
+import core.actors.units.Unit;
+import utils.IO;
+import utils.Vector2d;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Random;
 
 public class GameState {
 
-    // Forward model for the game.
-    ForwardModel model;
-
-    // Seed for the game state.
-    private long seed;
+    // Random generator for the game state.
+    private Random rnd;
 
     // Current tick of the game.
     private int tick = 0;
 
-    //Default constructor.
-    public GameState()
-    {
-        this.model = new ForwardModel();
-    }
+    // Board of the game
+    private Board board;
 
-    //Another constructor.
-    public GameState(long seed) {
-        this.seed = seed;
-        this.model = new ForwardModel();
+    // Player currently making a move.
+    private int activeTribeID = -1;
+
+    //Indicates if this tribe can end its turn.
+    private boolean[] canEndTurn;
+
+    //Actions per city, unit and tribe. These are computed when computePlayerActions() is called
+    private HashMap<City, ArrayList<Action>> cityActions;
+    private HashMap<Unit, ArrayList<Action>> unitActions;
+    private ArrayList<Action> tribeActions;
+
+    /**
+     * This variable indicates if the computed actions in this class are updated.
+     * It will take the value of the tribeId for which the actions are computed, and -1 if they are
+     * not computed or next() is called (as that makes the computed actions obsolete).
+     */
+    private int computedActionTribeIdFlag;
+
+
+    //Constructor.
+    public GameState(Random rnd) {
+        this.rnd = rnd;
+        computedActionTribeIdFlag = -1;
+        this.cityActions = new HashMap<>();
+        this.unitActions = new HashMap<>();
+        this.tribeActions = new ArrayList<>();
     }
 
     /**
@@ -34,7 +60,21 @@ public class GameState {
      * The level is only generated when this initialization method is called.
      */
     void init(String filename, Tribe[] tribes) {
-        this.model.init(tribes, seed, filename);
+
+        String[] lines = new IO().readFile(filename);
+        LevelLoader ll = new LevelLoader();
+        board = ll.buildLevel(tribes, lines, rnd);
+
+        for(Tribe tribe : tribes)
+        {
+            int startingCityId = tribe.getCitiesID().get(0);
+            City c = (City) board.getActor(startingCityId);
+            Vector2d cityPos = c.getPosition();
+            tribe.clearView(cityPos.x, cityPos.y);
+        }
+
+        canEndTurn = new boolean[tribes.length];
+
     }
 
     /**
@@ -44,7 +84,7 @@ public class GameState {
      */
     public int addActor(Actor actor)
     {
-        return model.getBoard().addActor(actor);
+        return board.addActor(actor);
     }
 
     /**
@@ -55,7 +95,7 @@ public class GameState {
      */
     public Actor getActor(int actorId)
     {
-        return model.getBoard().getActor(actorId);
+        return board.getActor(actorId);
     }
 
     /**
@@ -65,7 +105,7 @@ public class GameState {
      */
     public boolean removeActor(int actorId)
     {
-        return model.getBoard().removeActor(actorId);
+        return board.removeActor(actorId);
     }
 
 
@@ -94,10 +134,72 @@ public class GameState {
      */
     public void computePlayerActions(Tribe tribe)
     {
-        //TODO: Compute all actions that 'tribe' can execute in this game state.
-        // This function should fill a member variable in this class that provides the actions per unit/city.
-        // It also needs to update a flag that indicates that actions are computed for this tribe in particular.
+        this.activeTribeID = tribe.getTribeId();
 
+        if(computedActionTribeIdFlag != -1)
+        {
+            //Actions already computed and next() hasn't been called. No need to recompute again.
+            return;
+        }
+
+        computedActionTribeIdFlag = tribe.getTribeId();
+        this.cityActions = new HashMap<>();
+        this.unitActions = new HashMap<>();
+        this.tribeActions = new ArrayList<>();
+
+        ArrayList<Integer> cities = tribe.getCitiesID();
+        ArrayList<Integer> allUnits = new ArrayList<>();
+        CityActionBuilder cab = new CityActionBuilder();
+
+        int numCities = cities.size();
+        boolean done = false;
+        int i = 0;
+
+        while (!done && i < numCities)
+        {
+            City c = (City) board.getActor(cities.get(i));
+            ArrayList<Action> actions = cab.getActions(this, c);
+
+            if(actions.size() > 0)
+            {
+                cityActions.put(c, actions);
+            }
+
+            done = cab.cityLevelsUp();
+            if(!done)
+            {
+                //TODO: This misses the converted units that do not belong to any city. FIX!!!
+                LinkedList<Integer> unitIds = c.getUnitsID();
+                allUnits.addAll(unitIds);
+                i++;
+            }
+        }
+
+        if(done)
+        {
+            //A city is levelling up. We're done with this city.
+            canEndTurn[this.activeTribeID] = false;
+            return;
+        }else{
+            canEndTurn[this.activeTribeID] = true;
+        }
+
+        //Units!
+        UnitActionBuilder uab = new UnitActionBuilder();
+        for(Integer unitId : allUnits)
+        {
+            Unit u = (Unit) board.getActor(unitId);
+            ArrayList<Action> actions = uab.getActions(this, u);
+            if(actions.size() > 0)
+                unitActions.put(u, actions);
+        }
+
+        //This tribe
+        TribeActionBuilder tab = new TribeActionBuilder();
+        ArrayList<Action> actions = tab.getActions(this, tribe);
+        tribeActions.addAll(actions);
+
+        int a = 0;
     }
 
     /**
@@ -118,7 +220,15 @@ public class GameState {
      */
     public void next(Action action)
     {
-        model.next(action);
+        //TODO: MAIN function of this class.
+        // Takes the action passed as parameter and runs it in the game.
+
+        //At least it'll have these two things:
+        if(action != null)
+        {
+            action.execute(this);
+            computedActionTribeIdFlag = -1;
+        }
     }
 
     /**
@@ -135,7 +245,7 @@ public class GameState {
      */
     public Board getBoard()
     {
-        return model.getBoard();
+        return board;
     }
 
     /**
@@ -144,17 +254,36 @@ public class GameState {
      * @param playerIdx player index that indicates who is this copy for.
      * @return a copy of this game state.
      */
-    GameState copy(int playerIdx)
+    public GameState copy(int playerIdx)
     {
-        //TODO: Make an exact copy of this game state.
-        // It must call model.copy() to copy the model
+        GameState copy = new GameState(new Random()); //copies of the game state can't have the same random generator.
+        copy.board = board.copy(playerIdx!=-1, playerIdx);
+        copy.tick = this.tick;
+        copy.activeTribeID = activeTribeID;
 
-        // (this code below is incomplete)
-        GameState copy = new GameState(seed);
-        copy.model = model.copy(playerIdx);
+        int numTribes = getTribes().length;
+        copy.canEndTurn = new boolean[numTribes];
+        for(int i = 0; i < numTribes; ++i)
+            copy.canEndTurn[i] = canEndTurn[i];
+
 
         return copy;
     }
+
+    public boolean canEndTurn(int tribeId)
+    {
+        return canEndTurn[tribeId];
+    }
+
+    /**
+     * The player has decided to end the turn
+     * @param tribeId
+     */
+    public void endTurn(int tribeId)
+    {
+        //TODO: need to manage a turn ending here.
+    }
+
 
     /**
      * Gets the tribes playing this game.
@@ -162,18 +291,53 @@ public class GameState {
      */
     public Tribe[] getTribes()
     {
-        return model.getTribes();
+        return board.getTribes();
     }
 
 
     /**
-     * Gets the tribe tribeID playing this game.
+     * Gets the tribe tribeId playing this game.
      * @param tribeID ID of the tribe to pick
      * @return the tribe with the ID requested
      */
     public Tribe getTribe(int tribeID)
     {
-        return getTribes()[tribeID];
+        return board.getTribes()[tribeID];
+    }
+
+    public Tribe getActiveTribe() {
+        if (activeTribeID != -1) {
+            return board.getTribe(activeTribeID);
+        } else return null;
+    }
+
+    public int getActiveTribeID() {
+        return activeTribeID;
+    }
+
+    public Random getRandomGenerator() {
+        return rnd;
+    }
+
+
+    public HashMap<City, ArrayList<Action>> getCityActions() {
+        return cityActions;
+    }
+
+    public HashMap<Unit, ArrayList<Action>> getUnitActions() {
+        return unitActions;
+    }
+
+    public ArrayList<Action> getTribeActions() {
+        return tribeActions;
+    }
+
+    public ArrayList<Action> getCityActions(City c) {
+        return cityActions.get(c);
+    }
+
+    public ArrayList<Action> getUnitActions(Unit u) {
+        return unitActions.get(u);
     }
 
 }

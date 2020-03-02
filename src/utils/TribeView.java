@@ -1,32 +1,35 @@
 package utils;
 
-import core.game.Board;
+import core.actors.Tribe;
+import core.game.GameState;
 
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
 
 
 public class TribeView extends JComponent {
 
-    private int cellSize = 15;
-    private int offsetX = 40, offsetY = 18;
-
-    /**
-     * Dimensions of the window.
-     */
     private Dimension size;
+    private JEditorPane textArea;
+    private GameState gs;
 
     TribeView()
     {
-        this.size = new Dimension(4 * (this.cellSize + offsetX), this.cellSize + offsetY);
+        this.size = new Dimension(400, 300);
 
+        textArea = new JEditorPane("text/html", "");
+        textArea.setPreferredSize(this.size);
+        Font textFont = new Font(textArea.getFont().getName(), Font.PLAIN, 12);
+        textArea.setFont(textFont);
+        textArea.setEditable(false);
+        textArea.setBackground(Color.lightGray);
+        DefaultCaret caret = (DefaultCaret)textArea.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+
+        this.setLayout(new FlowLayout());
+        this.add(textArea);
     }
-
-    TribeView(int nTribes)
-    {
-        this.size = new Dimension(nTribes * (this.cellSize + offsetX), this.cellSize + offsetY);
-    }
-
 
     public void paintComponent(Graphics gx)
     {
@@ -36,24 +39,34 @@ public class TribeView extends JComponent {
 
     private void paintWithGraphics(Graphics2D g)
     {
-        //For a better graphics, enable this: (be aware this could bring performance issues depending on your HW & OS).
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        if(gs != null)
+        {
+            //For a better graphics, enable this: (be aware this could bring performance issues depending on your HW & OS).
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            Tribe[] tribes = gs.getTribes();
 
+            String s = "";
+
+            for (Tribe t: tribes) {
+                s += "<p><b>" + t.getName() + "</b>  ...........  " + t.getScore() + " points (stars: " + t.getStars() + ")</p>";
+            }
+
+            if (!textArea.getText().equals(s)) {
+                textArea.setText(s);
+            }
+        }
     }
 
 
     /**
 
      */
-    void paint(Board b)
+    void paint(GameState gameState)
     {
+        this.gs = gameState;
         this.repaint();
     }
 
-    private void copyObjects()
-    {
-
-    }
 
     /**
      * Gets the dimensions of the window.

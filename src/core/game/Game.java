@@ -9,6 +9,7 @@ import utils.GUI;
 import utils.WindowInput;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import static core.Constants.*;
 
@@ -22,6 +23,9 @@ public class Game {
 
     // Seed for the game state.
     private long seed;
+
+    //Random number generator for the game.
+    private Random rnd;
 
     // List of players of the game
     private Agent[] players;
@@ -41,6 +45,7 @@ public class Game {
      *   Initializes the array to hold the player game states.
      *   Assigns the tribes that will play the game.
      *   Creates the board according to the above information and resets the game so it's ready to start.
+     *   Turn order: by default, turns run following the order in the tribes array.
      * @param players Players of the game.
      * @param tribes Tribes to play the game with. Players and tribes related by position in array lists.
      * @param filename Name of the file with the level information.
@@ -50,7 +55,8 @@ public class Game {
 
         //Initiate the bare bones of the main game classes
         this.seed = seed;
-        this.gs = new GameState(seed);
+        this.rnd = new Random(seed);
+        this.gs = new GameState(rnd);
 
         if(players.size() != tribes.size())
         {
@@ -133,9 +139,6 @@ public class Game {
         Types.RESULT[] results = null;
 
         while(!isEnded() || VISUALS && wi != null && !wi.windowClosed && !isEnded()) {
-            // Loop while window is still open, even if the game ended.
-            // If not playing with visuals, loop while the game's not ended.
-            tick();
 
             // Check end of game
             if (firstEnd && isEnded()) {
@@ -148,15 +151,12 @@ public class Game {
                 }
             }
 
-            // Paint game state
-            if (VISUALS && frame != null) {
-                frame.paint(getBoard());
-                try {
-                    Thread.sleep(FRAME_DELAY);
-                } catch (Exception e) {
-                    System.out.println("EXCEPTION " + e);
-                }
-            }
+//            System.out.println(gs.getTick());
+
+            // Loop while window is still open, even if the game ended.
+            // If not playing with visuals, loop while the game's not ended.
+            tick(frame);
+
         }
 
         // The loop may have been broken out of before the game ended. Handle end-of-game:
@@ -170,7 +170,7 @@ public class Game {
     /**
      * Ticks the game forward. Asks agents for actions and applies returned actions to obtain the next game state.
      */
-    void tick () {
+    void tick (GUI frame) {
         if (VERBOSE) {
             //System.out.println("tick: " + gs.getTick());
         }
@@ -180,7 +180,7 @@ public class Game {
             Tribe tribe = tribes[i];
 
             //play the full turn for this player
-            processTurn(i, tribe);
+            processTurn(i, tribe, frame);
 
             //it may be that this player won the game, no more playing.
             if(isEnded())
@@ -199,7 +199,7 @@ public class Game {
      * @param playerID ID of the player whose turn is being processed.
      * @param tribe tribe that corresponds to this player.
      */
-    void processTurn(int playerID, Tribe tribe)
+    void processTurn(int playerID, Tribe tribe, GUI frame)
     {
         //Take the player for this turn
         Agent ag = players[playerID];
@@ -224,6 +224,27 @@ public class Game {
             gs.computePlayerActions(tribe);
 
             updateAssignedGameStates();
+
+            // Update GUI after every action
+            // Paint game state
+            if (VISUALS && frame != null) {
+
+                // GUI might take several frames to update with animations,
+                // wait for that to be done before doing next update. Using thread to run the update asynchronous,
+                // while the next action is being computed
+                while (!frame.nextMove()) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (Exception e) {
+                        System.out.println("EXCEPTION " + e);
+                    }
+                }
+
+                frame.update(getGameState(-1));
+//                frame.update(getGameState(gs.getTick() % gs.getTribes().length));        //Partial Obs
+                Thread gui = new Thread(frame);
+                gui.start();
+            }
 
             //the timer needs to be updated to the remaining time, not counting action computation.
             ect.setMaxTimeMillis(remaining);
@@ -254,7 +275,6 @@ public class Game {
 
         return results;
     }
-
 
     /**
      * Updates the state observations for all players with copies of the

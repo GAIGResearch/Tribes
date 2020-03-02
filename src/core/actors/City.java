@@ -2,18 +2,16 @@ package core.actors;
 
 import core.Types;
 import core.actors.buildings.Building;
+import utils.Vector2d;
 
 import java.util.LinkedList;
+import static core.Types.BUILDING.*;
 
 public class City extends Actor{
 
-    private int tribeId;
-    private int x;
-    private int y;
     private int level;
     private int population = 0;
     private int population_need;
-    private boolean isVillage;
     private boolean isCapital;
     private int production = 0;
     private int points = 0;
@@ -26,35 +24,24 @@ public class City extends Actor{
 
     // The constructor to initial the valley
     public City(int x, int y, int tribeId) {
-        this.x = x;
-        this.y = y;
-        isVillage = true;
-        population_need = 0;
+        this.position = new Vector2d(x,y);
+        population_need = 2; //level 1 requires population_need = 2
         bound = 1; //cities start with 1 tile around it for territory
         level = 1; //and starting level is 1
         isCapital = false;
         this.tribeId = tribeId;
     }
 
-    public City(int x, int y, int level, int population, int population_need, boolean isVillage, boolean isCapital, int production, LinkedList<Building> buildings, int tribeId, LinkedList<Integer> unitsID) {
-        this.x = x;
-        this.y = y;
+    public City(int x, int y, int level, int population, int population_need, boolean isCapital, int production, LinkedList<Building> buildings, int tribeId, LinkedList<Integer> unitsID) {
+        this.position = new Vector2d(x,y);
         this.level = level;
         this.population = population;
         this.population_need = population_need;
-        this.isVillage = isVillage;
         this.isCapital = isCapital;
         this.production = production;
         this.buildings = buildings;
         this.tribeId = tribeId;
         this.unitsID = unitsID;
-    }
-
-    public void occupy(){
-        if (isVillage){
-            isVillage =false;
-            levelUp();
-        }
     }
 
     // Increase population
@@ -68,26 +55,31 @@ public class City extends Actor{
     }
 
     public void addBuildings(Building building){
-        if (building.getTYPE().equals(Types.BUILDING.WINDMILL) || building.getTYPE().equals(Types.BUILDING.SAWMILL)
-                || building.getTYPE().equals(Types.BUILDING.FORGE) || building.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
+        if (building.getTYPE() == WINDMILL || building.getTYPE() == SAWMILL ||
+                building.getTYPE() == FORGE || building.getTYPE() == CUSTOM_HOUSE){
             setProduction(building);
-        }else if (building.getTYPE().equals(Types.BUILDING.FARM) || building.getTYPE().equals(Types.BUILDING.LUMBER_HUT)
-                || building.getTYPE().equals(Types.BUILDING.MINE) || building.getTYPE().equals(Types.BUILDING.PORT)){
+        }else if (building.getTYPE() == FARM || building.getTYPE() == LUMBER_HUT ||
+                building.getTYPE() == MINE || building.getTYPE() == PORT){
             changeProduction(building);
-        }else if (building.getTYPE().equals(Types.BUILDING.TEMPLE) || building.getTYPE().equals(Types.BUILDING.WATER_TEMPLE)){
+        }else if (building.getTYPE() == TEMPLE || building.getTYPE() == WATER_TEMPLE){
             addLongTimePoints(building.getPoints());
             addPoints(building.getPoints());
         }else{
             addPoints(building.getPoints());
         }
 
-        if (building.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
+        if (building.getTYPE() == CUSTOM_HOUSE){
             addProduction(building.getPRODUCTION());
         }else {
             addPopulation(building.getPRODUCTION());
         }
 
         buildings.add(building);
+    }
+
+
+    public void removePoints(int points) {
+        this.points -= points;
     }
 
     private void addPoints(int points) {
@@ -99,13 +91,11 @@ public class City extends Actor{
     }
 
     public void setProduction(Building building){
-        int x = building.getX();
-        int y = building.getY();
+        Vector2d pos = building.getPosition();
         int production = 0;
         for(Building existBuilding: buildings){
-            int exist_x = existBuilding.getX();
-            int exist_y = existBuilding.getY();
-            if ( (exist_x >= x-1 && exist_x <= x+1) && (exist_y >= y-1 && exist_y <= y+1)){
+            Vector2d existingPos = existBuilding.getPosition();
+            if ( (existingPos.x >= pos.x-1 && existingPos.x <= pos.x+1) && (existingPos.y >= pos.y-1 && existingPos.y <= pos.y+1)){
                 if (checkMatchedBuilding(existBuilding, building)){
                     production++;
                 }
@@ -115,16 +105,14 @@ public class City extends Actor{
     }
 
     public void changeProduction(Building building){
-        int x = building.getX();
-        int y = building.getY();
+        Vector2d pos = building.getPosition();
         for(Building existBuilding: buildings){
-            int exist_x = existBuilding.getX();
-            int exist_y = existBuilding.getY();
-            if ( (exist_x >= x-1 && exist_x <= x+1) && (exist_y >= y-1 && exist_y <= y+1)){
+            Vector2d existingPos = existBuilding.getPosition();
+            if ( (existingPos.x >= pos.x-1 && existingPos.x <= pos.x+1) && (existingPos.y >= pos.y-1 && existingPos.y <= pos.y+1)){
                 if (checkMatchedBuilding(building, existBuilding)){
-                    if (existBuilding.getTYPE().equals(Types.BUILDING.FORGE)){
+                    if (existBuilding.getTYPE() == FORGE){
                         addPopulation(2);
-                    }else if(existBuilding.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE)){
+                    }else if(existBuilding.getTYPE() == CUSTOM_HOUSE){
                         addProduction(2);
                     }else{
                         addPopulation(1);
@@ -136,10 +124,10 @@ public class City extends Actor{
     }
 
     public boolean checkMatchedBuilding(Building original, Building functional){
-        return original.getTYPE().equals(Types.BUILDING.FARM) && functional.getTYPE().equals(Types.BUILDING.WINDMILL) ||
-                original.getTYPE().equals(Types.BUILDING.LUMBER_HUT) && functional.getTYPE().equals(Types.BUILDING.SAWMILL) ||
-                original.getTYPE().equals(Types.BUILDING.MINE) && functional.getTYPE().equals(Types.BUILDING.FORGE) ||
-                original.getTYPE().equals(Types.BUILDING.PORT) && functional.getTYPE().equals(Types.BUILDING.CUSTOM_HOUSE);
+        return (original.getTYPE() == FARM && functional.getTYPE() == Types.BUILDING.WINDMILL) ||
+                (original.getTYPE() == LUMBER_HUT && functional.getTYPE() == SAWMILL) ||
+                (original.getTYPE() == MINE && functional.getTYPE() == FORGE) ||
+                (original.getTYPE() == PORT && functional.getTYPE() == CUSTOM_HOUSE);
     }
 
     public boolean canLevelUp()
@@ -187,14 +175,6 @@ public class City extends Actor{
     }
 
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
     public int getLevel() {
         return level;
     }
@@ -207,9 +187,6 @@ public class City extends Actor{
         return population;
     }
 
-    public boolean isVillage() {
-        return isVillage;
-    }
 
     public boolean isCapital() {
         return isCapital;
@@ -220,17 +197,10 @@ public class City extends Actor{
         this.isCapital = isCapital;
     }
 
-
     public int getPopulation_need() {
         return population_need;
     }
 
-    public Types.TERRAIN type(){
-        if (isVillage){
-            return Types.TERRAIN.VILLAGE;
-        }
-        return Types.TERRAIN.CITY;
-    }
 
     public LinkedList<Building> copyBuildings() {
         LinkedList<Building> copyList = new LinkedList<>();
@@ -247,10 +217,6 @@ public class City extends Actor{
         return turnPoint;
     }
 
-    public int getTribeId() {
-        return tribeId;
-    }
-
     public LinkedList<Integer> copyUnitsID() {
         LinkedList<Integer> copyUnits = new LinkedList<>();
         for (Integer integer : unitsID) {
@@ -260,7 +226,7 @@ public class City extends Actor{
     }
 
     public City copy(){
-        City c = new City(x, y, level, population, population_need, isVillage, isCapital, production, copyBuildings(), tribeId, copyUnitsID());
+        City c = new City(position.x, position.y, level, population, population_need, isCapital, production, copyBuildings(), tribeId, copyUnitsID());
         c.setWalls(hasWalls);
         return c;
     }
@@ -273,15 +239,6 @@ public class City extends Actor{
     public boolean hasWalls()
     {
         return hasWalls;
-    }
-
-
-    public boolean getIsVilage(){
-        return this.isVillage;
-    }
-
-    public void setIsVillage(boolean isVillage){
-         this.isVillage = isVillage;
     }
 
     public int getBound(){
@@ -298,7 +255,7 @@ public class City extends Actor{
     public Building removeBuilding(int x, int y){
         Building removeBuilding = null;
         for(Building building :buildings){
-            if (building.getX() == x && building.getY() == y){
+            if (building.getPosition().x == x && building.getPosition().y == y){
                 buildings.remove(building);
                 removeBuilding = building;
 
@@ -321,4 +278,7 @@ public class City extends Actor{
         this.production -= production;
     }
 
+    public void setTribeId(int tribeId) {
+        this.tribeId = tribeId;
+    }
 }

@@ -140,6 +140,8 @@ public class TribesConfig
     public static int TEMPLE_PRODUCTION = 3;
     public static int TEMPLE_POINT = 100;
 
+    // ROAD
+    public static int ROAD_COST = 2;
 
     /* TRIBES */
     public static int INITIAL_STARS = 5;

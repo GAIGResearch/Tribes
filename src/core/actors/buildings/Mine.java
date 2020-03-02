@@ -19,6 +19,6 @@ public class Mine extends Building{
 
     @Override
     public Building copy() {
-        return new Mine(getX(), getY());
+        return new Mine(position.x, position.y);
     }
 }

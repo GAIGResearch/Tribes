@@ -11,6 +11,6 @@ public class Temple extends Building {
 
     @Override
     public Building copy() {
-        return new Temple(getX(), getY(), getCOST(), getTYPE());
+        return new Temple(position.x, position.y);
     }
 }

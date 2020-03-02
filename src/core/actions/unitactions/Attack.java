@@ -1,8 +1,10 @@
 package core.actions.unitactions;
 
 import core.actions.Action;
+import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
+import utils.Vector2d;
 
 import java.util.LinkedList;
 
@@ -22,20 +24,59 @@ public class Attack extends UnitAction
 
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
-        //TODO compute all the attack actions for super.unit.
-        return null;
+
+        LinkedList<Action> attacks = new LinkedList<>();
+        Board b = gs.getBoard();
+        boolean[][] obsGrid = b.getTribe(this.unit.getTribeId()).getObsGrid();
+        Vector2d position = unit.getPosition();
+
+        // Loop through unit range, check if tile observable and action feasible, if so add action
+        for(int i = position.x - this.unit.RANGE; i <= position.x + this.unit.RANGE; i++) {
+            for (int j = position.y - this.unit.RANGE; j <= position.y + this.unit.RANGE; j++) {
+
+                //Not attacking itself
+                if(i != position.x || j != position.y) {
+                    Attack a = new Attack(this.unit);
+                    a.setTarget(b.getUnitAt(i, j));
+                    if (!obsGrid[i][j]) {
+                        continue;
+                    }
+                    if (a.isFeasible(gs)) {
+                        attacks.add(a);
+                    }
+                }
+            }
+        }
+        return attacks;
     }
 
     @Override
     public boolean isFeasible(final GameState gs)
     {
-        //TODO check if this action is feasible.
-        return false;
+        // Check if target is not null
+        if(target == null)
+            return false;
+
+        return true;
     }
 
     @Override
     public boolean execute(GameState gs) {
-        //TODO execute the atack action in the game.
+        //Check if action is feasible before execution
+        if(isFeasible(gs)) {
+            float attackForce =this.unit.ATK*((float)this.unit.getCurrentHP()/this.unit.getMaxHP());
+            float defenceForce =target.DEF*((float)target.getCurrentHP()/target.getMaxHP());
+            float accelerator = 4.5f;
+            float totalDamage =attackForce+defenceForce;
+            int attackResult = Math.round((attackForce/totalDamage)*this.unit.ATK*accelerator);
+            if (target.getCurrentHP() <= attackResult) {
+                unit.addKill();
+                target = null;
+            } else {
+                target.setCurrentHP(target.getCurrentHP() - attackResult);
+            }
+            return true;
+        }
         return false;
     }
 }

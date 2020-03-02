@@ -13,13 +13,14 @@ public class MindBender extends Unit
 
     @Override
     public Types.UNIT getType() {
-        return Types.UNIT.MIND_BEARER;
+        return Types.UNIT.MIND_BENDRER;
     }
 
     @Override
     public MindBender copy() {
-        MindBender c = new MindBender(getCurrentPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
+        MindBender c = new MindBender(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
         c.setCurrentHP(getCurrentHP());
+        c.setActorId(getActorId());
         return c;
     }
 }

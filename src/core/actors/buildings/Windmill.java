@@ -24,7 +24,7 @@ public class Windmill extends Building {
 
     @Override
     public Building copy() {
-        return new Windmill(getX(), getY(), getPRODUCTION());
+        return new Windmill(position.x, position.y, getPRODUCTION());
     }
 
 

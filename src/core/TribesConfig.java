@@ -11,6 +11,7 @@ public class TribesConfig
     public static int WARRIOR_MAX_HP = 10;
     public static int WARRIOR_RANGE = 1;
     public static int WARRIOR_COST = 2;
+    public static int WARRIOR_POINTS = 10;
 
     //Archer
     public static int ARCHER_ATTACK = 2;
@@ -19,6 +20,7 @@ public class TribesConfig
     public static int ARCHER_MAX_HP = 10;
     public static int ARCHER_RANGE = 2;
     public static int ARCHER_COST = 3;
+    public static int ARCHER_POINTS = 15;
 
     //Catapult
     public static int CATAPULT_ATTACK = 4;
@@ -27,6 +29,7 @@ public class TribesConfig
     public static int CATAPULT_MAX_HP = 10;
     public static int CATAPULT_RANGE = 3;
     public static int CATAPULT_COST = 8;
+    public static int CATAPULT_POINTS = 40;
 
     //Swordman
     public static int SWORDMAN_ATTACK = 3;
@@ -35,6 +38,7 @@ public class TribesConfig
     public static int SWORDMAN_MAX_HP = 15;
     public static int SWORDMAN_RANGE = 1;
     public static int SWORDMAN_COST = 5;
+    public static int SWORDMAN_POINTS = 25;
 
     //MindBender
     public static int MINDBENDER_ATTACK = 0;
@@ -43,6 +47,7 @@ public class TribesConfig
     public static int MINDBENDER_MAX_HP = 10;
     public static int MINDBENDER_RANGE = 1;
     public static int MINDBENDER_COST = 5;
+    public static int MINDBENDER_POINTS = 25;
 
     //Defender
     public static int DEFENDER_ATTACK = 1;
@@ -51,6 +56,7 @@ public class TribesConfig
     public static int DEFENDER_MAX_HP = 15;
     public static int DEFENDER_RANGE = 1;
     public static int DEFENDER_COST = 3;
+    public static int DEFENDER_POINTS = 15;
 
     //Knight
     public static int KNIGHT_ATTACK = 4;
@@ -59,6 +65,7 @@ public class TribesConfig
     public static int KNIGHT_MAX_HP = 15;
     public static int KNIGHT_RANGE = 1;
     public static int KNIGHT_COST = 8;
+    public static int KNIGHT_POINTS = 40;
 
     //Rider
     public static int RIDER_ATTACK = 2;
@@ -67,6 +74,7 @@ public class TribesConfig
     public static int RIDER_MAX_HP = 10;
     public static int RIDER_RANGE = 1;
     public static int RIDER_COST = 3;
+    public static int RIDER_POINTS = 15;
 
     // Boat
     public static int BOAT_ATTACK = 1;
@@ -74,6 +82,7 @@ public class TribesConfig
     public static int BOAT_MOVEMENT = 2;
     public static int BOAT_RANGE = 2;
     public static int BOAT_COST = 0;
+    public static int BOAT_POINTS = 0;
 
     // Ship
     public static int SHIP_ATTACK = 2;
@@ -81,6 +90,7 @@ public class TribesConfig
     public static int SHIP_MOVEMENT = 3;
     public static int SHIP_RANGE = 2;
     public static int SHIP_COST = 5;
+    public static int SHIP_POINTS = 0;
 
     // Battleship
     public static int BATTLESHIP_ATTACK = 4;
@@ -88,6 +98,7 @@ public class TribesConfig
     public static int BATTLESHIP_MOVEMENT = 3;
     public static int BATTLESHIP_RANGE = 2;
     public static int BATTLESHIP_COST = 15;
+    public static int BATTLESHIP_POINTS = 0;
 
     //Superunit
     public static int SUPERUNIT_ATTACK = 5;
@@ -96,6 +107,7 @@ public class TribesConfig
     public static int SUPERUNIT_MAX_HP = 40;
     public static int SUPERUNIT_RANGE = 1;
     public static int SUPERUNIT_COST = 10; //Useful for when unit is disbanded.
+    public static int SUPERUNIT_POINTS = 50;
 
     //Explorer
     public static int NUM_STEPS = 15;

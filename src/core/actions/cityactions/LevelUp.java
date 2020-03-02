@@ -42,12 +42,15 @@ public class LevelUp extends CityAction {
 
     @Override
     public boolean isFeasible(GameState gs) {
-        return city.canLevelUp();
+        return city.canLevelUp() && bonus.validType(city.getLevel());
     }
 
     @Override
     public boolean execute(GameState gs) {
 
+        if(!isFeasible(gs))
+            return false;
+        Tribe tribe = gs.getBoard().getTribe(city.getTribeId());
         Vector2d cityPos = city.getPosition();
 
         switch(bonus)
@@ -56,14 +59,12 @@ public class LevelUp extends CityAction {
                 city.addProduction(1);
                 break;
             case EXPLORER:
-
                 gs.getBoard().launchExplorer(cityPos.x, cityPos.y, city.getTribeId(), gs.getRandomGenerator());
                 break;
             case CITY_WALL:
                 city.setWalls(true);
                 break;
             case RESOURCES:
-                Tribe tribe = gs.getBoard().getTribe(city.getTribeId());
                 tribe.addStars(5);
                 break;
             case POP_GROWTH:
@@ -73,25 +74,21 @@ public class LevelUp extends CityAction {
                 gs.getBoard().expandBorder(city);
                 break;
             case PARK:
-                tribe = gs.getBoard().getTribe(city.getTribeId());
                 tribe.addScore(250);
                 break;
             case SUPERUNIT:
-
                 Unit unitInCity = gs.getBoard().getUnitAt(cityPos.x, cityPos.y);
-
-                //This can probably be encapsulated
                 Unit superUnit = Types.UNIT.createUnit(cityPos, 0, false, city.getActorId(), city.getTribeId(), Types.UNIT.SUPERUNIT);
                 gs.getBoard().addUnit(city, superUnit);
 
                 if(unitInCity != null)
-                {
                     gs.getBoard().pushUnit(unitInCity.getTribeId(), unitInCity, cityPos.x, cityPos.y);
-                }
 
                 break;
         }
 
+        tribe.addScore(bonus.getLevelUpPoints());
+        city.levelUp();
 
         return true;
     }

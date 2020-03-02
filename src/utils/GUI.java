@@ -4,6 +4,7 @@ import core.Constants;
 import core.Types;
 import core.actions.tribeactions.EndTurnAction;
 import core.actions.unitactions.*;
+import core.actors.units.Unit;
 import core.game.Game;
 import core.game.GameState;
 import core.actions.Action;
@@ -14,6 +15,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static core.Types.getActionPosition;
 
@@ -226,15 +229,19 @@ public class GUI extends JFrame implements Runnable {
      * unit at coordinates (unitX, unitY).
      */
     private Action getActionAt(int actionX, int actionY, int unitX, int unitY) {
-//        ArrayList<Action> possibleActions = gs.getPossibleActions();  // TODO: get possible actions
-//        for (Action a: possibleActions) {
-//            // Only draw actions for highlighted unit
-//            if (a instanceof UnitAction && ((UnitAction) a).getUnit().getPosition().x == unitX
-//                    && ((UnitAction) a).getUnit().getPosition().y == unitY) {
-//                Vector2d pos = getActionPosition(a);
-//                if (pos != null && pos.x == actionX && pos.y == actionY) return a;
-//            }
-//        }
+        HashMap<Unit, ArrayList<Action>> possibleActions = gs.getUnitActions();
+        for (Map.Entry<Unit, ArrayList<Action>> e: possibleActions.entrySet()) {
+            Unit u = e.getKey();
+
+            // Only draw actions for highlighted unit
+            if (u.getPosition().x == unitX && u.getPosition().y == unitY) {
+                for (Action a: e.getValue()) {
+                    Vector2d pos = getActionPosition(a);
+                    if (pos != null && pos.x == actionX && pos.y == actionY) return a;
+                }
+                return null;
+            }
+        }
         return null;
     }
 

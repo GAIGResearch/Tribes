@@ -3,6 +3,8 @@ package utils;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.sun.javafx.geom.RoundRectangle2D;
 import core.Types;
@@ -131,23 +133,26 @@ public class GameView extends JComponent {
             }
         }
 
-        // Draw actions
-//        ArrayList<Action> possibleActions = gameState.getPossibleActions();  // TODO: get possible actions
-//        for (Action a: possibleActions) {
-//            // Only draw actions for highlighted unit
-//            if (a instanceof UnitAction && ((UnitAction) a).getUnit().getPosition().x == highlightX
-//                    && ((UnitAction) a).getUnit().getPosition().y == highlightY) {
-//                Image actionImg = Types.ACTION.getImage(a);
-//
-//                if (actionImg != null) {
-//                    Vector2d pos = getActionPosition(a);
-//
-//                    if (pos != null) {
-//                        paintImage(g, pos.x * cellSize, pos.y + cellSize, actionImg, cellSize);
-//                    }
-//                }
-//            }
-//        }
+        // Draw unit actions
+        HashMap<Unit, ArrayList<Action>> possibleActions = gameState.getUnitActions();
+        for (Map.Entry<Unit, ArrayList<Action>> e: possibleActions.entrySet()) {
+            Unit u = e.getKey();
+
+            // Only draw actions for highlighted unit
+            if (u.getPosition().x == highlightX && u.getPosition().y == highlightY) {
+                for (Action a: e.getValue()) {
+                    Image actionImg = Types.ACTION.getImage(a);
+
+                    if (actionImg != null) {
+                        Vector2d pos = getActionPosition(a);
+
+                        if (pos != null) {
+                            paintImage(g, pos.x * cellSize, pos.y + cellSize, actionImg, cellSize);
+                        }
+                    }
+                }
+            }
+        }
 
         g.setColor(Color.BLACK);
         //player.draw(g); //if we want to give control to the agent to paint something (for debug), start here.

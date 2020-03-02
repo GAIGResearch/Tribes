@@ -31,15 +31,19 @@ public class Build extends CityAction
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         LinkedList<Action> actions = new LinkedList<>();
-        LinkedList<Vector2d> tiles = gs.getBoard().getCityTiles(city.getActorID());
+        Board board = gs.getBoard();
+        LinkedList<Vector2d> tiles = board.getCityTiles(city.getActorID());
 
         for(Vector2d tile : tiles){
             for(Types.BUILDING building: Types.BUILDING.values()){
-                Build action = new Build(city);
-                action.setBuildingType(building);
-                action.targetPos = tile;
-                if(action.isFeasible(gs)){
-                    actions.add(action);
+                //check if tile is empty
+                if(board.getBuildingAt(tile.x, tile.y) == null) {
+                    Build action = new Build(city);
+                    action.setBuildingType(building);
+                    action.targetPos = tile;
+                    if (action.isFeasible(gs)) {
+                        actions.add(action);
+                    }
                 }
             }
         }
@@ -48,17 +52,92 @@ public class Build extends CityAction
 
     @Override
     public boolean isFeasible(final GameState gs) {
-        //TODO: Is feasible to build
-        //Use is_buildable in Building?
+        //TODO: Add monuments
         Tribe tribe = gs.getTribe(city.getTribeId());
+        Board board = gs.getBoard();
         TechnologyTree t = tribe.getTechTree();
         int stars = tribe.getStars();
+
+        switch (buildingType) {
+            case PORT:
+                if(stars >= TribesConfig.PORT_COST && t.isResearched(Types.BUILDING.PORT.getTechnologyRequirement())){
+                    for(Types.TERRAIN goodTerrain : Types.BUILDING.PORT.getTerrainRequirements()){
+                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            case FARM:
+                if(stars >= TribesConfig.FARM_COST && t.isResearched(Types.BUILDING.FARM.getTechnologyRequirement())){
+                    for(Types.TERRAIN goodTerrain : Types.BUILDING.FARM.getTerrainRequirements()){
+                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            case MINE:
+                if(stars >= TribesConfig.MINE_COST && t.isResearched(Types.BUILDING.MINE.getTechnologyRequirement())){
+                    for(Types.TERRAIN goodTerrain : Types.BUILDING.MINE.getTerrainRequirements()){
+                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            case LUMBER_HUT:
+                if(stars >= TribesConfig.LUMBER_HUT_COST && t.isResearched(Types.BUILDING.LUMBER_HUT.getTechnologyRequirement())){
+                    for(Types.TERRAIN goodTerrain : Types.BUILDING.LUMBER_HUT.getTerrainRequirements()){
+                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            case TEMPLE:
+                if(stars >= TribesConfig.TEMPLE_COST && t.isResearched(Types.BUILDING.TEMPLE.getTechnologyRequirement())){
+                    for(Types.TERRAIN goodTerrain : Types.BUILDING.TEMPLE.getTerrainRequirements()){
+                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            case WATER_TEMPLE:
+                if(stars >= TribesConfig.TEMPLE_COST && t.isResearched(Types.BUILDING.WATER_TEMPLE.getTechnologyRequirement())){
+                    for(Types.TERRAIN goodTerrain : Types.BUILDING.WATER_TEMPLE.getTerrainRequirements()){
+                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            case MOUNTAIN_TEMPLE:
+                if(stars >= TribesConfig.TEMPLE_COST && t.isResearched(Types.BUILDING.MOUNTAIN_TEMPLE.getTechnologyRequirement())){
+                    for(Types.TERRAIN goodTerrain : Types.BUILDING.MOUNTAIN_TEMPLE.getTerrainRequirements()){
+                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            case FOREST_TEMPLE:
+                if(stars >= TribesConfig.TEMPLE_FOREST_COST && t.isResearched(Types.BUILDING.FOREST_TEMPLE.getTechnologyRequirement())){
+                    for(Types.TERRAIN goodTerrain : Types.BUILDING.FOREST_TEMPLE.getTerrainRequirements()){
+                        if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+        }
         return false;
     }
 
     @Override
     public boolean execute(GameState gs) {
-        //TODO: Executes the action
+        //TODO: Add monuments, roads
         Tribe tribe = gs.getTribe(city.getTribeId());
         Board board = gs.getBoard();
 
@@ -127,7 +206,7 @@ public class Build extends CityAction
                     board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.CUSTOM_HOUSE);
                     city.addBuildings(new CustomHouse(targetPos.x, targetPos.y));
                     return true;
-                //What about monuments and special buildings? missing objects and from addBuildings
+                //Ask Judy to add monuments to addBuildings.
             }
         }
         return false;

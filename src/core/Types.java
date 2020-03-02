@@ -147,6 +147,8 @@ public class Types {
             this.technologyRequirement = technologyRequirement;
             this.terrainRequirements = terrainRequirements;
         }
+        public TECHNOLOGY getTechnologyRequirement() { return technologyRequirement; }
+        public TERRAIN[] getTerrainRequirements() { return terrainRequirements; }
         public int getKey() {  return key; }
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
     }

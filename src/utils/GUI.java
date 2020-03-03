@@ -234,10 +234,10 @@ public class GUI extends JFrame implements Runnable {
             Unit u = e.getKey();
 
             // Only draw actions for highlighted unit
-            if (u.getPosition().x == unitX && u.getPosition().y == unitY) {
+            if (u.getPosition().x == unitY && u.getPosition().y == unitX) {
                 for (Action a: e.getValue()) {
                     Vector2d pos = getActionPosition(a);
-                    if (pos != null && pos.x == actionX && pos.y == actionY) return a;
+                    if (pos != null && pos.x == actionY && pos.y == actionX) return a;
                 }
                 return null;
             }

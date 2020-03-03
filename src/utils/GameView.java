@@ -137,7 +137,7 @@ public class GameView extends JComponent {
             Unit u = e.getKey();
 
             // Only draw actions for highlighted unit
-            if (u.getPosition().x == highlightX && u.getPosition().y == highlightY) {
+            if (u.getPosition().x == highlightY && u.getPosition().y == highlightX) {
                 for (Action a: e.getValue()) {
                     Image actionImg = Types.ACTION.getImage(a);
 
@@ -145,7 +145,7 @@ public class GameView extends JComponent {
                         Vector2d pos = getActionPosition(a);
 
                         if (pos != null) {
-                            paintImage(g, pos.x * cellSize, pos.y + cellSize, actionImg, cellSize);
+                            paintImage(g, pos.y * cellSize, pos.x * cellSize, actionImg, cellSize);
                         }
                     }
                 }

@@ -152,36 +152,42 @@ Yellow_dark - 929000
      */
     public enum BUILDING
     {
-        PORT (0,"img/building/port.png", TECHNOLOGY.SAILING),
-        MINE (1,"img/building/mine.png", TECHNOLOGY.MINING),
-        FORGE (2,"img/building/forge.png", TECHNOLOGY.SMITHERY),
-        FARM (3, "img/building/farm.png", TECHNOLOGY.FARMING),
-        WINDMILL (4,"img/building/windmill.png", TECHNOLOGY.CONSTRUCTION),
-        ROAD (5,"none.png", TECHNOLOGY.ROADS),
-        CUSTOM_HOUSE (6,"img/building/custom_house.png", TECHNOLOGY.TRADE),
-        LUMBER_HUT(7,"img/building/lumner_hut.png", TECHNOLOGY.FORESTRY),
-        SAWMILL (8,"img/building/sawmill.png", TECHNOLOGY.MATHEMATICS),
-        TEMPLE (9, "img/building/temple.png", TECHNOLOGY.FREE_SPIRIT),
-        WATER_TEMPLE (10,"img/building/temple.png", TECHNOLOGY.AQUATISM),
-        FOREST_TEMPLE (11,"img/building/temple.png", TECHNOLOGY.SPIRITUALISM),
-        MOUNTAIN_TEMPLE (12,"img/building/temple.png", TECHNOLOGY.MEDITATION),
-        ALTAR_OF_PEACE (13,"img/building/monument.png", null),
-        EMPERORS_TOMB (14,"img/building/monument.png", null),
-        EYE_OF_GOD (15,"img/building/monument.png", null),
-        GATE_OF_POWER (16,"img/building/monument.png", null),
-        GRAND_BAZAR (17,"img/building/monument.png", null),
-        PARK_OF_FORTUNE (18,"img/building/monument.png", null),
-        TOWER_OF_WISDOM (19, "img/building/monument.png", null);
+        PORT (0,"img/building/port.png", TECHNOLOGY.SAILING, new TERRAIN[]{TERRAIN.SHALLOW_WATER}),
+        MINE (1,"img/building/mine.png", TECHNOLOGY.MINING, new TERRAIN[]{TERRAIN.MOUNTAIN}),
+        FORGE (2,"img/building/forge.png", TECHNOLOGY.SMITHERY, new TERRAIN[]{TERRAIN.PLAIN}),
+        FARM (3, "img/building/farm.png", TECHNOLOGY.FARMING, new TERRAIN[]{TERRAIN.PLAIN}),
+        WINDMILL (4,"img/building/windmill.png", TECHNOLOGY.CONSTRUCTION, new TERRAIN[]{TERRAIN.PLAIN}),
+        ROAD (5,"none.png", TECHNOLOGY.ROADS, new TERRAIN[]{TERRAIN.PLAIN, TERRAIN.FOREST}),
+        CUSTOM_HOUSE (6,"img/building/custom_house.png", TECHNOLOGY.TRADE, new TERRAIN[]{TERRAIN.PLAIN}),
+        LUMBER_HUT(7,"img/building/lumner_hut.png", TECHNOLOGY.MATHEMATICS, new TERRAIN[]{TERRAIN.FOREST}),
+        SAWMILL (8,"img/building/sawmill.png", TECHNOLOGY.MATHEMATICS, new TERRAIN[]{TERRAIN.PLAIN}),
+        TEMPLE (9, "img/building/temple.png", TECHNOLOGY.FREE_SPIRIT, new TERRAIN[]{TERRAIN.PLAIN}),
+        WATER_TEMPLE (10,"img/building/temple.png", TECHNOLOGY.AQUATISM, new TERRAIN[]{TERRAIN.SHALLOW_WATER, TERRAIN.DEEP_WATER}),
+        FOREST_TEMPLE (11,"img/building/temple.png", TECHNOLOGY.SPIRITUALISM, new TERRAIN[]{TERRAIN.FOREST}),
+        MOUNTAIN_TEMPLE (12,"img/building/temple.png", TECHNOLOGY.MEDITATION, new TERRAIN[]{TERRAIN.MOUNTAIN}),
+        ALTAR_OF_PEACE (13,"img/building/monument.png", null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        EMPERORS_TOMB (14,"img/building/monument.png", TECHNOLOGY.TRADE, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        EYE_OF_GOD (15,"img/building/monument.png", TECHNOLOGY.NAVIGATION, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        GATE_OF_POWER (16,"img/building/monument.png", null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        GRAND_BAZAR (17,"img/building/monument.png", TECHNOLOGY.ROADS, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        PARK_OF_FORTUNE (18,"img/building/monument.png", null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        TOWER_OF_WISDOM (19, "img/building/monument.png", TECHNOLOGY.PHILOSOPHY, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN});
 
         private int key;
         private String imageFile;
-        private TECHNOLOGY requirement;
-        BUILDING(int numVal, String imageFile, Types.TECHNOLOGY requirement) {  this.key = numVal;  this.imageFile = imageFile; this.requirement = requirement;}
+        private TECHNOLOGY technologyRequirement;
+        private TERRAIN[] terrainRequirements;
+        BUILDING(int numVal, String imageFile, TECHNOLOGY technologyRequirement, TERRAIN[] terrainRequirements)
+        {
+            this.key = numVal;
+            this.imageFile = imageFile;
+            this.technologyRequirement = technologyRequirement;
+            this.terrainRequirements = terrainRequirements;
+        }
+        public TECHNOLOGY getTechnologyRequirement() { return technologyRequirement; }
+        public TERRAIN[] getTerrainRequirements() { return terrainRequirements; }
         public int getKey() {  return key; }
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
-        public TECHNOLOGY getRequirement() {
-            return requirement;
-        }
     }
 
     /**
@@ -201,6 +207,7 @@ Yellow_dark - 929000
         private int level;
 
         CITY_LEVEL_UP(int level) {
+            this.level = level;
         }
 
         public int getLevel() { return level; }
@@ -232,6 +239,23 @@ Yellow_dark - 929000
             }
             return actions;
         }
+
+        public boolean validType(int cityLevel)
+        {
+            if(cityLevel == 1 && (this == WORKSHOP || this == EXPLORER)) return true;
+            if(cityLevel == 2 && (this == CITY_WALL || this == RESOURCES)) return true;
+            if(cityLevel == 3 && (this == POP_GROWTH || this == BORDER_GROWTH)) return true;
+            if(cityLevel >= 4 && (this == PARK || this == SUPERUNIT)) return true;
+            return false;
+        }
+
+        public int getLevelUpPoints(){
+            //TODO: What happens when level > 10? Negative points? Unlikely!
+            if (level == 1){
+                return 100;
+            }
+            return 50 - level * 5;
+        }
     }
 
 
@@ -240,25 +264,31 @@ Yellow_dark - 929000
      */
     public enum UNIT
     {
-        WARRIOR (0,"img/unit/warrior/", TribesConfig.WARRIOR_COST, null),
-        RIDER (1,"img/unit/rider/", TribesConfig.RIDER_COST, TECHNOLOGY.RIDING),
-        DEFENDER (2,"img/unit/defender/", TribesConfig.DEFENDER_COST, TECHNOLOGY.SHIELDS),
-        SWORDMAN (3,"img/unit/swordman/", TribesConfig.SWORDMAN_COST, TECHNOLOGY.SMITHERY),
-        ARCHER (4,"img/unit/archer/", TribesConfig.ARCHER_COST, TECHNOLOGY.ARCHERY),
-        CATAPULT (5,"img/unit/", TribesConfig.CATAPULT_COST, TECHNOLOGY.MATHEMATICS),
-        KNIGHT (6,"img/unit/knight/", TribesConfig.KNIGHT_COST, TECHNOLOGY.CHIVALRY),
-        MIND_BENDRER(7,"img/unit/mind_bender/", TribesConfig.MINDBENDER_COST, TECHNOLOGY.PHILOSOPHY),
-        BOAT(8,"img/unit/boat/", TribesConfig.BOAT_COST, TECHNOLOGY.SAILING),
-        SHIP(9,"img/unit/ship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.SAILING),
-        BATTLESHIP(10,"img/unit/battleship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.NAVIGATION),
-        SUPERUNIT(11, "img/unit/superunit/", TribesConfig.SUPERUNIT_COST, null);
-
+        WARRIOR (0,"img/unit/warrior/", TribesConfig.WARRIOR_COST, null, TribesConfig.WARRIOR_POINTS), //+10
+        RIDER (1,"img/unit/rider/", TribesConfig.RIDER_COST, TECHNOLOGY.RIDING, TribesConfig.RIDER_POINTS), //+15
+        DEFENDER (2,"img/unit/defender/", TribesConfig.DEFENDER_COST, TECHNOLOGY.SHIELDS, TribesConfig.DEFENDER_POINTS), // +15
+        SWORDMAN (3,"img/unit/swordman/", TribesConfig.SWORDMAN_COST, TECHNOLOGY.SMITHERY, TribesConfig.SWORDMAN_POINTS), //+25
+        ARCHER (4,"img/unit/archer/", TribesConfig.ARCHER_COST, TECHNOLOGY.ARCHERY, TribesConfig.ARCHER_POINTS),//+15
+        CATAPULT (5,"img/unit/", TribesConfig.CATAPULT_COST, TECHNOLOGY.MATHEMATICS, TribesConfig.CATAPULT_POINTS), //+40
+        KNIGHT (6,"img/unit/knight/", TribesConfig.KNIGHT_COST, TECHNOLOGY.CHIVALRY, TribesConfig.KNIGHT_POINTS), //+40
+        MIND_BENDER(7,"img/unit/mind_bender/", TribesConfig.MINDBENDER_COST, TECHNOLOGY.PHILOSOPHY, TribesConfig.MINDBENDER_POINTS), //+25
+        BOAT(8,"img/unit/boat/", TribesConfig.BOAT_COST, TECHNOLOGY.SAILING, TribesConfig.BOAT_POINTS), //+0
+        SHIP(9,"img/unit/ship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.SAILING, TribesConfig.SHIP_POINTS),//+0
+        BATTLESHIP(10,"img/unit/battleship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.NAVIGATION, TribesConfig.BATTLESHIP_POINTS),//+0
+        SUPERUNIT(11, "img/unit/superunit/", TribesConfig.SUPERUNIT_COST, null, TribesConfig.SUPERUNIT_POINTS); //+50
 
         private int key;
         private String imageFile;
         private int cost;
         private TECHNOLOGY requirement;
-        UNIT(int numVal, String imageFile, int cost, Types.TECHNOLOGY requirement) {  this.key = numVal;  this.imageFile = imageFile; this.cost = cost; this.requirement = requirement;}
+        private int points;
+        UNIT(int numVal, String imageFile, int cost, Types.TECHNOLOGY requirement, int points) {
+            this.key = numVal;
+            this.imageFile = imageFile;
+            this.cost = cost;
+            this.requirement = requirement;
+            this.points = points;
+        }
         public int getKey() {  return key; }
         public Image getImage(int playerID) { return ImageIO.GetInstance().getImage(imageFile + playerID + ".png"); }
         public String getImageStr(int playerID) { return imageFile + playerID + ".png"; }
@@ -269,6 +299,7 @@ Yellow_dark - 929000
         public TECHNOLOGY getRequirement() {
             return requirement;
         }
+        public int getPoints() { return points; }
 
         public static Unit createUnit (Vector2d pos, int kills, boolean isVeteran, int ownerID, int tribeID, UNIT type)
         {
@@ -276,7 +307,17 @@ Yellow_dark - 929000
             {
                 case WARRIOR: return new Warrior(pos, kills, isVeteran, ownerID, tribeID);
                 case RIDER: return new Rider(pos, kills, isVeteran, ownerID, tribeID);
+                case DEFENDER: return new Defender(pos, kills, isVeteran, ownerID, tribeID);
+                case SWORDMAN: return new Swordman(pos, kills, isVeteran, ownerID, tribeID);
+                case ARCHER: return new Archer(pos, kills, isVeteran, ownerID, tribeID);
+                case CATAPULT: return new Catapult(pos, kills, isVeteran, ownerID, tribeID);
+                case KNIGHT: return new Knight(pos, kills, isVeteran, ownerID, tribeID);
+                case MIND_BENDER: return new MindBender(pos, kills, isVeteran, ownerID, tribeID);
+                case BOAT: return new Boat(pos, kills, isVeteran, ownerID, tribeID);
+                case SHIP: return new Ship(pos, kills, isVeteran, ownerID, tribeID);
+                case BATTLESHIP: return new Battleship(pos, kills, isVeteran, ownerID, tribeID);
                 case SUPERUNIT: return new SuperUnit(pos, kills, isVeteran, ownerID, tribeID);
+
                 default:
                     System.out.println("WARNING: Types.Unit.createUnit(), type creation not implemented.");
             }
@@ -367,7 +408,6 @@ Yellow_dark - 929000
         public int getKey() {  return key; }
         public char getMapChar() {return mapChar;}
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
-        public String getImageStr() { return imageFile; }
 
 
         /**
@@ -438,3 +478,27 @@ Yellow_dark - 929000
         return pos;
     }
 }
+
+
+/*
+ * Tribes colours as used in the unit scripts
+        0 -
+        Red - FB0207
+        Red_light - FD827B
+        Red_dark - ae4230
+
+        1 -
+        Bule - 0000FF
+        Blue_light - 667DFF
+        Blue_dark - 3249b1
+
+        2 -
+        Grey - 4C4C4C
+        Grey_light - B0B2B2
+        Grey_dark - 463a3a
+
+        3 -
+        Yellow - FFFF0A
+        Yellow_light - F2FF64
+        Yellow_dark - 929000
+*/

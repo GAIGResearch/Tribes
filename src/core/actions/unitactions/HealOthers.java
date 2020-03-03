@@ -15,19 +15,25 @@ public class HealOthers extends UnitAction
 
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
-        //TODO: compute all healothers actions
-        return new LinkedList<>();
+        LinkedList<Action> actions = new LinkedList<>();
+        MakeVeteran action = new MakeVeteran(unit);
+        if(isFeasible(gs)){ actions.add(action); }
+        return actions;
     }
 
     @Override
     public boolean isFeasible(final GameState gs) {
         //TODO: check if this HealOthers is feasible.
+        //add some kind of action point system for every unit?
+        //action point can be used to move a unit, attack, use an ability
         return false;
     }
 
     @Override
     public boolean execute(GameState gs) {
         //TODO: execute HealOthers
+        //implement adjacency, action points
+
         return false;
     }
 }

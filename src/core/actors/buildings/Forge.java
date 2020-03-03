@@ -25,9 +25,4 @@ public class Forge extends Building {
     public Building copy() {
         return new Forge(position.x, position.y, getPRODUCTION());
     }
-
-    @Override
-    public Types.TERRAIN getTERRAIN_CONSTRAINT() {
-        return TERRAIN_CONSTRAINT;
-    }
 }

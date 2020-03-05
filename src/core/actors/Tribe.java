@@ -9,6 +9,7 @@ import utils.Vector2d;
 import utils.graph.Graph;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Tribe extends Actor{
 
@@ -215,6 +216,18 @@ public class Tribe extends Actor{
             }
             if(!inMetTribes[i]){
                 tribesMet.add(t[i].tribe);
+                //Pick a technology at random from the tribe to learn
+                TechnologyTree metTribeTree = t[i].getTechTree();
+                Types.TECHNOLOGY[] tech = Types.TECHNOLOGY.values();
+                Random r = new Random();
+                Types.TECHNOLOGY techToGet = tech[r.nextInt(tech.length)];
+                while(!metTribeTree.isResearched(techToGet)){
+                    techToGet = tech[r.nextInt(tech.length)];
+                }
+
+                techTree.doResearch(techToGet);
+
+
             }
         }
 

@@ -3,6 +3,8 @@ package core.actors;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
+import core.game.Board;
+import core.game.GameState;
 import utils.Vector2d;
 import utils.graph.Graph;
 
@@ -37,6 +39,8 @@ public class Tribe extends Actor{
     //Trade network of this tribe
     private Graph tradeNetwork;
 
+    private  ArrayList<Types.TRIBE> tribesMet;
+
 
     public Tribe(Types.TRIBE tribe)
     {
@@ -58,6 +62,7 @@ public class Tribe extends Actor{
         citiesID = new ArrayList<>();
         stars = TribesConfig.INITIAL_STARS;
         this.tradeNetwork = new Graph();
+        tribesMet = new ArrayList<>();
     }
 
     public void initObsGrid(int size)
@@ -190,6 +195,30 @@ public class Tribe extends Actor{
     public Vector2d getPosition()
     {
         return null;
+    }
+
+    public ArrayList<Types.TRIBE> getTribesMet(){
+        return tribesMet;
+    }
+
+    public void meetTribe(GameState gs, int tribeID){
+
+        Board b = gs.getBoard();
+        Tribe[] t = gs.getTribes(); // get tribes from boards
+
+        boolean[] inMetTribes = new boolean[4];
+        //loop through all tribes
+        for(int i = 0; i<t.length; i++){
+            // if tribes not in tribes met or tribe is itself then do nothing else add to tribesmet arraylist
+            if (t[i].tribe == this.tribesMet.get(i) || t[i].tribeId == tribeID){
+                inMetTribes[i] = true;
+            }
+            if(!inMetTribes[i]){
+                tribesMet.add(t[i].tribe);
+            }
+        }
+
+
     }
 
     public void updateNetwork(boolean[][] tradeNetwork, int[][] tileCityId, Types.BUILDING[][] buildings)

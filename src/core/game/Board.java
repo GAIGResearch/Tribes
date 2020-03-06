@@ -151,8 +151,10 @@ public class Board {
             idx++;
         }
 
+        //TODO: A pushed unit loses its next turn! (manage through TURN_STATUS).
+
         if (!pushed) {
-            //it can't be pushed, unit must disappear
+            //TODO: if a unit can't be pushed, unit must disappear
         }
 
     }
@@ -307,6 +309,7 @@ public class Board {
     public void setTradeNetwork(int x, int y, boolean trade)
     {
         roads[x][y] = trade;
+        //This may have caused two cities (or more) to connect
     }
 
     // Get units array
@@ -468,6 +471,7 @@ public class Board {
             return false;
         }
 
+        this.setTradeNetwork(x, y, true);
         this.recomputeTradeNetwork();
         return true;
     }

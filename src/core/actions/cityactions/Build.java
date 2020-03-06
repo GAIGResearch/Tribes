@@ -108,6 +108,7 @@ public class Build extends CityAction
                     tribe.subtractStars(TribesConfig.PORT_COST);
                     board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.PORT);
                     city.addBuilding(new Port(targetPos.x, targetPos.y));
+                    board.setTradeNetwork(targetPos.x, targetPos.y, true);
                     return true;
                 case ROAD:
                     //is road a building? Road object is missing

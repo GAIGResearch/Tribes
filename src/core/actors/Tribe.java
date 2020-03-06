@@ -34,10 +34,6 @@ public class Tribe extends Actor{
     //Indicates if the position in the board is visible
     private boolean obsGrid[][];
 
-    //Trade network of this tribe
-    private Graph tradeNetwork;
-
-
     public Tribe(Types.TRIBE tribe)
     {
         this.tribe = tribe;
@@ -57,7 +53,6 @@ public class Tribe extends Actor{
         techTree.doResearch(tribe.getInitialTech());
         citiesID = new ArrayList<>();
         stars = TribesConfig.INITIAL_STARS;
-        this.tradeNetwork = new Graph();
     }
 
     public void initObsGrid(int size)
@@ -76,9 +71,6 @@ public class Tribe extends Actor{
         tribeCopy.capitalID = this.capitalID;
 
         tribeCopy.techTree = this.techTree.copy();
-        if (tradeNetwork != null) {
-            tribeCopy.tradeNetwork = this.tradeNetwork.copy();
-        }
 
         tribeCopy.obsGrid = new boolean[obsGrid.length][obsGrid.length];
         for(int i = 0; i < obsGrid.length; ++i)

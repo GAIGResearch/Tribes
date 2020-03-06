@@ -158,7 +158,11 @@ public class City extends Actor{
     }
 
     public int getProduction(){
-        return level + production;
+        // If population less than 0, return start between [0 ~ level+production]
+        if(population > 0) {
+            return level + production;
+        }
+        return Math.max(0, (level + production - population));
     }
 
     public int getPopulation() {

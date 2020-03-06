@@ -12,16 +12,9 @@ import java.util.LinkedList;
 
 public class ClearForest extends CityAction
 {
-    private Vector2d position;
 
     public ClearForest(City c) {
         super.city = c;
-    }
-    public void setPosition(int x, int y){
-        this.position = new Vector2d(x, y);
-    }
-    public Vector2d getPosition() {
-        return position;
     }
 
     @Override
@@ -34,7 +27,7 @@ public class ClearForest extends CityAction
             for(Vector2d tile: tiles){
                 if (currentBoard.getTerrainAt(tile.x, tile.y) == Types.TERRAIN.FOREST){
                     ClearForest action = new ClearForest(city);
-                    action.setPosition(tile.x, tile.y);
+                    action.setTargetPos(new Vector2d(tile.x, tile.y));
                     actions.add(action);
                 }
             }
@@ -44,8 +37,8 @@ public class ClearForest extends CityAction
 
     @Override
     public boolean isFeasible(final GameState gs) {
-        boolean isForest = gs.getBoard().getTerrainAt(position.x, position.y) == Types.TERRAIN.FOREST;
-        boolean isBelonging = gs.getBoard().getCityIdAt(position.x, position.y) == city.getActorId();
+        boolean isForest = gs.getBoard().getTerrainAt(targetPos.x, targetPos.y) == Types.TERRAIN.FOREST;
+        boolean isBelonging = gs.getBoard().getCityIdAt(targetPos.x, targetPos.y) == city.getActorId();
         boolean isResearched = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.FORESTRY);
         return isForest && isBelonging && isResearched;
     }
@@ -53,7 +46,7 @@ public class ClearForest extends CityAction
     @Override
     public boolean execute(GameState gs) {
         if (isFeasible(gs)){
-            gs.getBoard().setTerrainAt(position.x, position.y, Types.TERRAIN.PLAIN);
+            gs.getBoard().setTerrainAt(targetPos.x, targetPos.y, Types.TERRAIN.PLAIN);
             gs.getTribe(city.getTribeId()).addStars(TribesConfig.CLEAR_FOREST_STAR);
             return true;
         }

@@ -12,18 +12,10 @@ import java.util.LinkedList;
 
 public class Destroy extends CityAction
 {
-    private Vector2d position;
 
     public Destroy(City c)
     {
         super.city = c;
-    }
-
-    public void setPosition(int x, int y){
-        this.position = new Vector2d(x, y);
-    }
-    public Vector2d getPosition() {
-        return position;
     }
 
     @Override
@@ -36,7 +28,7 @@ public class Destroy extends CityAction
             for(Vector2d tile: tiles){
                 if (currentBoard.getBuildingAt(tile.x, tile.y) != null){
                     Destroy action = new Destroy(city);
-                    action.setPosition(tile.x, tile.y);
+                    action.setTargetPos(new Vector2d(tile.x, tile.y));
                     actions.add(action);
                 }
             }
@@ -47,8 +39,8 @@ public class Destroy extends CityAction
     @Override
     public boolean isFeasible(final GameState gs)
     {
-        boolean isBuilding = gs.getBoard().getBuildingAt(position.x, position.y) != null;
-        boolean isBelonging = gs.getBoard().getCityIdAt(position.x, position.y) == city.getActorId();
+        boolean isBuilding = gs.getBoard().getBuildingAt(targetPos.x, targetPos.y) != null;
+        boolean isBelonging = gs.getBoard().getCityIdAt(targetPos.x, targetPos.y) == city.getActorId();
         boolean isResearched = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.CONSTRUCTION);
         return isBuilding && isBelonging && isResearched;
     }
@@ -56,9 +48,9 @@ public class Destroy extends CityAction
     @Override
     public boolean execute(GameState gs) {
         if (isFeasible(gs)){
-            Building removedBuilding = city.removeBuilding(position.x, position.y);
+            Building removedBuilding = city.removeBuilding(targetPos.x, targetPos.y);
             if (removedBuilding != null) {
-                gs.getBoard().setBuildingAt(position.x, position.y, null);
+                gs.getBoard().setBuildingAt(targetPos.x, targetPos.y, null);
                 if (removedBuilding.getTYPE() != Types.BUILDING.CUSTOM_HOUSE) {
                     city.subtractPopulation(removedBuilding.getPRODUCTION());
                 }else{

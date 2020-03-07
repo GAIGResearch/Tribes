@@ -224,15 +224,13 @@ public class Tribe extends Actor{
                 while(!metTribeTree.isResearched(techToGet)){
                     techToGet = tech[r.nextInt(tech.length)];
                 }
-
                 techTree.doResearch(techToGet);
-
-
             }
         }
 
-
     }
+
+
 
     public void updateNetwork(boolean[][] tradeNetwork, int[][] tileCityId, Types.BUILDING[][] buildings)
     {

@@ -400,20 +400,34 @@ public class Board {
     // Set border helper method to set city bounds
     public void setBorderHelper(City c, int bound){
         Vector2d cityPos = c.getPosition();
+        Tribe t = getTribe(c.getTribeId());
         for (int i = cityPos.x-bound; i <= cityPos.x+bound; i++){
             for(int j = cityPos.y-bound; j <= cityPos.y+bound; j++) {
                 if(tileCityId[i][j] == -1){
                     tileCityId[i][j] = c.getActorId();
+                    t.addScore(20); // Add score to tribe on border creation
                 }
             }
         }
     }
 
+    //Set extra points for tribe on border expansion
+    public void setPointsForBorderExpansion(City c ){
+        Tribe t = getTribe(c.getTribeId());
+        Vector2d cityPos = c.getPosition();
+            for (int i = cityPos.x-1; i <= cityPos.x+1; i++){
+                for(int j = cityPos.y-1; j <= cityPos.y+1; j++) {
+                    if(tileCityId[i][j] == c.getActorId())
+                        t.addScore(20);
+                }
+            }
+            }
+
     // Method to expand city borders, take city as param
     public void expandBorder(City city){
         city.setBound(city.getBound()+1);
         setBorderHelper(city,city.getBound());
-
+        setPointsForBorderExpansion(city);
     }
 
     public int getCityIdAt(int x, int y)

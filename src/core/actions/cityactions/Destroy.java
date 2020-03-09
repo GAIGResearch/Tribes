@@ -58,10 +58,13 @@ public class Destroy extends CityAction
         if (isFeasible(gs)){
             Building removedBuilding = city.removeBuilding(position.x, position.y);
             if (removedBuilding != null) {
-                gs.getBoard().setBuildingAt(position.x, position.y, null);
+                Board b = gs.getBoard();
+                b.setBuildingAt(position.x, position.y, null);
                 if (removedBuilding.getTYPE() != Types.BUILDING.CUSTOM_HOUSE) {
-                    city.subtractPopulation(removedBuilding.getPRODUCTION());
+                    city.addPopulation(-removedBuilding.getPRODUCTION());
                 }else{
+                    //TODO: Is this correct? The production of a custom house depends on the number of Ports around it,
+                    // so I'm not sure this should be a constant value.
                     city.subtractProduction(removedBuilding.getPRODUCTION());
                 }
                 // TODO: Should be check if the building enum is changed
@@ -73,6 +76,13 @@ public class Destroy extends CityAction
                 if(isTemple){
                     city.subtractLongTermPoints(removedBuilding.getPoints());
                 }
+
+                if(removedBuilding.getTYPE() == Types.BUILDING.PORT)
+                {
+                    //If a port is removed, then the tile stops belonging to the trade network
+                    b.setTradeNetwork(position.x, position.y, false);
+                }
+
 
 
                 return true;

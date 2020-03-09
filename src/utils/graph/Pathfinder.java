@@ -25,7 +25,7 @@ public class Pathfinder
 
     }
 
-    private static double heuristicEstimatedCost(Node curNode, Node goalNode)
+    private static double manhattanDistance(Node curNode, Node goalNode)
     {
         //4-way: using Manhattan
         double xDiff = Math.abs(curNode.getX() - goalNode.getX());
@@ -33,6 +33,14 @@ public class Pathfinder
         return xDiff + yDiff;
     }
 
+
+    private static double euclideanDistance(Node curNode, Node goalNode)
+    {
+        //4-way: using Manhattan
+        double xDiffSq = Math.pow(Math.abs(curNode.getX() - goalNode.getX()), 2);
+        double yDiffSq = Math.pow(Math.abs(curNode.getY() - goalNode.getY()), 2);
+        return Math.sqrt(xDiffSq + yDiffSq);
+    }
 
     private ArrayList<Node> calculatePath(Node node)
     {
@@ -146,7 +154,7 @@ public class Pathfinder
         closedList = new PriorityQueue<Node>();
 
         start.setTotalCost(0.0);
-        start.setEstimatedCost(heuristicEstimatedCost(start, goal));
+        start.setEstimatedCost(euclideanDistance(start, goal));
 
         openList.add(start);
 
@@ -168,7 +176,7 @@ public class Pathfinder
                 if(!openList.contains(neighbour) && !closedList.contains(neighbour))
                 {
                     neighbour.setTotalCost(curDistance + node.getTotalCost());
-                    neighbour.setEstimatedCost(heuristicEstimatedCost(neighbour, goal));
+                    neighbour.setEstimatedCost(euclideanDistance(neighbour, goal));
                     neighbour.setParent(node);
 
                     openList.add(neighbour);

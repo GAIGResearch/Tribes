@@ -138,6 +138,7 @@ public class TribesConfig
     // Port
     public static int PORT_COST = 10;
     public static int PORT_PRODUCTION = 2;
+    public static int PORT_TRADE_DISTANCE = 3;
 
     // Custom House
     public static int CUSTOM_COST = 5;

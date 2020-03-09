@@ -3,10 +3,14 @@ package core.actors;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
+import core.game.Board;
 import utils.Vector2d;
 import utils.graph.Graph;
+import utils.graph.Node;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Tribe extends Actor{
 
@@ -25,18 +29,19 @@ public class Tribe extends Actor{
     //Current number of stars (resources) of this tribe.
     private int stars; //TODO: compute this amount at the beginning of each turn.
 
+
     //Game result for this player.
     private Types.RESULT winner = Types.RESULT.INCOMPLETE;
 
     //Score for the tribe.
     private int score = 0;
 
+
     //Indicates if the position in the board is visible
     private boolean obsGrid[][];
 
-    //Trade network of this tribe
-    private Graph tradeNetwork;
-
+    //List of city ids connected to the capital (capital not included)
+    private ArrayList<Integer> connectedCities = new ArrayList<>();
 
     public Tribe(Types.TRIBE tribe)
     {
@@ -57,7 +62,6 @@ public class Tribe extends Actor{
         techTree.doResearch(tribe.getInitialTech());
         citiesID = new ArrayList<>();
         stars = TribesConfig.INITIAL_STARS;
-        this.tradeNetwork = new Graph();
     }
 
     public void initObsGrid(int size)
@@ -76,9 +80,6 @@ public class Tribe extends Actor{
         tribeCopy.capitalID = this.capitalID;
 
         tribeCopy.techTree = this.techTree.copy();
-        if (tradeNetwork != null) {
-            tribeCopy.tradeNetwork = this.tradeNetwork.copy();
-        }
 
         tribeCopy.obsGrid = new boolean[obsGrid.length][obsGrid.length];
         for(int i = 0; i < obsGrid.length; ++i)
@@ -89,6 +90,12 @@ public class Tribe extends Actor{
         for(int cityID : citiesID)
         {
             tribeCopy.citiesID.add(cityID);
+        }
+
+        tribeCopy.connectedCities = new ArrayList<>();
+        for(int cityID : connectedCities)
+        {
+            tribeCopy.connectedCities.add(cityID);
         }
 
         return tribeCopy;
@@ -192,23 +199,82 @@ public class Tribe extends Actor{
         return null;
     }
 
-    public void updateNetwork(boolean[][] tradeNetwork, int[][] tileCityId, Types.BUILDING[][] buildings)
+    /**
+     * Updates the cities connected to the capital of this tribe given a graph.
+     * @param mainGraph graph with tile connections. Must include roads, ports, capital and links between ports
+     * @param b board of the game.
+     * @param thisTribesTurn indicates if it is this tribe's turn
+     */
+    public void updateNetwork(Graph mainGraph, Board b, boolean thisTribesTurn)
     {
-        //TODO: compute the trade network for this tribe
+        ArrayList<Integer> lostCities = new ArrayList<>();
+        ArrayList<Integer> addedCities = new ArrayList<>();
 
         //We need to start from the capital. If capital is not owned, there's no trade network
-        if(!citiesID.contains(capitalID))
-        {
+        if(!controlsCapital()) {
 
+            for(int cityId : connectedCities)
+                lostCities.add(cityId);
+
+            connectedCities.clear();
+
+        }else{
+
+            //Execute Dijkstra from the capital city to all cities owned by this tribe
+            City capital = (City) b.getActor(capitalID);
+            Node capitalNode = mainGraph.getNode(capital.getPosition().x, capital.getPosition().y);
+            mainGraph.pathfinder.findPath(capitalNode, null);
+
+            for (int cityId : citiesID) {
+                if (cityId != capitalID) {
+
+                    //Check if the city is conected to the capital
+                    City nonCapitalCity = (City) b.getActor(cityId);
+                    Node nonCapitalCityNode = mainGraph.getNode(nonCapitalCity.getPosition().x, nonCapitalCity.getPosition().y);
+                    boolean connectedNow = nonCapitalCityNode.isVisited();
+
+                    //This was previously connected
+                    if (connectedCities.contains(cityId)) {
+                        if (!connectedNow) {
+                            //drops from the network
+                            connectedCities.remove(cityId);
+                            lostCities.add(cityId);
+                        }
+                    } else if (connectedNow) {
+                        //Wasn't connected, but it is now
+                        connectedCities.add(cityId);
+                        addedCities.add(cityId);
+                    }
+
+                }
+            }
+
+            //The capital gains 1 population for each city connected, -1 for each city disconnected
+            int capitalGain = addedCities.size() - lostCities.size();
+            capital.addPopulation(capitalGain);
         }
 
-        //HOW-TO: Execute Dijkstra from the capital city to all cities owned by this tribe
-        //  - For roads and cities, they're set to True in tradeNetwork
-        //  - None of the traversed tiles can be owned by an opponent tribe or there's no route.
-        //  - Two ports from this tribe are connected if separated by 0, 1, 2 or 3 WATER tiles (of any type)
 
-        //Also: a connection between two cities only gives population bonus if the connection is completed by
-        //the tribe that owns the cities!
+        //Population adjustments: they only happen if it's this tribe's turn
+        if(thisTribesTurn) {
 
+            //All cities that lost connection with the capital lose 1 population
+            for (int cityId : lostCities) {
+                City nonCapitalCity = (City) b.getActor(cityId);
+                nonCapitalCity.addPopulation(-1);
+            }
+
+            //All cities that gained connection with the capital gain 1 population.
+            for (int cityId : addedCities) {
+                City nonCapitalCity = (City) b.getActor(cityId);
+                nonCapitalCity.addPopulation(1);
+            }
+        }
+
+
+    }
+
+    public boolean controlsCapital() {
+        return citiesID.contains(capitalID);
     }
 }

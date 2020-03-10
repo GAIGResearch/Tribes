@@ -47,11 +47,11 @@ public class Pathfinder
         ArrayList<Node> path = new ArrayList<Node>();
         while(node != null)
         {
-            if(node.getParent() != null) //to avoid adding the start node.
+            if(node.getParentId() != -1) //to avoid adding the start node.
             {
                 path.add(0,node);
             }
-            node = node.getParent();
+            node = graph.getNode(node.getParentId());
         }
         return path;
     }
@@ -116,23 +116,23 @@ public class Pathfinder
                 destinationsFromStart.add(node);
             }
 
-            ArrayList<Node> neighbours = node.getNeighbours();
+            ArrayList<Integer> neighbours = node.getNeighbours();
 
             for(int i = 0; i < neighbours.size(); ++i)
             {
-                Node neighbour = neighbours.get(i);
+                Node neighbour = graph.getNode(neighbours.get(i));
                 double curDistance = neighbour.getTotalCost();
                 if(!neighbour.isVisited())
                 {
                     neighbour.setVisited(true);
                     neighbour.setTotalCost(curDistance + node.getTotalCost());
-                    neighbour.setParent(node);
+                    neighbour.setParentId(node);
                     openList.add(neighbour);
 
                 }else if(curDistance + node.getTotalCost() < neighbour.getTotalCost())
                 {
                     neighbour.setTotalCost(curDistance + node.getTotalCost());
-                    neighbour.setParent(node);
+                    neighbour.setParentId(node);
                 }
             }
 
@@ -166,25 +166,25 @@ public class Pathfinder
             if(node.getX() == goal.getX() && node.getY() == goal.getY())
                 return calculatePath(node);
 
-            ArrayList<Node> neighbours = node.getNeighbours();
+            ArrayList<Integer> neighbours = node.getNeighbours();
 
             for(int i = 0; i < neighbours.size(); ++i)
             {
-                Node neighbour = neighbours.get(i);
+                Node neighbour = graph.getNode(neighbours.get(i));
                 double curDistance = neighbour.getTotalCost();
 
                 if(!openList.contains(neighbour) && !closedList.contains(neighbour))
                 {
                     neighbour.setTotalCost(curDistance + node.getTotalCost());
                     neighbour.setEstimatedCost(euclideanDistance(neighbour, goal));
-                    neighbour.setParent(node);
+                    neighbour.setParentId(node);
 
                     openList.add(neighbour);
 
                 }else if(curDistance + node.getTotalCost() < neighbour.getTotalCost())
                 {
                     neighbour.setTotalCost(curDistance + node.getTotalCost());
-                    neighbour.setParent(node);
+                    neighbour.setParentId(node);
 
                     if(openList.contains(neighbour))
                         openList.remove(neighbour);

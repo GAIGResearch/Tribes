@@ -45,6 +45,7 @@ public class Board {
     // Player currently making a move.
     private int activeTribeID = -1;
 
+
     // Constructor for board
     public Board() {
         this.gameActors = new HashMap<>();
@@ -310,6 +311,46 @@ public class Board {
         return size;
     }
 
+    public void computeMoves(Unit u)
+    {
+//        Graph moveGraph = new Graph();
+//
+//        Vector2d unitPos = u.getPosition();
+//        int doubleMoveRange = u.MOV * 2;
+//
+//        int startX = Math.max(0, unitPos.x - doubleMoveRange);
+//        int startY = Math.max(0, unitPos.y - doubleMoveRange);
+//        int endX = Math.min(unitPos.x + doubleMoveRange, terrains.length - 1);
+//        int endY = Math.min(unitPos.y + doubleMoveRange, terrains[0].length - 1);
+//
+//        boolean[][] traversable = new boolean[endX - startX + 1][endY - startY + 1];
+//
+//        for(int x = startX; x < endX; ++x)
+//        {
+//            for(int y = startY; y < endY; ++y)
+//            {
+//                traversable[x][y] = true;
+//                //Set to false if - there's another unit there, tile is not visible for this tribe
+//            }
+//        }
+//
+//        moveGraph.setData(traversable);
+//
+//
+//        for(int x = startX; x < endX; ++x)
+//        {
+//            for(int y = startY; y < endY; ++y)
+//            {
+//                if(traversable[x][y])
+//                {
+//                    //TODO: check for all neighbours of (x,y), if they are traversable, the cost of moving from (x,y) to the neighbour.
+//                    // by default, all neighbours have a cost of 1, so we only set to a different values those
+//
+//                }
+//
+//            }
+//        }
+    }
 
     public void setTradeNetwork(int x, int y, boolean trade)
     {
@@ -726,4 +767,5 @@ public class Board {
     {
         setTradeNetwork(x, y, true);
     }
+
 }

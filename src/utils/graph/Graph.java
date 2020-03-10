@@ -6,7 +6,6 @@ import java.util.HashMap;
 public class Graph {
 
     private HashMap<Integer, Node> nodes;
-    private Node mainNode;
     public Pathfinder pathfinder;
     public boolean VERBOSE = false;
     public int MAX_CAPACITY = 10000;
@@ -16,47 +15,15 @@ public class Graph {
         nodes = new HashMap<>();
     }
 
-    public void find(Graph graph, int startX, int startY)
-    {
-        //    this.navigableGrid = navigableGrid;
-        this.pathfinder = new Pathfinder(this);
-
-        Node start = new Node(-1, startX, startY);
-        Node goal = null; //To get all routes.
-
-        pathfinder.findPath(start, goal);
-
-
-        if(VERBOSE)
-        {
-            for(Integer pathId : pathfinder.pathCache.keySet())
-            {
-                ArrayList<Node> nodes = pathfinder.pathCache.get(pathId);
-                pathfinder.printPath(pathId, nodes);
-            }
-        }
-    }
-
-//    private boolean navigable(int x, int y)
-//    {
-//        if(x < 0 || x >= navigableGrid.length || y < 0 || y >= navigableGrid[0].length)
-//            return false;
-//        return navigableGrid[x][y];
-//    }
-
     public Node getNode(int x, int y)
     {
         int id = calcNodeId(x, y);
-        return nodes.get(id);
+        return getNode(id);
     }
 
-    public void addNode(int id, int x, int y)
+    public Node getNode(int id)
     {
-        Node n = new Node(id, x, y);
-        nodes.put(id, n);
-
-        if(nodes.size() == 1)
-            mainNode = n;
+        return nodes.get(id);
     }
 
     public void addNode(Node n)
@@ -100,15 +67,14 @@ public class Graph {
     }
 
 
-//    public Graph copy() {
-//        Graph gr = new Graph();
-//        mainNode = (gr.mainNode == null)? null : gr.mainNode.copy();
-//        for(Node n : nodes.values())
-//        {
-//            gr.addNode(n.copy());
-//        }
-//        return gr;
-//    }
+    public Graph copy() {
+        Graph gr = new Graph();
+        for(Node n : nodes.values())
+        {
+            gr.addNode(n.copy());
+        }
+        return gr;
+    }
 
     /**
      * Sets the data for this graph. For each true value in 'navigableData', a new node is

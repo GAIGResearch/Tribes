@@ -115,7 +115,10 @@ public class Tribe extends Actor{
                 //All these positions should be within my view.
                 if(i >= 0 && j >= 0 && i < size && j < size)
                 {
-                    obsGrid[i][j] = true;
+                    if( obsGrid [i][j] == false) {
+                        obsGrid[i][j] = true;
+                        this.score +=5;
+                    }
                 }
             }
     }

@@ -11,7 +11,7 @@ import utils.graph.TreePathfinder;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class Move extends UnitAction implements NeighbourProvider
+public class Move extends UnitAction
 {
     private int destX;
     private int destY;
@@ -58,12 +58,6 @@ public class Move extends UnitAction implements NeighbourProvider
         return false;
     }
 
-
-    @Override
-    public ArrayList<TreeNode> getNeighbours(Vector2d from, double cost) {
-        return null;
-    }
-
     private class StepMove implements NeighbourProvider
     {
         private GameState gs;
@@ -78,7 +72,7 @@ public class Move extends UnitAction implements NeighbourProvider
         @Override
         // from: position from which we need neighbours
         // costFrom: is the total move cost computed up to "from"
-        // Using this.gs, this.unit, from and costFrom, gets all the adjacent neightbours to tile in position "from"
+        // Using this.gs, this.unit, from and costFrom, gets all the adjacent neighbours to tile in position "from"
         public ArrayList<TreeNode> getNeighbours(Vector2d from, double costFrom) {
 
             ArrayList<TreeNode> neighbours = new ArrayList<>();
@@ -89,6 +83,11 @@ public class Move extends UnitAction implements NeighbourProvider
             // We only add nodes to neighbours if costFrom+stepCost <= total move range of this.unit
 
             return neighbours;
+        }
+
+        @Override
+        public void addJumpLink(Vector2d from, Vector2d to, boolean reverse) {
+            //No jump links
         }
     }
 

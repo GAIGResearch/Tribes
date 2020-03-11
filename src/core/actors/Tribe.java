@@ -7,6 +7,8 @@ import core.game.Board;
 import utils.Vector2d;
 import utils.graph.Graph;
 import utils.graph.Node;
+import utils.graph.TreeNode;
+import utils.graph.TreePathfinder;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -232,6 +234,76 @@ public class Tribe extends Actor{
                     City nonCapitalCity = (City) b.getActor(cityId);
                     Node nonCapitalCityNode = mainGraph.getNode(nonCapitalCity.getPosition().x, nonCapitalCity.getPosition().y);
                     boolean connectedNow = nonCapitalCityNode.isVisited();
+
+                    //This was previously connected
+                    if (connectedCities.contains(cityId)) {
+                        if (!connectedNow) {
+                            //drops from the network
+                            connectedCities.remove(cityId);
+                            lostCities.add(cityId);
+                        }
+                    } else if (connectedNow) {
+                        //Wasn't connected, but it is now
+                        connectedCities.add(cityId);
+                        addedCities.add(cityId);
+                    }
+
+                }
+            }
+
+            //The capital gains 1 population for each city connected, -1 for each city disconnected
+            int capitalGain = addedCities.size() - lostCities.size();
+            capital.addPopulation(capitalGain);
+        }
+
+
+        //Population adjustments: they only happen if it's this tribe's turn
+        if(thisTribesTurn) {
+
+            //All cities that lost connection with the capital lose 1 population
+            for (int cityId : lostCities) {
+                City nonCapitalCity = (City) b.getActor(cityId);
+                nonCapitalCity.addPopulation(-1);
+            }
+
+            //All cities that gained connection with the capital gain 1 population.
+            for (int cityId : addedCities) {
+                City nonCapitalCity = (City) b.getActor(cityId);
+                nonCapitalCity.addPopulation(1);
+            }
+        }
+
+
+    }
+
+
+    public void updateNetwork2(TreePathfinder tp, Board b, boolean thisTribesTurn)
+    {
+        ArrayList<Integer> lostCities = new ArrayList<>();
+        ArrayList<Integer> addedCities = new ArrayList<>();
+
+        //We need to start from the capital. If capital is not owned, there's no trade network
+        if(!controlsCapital()) {
+
+            for(int cityId : connectedCities)
+                lostCities.add(cityId);
+
+            connectedCities.clear();
+
+        }else if(tp != null){
+
+            City capital = (City) b.getActor(capitalID);
+
+            for (int cityId : citiesID) {
+                if (cityId != capitalID) {
+
+                    //Check if the city is conected to the capital
+                    City nonCapitalCity = (City) b.getActor(cityId);
+                    Vector2d nonCapitalPos = nonCapitalCity.getPosition();
+                    ArrayList<TreeNode> pathToCity = tp.findPathTo(nonCapitalPos);
+
+
+                    boolean connectedNow = pathToCity.size() > 0;
 
                     //This was previously connected
                     if (connectedCities.contains(cityId)) {

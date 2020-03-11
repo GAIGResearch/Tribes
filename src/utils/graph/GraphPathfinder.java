@@ -7,13 +7,13 @@ import java.util.PriorityQueue;
 /**
  * Created by dperez on 13/01/16.
  */
-public class Pathfinder
+public class GraphPathfinder
 {
     public static PriorityQueue<Node> closedList, openList;
     public HashMap<Integer, ArrayList<Node>> pathCache;
     public Graph graph;
 
-    public Pathfinder(Graph graph)
+    public GraphPathfinder(Graph graph)
     {
         this.graph = graph;
         pathCache = new HashMap<Integer, ArrayList<Node>>();

@@ -1,12 +1,11 @@
 package utils.graph;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Graph {
 
     private HashMap<Integer, Node> nodes;
-    public Pathfinder pathfinder;
+    public GraphPathfinder pathfinder;
     public boolean VERBOSE = false;
     public int MAX_CAPACITY = 10000;
 

@@ -3,6 +3,7 @@ package core.actors;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
+import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
 import utils.Vector2d;
@@ -42,6 +43,8 @@ public class Tribe extends Actor{
 
     private  ArrayList<Types.TRIBE> tribesMet;
 
+    private ArrayList<Unit> convertedUnits;
+
 
     public Tribe(Types.TRIBE tribe)
     {
@@ -64,6 +67,7 @@ public class Tribe extends Actor{
         stars = TribesConfig.INITIAL_STARS;
         this.tradeNetwork = new Graph();
         tribesMet = new ArrayList<>();
+        convertedUnits = new ArrayList<>();
     }
 
     public void initObsGrid(int size)
@@ -218,21 +222,37 @@ public class Tribe extends Actor{
                 inMetTribes[i] = true;
             }
             if(!inMetTribes[i]){
-                tribesMet.add(t[i].tribe);
+                tribesMet.add(t[i].tribe); // add to this trube
+                t[i].tribesMet.add(this.tribe); // add to met tribe as well
+
                 //Pick a technology at random from the tribe to learn
+                TechnologyTree thisTribeTree = getTechTree();
                 TechnologyTree metTribeTree = t[i].getTechTree();
                 Types.TECHNOLOGY[] tech = Types.TECHNOLOGY.values();
                 Random r = new Random();
                 Types.TECHNOLOGY techToGet = tech[r.nextInt(tech.length)];
-                while(!metTribeTree.isResearched(techToGet)){
+                //TODO: need to change as this could potentially cause an infinte loop
+                while(!metTribeTree.isResearched(techToGet) || thisTribeTree.isResearched(techToGet) ){
                     techToGet = tech[r.nextInt(tech.length)];
                 }
                 techTree.doResearch(techToGet);
+
+                //Other tribe gets random technology too
+                tech = Types.TECHNOLOGY.values();
+                techToGet = tech[r.nextInt(tech.length)];
+                //TODO: need to change as this could potentially cause an infinte loop
+                while(!thisTribeTree.isResearched(techToGet) || metTribeTree.isResearched(techToGet)){
+                    techToGet = tech[r.nextInt(tech.length)];
+                }
+                metTribeTree.doResearch(techToGet);
             }
         }
 
     }
 
+    public void addConvertedUnit (Unit u){
+        convertedUnits.add(u);
+    }
 
 
     public void updateNetwork(boolean[][] tradeNetwork, int[][] tileCityId, Types.BUILDING[][] buildings)

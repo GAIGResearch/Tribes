@@ -64,6 +64,8 @@ public class Convert extends UnitAction
         //Check if action is feasible before execution
         if(isFeasible(gs)) {
             target.setTribeId(this.unit.getTribeId());
+            //add tribe to converted units
+            gs.getActiveTribe().addConvertedUnit(target);
             return true;
         }
         return false;

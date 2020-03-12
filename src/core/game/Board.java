@@ -8,6 +8,7 @@ import core.actors.City;
 import core.actors.Tribe;
 import core.actors.units.*;
 import utils.Vector2d;
+import utils.graph.*;
 
 import java.util.*;
 
@@ -32,13 +33,17 @@ public class Board {
     private int[][] tileCityId;
 
     // Array that indicates presence of roads, cities, ports or naval links
-    private boolean[][] roads;
+    private boolean[][] networkTiles;
 
     //Actors in the game
     private HashMap<Integer, Actor> gameActors;
 
     //variable to declare size of board
     private int size;
+
+    // Player currently making a move.
+    private int activeTribeID = -1;
+
 
     // Constructor for board
     public Board() {
@@ -54,7 +59,7 @@ public class Board {
         buildings = new Types.BUILDING[size][size];
         units = new int[size][size];
         this.tileCityId = new int[size][size];
-        this.roads = new boolean[size][size];
+        this.networkTiles = new boolean[size][size];
 
         for(Tribe t : tribes)
             t.initObsGrid(size);
@@ -79,13 +84,13 @@ public class Board {
         Board copyBoard = new Board();
         copyBoard.size = this.size;
         copyBoard.tribes = new Tribe[this.tribes.length];
-
         copyBoard.terrains = new Types.TERRAIN[size][size];
         copyBoard.resources = new Types.RESOURCE[size][size];
         copyBoard.buildings = new Types.BUILDING[size][size];
         copyBoard.units = new int[size][size];
         copyBoard.tileCityId = new int[size][size];
-        copyBoard.roads = new boolean[size][size];
+        copyBoard.networkTiles = new boolean[size][size];
+        copyBoard.activeTribeID = activeTribeID;
 
         // Copy board objects (they are all ids)
         for (int x = 0; x < this.size; x++) {
@@ -98,7 +103,7 @@ public class Board {
                     copyBoard.setResourceAt(x, y, resources[x][y]);
                     copyBoard.setBuildingAt(x, y, buildings[x][y]);
                     copyBoard.tileCityId[x][y] = tileCityId[x][y];
-                    copyBoard.roads[x][y] = roads[x][y];
+                    copyBoard.networkTiles[x][y] = networkTiles[x][y];
                 }
             }
         }
@@ -151,8 +156,10 @@ public class Board {
             idx++;
         }
 
+        //TODO: A pushed unit loses its next turn! (manage through TURN_STATUS).
+
         if (!pushed) {
-            //it can't be pushed, unit must disappear
+            //TODO: if a unit can't be pushed, unit must disappear
         }
 
     }
@@ -205,6 +212,7 @@ public class Board {
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(xF, yF);
         Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), Types.UNIT.BOAT);
+        boat.setCurrentHP(unit.getCurrentHP());
         addUnit(city, boat);
     }
 
@@ -302,10 +310,51 @@ public class Board {
         return size;
     }
 
+    public void computeMoves(Unit u)
+    {
+//        Graph moveGraph = new Graph();
+//
+//        Vector2d unitPos = u.getPosition();
+//        int doubleMoveRange = u.MOV * 2;
+//
+//        int startX = Math.max(0, unitPos.x - doubleMoveRange);
+//        int startY = Math.max(0, unitPos.y - doubleMoveRange);
+//        int endX = Math.min(unitPos.x + doubleMoveRange, terrains.length - 1);
+//        int endY = Math.min(unitPos.y + doubleMoveRange, terrains[0].length - 1);
+//
+//        boolean[][] traversable = new boolean[endX - startX + 1][endY - startY + 1];
+//
+//        for(int x = startX; x < endX; ++x)
+//        {
+//            for(int y = startY; y < endY; ++y)
+//            {
+//                traversable[x][y] = true;
+//                //Set to false if - there's another unit there, tile is not visible for this tribe
+//            }
+//        }
+//
+//        moveGraph.setData(traversable);
+//
+//
+//        for(int x = startX; x < endX; ++x)
+//        {
+//            for(int y = startY; y < endY; ++y)
+//            {
+//                if(traversable[x][y])
+//                {
+//                    //TODO: check for all neighbours of (x,y), if they are traversable, the cost of moving from (x,y) to the neighbour.
+//                    // by default, all neighbours have a cost of 1, so we only set to a different values those
+//
+//                }
+//
+//            }
+//        }
+    }
 
     public void setTradeNetwork(int x, int y, boolean trade)
     {
-        roads[x][y] = trade;
+        networkTiles[x][y] = trade;
+        recomputeTradeNetwork();
     }
 
     // Get units array
@@ -467,18 +516,164 @@ public class Board {
             return false;
         }
 
-        this.recomputeTradeNetwork();
+        this.setTradeNetwork(x, y, true);
         return true;
     }
 
+
+    private void computeTradeNetwork()
+    {
+        for(Tribe t : tribes) {
+
+            if (t.controlsCapital()) {
+
+                int tribeId = t.getTribeId();
+
+                boolean[][] connectedTiles = new boolean[networkTiles.length][networkTiles[0].length];
+                boolean[][] navigable = new boolean[networkTiles.length][networkTiles[0].length];
+
+                ArrayList<Vector2d> ports = new ArrayList<>();
+
+                //First, set up the graph. Including all tiles that correspond to active trade points (roads, cities, ports)
+                for (int i = 0; i < networkTiles.length; ++i) {
+                    for (int j = 0; j < networkTiles[0].length; ++j) {
+                        //Only for this tribe
+                        if (tileCityId[i][j] == tribeId) {
+                            // Map cities, roads and ports
+                            connectedTiles[i][j] = networkTiles[i][j];
+
+                            //Keep a list of my ports
+                            if (buildings[i][j] == Types.BUILDING.PORT)
+                                ports.add(new Vector2d(i, j));
+
+                            //And navigable tiles
+                            if ((terrains[i][j] == Types.TERRAIN.SHALLOW_WATER || terrains[i][j] == Types.TERRAIN.DEEP_WATER) //WATER
+                                    && t.isVisible(i, j) && tileCityId[i][j] != -1) //VISIBLE AND NOT ENEMY
+                            {
+                                navigable[i][j] = true;
+                            }
+
+                        }
+                    }
+                }
+
+                TradeNetworkStep tns = new TradeNetworkStep(connectedTiles);
+
+                //Now, we need to add jump links. In this case, two ports are connected if
+                // separated by [0,TribesConfig.PORT_TRADE_DISTANCE] WATER, VISIBLE, NON-ENEMY tiles
+                for (Vector2d portFrom : ports) {
+                    for (Vector2d portTo : ports) {
+                        if (!portFrom.equals(portTo)) {
+
+                            Vector2d originPortPos = new Vector2d(portFrom.x, portFrom.y);
+                            TreePathfinder tp = new TreePathfinder(originPortPos, new TradeWaterStep(navigable));
+                            ArrayList<TreeNode> path = tp.findPathTo(new Vector2d(portTo.x, portTo.y));
+
+                            if (path != null) //+1 because path includes destination
+                            {
+                                //We add this as a link between ports.
+                                tns.addJumpLink(portFrom, portTo, true);
+                            }
+                        }
+                    }
+                }
+
+                City capital = (City) getActor(t.getCapitalID());
+                t.updateNetwork2(new TreePathfinder(capital.getPosition(), tns), this, t.getTribeId() == this.activeTribeID);
+            }
+
+            //TODO: a connection between two cities only gives population bonus if the connection is completed by
+            // the tribe that owns the cities! This needs to be recorded for the next turn if this tribe is not the
+            // one moving now. Population of capital and all newly disconnected cities need update.
+            t.updateNetwork2(null, this, t.getTribeId() == this.activeTribeID);
+
+        }
+    }
+
+
+
     /**
-     * Recomputes the trade network for the game..
+     * Recomputes the trade network for all tribes in the game.
      */
     private void recomputeTradeNetwork() {
-        for(Tribe t : tribes)
-        {
-            t.updateNetwork(roads, tileCityId, buildings);
+
+        for(Tribe t : tribes) {
+            Graph tribeNetworkGraph = new Graph();
+
+            if (t.controlsCapital()) {
+
+                int tribeId = t.getTribeId();
+
+                Graph waterGraph = new Graph();
+
+                //tiles that are part of the network (roads, cities and ports)
+                boolean[][] connectedTiles = new boolean[networkTiles.length][networkTiles[0].length];
+
+                //Navigable tiles, in water
+                boolean[][] navigable = new boolean[networkTiles.length][networkTiles[0].length];
+
+                ArrayList<Vector2d> ports = new ArrayList<>();
+
+                //First, set up the graph. Including all tiles that correspond to active trade points (roads, cities, ports)
+                for (int i = 0; i < networkTiles.length; ++i) {
+                    for (int j = 0; j < networkTiles[0].length; ++j) {
+                        //Only for this tribe
+                        if (tileCityId[i][j] == tribeId) {
+                            // Map cities, roads and ports
+                            connectedTiles[i][j] = networkTiles[i][j];
+
+                            //Keep a list of my ports
+                            if (buildings[i][j] == Types.BUILDING.PORT)
+                                ports.add(new Vector2d(i, j));
+
+                            //And navigable tiles
+                            if ((terrains[i][j] == Types.TERRAIN.SHALLOW_WATER || terrains[i][j] == Types.TERRAIN.DEEP_WATER) //WATER
+                                    && t.isVisible(i, j) && tileCityId[i][j] != -1) //VISIBLE AND NOT ENEMY
+                            {
+                                navigable[i][j] = true;
+                            }
+
+                        }
+                    }
+                }
+
+                //Set the ground and water graphs' data:
+                tribeNetworkGraph.setData(connectedTiles);
+                waterGraph.setData(navigable);
+
+                //Now, we need to add jump links. In this case, two ports are connected if
+                // separated by [0,TribesConfig.PORT_TRADE_DISTANCE] WATER, VISIBLE, NON-ENEMY tiles
+                for (Vector2d portFrom : ports) {
+                    for (Vector2d portTo : ports) {
+                        if (!portFrom.equals(portTo)) {
+                            Node origin = waterGraph.getNode(portFrom.x, portFrom.y);
+                            Node dest = waterGraph.getNode(portTo.x, portTo.y);
+                            ArrayList<Node> path = waterGraph.pathfinder.findPath(origin, dest);
+                            if (path.size() <= TribesConfig.PORT_TRADE_DISTANCE + 1) //+1 because path includes destination
+                            {
+                                //We add this as a link between ports.
+                                tribeNetworkGraph.addEdge(portFrom.x, portFrom.y, portTo.x, portTo.y, true);
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            //TODO: a connection between two cities only gives population bonus if the connection is completed by
+            // the tribe that owns the cities! This needs to be recorded for the next turn if this tribe is not the
+            // one moving now. Population of capital and all newly disconnected cities need update.
+            t.updateNetwork(tribeNetworkGraph, this, t.getTribeId() == this.activeTribeID);
+
         }
+    }
+
+    public int getActiveTribeID() {
+        return activeTribeID;
+    }
+
+    public void setActiveTribeID(int activeTribeID) {
+        this.activeTribeID = activeTribeID;
     }
 
     // Setter method for tribes array
@@ -502,7 +697,7 @@ public class Board {
         tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, 2);
 
         //By default, cities are considered to be roads for trade network purposes.
-        roads[c.getPosition().x][c.getPosition().y] = true;
+        networkTiles[c.getPosition().x][c.getPosition().y] = true;
     }
 
 
@@ -612,7 +807,7 @@ public class Board {
                 if(cityId == -1 || tribes[tribeId].hasCity(cityId))
                 {
                     //There should be no road already here
-                    if(!roads[x][y])
+                    if(!networkTiles[x][y])
                     {
                         //Finally, there should be no enemy unit at this position
                         if(!enemyUnitAt(tribeId, x, y))
@@ -647,4 +842,122 @@ public class Board {
     {
         setTradeNetwork(x, y, true);
     }
+
+
+    private class TradeWaterStep implements NeighbourProvider
+    {
+        private boolean [][]navigable;
+
+        TradeWaterStep(boolean [][]navigable)
+        {
+            this.navigable = navigable;
+        }
+
+        @Override
+        // from: position from which we need neighbours
+        // costFrom: is the total move cost computed up to "from"
+        // Using this.board, this.tribe, from and costFrom, gets all the adjacent neighbours to tile in position "from"
+        public ArrayList<TreeNode> getNeighbours(Vector2d from, double costFrom) {
+
+            ArrayList<TreeNode> neighbours = new ArrayList<>();
+            int xMove[] = {0, -1, 0, 1, -1, -1, 1, 1};
+            int yMove[] = {1, 0, -1, 0, 1, -1, -1, 1};
+            double stepCost = 1.0;
+
+            for(int i = 0; i < xMove.length; ++i)
+                for(int j = 0; j < yMove.length; ++j)
+                {
+                    int x = from.x + xMove[i];
+                    int y = from.y + yMove[i];
+
+                    if(x >= 0 && x < navigable.length && y >= 0 && y < navigable[y].length)
+                    {
+                        if(navigable[x][y] && costFrom+stepCost <= TribesConfig.PORT_TRADE_DISTANCE)
+                        {
+                            neighbours.add(new TreeNode(new Vector2d(x, y), stepCost));
+                        }
+                    }
+                }
+
+            return neighbours;
+        }
+
+        @Override
+        public void addJumpLink(Vector2d from, Vector2d to, boolean reverse) {
+            //No jump links
+        }
+    }
+
+
+    private class TradeNetworkStep implements NeighbourProvider
+    {
+        private boolean [][]connected;
+        private HashMap<Vector2d, ArrayList<Vector2d>> jumpLinks;
+
+        TradeNetworkStep (boolean [][]connected)
+        {
+            this.connected = connected;
+            this.jumpLinks = new HashMap<>();
+        }
+
+        @Override
+        // from: position from which we need neighbours
+        // costFrom: is the total move cost computed up to "from"
+        // Using this.board, this.tribe, from and costFrom, gets all the adjacent neighbours to tile in position "from"
+        public ArrayList<TreeNode> getNeighbours(Vector2d from, double costFrom) {
+
+            ArrayList<TreeNode> neighbours = new ArrayList<>();
+            int xMove[] = {0, -1, 0, 1, -1, -1, 1, 1};
+            int yMove[] = {1, 0, -1, 0, 1, -1, -1, 1};
+            double stepCost = 1.0;
+
+            for(int i = 0; i < xMove.length; ++i)
+                for(int j = 0; j < yMove.length; ++j)
+                {
+                    int x = from.x + xMove[i];
+                    int y = from.y + yMove[i];
+
+                    if(x >= 0 && x < connected.length && y >= 0 && y < connected[y].length)
+                    {
+                        if(connected[x][y])
+                        {
+                            neighbours.add(new TreeNode(new Vector2d(x, y), stepCost));
+                        }
+                    }
+                }
+
+
+            //Now, add the jump link neighbours
+            if(jumpLinks.containsKey(from))
+            {
+                ArrayList<Vector2d> connected = jumpLinks.get(from);
+                for(Vector2d to: connected)
+                {
+                    neighbours.add(new TreeNode(to, stepCost));
+                }
+            }
+
+
+            return neighbours;
+        }
+
+        @Override
+        public void addJumpLink(Vector2d from, Vector2d to, boolean reverse) {
+            addAtoB(from, to);
+            if(reverse) addAtoB(to, from);
+        }
+
+        private void addAtoB(Vector2d from, Vector2d to)
+        {
+            if(!jumpLinks.containsKey(from))
+                jumpLinks.put(from, new ArrayList<>());
+
+            ArrayList<Vector2d> connected = jumpLinks.get(from);
+            connected.add(to);
+        }
+
+
+    }
+
+
 }

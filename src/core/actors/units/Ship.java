@@ -7,11 +7,9 @@ import static core.TribesConfig.*;
 
 public class Ship extends Unit
 {
-    private int hp;
 
-    public Ship(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId, int hp) {
-        super(SHIP_ATTACK, SHIP_DEFENCE, SHIP_MOVEMENT, hp, SHIP_RANGE, SHIP_COST, pos, kills, isVeteran, cityId, tribeId);
-        this.hp = hp;
+    public Ship(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId) {
+        super(SHIP_ATTACK, SHIP_DEFENCE, SHIP_MOVEMENT, -1, SHIP_RANGE, SHIP_COST, pos, kills, isVeteran, cityId, tribeId);
     }
 
     @Override
@@ -21,7 +19,7 @@ public class Ship extends Unit
 
     @Override
     public Ship copy() {
-        Ship c = new Ship(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId(), hp);
+        Ship c = new Ship(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());

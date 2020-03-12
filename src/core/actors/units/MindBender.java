@@ -13,7 +13,7 @@ public class MindBender extends Unit
 
     @Override
     public Types.UNIT getType() {
-        return Types.UNIT.MIND_BEARER;
+        return Types.UNIT.MIND_BENDER;
     }
 
     @Override

@@ -1,44 +1,48 @@
 package core.actions.unitactions;
 
-import core.Types;
 import core.actions.Action;
 import core.game.GameState;
 import core.actors.units.Unit;
 import utils.Vector2d;
+import utils.graph.NeighbourProvider;
+import utils.graph.TreeNode;
+import utils.graph.TreePathfinder;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Move extends UnitAction
 {
-    private Vector2d destination;
+    private int destX;
+    private int destY;
 
     public Move(Unit u)
     {
         super.unit = u;
     }
 
-    public void setDest(Vector2d destination) { this.destination = destination; }
-    public Vector2d getDest() {
-        return destination;
+    public void setDest(int x, int y) {this.destX = x; this.destY = y;}
+    public int getDestX() {
+        return destX;
+    }
+    public int getDestY() {
+        return destY;
     }
 
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
-        LinkedList<Action> moves = new LinkedList<>();
-        LinkedList<Vector2d> possibleTiles = unit.getPosition().neighborhood(unit.RANGE, gs.getBoard().getSize());
+        //TODO: compute all the possible Move actions for super.unit.
 
-        //If a units turn is FINISHED don't do unnecessary calculations.
-        if(unit.getStatus() != Types.TURN_STATUS.FINISHED) {
-            for (Vector2d tile : possibleTiles) {
-                Move action = new Move(unit);
-                action.setDest(tile);
+        // Code below for demonstration purposes only:
+        TreePathfinder tp = new TreePathfinder(unit.getPosition(), new StepMove(gs, unit));
 
-                if (action.isFeasible(gs)) {
-                    moves.add(action);
-                }
-            }
-        }
-        return moves;
+        //This gets all reachable nodes.
+        ArrayList<TreeNode> reachableNodes = tp.findPaths();
+
+        //This finds a path to a given destination
+        ArrayList<TreeNode> path = tp.findPathTo(new Vector2d(destX, destY));
+
+        return new LinkedList<>();
     }
 
     @Override
@@ -50,37 +54,41 @@ public class Move extends UnitAction
 
     @Override
     public boolean execute(GameState gs) {
-        Types.TURN_STATUS status = unit.getStatus();
-
-        if(isFeasible(gs)) {
-            switch(unit.getType()) {
-                case WARRIOR:
-                case BOAT:
-                case SHIP:
-                case BATTLESHIP:
-                case ARCHER:
-                case SWORDMAN:
-                    unit.setStatus(Types.TURN_STATUS.MOVED);
-                    unit.setPosition(destination.x, destination.y);
-                    return true;
-                case RIDER:
-                    if(status == Types.TURN_STATUS.MOVED_AND_ATTACKED) {
-                        unit.setStatus(Types.TURN_STATUS.FINISHED);
-                        unit.setPosition(destination.x, destination.y);
-                        return true;
-                    }else if(status == Types.TURN_STATUS.ATTACKED) {
-                        unit.setStatus(Types.TURN_STATUS.MOVED_AND_ATTACKED);
-                        unit.setPosition(destination.x, destination.y);
-                        return true;
-                    }else {
-                        unit.setStatus(Types.TURN_STATUS.MOVED);
-                        unit.setPosition(destination.x, destination.y);
-                        return true;
-                    }
-                case KNIGHT:
-                    
-            }
-        }
+        //TODO Execute this Move action
         return false;
     }
+
+    private class StepMove implements NeighbourProvider
+    {
+        private GameState gs;
+        private Unit unit;
+
+        StepMove(GameState curGameState, Unit movingUnit)
+        {
+            this.gs = curGameState;
+            this.unit = movingUnit;
+        }
+
+        @Override
+        // from: position from which we need neighbours
+        // costFrom: is the total move cost computed up to "from"
+        // Using this.gs, this.unit, from and costFrom, gets all the adjacent neighbours to tile in position "from"
+        public ArrayList<TreeNode> getNeighbours(Vector2d from, double costFrom) {
+
+            ArrayList<TreeNode> neighbours = new ArrayList<>();
+
+            // Each one of the tree nodes added to "neighbours" must have a position (x,y) and also the cost of moving there from "from":
+            //  TreeNode tn = new TreeNode (vector2d pos, double stepCost)
+
+            // We only add nodes to neighbours if costFrom+stepCost <= total move range of this.unit
+
+            return neighbours;
+        }
+
+        @Override
+        public void addJumpLink(Vector2d from, Vector2d to, boolean reverse) {
+            //No jump links
+        }
+    }
+
 }

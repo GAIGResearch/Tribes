@@ -46,7 +46,7 @@ public class Examine extends UnitAction
             TechnologyTree technologyTree = gs.getTribe(unit.getTribeId()).getTechTree();
             int capital = gs.getTribe(unit.getTribeId()).getCapitalID();
             Vector2d cityPos = gs.getActor(capital).getPosition();
-            boolean allTech = technologyTree.getEverythingResearched();
+            boolean allTech = technologyTree.isEverythingResearched();
 
 
             int bonus = r.nextInt(5);

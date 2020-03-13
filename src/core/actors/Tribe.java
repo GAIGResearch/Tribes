@@ -10,6 +10,8 @@ import utils.graph.Node;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Tribe extends Actor{
@@ -36,12 +38,14 @@ public class Tribe extends Actor{
     //Score for the tribe.
     private int score = 0;
 
-
     //Indicates if the position in the board is visible
     private boolean obsGrid[][];
 
     //List of city ids connected to the capital (capital not included)
     private ArrayList<Integer> connectedCities = new ArrayList<>();
+
+    //Monument availability
+    private HashMap<Types.BUILDING, Types.BUILDING.MONUMENT_STATUS> monuments;
 
     public Tribe(Types.TRIBE tribe)
     {
@@ -62,6 +66,7 @@ public class Tribe extends Actor{
         techTree.doResearch(tribe.getInitialTech());
         citiesID = new ArrayList<>();
         stars = TribesConfig.INITIAL_STARS;
+        monuments = Types.BUILDING.initMonuments();
     }
 
     public void initObsGrid(int size)
@@ -96,6 +101,12 @@ public class Tribe extends Actor{
         for(int cityID : connectedCities)
         {
             tribeCopy.connectedCities.add(cityID);
+        }
+
+        tribeCopy.monuments = new HashMap<>();
+        for(Types.BUILDING b : monuments.keySet())
+        {
+            tribeCopy.monuments.put(b, monuments.get(b));
         }
 
         return tribeCopy;
@@ -198,6 +209,18 @@ public class Tribe extends Actor{
     {
         return null;
     }
+
+
+    public boolean isMonumentBuildable(Types.BUILDING building)
+    {
+        return monuments.get(building) == Types.BUILDING.MONUMENT_STATUS.AVAILABLE;
+    }
+
+    public void monumentIsBuilt(Types.BUILDING building)
+    {
+        monuments.put(building, Types.BUILDING.MONUMENT_STATUS.BUILT);
+    }
+
 
     /**
      * Updates the cities connected to the capital of this tribe given a graph.

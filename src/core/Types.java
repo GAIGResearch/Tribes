@@ -5,6 +5,7 @@ import utils.ImageIO;
 import utils.Vector2d;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Types {
@@ -134,6 +135,12 @@ public class Types {
         PARK_OF_FORTUNE (18,"img/building/monument.png", 0, null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
         TOWER_OF_WISDOM (19, "img/building/monument.png", 0, TECHNOLOGY.PHILOSOPHY, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN});
 
+        public enum MONUMENT_STATUS {
+            UNAVAILABLE,
+            AVAILABLE,
+            BUILT;
+        }
+
         private int key;
         private String imageFile;
         private TECHNOLOGY technologyRequirement;
@@ -152,6 +159,19 @@ public class Types {
         public int getKey() {  return key; }
         public int getCost() {return cost; }
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
+
+
+        public static HashMap<BUILDING, MONUMENT_STATUS> initMonuments()
+        {
+            HashMap<BUILDING, MONUMENT_STATUS> monuments = new HashMap<>();
+            monuments.put(ALTAR_OF_PEACE, MONUMENT_STATUS.UNAVAILABLE);
+            monuments.put(EMPERORS_TOMB, MONUMENT_STATUS.UNAVAILABLE);
+            monuments.put(EYE_OF_GOD, MONUMENT_STATUS.UNAVAILABLE);
+            monuments.put(GATE_OF_POWER, MONUMENT_STATUS.UNAVAILABLE);
+            monuments.put(PARK_OF_FORTUNE, MONUMENT_STATUS.UNAVAILABLE);
+            monuments.put(TOWER_OF_WISDOM, MONUMENT_STATUS.UNAVAILABLE);
+            return monuments;
+        }
     }
 
 

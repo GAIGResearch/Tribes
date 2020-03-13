@@ -53,10 +53,6 @@ public class Build extends CityAction
 
     @Override
     public boolean isFeasible(final GameState gs) {
-        //TODO: Add monuments.
-        Tribe tribe = gs.getTribe(city.getTribeId());
-        Board board = gs.getBoard();
-        TechnologyTree t = tribe.getTechTree();
 
         switch (buildingType) {
             case ROAD:
@@ -73,33 +69,33 @@ public class Build extends CityAction
             case WATER_TEMPLE:
             case MOUNTAIN_TEMPLE:
             case FOREST_TEMPLE:
-                if(isBuildable(gs, buildingType.getCost(), false)) { return true; }
+                return isBuildable(gs, buildingType.getCost(), false);
 
             //Buildings that must be unique in a city
             case SAWMILL:
             case CUSTOM_HOUSE:
             case WINDMILL:
             case FORGE:
-                if(isBuildable(gs, buildingType.getCost(), true)) { return true; }
+                return isBuildable(gs, buildingType.getCost(), true);
 
-            //Buildings that must be unique in a tribe (monuments)
-
+            //Buildings that must be unique in a tribe (i.e. monuments)
             case ALTAR_OF_PEACE:
             case EMPERORS_TOMB:
             case EYE_OF_GOD:
             case GATE_OF_POWER:
             case PARK_OF_FORTUNE:
             case TOWER_OF_WISDOM:
-                if(isMonumentBuildable(gs)) { return true; }
-
-
+                boolean buildingConstraintsOk = isBuildable(gs, buildingType.getCost(), false);
+                Tribe tribe = gs.getTribe(city.getTribeId());
+                if(buildingConstraintsOk)
+                    return tribe.isMonumentBuildable(buildingType);
+                else return false;
         }
         return false;
     }
 
     @Override
     public boolean execute(GameState gs) {
-        //TODO: Add monuments
         //TODO: Make sure all the side effects for Buildings are counted.
         Tribe tribe = gs.getTribe(city.getTribeId());
         Board board = gs.getBoard();
@@ -186,10 +182,6 @@ public class Build extends CityAction
         }
 
         return true;
-    }
-
-    private boolean isMonumentBuildable(final GameState gs) {
-        return false;
     }
 
 }

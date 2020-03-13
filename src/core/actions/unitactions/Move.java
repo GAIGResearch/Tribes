@@ -1,5 +1,6 @@
 package core.actions.unitactions;
 
+import core.Types;
 import core.actions.Action;
 import core.game.GameState;
 import core.actors.units.Unit;
@@ -13,48 +14,61 @@ import java.util.LinkedList;
 
 public class Move extends UnitAction
 {
-    private int destX;
-    private int destY;
+    private Vector2d destination;
 
     public Move(Unit u)
     {
         super.unit = u;
     }
 
-    public void setDest(int x, int y) {this.destX = x; this.destY = y;}
-    public int getDestX() {
-        return destX;
-    }
-    public int getDestY() {
-        return destY;
-    }
+    public void setDestination(Vector2d destination) {this.destination = destination; }
+    public Vector2d getDestination() { return destination; }
 
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         //TODO: compute all the possible Move actions for super.unit.
-
-        // Code below for demonstration purposes only:
+        LinkedList<Action> moves = new LinkedList<>();
         TreePathfinder tp = new TreePathfinder(unit.getPosition(), new StepMove(gs, unit));
 
+        //If a units turn is FINISHED don't do unnecessary calculations.
+        if(unit.getStatus() != Types.TURN_STATUS.FINISHED) {
+            for(TreeNode tile : tp.findPaths()) {
+                Move action = new Move(unit);
+                action.setDestination(tile.getPosition());
+
+                if(action.isFeasible(gs)) {
+                    moves.add(action);
+                }
+            }
+        }
         //This gets all reachable nodes.
         ArrayList<TreeNode> reachableNodes = tp.findPaths();
 
         //This finds a path to a given destination
-        ArrayList<TreeNode> path = tp.findPathTo(new Vector2d(destX, destY));
+        ArrayList<TreeNode> path = tp.findPathTo(destination);
 
-        return new LinkedList<>();
+        return moves;
     }
 
     @Override
     public boolean isFeasible(final GameState gs)
     {
-        //TODO: isFeasible this Move action
+        TreePathfinder tp = new TreePathfinder(unit.getPosition(), new StepMove(gs, unit));
+
+        if(unit.checkStatus(Types.TURN_STATUS.MOVED)) {
+            return !tp.findPathTo(destination).isEmpty();
+        }
         return false;
     }
 
     @Override
-    public boolean execute(GameState gs) {
-        //TODO Execute this Move action
+    public boolean execute(GameState gs)
+    {
+        if(isFeasible(gs)) {
+            unit.setStatus(Types.TURN_STATUS.MOVED);
+            unit.setPosition(destination.x, destination.y);
+            return true;
+        }
         return false;
     }
 

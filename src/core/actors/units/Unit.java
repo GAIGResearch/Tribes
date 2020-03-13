@@ -56,6 +56,10 @@ public abstract class Unit extends Actor
 
     public void addKill() {
         this.kills++;
+        //Persist skill
+        if(getType() == Types.UNIT.KNIGHT) {
+            setStatus(Types.TURN_STATUS.FRESH);
+        }
     }
 
     public boolean isVeteran() {
@@ -74,7 +78,73 @@ public abstract class Unit extends Actor
 
     public Types.TURN_STATUS getStatus() { return status; }
 
-    public void setStatus(Types.TURN_STATUS status) { this.status = status; }
+    /**
+     * Checks if the unit can transition to the status indicated by @param transition.
+     * @param transition the status to transition to.
+     * @return if the unit can transition to @param transition or not.
+    */
+    public boolean checkStatus(Types.TURN_STATUS transition) {
+        switch (getType()) {
+            //Either move or attack
+            case MIND_BENDER:
+            case CATAPULT:
+            case DEFENDER:
+                if(transition == Types.TURN_STATUS.MOVED && status == Types.TURN_STATUS.FRESH) { return true; }
+                if(transition == Types.TURN_STATUS.ATTACKED && status == Types.TURN_STATUS.FRESH) { return true; }
+            //Rules for Dash
+            case ARCHER:
+            case BATTLESHIP:
+            case BOAT:
+            case SHIP:
+            case WARRIOR:
+            case SWORDMAN:
+                if(transition == Types.TURN_STATUS.MOVED && status == Types.TURN_STATUS.FRESH) { return true; }
+                if(transition == Types.TURN_STATUS.ATTACKED && status == Types.TURN_STATUS.FRESH) { return true; }
+                if(transition == Types.TURN_STATUS.ATTACKED && status == Types.TURN_STATUS.MOVED) { return true; }
+            //Rules for Escape
+            case RIDER:
+                if(transition == Types.TURN_STATUS.MOVED && status == Types.TURN_STATUS.FRESH) { return true; }
+                if(transition == Types.TURN_STATUS.MOVED && status == Types.TURN_STATUS.ATTACKED) { return true; }
+                if(transition == Types.TURN_STATUS.MOVED && status == Types.TURN_STATUS.MOVED_AND_ATTACKED) { return true; }
+                if(transition == Types.TURN_STATUS.ATTACKED && status == Types.TURN_STATUS.FRESH) { return true; }
+                if(transition == Types.TURN_STATUS.ATTACKED && status == Types.TURN_STATUS.MOVED) { return true; }
+            //Rules for Persist
+            //Adding a kill for a knight resets its status to FRESH
+            case KNIGHT:
+                if(transition == Types.TURN_STATUS.MOVED && status == Types.TURN_STATUS.FRESH) { return true; }
+                if(transition == Types.TURN_STATUS.ATTACKED && status == Types.TURN_STATUS.FRESH) { return true; }
+        }
+        return false;
+    }
+
+    public void setStatus(Types.TURN_STATUS newStatus) {
+        if(checkStatus(newStatus)) {
+            switch (getType()) {
+                case MIND_BENDER:
+                case CATAPULT:
+                case DEFENDER:
+                    this.status = Types.TURN_STATUS.FINISHED;
+                case ARCHER:
+                case BATTLESHIP:
+                case BOAT:
+                case SHIP:
+                case WARRIOR:
+                case SWORDMAN:
+                    if(newStatus == Types.TURN_STATUS.MOVED && getStatus() == Types.TURN_STATUS.FRESH) { this.status = Types.TURN_STATUS.MOVED; }
+                    if(newStatus == Types.TURN_STATUS.ATTACKED && getStatus() == Types.TURN_STATUS.FRESH) { this.status = Types.TURN_STATUS.FINISHED; }
+                    if(newStatus == Types.TURN_STATUS.ATTACKED && getStatus() == Types.TURN_STATUS.MOVED) { this.status = Types.TURN_STATUS.FINISHED; }
+                case RIDER:
+                    if(newStatus == Types.TURN_STATUS.MOVED && getStatus() == Types.TURN_STATUS.FRESH) { this.status = Types.TURN_STATUS.MOVED; }
+                    if(newStatus == Types.TURN_STATUS.MOVED && getStatus() == Types.TURN_STATUS.ATTACKED) { this.status = Types.TURN_STATUS.MOVED_AND_ATTACKED; }
+                    if(newStatus == Types.TURN_STATUS.MOVED && getStatus() == Types.TURN_STATUS.MOVED_AND_ATTACKED) { this.status = Types.TURN_STATUS.FINISHED; }
+                    if(newStatus == Types.TURN_STATUS.ATTACKED && getStatus() == Types.TURN_STATUS.FRESH) { this.status = Types.TURN_STATUS.ATTACKED; }
+                    if(newStatus == Types.TURN_STATUS.ATTACKED && getStatus() == Types.TURN_STATUS.MOVED) { this.status = Types.TURN_STATUS.MOVED_AND_ATTACKED; }
+                case KNIGHT:
+                    if(newStatus == Types.TURN_STATUS.MOVED && getStatus() == Types.TURN_STATUS.FRESH) { this.status = Types.TURN_STATUS.MOVED; }
+                    if(newStatus == Types.TURN_STATUS.ATTACKED && getStatus() == Types.TURN_STATUS.FRESH) { this.status = Types.TURN_STATUS.FINISHED; }
+            }
+        }
+    }
 
     public abstract Unit copy();
 

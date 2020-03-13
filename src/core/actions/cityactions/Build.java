@@ -11,6 +11,7 @@ import core.game.GameState;
 import core.actors.City;
 import utils.Vector2d;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Build extends CityAction
@@ -56,109 +57,105 @@ public class Build extends CityAction
         Tribe tribe = gs.getTribe(city.getTribeId());
         Board board = gs.getBoard();
         TechnologyTree t = tribe.getTechTree();
-        int stars = tribe.getStars();
 
         switch (buildingType) {
+            case ROAD:
+                //Not this way.
+                System.out.println("ERROR: Action Build can't built roads. Use tribeactions.BuildRoad instead.");
+                return false;
+
+            //Buildings that can be repeated in a city:
             case PORT:
-                if(isBuildable(gs, TribesConfig.PORT_COST, false)) { return true; }
             case FARM:
-                if(isBuildable(gs, TribesConfig.FARM_COST, false)) { return true; }
             case MINE:
-                if(isBuildable(gs, TribesConfig.MINE_COST, false)) { return true; }
             case LUMBER_HUT:
-                if(isBuildable(gs, TribesConfig.LUMBER_HUT_COST, false)) { return true; }
             case TEMPLE:
             case WATER_TEMPLE:
             case MOUNTAIN_TEMPLE:
-                if(isBuildable(gs, TribesConfig.TEMPLE_COST, false)) { return true; }
             case FOREST_TEMPLE:
-                if(isBuildable(gs, TribesConfig.TEMPLE_FOREST_COST, false)) { return true; }
+                if(isBuildable(gs, buildingType.getCost(), false)) { return true; }
+
+            //Buildings that must be unique in a city
             case SAWMILL:
-                if(isBuildable(gs, TribesConfig.SAW_MILL_COST, true)) { return true; }
             case CUSTOM_HOUSE:
-                if(isBuildable(gs, TribesConfig.CUSTOM_COST, true)) { return true; }
             case WINDMILL:
-                if(isBuildable(gs, TribesConfig.WIND_MILL_COST, true)) { return true; }
             case FORGE:
-                if(isBuildable(gs, TribesConfig.FORGE_COST, true)) { return true; }
+                if(isBuildable(gs, buildingType.getCost(), true)) { return true; }
+
+            //Buildings that must be unique in a tribe (monuments)
+
+            case ALTAR_OF_PEACE:
+            case EMPERORS_TOMB:
+            case EYE_OF_GOD:
+            case GATE_OF_POWER:
+            case PARK_OF_FORTUNE:
+            case TOWER_OF_WISDOM:
+                if(isMonumentBuildable(gs)) { return true; }
+
+
         }
         return false;
     }
 
     @Override
     public boolean execute(GameState gs) {
-        //TODO: Add monuments, roads
+        //TODO: Add monuments
         //TODO: Make sure all the side effects for Buildings are counted.
         Tribe tribe = gs.getTribe(city.getTribeId());
         Board board = gs.getBoard();
 
         if(isFeasible(gs)) {
+
+            tribe.subtractStars(buildingType.getCost());
+            board.setBuildingAt(targetPos.x, targetPos.y, buildingType);
+
             switch (buildingType) {
                 case FARM:
-                    tribe.subtractStars(TribesConfig.FARM_COST);
-                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.FARM);
                     city.addBuilding(new Farm(targetPos.x, targetPos.y));
                     return true;
                 case MINE:
-                    tribe.subtractStars(TribesConfig.MINE_COST);
-                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.MINE);
                     city.addBuilding(new Mine(targetPos.x, targetPos.y));
                     return true;
                 case PORT:
-                    tribe.subtractStars(TribesConfig.PORT_COST);
-                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.PORT);
                     city.addBuilding(new Port(targetPos.x, targetPos.y));
                     board.setTradeNetwork(targetPos.x, targetPos.y, true);
                     return true;
-                case ROAD:
-                    //is road a building? Road object is missing
-                    return true;
                 case FORGE:
-                    tribe.subtractStars(TribesConfig.FORGE_COST);
-                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.FORGE);
                     city.addBuilding(new Forge(targetPos.x, targetPos.y));
                     return true;
                 case TEMPLE:
-                    tribe.subtractStars(TribesConfig.TEMPLE_COST);
-                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.TEMPLE);
                     city.addBuilding(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_COST, Types.BUILDING.TEMPLE));
                     return true;
                 case MOUNTAIN_TEMPLE:
-                    tribe.subtractStars(TribesConfig.TEMPLE_COST);
-                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.MOUNTAIN_TEMPLE);
                     city.addBuilding(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_COST, Types.BUILDING.MOUNTAIN_TEMPLE));
                     return true;
                 case WATER_TEMPLE:
-                    tribe.subtractStars(TribesConfig.TEMPLE_COST);
-                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.WATER_TEMPLE);
                     city.addBuilding(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_COST, Types.BUILDING.WATER_TEMPLE));
                     return true;
                 case FOREST_TEMPLE:
-                    tribe.subtractStars(TribesConfig.TEMPLE_FOREST_COST);
-                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.FOREST_TEMPLE);
                     city.addBuilding(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_FOREST_COST, Types.BUILDING.FOREST_TEMPLE));
                     return true;
                 case SAWMILL:
-                    tribe.subtractStars(TribesConfig.SAW_MILL_COST);
-                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.SAWMILL);
                     city.addBuilding(new Sawmill(targetPos.x, targetPos.y));
                     return true;
                 case WINDMILL:
-                    tribe.subtractStars(TribesConfig.WIND_MILL_COST);
-                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.WINDMILL);
                     city.addBuilding(new Windmill(targetPos.x, targetPos.y));
                     return true;
                 case LUMBER_HUT:
-                    tribe.subtractStars(TribesConfig.LUMBER_HUT_COST);
-                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.LUMBER_HUT);
                     city.addBuilding(new LumberHut(targetPos.x, targetPos.y));
                     return true;
                 case CUSTOM_HOUSE:
-                    tribe.subtractStars(TribesConfig.CUSTOM_COST);
-                    board.setBuildingAt(targetPos.x, targetPos.y, Types.BUILDING.CUSTOM_HOUSE);
                     city.addBuilding(new CustomHouse(targetPos.x, targetPos.y));
                     return true;
-                //Ask Judy to add monuments to addBuilding.
+
+                case ALTAR_OF_PEACE:
+                case EMPERORS_TOMB:
+                case EYE_OF_GOD:
+                case GATE_OF_POWER:
+                case PARK_OF_FORTUNE:
+                case TOWER_OF_WISDOM:
+                    city.addBuilding(new Monument(targetPos.x, targetPos.y, buildingType));
+                    break;
             }
         }
         return false;
@@ -171,7 +168,7 @@ public class Build extends CityAction
         int stars = tribe.getStars();
 
         //Cost constraint
-        if(stars < cost) { return false; }
+        if(cost > 0 && stars < cost) { return false; }
 
         //Technology constraint
         if(!techTree.isResearched(buildingType.getTechnologyRequirement())) { return false; }
@@ -190,4 +187,9 @@ public class Build extends CityAction
 
         return true;
     }
+
+    private boolean isMonumentBuildable(final GameState gs) {
+        return false;
+    }
+
 }

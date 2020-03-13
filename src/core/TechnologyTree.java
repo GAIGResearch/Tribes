@@ -123,7 +123,7 @@ public class TechnologyTree {
         everythingResearched = true;
     }
 
-    public boolean getEverythingResearched(){
+    public boolean isEverythingResearched(){
         return everythingResearched;
     }
 

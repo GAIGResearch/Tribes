@@ -32,7 +32,7 @@ public class Test
         rt.setTech(SHIELDS);
         System.out.println("Tech feasible: " + rt.toString() + ", " + rt.isFeasible(null));
 
-        t.setStars(10);
+        t.addStars(10);
 
         rt.setTech(MINING);
         System.out.println("Tech feasible: " + rt.toString() + ", " + rt.isFeasible(null));
@@ -45,7 +45,7 @@ public class Test
         rt.setTech(MINING);
         System.out.println("Managed to research: " + rt.toString() + ", " + rt.execute(null));
 
-        t.setStars(10);
+        t.addStars(10);
 
         allResearchable = new ResearchTech(t).computeActionVariants(null);
         for(Action act : allResearchable)

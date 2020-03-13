@@ -151,6 +151,7 @@ public class Build extends CityAction
                 case PARK_OF_FORTUNE:
                 case TOWER_OF_WISDOM:
                     city.addBuilding(new Monument(targetPos.x, targetPos.y, buildingType));
+                    tribe.monumentIsBuilt(buildingType);
                     break;
             }
         }

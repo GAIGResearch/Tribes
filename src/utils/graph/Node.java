@@ -1,37 +1,70 @@
 package utils.graph;
 
+import utils.Vector2d;
+
 import java.util.ArrayList;
 
-public class Node<T>
+public class Node
 {
-    private T id;
-    private ArrayList<T> neighbours;
+    private int id;
+    private Vector2d position;
+    private ArrayList<Node> neighbours;
 
-    public Node (T id)
+    private double totalCost;
+
+    private double estimatedCost;
+    private Node parent;
+    private boolean visited;
+
+    public Node (int id, int x, int y)
     {
+        this.parent = null;
         this.id = id;
+        this.position = new Vector2d(x, y);
         this.neighbours = new ArrayList<>();
     }
 
-    public void addNeighbour(T neighbourId)
+    public void addNeighbour(Node neighbour)
     {
-        this.neighbours.add(neighbourId);
+        this.neighbours.add(neighbour);
+    }
+    public void removeNeighbour(Node neighbour)
+    {
+        this.neighbours.remove(neighbour);
     }
 
-    public void removeNeighbour(T neighbourId)
-    {
-        this.neighbours.remove(neighbourId);
+    public ArrayList<Node> getNeighbours() {
+        return neighbours;
     }
 
-    public T getId() {return id;}
+    public int getId() {return id;}
+    public int getX() {return position.x; }
+    public int getY() {return position.y;}
 
-    public Node copy()
+    public Node getParent() {return parent;}
+    public void setParent(Node parent) {this.parent = parent;}
+    public double getTotalCost() {return totalCost;}
+    public void setTotalCost(double totalCost) {this.totalCost = totalCost;}
+    public double getEstimatedCost() {return estimatedCost;}
+    public void setEstimatedCost(double estimatedCost) { this.estimatedCost = estimatedCost; }
+    public boolean isVisited() {return visited;}
+    public void setVisited(boolean visited) {this.visited = visited;}
+
+    public boolean equals(Node n)
     {
-        Node other = new Node(this.id);
-        for(T id : neighbours)
-        {
-            other.addNeighbour(id);
-        }
-        return other;
+        return this.id == n.id;
     }
+
+//    public Node copy()
+//    {
+//        Node other = new Node(this.id, this.position.x, this.position.y);
+//        other.setParent(this.parent);
+//        other.setTotalCost(this.totalCost);
+//        other.setEstimatedCost(this.estimatedCost);
+//        for(Node id : neighbours)
+//        {
+//            other.addNeighbour(id.copy());
+//        }
+//        return other;
+//    }
 }

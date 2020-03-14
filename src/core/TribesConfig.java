@@ -138,13 +138,17 @@ public class TribesConfig
     // Port
     public static int PORT_COST = 10;
     public static int PORT_PRODUCTION = 2;
+    public static int PORT_TRADE_DISTANCE = 3;
 
     // Custom House
     public static int CUSTOM_COST = 5;
 
-    //Monument
+    //Monuments
     public static int MONUMENT_PRODUCTION = 3;
     public static int MONUMENT_POINT = 400;
+    public static int EMPERORS_TOMB_STARS = 100;
+    public static int GATE_OF_POWER_KILLS = 10;
+    public static int GRAND_BAZAR_CITIES = 5;
 
     // Temple
     public static int TEMPLE_COST = 20;
@@ -161,5 +165,4 @@ public class TribesConfig
     /* ACTIONS */
     public static int CLEAR_FOREST_STAR = 2;
     public static int FOREST_COST = 5;
-
 }

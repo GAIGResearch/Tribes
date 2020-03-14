@@ -8,6 +8,8 @@ import core.actors.City;
 import core.actors.Tribe;
 import core.actors.units.*;
 import utils.Vector2d;
+import utils.graph.Graph;
+import utils.graph.Node;
 
 import java.util.*;
 
@@ -32,13 +34,16 @@ public class Board {
     private int[][] tileCityId;
 
     // Array that indicates presence of roads, cities, ports or naval links
-    private boolean[][] roads;
+    private boolean[][] networkTiles;
 
     //Actors in the game
     private HashMap<Integer, Actor> gameActors;
 
     //variable to declare size of board
     private int size;
+
+    // Player currently making a move.
+    private int activeTribeID = -1;
 
     // Constructor for board
     public Board() {
@@ -54,7 +59,7 @@ public class Board {
         buildings = new Types.BUILDING[size][size];
         units = new int[size][size];
         this.tileCityId = new int[size][size];
-        this.roads = new boolean[size][size];
+        this.networkTiles = new boolean[size][size];
 
         for(Tribe t : tribes)
             t.initObsGrid(size);
@@ -79,13 +84,13 @@ public class Board {
         Board copyBoard = new Board();
         copyBoard.size = this.size;
         copyBoard.tribes = new Tribe[this.tribes.length];
-
         copyBoard.terrains = new Types.TERRAIN[size][size];
         copyBoard.resources = new Types.RESOURCE[size][size];
         copyBoard.buildings = new Types.BUILDING[size][size];
         copyBoard.units = new int[size][size];
         copyBoard.tileCityId = new int[size][size];
-        copyBoard.roads = new boolean[size][size];
+        copyBoard.networkTiles = new boolean[size][size];
+        copyBoard.activeTribeID = activeTribeID;
 
         // Copy board objects (they are all ids)
         for (int x = 0; x < this.size; x++) {
@@ -98,7 +103,7 @@ public class Board {
                     copyBoard.setResourceAt(x, y, resources[x][y]);
                     copyBoard.setBuildingAt(x, y, buildings[x][y]);
                     copyBoard.tileCityId[x][y] = tileCityId[x][y];
-                    copyBoard.roads[x][y] = roads[x][y];
+                    copyBoard.networkTiles[x][y] = networkTiles[x][y];
                 }
             }
         }
@@ -151,8 +156,10 @@ public class Board {
             idx++;
         }
 
+        //TODO: A pushed unit loses its next turn! (manage through TURN_STATUS).
+
         if (!pushed) {
-            //it can't be pushed, unit must disappear
+            //TODO: if a unit can't be pushed, unit must disappear
         }
 
     }
@@ -306,7 +313,8 @@ public class Board {
 
     public void setTradeNetwork(int x, int y, boolean trade)
     {
-        roads[x][y] = trade;
+        networkTiles[x][y] = trade;
+        recomputeTradeNetwork();
     }
 
     // Get units array
@@ -482,18 +490,88 @@ public class Board {
             return false;
         }
 
-        this.recomputeTradeNetwork();
+        this.setTradeNetwork(x, y, true);
         return true;
     }
 
     /**
-     * Recomputes the trade network for the game..
+     * Recomputes the trade network for all tribes in the game.
      */
     private void recomputeTradeNetwork() {
-        for(Tribe t : tribes)
-        {
-            t.updateNetwork(roads, tileCityId, buildings);
+
+        for(Tribe t : tribes) {
+            Graph tribeNetworkGraph = new Graph();
+
+            if (t.controlsCapital()) {
+
+                int tribeId = t.getTribeId();
+
+                Graph waterGraph = new Graph();
+                boolean[][] connectedTiles = new boolean[networkTiles.length][networkTiles[0].length];
+                boolean[][] navigable = new boolean[networkTiles.length][networkTiles[0].length];
+
+                ArrayList<Vector2d> ports = new ArrayList<>();
+
+                //First, set up the graph. Including all tiles that correspond to active trade points (roads, cities, ports)
+                for (int i = 0; i < networkTiles.length; ++i) {
+                    for (int j = 0; j < networkTiles[0].length; ++j) {
+                        //Only for this tribe
+                        if (tileCityId[i][j] == tribeId) {
+                            // Map cities, roads and ports
+                            connectedTiles[i][j] = networkTiles[i][j];
+
+                            //Keep a list of my ports
+                            if (buildings[i][j] == Types.BUILDING.PORT)
+                                ports.add(new Vector2d(i, j));
+
+                            //And navigable tiles
+                            if ((terrains[i][j] == Types.TERRAIN.SHALLOW_WATER || terrains[i][j] == Types.TERRAIN.DEEP_WATER) //WATER
+                                    && t.isVisible(i, j) && tileCityId[i][j] != -1) //VISIBLE AND NOT ENEMY
+                            {
+                                navigable[i][j] = true;
+                            }
+
+                        }
+                    }
+                }
+
+                //Set the ground and water graphs' data:
+                tribeNetworkGraph.setData(connectedTiles);
+                waterGraph.setData(navigable);
+
+                //Now, we need to add jump links. In this case, two ports are connected if
+                // separated by [0,TribesConfig.PORT_TRADE_DISTANCE] WATER, VISIBLE, NON-ENEMY tiles
+                for (Vector2d portFrom : ports) {
+                    for (Vector2d portTo : ports) {
+                        if (!portFrom.equals(portTo)) {
+                            Node origin = waterGraph.getNode(portFrom.x, portFrom.y);
+                            Node dest = waterGraph.getNode(portTo.x, portTo.y);
+                            ArrayList<Node> path = waterGraph.pathfinder.findPath(origin, dest);
+                            if (path.size() <= TribesConfig.PORT_TRADE_DISTANCE + 1) //+1 because path includes destination
+                            {
+                                //We add this as a link between ports.
+                                tribeNetworkGraph.addEdge(portFrom.x, portFrom.y, portTo.x, portTo.y, true);
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            //TODO: a connection between two cities only gives population bonus if the connection is completed by
+            // the tribe that owns the cities! This needs to be recorded for the next turn if this tribe is not the
+            // one moving now. Population of capital and all newly disconnected cities need update.
+            t.updateNetwork(tribeNetworkGraph, this, t.getTribeId() == this.activeTribeID);
+
         }
+    }
+
+    public int getActiveTribeID() {
+        return activeTribeID;
+    }
+
+    public void setActiveTribeID(int activeTribeID) {
+        this.activeTribeID = activeTribeID;
     }
 
     // Setter method for tribes array
@@ -517,7 +595,7 @@ public class Board {
         tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, 2);
 
         //By default, cities are considered to be roads for trade network purposes.
-        roads[c.getPosition().x][c.getPosition().y] = true;
+        networkTiles[c.getPosition().x][c.getPosition().y] = true;
     }
 
 
@@ -627,7 +705,7 @@ public class Board {
                 if(cityId == -1 || tribes[tribeId].hasCity(cityId))
                 {
                     //There should be no road already here
-                    if(!roads[x][y])
+                    if(!networkTiles[x][y])
                     {
                         //Finally, there should be no enemy unit at this position
                         if(!enemyUnitAt(tribeId, x, y))

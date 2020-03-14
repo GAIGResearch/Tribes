@@ -87,7 +87,7 @@ public class Tribe extends Actor{
 
         tribeCopy.techTree = this.techTree.copy();
         if (tradeNetwork != null) {
-            tribeCopy.tradeNetwork = this.tradeNetwork.copy();
+         //   tribeCopy.tradeNetwork = this.tradeNetwork.copy();
         }
 
         tribeCopy.obsGrid = new boolean[obsGrid.length][obsGrid.length];
@@ -119,7 +119,7 @@ public class Tribe extends Actor{
                 //All these positions should be within my view.
                 if(i >= 0 && j >= 0 && i < size && j < size)
                 {
-                    if( obsGrid [i][j] == false) {
+                    if( !obsGrid [i][j]) {
                         obsGrid[i][j] = true;
                         this.score +=5;
                     }
@@ -222,29 +222,45 @@ public class Tribe extends Actor{
                 inMetTribes[i] = true;
             }
             if(!inMetTribes[i]){
-                tribesMet.add(t[i].tribe); // add to this trube
+                tribesMet.add(t[i].tribe); // add to this tribe
                 t[i].tribesMet.add(this.tribe); // add to met tribe as well
 
                 //Pick a technology at random from the tribe to learn
                 TechnologyTree thisTribeTree = getTechTree();
                 TechnologyTree metTribeTree = t[i].getTechTree();
-                Types.TECHNOLOGY[] tech = Types.TECHNOLOGY.values();
+                ArrayList<Types.TECHNOLOGY> techInThisTribe = new ArrayList<>(); //Check which tech in this tribe
+                ArrayList<Types.TECHNOLOGY> techInMetTribe = new ArrayList<>(); // Check which tech in met tribe
+                //Check which technologies both research trees contain
                 Random r = new Random();
-                Types.TECHNOLOGY techToGet = tech[r.nextInt(tech.length)];
-                //TODO: need to change as this could potentially cause an infinte loop
-                while(!metTribeTree.isResearched(techToGet) || thisTribeTree.isResearched(techToGet) ){
-                    techToGet = tech[r.nextInt(tech.length)];
+                for (Types.TECHNOLOGY tech: Types.TECHNOLOGY.values()
+                     ) {
+                    if (thisTribeTree.isResearched(tech))
+                        techInThisTribe.add(tech);
+                    if (metTribeTree.isResearched(tech))
+                        techInMetTribe.add(tech);
                 }
-                techTree.doResearch(techToGet);
+                ArrayList<Types.TECHNOLOGY> potentialTechForThisTribe = new ArrayList<>();
+                ArrayList<Types.TECHNOLOGY> potentialTechForMetTribe = new ArrayList<>();
 
-                //Other tribe gets random technology too
-                tech = Types.TECHNOLOGY.values();
-                techToGet = tech[r.nextInt(tech.length)];
-                //TODO: need to change as this could potentially cause an infinte loop
-                while(!thisTribeTree.isResearched(techToGet) || metTribeTree.isResearched(techToGet)){
-                    techToGet = tech[r.nextInt(tech.length)];
+                for (int x = 0; i<techInMetTribe.size(); i++){
+                    if(!thisTribeTree.isResearched(techInMetTribe.get(x)))
+                        potentialTechForThisTribe.add(techInMetTribe.get(x));
                 }
+
+                for (int x = 0; i<techInThisTribe.size(); i++){
+                    if(!metTribeTree.isResearched(techInThisTribe.get(x)))
+                        potentialTechForMetTribe.add(techInThisTribe.get(x));
+                }
+
+                if(potentialTechForThisTribe.size() == 0 || potentialTechForMetTribe.size() == 0)
+                    continue;
+
+                Types.TECHNOLOGY techToGet = potentialTechForThisTribe.get(r.nextInt(potentialTechForThisTribe.size()));
+                thisTribeTree.doResearch(techToGet);
+
+                techToGet = potentialTechForMetTribe.get(r.nextInt(potentialTechForMetTribe.size()));
                 metTribeTree.doResearch(techToGet);
+;
             }
         }
 

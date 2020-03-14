@@ -159,10 +159,17 @@ public class TribesConfig
     // ROAD
     public static int ROAD_COST = 2;
 
+    // City
+
+    public static int CITY_BORDER_POINTS = 20;
+
     /* TRIBES */
     public static int INITIAL_STARS = 5;
 
     /* ACTIONS */
     public static int CLEAR_FOREST_STAR = 2;
     public static int FOREST_COST = 5;
+    public static int CLEAR_VIEW_POINTS = 5;
+
+
 }

@@ -101,6 +101,18 @@ public class Tribe extends Actor{
             tribeCopy.citiesID.add(cityID);
         }
 
+        tribeCopy.tribesMet = new ArrayList<>();
+        for (Types.TRIBE t:tribesMet) {
+            tribeCopy.tribesMet.add(t);
+        }
+
+        tribeCopy.convertedUnits = new ArrayList<>();
+
+        for (Unit u: convertedUnits) {
+            tribeCopy.convertedUnits.add(u);
+        }
+
+
         return tribeCopy;
     }
 
@@ -121,7 +133,7 @@ public class Tribe extends Actor{
                 {
                     if( !obsGrid [i][j]) {
                         obsGrid[i][j] = true;
-                        this.score +=5;
+                        this.score +=TribesConfig.CLEAR_VIEW_POINTS;
                     }
                 }
             }
@@ -211,10 +223,9 @@ public class Tribe extends Actor{
 
     public void meetTribe(GameState gs, int tribeID){
 
-        Board b = gs.getBoard();
         Tribe[] t = gs.getTribes(); // get tribes from boards
 
-        boolean[] inMetTribes = new boolean[4];
+        boolean[] inMetTribes = new boolean[t.length];
         //loop through all tribes
         for(int i = 0; i<t.length; i++){
             // if tribes not in tribes met or tribe is itself then do nothing else add to tribesmet arraylist
@@ -231,7 +242,7 @@ public class Tribe extends Actor{
                 ArrayList<Types.TECHNOLOGY> techInThisTribe = new ArrayList<>(); //Check which tech in this tribe
                 ArrayList<Types.TECHNOLOGY> techInMetTribe = new ArrayList<>(); // Check which tech in met tribe
                 //Check which technologies both research trees contain
-                Random r = new Random();
+
                 for (Types.TECHNOLOGY tech: Types.TECHNOLOGY.values()
                      ) {
                     if (thisTribeTree.isResearched(tech))
@@ -255,10 +266,10 @@ public class Tribe extends Actor{
                 if(potentialTechForThisTribe.size() == 0 || potentialTechForMetTribe.size() == 0)
                     continue;
 
-                Types.TECHNOLOGY techToGet = potentialTechForThisTribe.get(r.nextInt(potentialTechForThisTribe.size()));
+                Types.TECHNOLOGY techToGet = potentialTechForThisTribe.get(gs.getRandomGenerator().nextInt(potentialTechForThisTribe.size()));
                 thisTribeTree.doResearch(techToGet);
 
-                techToGet = potentialTechForMetTribe.get(r.nextInt(potentialTechForMetTribe.size()));
+                techToGet = potentialTechForMetTribe.get(gs.getRandomGenerator().nextInt(potentialTechForMetTribe.size()));
                 metTribeTree.doResearch(techToGet);
 ;
             }

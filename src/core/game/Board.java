@@ -40,6 +40,9 @@ public class Board {
     //variable to declare size of board
     private int size;
 
+    // TODO: RANDOM
+    Random r = new Random();
+
     // Constructor for board
     public Board() {
         this.gameActors = new HashMap<>();
@@ -444,13 +447,33 @@ public class Board {
     public boolean capture(Tribe t, int x, int y){
 
         Types.TERRAIN ter = terrains[x][y];
+        City capital = (City) getActor(t.getCapitalID());
+        LinkedList<Integer> cities = new LinkedList<>(t.getCitiesID());
+        cities.remove((Integer)t.getCapitalID());
+        boolean ownCapital = capital.getTribeId() == t.getTribeId();
         City c;
         if(ter == Types.TERRAIN.VILLAGE)
         {
             //Not a city. Needs to be created, assigned and its border calculated.
             c = new City(x, y, t.getTribeId());
+            // Move the unit from one city to village. Rank: capital -> cities -> None
+            if(ownCapital && capital.getUnitsID().size() > 0){
+                moveBelongingCity(capital, c);
+            }else{
+                while (cities.size() > 0){
+                    int index = r.nextInt(cities.size());
+                    City originalCity = (City)getActor(cities.get(index));
+                    if (originalCity.getUnitsID().size() > 0){
+                        moveBelongingCity(originalCity, c);
+                        break;
+                    }else{
+                        cities.remove(index);
+                    }
+                }
+            }
             addCityToTribe(c);
             setBorderHelper(c, c.getBound());
+
 
         }else if(ter == Types.TERRAIN.CITY)
         {
@@ -461,6 +484,28 @@ public class Board {
             c.setTribeId(t.getTribeId());
             tribes[t.getTribeId()].addCity(cityId);
             tribes[prevTribeId].removeCity(cityId);
+            // Move units to previous Tribe. Rank: capital -> cities -> Tribe
+            City preCapital = (City) getActor(tribes[prevTribeId].getCapitalID());
+            LinkedList<Integer> preCities = new LinkedList<>(tribes[prevTribeId].getCitiesID());
+            preCities.remove(tribes[prevTribeId].getCapitalID());
+            boolean preOwnCapital = preCapital.getTribeId() == prevTribeId;
+            LinkedList<Integer> units = c.moveUnits();
+            while (preOwnCapital && preCapital.addUnitAble() && units.size() > 0){
+                preCapital.addUnit(units.getFirst());
+                units.removeFirst();
+            }
+            while (preCities.size() > 0 && units.size() > 0){
+                int index = r.nextInt(preCities.size());
+                City originalCity = (City)getActor(preCities.get(index));
+                while (originalCity.addUnitAble() && units.size() > 0){
+                    originalCity.addUnit(units.getFirst());
+                    units.removeFirst();
+                }
+                preCities.remove(index);
+            }
+            if (units.size() > 0){
+                tribes[prevTribeId].moveAllUnits(units);
+            }
 
         }else
         {
@@ -470,6 +515,12 @@ public class Board {
 
         this.recomputeTradeNetwork();
         return true;
+    }
+
+    public void moveBelongingCity(City originalCity, City targetCity){
+        int index = r.nextInt(originalCity.getUnitsID().size());
+        int actorID = originalCity.removeUnitByIndex(index);
+        targetCity.addUnit(actorID);
     }
 
     /**

@@ -7,6 +7,7 @@ import utils.Vector2d;
 import utils.graph.Graph;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Tribe extends Actor{
 
@@ -37,6 +38,9 @@ public class Tribe extends Actor{
     //Trade network of this tribe
     private Graph tradeNetwork;
 
+    //Units for the tribe
+    private ArrayList<Integer> unitsID;
+
 
     public Tribe(Types.TRIBE tribe)
     {
@@ -58,6 +62,7 @@ public class Tribe extends Actor{
         citiesID = new ArrayList<>();
         stars = TribesConfig.INITIAL_STARS;
         this.tradeNetwork = new Graph();
+        unitsID = new ArrayList<>();
     }
 
     public void initObsGrid(int size)
@@ -74,6 +79,7 @@ public class Tribe extends Actor{
         tribeCopy.winner = this.winner;
         tribeCopy.score = this.score;
         tribeCopy.capitalID = this.capitalID;
+        tribeCopy.unitsID = this.unitsID;
 
         tribeCopy.techTree = this.techTree.copy();
         if (tradeNetwork != null) {
@@ -89,6 +95,12 @@ public class Tribe extends Actor{
         for(int cityID : citiesID)
         {
             tribeCopy.citiesID.add(cityID);
+        }
+
+        tribeCopy.unitsID = new ArrayList<>();
+        for(int unitID : unitsID)
+        {
+            tribeCopy.unitsID.add(unitID);
         }
 
         return tribeCopy;
@@ -190,6 +202,10 @@ public class Tribe extends Actor{
     public Vector2d getPosition()
     {
         return null;
+    }
+
+    public void moveAllUnits(LinkedList<Integer> units){
+        unitsID.addAll(units);
     }
 
     public void updateNetwork(boolean[][] tradeNetwork, int[][] tileCityId, Types.BUILDING[][] buildings)

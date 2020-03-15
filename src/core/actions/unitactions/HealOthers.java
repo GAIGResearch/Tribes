@@ -63,6 +63,7 @@ public class HealOthers extends UnitAction
                 }
             }
             unit.setStatus(Types.TURN_STATUS.ATTACKED);
+            return true;
         }
         return false;
     }

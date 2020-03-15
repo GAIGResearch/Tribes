@@ -469,16 +469,25 @@ public class Board {
         return tileCityId[x][y];
     }
 
-    // Get all of tiles belong to the city
-    public LinkedList<Vector2d> getCityTiles(int cityId){
+    // Get all the tiles that belong to a city
+    public LinkedList<Vector2d> getCityTiles(int cityID){
         LinkedList<Vector2d> tiles = new LinkedList<>();
-        for (int i=0; i<size; i++){
-            for (int j=0; j<size; j++){
-                if (tileCityId[i][j] == cityId){
-                    tiles.add(new Vector2d(i, j));
+        City targetCity = (City) gameActors.get(cityID);
+        Vector2d targetCityPos = targetCity.getPosition();
+        int radius = 0;
+
+        if(targetCity.getLevel() < 4){ radius = 1; } else{ radius = 2; }
+
+        for(int i = targetCityPos.x - radius; i <= targetCityPos.x + radius; i++) {
+            for(int j = targetCityPos.y - radius; j <= targetCityPos.y + radius; j++) {
+                if(i >= 0 && j >= 0 && i < size && j < size) {
+                    if (tileCityId[i][j] == cityID){
+                        tiles.add(new Vector2d(i, j));
+                    }
                 }
             }
         }
+
         return tiles;
     }
 

@@ -7,10 +7,8 @@ import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
 import utils.Vector2d;
-import utils.graph.Graph;
-import utils.graph.Node;
-import utils.graph.TreeNode;
-import utils.graph.TreePathfinder;
+import utils.graph.PathNode;
+import utils.graph.Pathfinder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -48,11 +46,10 @@ public class Tribe extends Actor {
     //Monument availability
     private HashMap<Types.BUILDING, MONUMENT_STATUS> monuments;
 
-    //Trade network of this tribe
-    private Graph tradeNetwork;
-
+    //Tribes met by this tribe.
     private ArrayList<Types.TRIBE> tribesMet;
 
+    //Units that don't belong to a city (either converted of shifted).
     private ArrayList<Integer> extraUnits;
 
     //Kills by this tribe
@@ -75,7 +72,6 @@ public class Tribe extends Actor {
         techTree.doResearch(tribe.getInitialTech());
         citiesID = new ArrayList<>();
         stars = TribesConfig.INITIAL_STARS;
-        this.tradeNetwork = new Graph();
         tribesMet = new ArrayList<>();
         extraUnits = new ArrayList<>();
         connectedCities = new ArrayList<>();
@@ -98,35 +94,22 @@ public class Tribe extends Actor {
         tribeCopy.nKills = this.nKills;
 
         tribeCopy.techTree = this.techTree.copy();
-        if (tradeNetwork != null) {
-            //   tribeCopy.tradeNetwork = this.tradeNetwork.copy();
-        }
 
         tribeCopy.obsGrid = new boolean[obsGrid.length][obsGrid.length];
         for (int i = 0; i < obsGrid.length; ++i)
-            for (int j = 0; j < obsGrid.length; ++j)
-                tribeCopy.obsGrid[i][j] = obsGrid[i][j];
+            System.arraycopy(obsGrid[i], 0, tribeCopy.obsGrid[i], 0, obsGrid.length);
 
         tribeCopy.citiesID = new ArrayList<>();
-        for (int cityID : citiesID) {
-            tribeCopy.citiesID.add(cityID);
-        }
+        tribeCopy.citiesID.addAll(citiesID);
 
         tribeCopy.connectedCities = new ArrayList<>();
-        for (int cityID : connectedCities) {
-            tribeCopy.connectedCities.add(cityID);
-        }
+        tribeCopy.connectedCities.addAll(connectedCities);
 
         tribeCopy.tribesMet = new ArrayList<>();
-        for (Types.TRIBE t : tribesMet) {
-            tribeCopy.tribesMet.add(t);
-        }
+        tribeCopy.tribesMet.addAll(tribesMet);
 
         tribeCopy.extraUnits = new ArrayList<>();
-
-        for (Integer unitID : extraUnits) {
-            tribeCopy.extraUnits.add(unitID);
-        }
+        tribeCopy.extraUnits.addAll(extraUnits);
 
         tribeCopy.monuments = new HashMap<>();
         for(Types.BUILDING b : monuments.keySet())
@@ -353,16 +336,14 @@ public class Tribe extends Actor {
 
     }
 
-    public void updateNetwork2(TreePathfinder tp, Board b, boolean thisTribesTurn) {
+    public void updateNetwork(Pathfinder tp, Board b, boolean thisTribesTurn) {
         ArrayList<Integer> lostCities = new ArrayList<>();
         ArrayList<Integer> addedCities = new ArrayList<>();
 
         //We need to start from the capital. If capital is not owned, there's no trade network
         if (!controlsCapital()) {
 
-            for (int cityId : connectedCities)
-                lostCities.add(cityId);
-
+            lostCities.addAll(connectedCities);
             connectedCities.clear();
 
         } else if (tp != null) {
@@ -375,7 +356,7 @@ public class Tribe extends Actor {
                     //Check if the city is conected to the capital
                     City nonCapitalCity = (City) b.getActor(cityId);
                     Vector2d nonCapitalPos = nonCapitalCity.getPosition();
-                    ArrayList<TreeNode> pathToCity = tp.findPathTo(nonCapitalPos);
+                    ArrayList<PathNode> pathToCity = tp.findPathTo(nonCapitalPos);
 
 
                     boolean connectedNow = pathToCity.size() > 0;

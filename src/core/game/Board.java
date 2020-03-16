@@ -539,8 +539,8 @@ public class Board {
                         if (!portFrom.equals(portTo)) {
 
                             Vector2d originPortPos = new Vector2d(portFrom.x, portFrom.y);
-                            TreePathfinder tp = new TreePathfinder(originPortPos, new TradeWaterStep(navigable));
-                            ArrayList<TreeNode> path = tp.findPathTo(new Vector2d(portTo.x, portTo.y));
+                            Pathfinder tp = new Pathfinder(originPortPos, new TradeWaterStep(navigable));
+                            ArrayList<PathNode> path = tp.findPathTo(new Vector2d(portTo.x, portTo.y));
 
                             if (path != null) //+1 because path includes destination
                             {
@@ -552,14 +552,10 @@ public class Board {
                 }
 
                 City capital = (City) getActor(t.getCapitalID());
-                t.updateNetwork2(new TreePathfinder(capital.getPosition(), tns), this, t.getTribeId() == this.activeTribeID);
+                t.updateNetwork(new Pathfinder(capital.getPosition(), tns), this, t.getTribeId() == this.activeTribeID);
+            }else {
+                t.updateNetwork(null, this, t.getTribeId() == this.activeTribeID);
             }
-
-            //TODO: a connection between two cities only gives population bonus if the connection is completed by
-            // the tribe that owns the cities! This needs to be recorded for the next turn if this tribe is not the
-            // one moving now. Population of capital and all newly disconnected cities need update.
-            t.updateNetwork2(null, this, t.getTribeId() == this.activeTribeID);
-
         }
     }
 
@@ -739,7 +735,7 @@ public class Board {
     }
 
 
-    private class TradeWaterStep implements NeighbourProvider
+    private class TradeWaterStep implements NeighbourHelper
     {
         private boolean [][]navigable;
 
@@ -752,9 +748,9 @@ public class Board {
         // from: position from which we need neighbours
         // costFrom: is the total move cost computed up to "from"
         // Using this.board, this.tribe, from and costFrom, gets all the adjacent neighbours to tile in position "from"
-        public ArrayList<TreeNode> getNeighbours(Vector2d from, double costFrom) {
+        public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
 
-            ArrayList<TreeNode> neighbours = new ArrayList<>();
+            ArrayList<PathNode> neighbours = new ArrayList<>();
             int xMove[] = {0, -1, 0, 1, -1, -1, 1, 1};
             int yMove[] = {1, 0, -1, 0, 1, -1, -1, 1};
             double stepCost = 1.0;
@@ -769,7 +765,7 @@ public class Board {
                     {
                         if(navigable[x][y] && costFrom+stepCost <= TribesConfig.PORT_TRADE_DISTANCE)
                         {
-                            neighbours.add(new TreeNode(new Vector2d(x, y), stepCost));
+                            neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
                         }
                     }
                 }
@@ -784,7 +780,7 @@ public class Board {
     }
 
 
-    private class TradeNetworkStep implements NeighbourProvider
+    private class TradeNetworkStep implements NeighbourHelper
     {
         private boolean [][]connected;
         private HashMap<Vector2d, ArrayList<Vector2d>> jumpLinks;
@@ -799,9 +795,9 @@ public class Board {
         // from: position from which we need neighbours
         // costFrom: is the total move cost computed up to "from"
         // Using this.board, this.tribe, from and costFrom, gets all the adjacent neighbours to tile in position "from"
-        public ArrayList<TreeNode> getNeighbours(Vector2d from, double costFrom) {
+        public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
 
-            ArrayList<TreeNode> neighbours = new ArrayList<>();
+            ArrayList<PathNode> neighbours = new ArrayList<>();
             int xMove[] = {0, -1, 0, 1, -1, -1, 1, 1};
             int yMove[] = {1, 0, -1, 0, 1, -1, -1, 1};
             double stepCost = 1.0;
@@ -816,7 +812,7 @@ public class Board {
                     {
                         if(connected[x][y])
                         {
-                            neighbours.add(new TreeNode(new Vector2d(x, y), stepCost));
+                            neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
                         }
                     }
                 }
@@ -828,7 +824,7 @@ public class Board {
                 ArrayList<Vector2d> connected = jumpLinks.get(from);
                 for(Vector2d to: connected)
                 {
-                    neighbours.add(new TreeNode(to, stepCost));
+                    neighbours.add(new PathNode(to, stepCost));
                 }
             }
 
@@ -850,9 +846,6 @@ public class Board {
             ArrayList<Vector2d> connected = jumpLinks.get(from);
             connected.add(to);
         }
-
-
     }
-
 
 }

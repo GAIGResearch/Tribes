@@ -2,14 +2,11 @@ package utils.graph;
 
 import utils.Vector2d;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-public class TreeNode
+public class PathNode
 {
     private int id;
     private Vector2d position;
-    private TreeNode parent;
+    private PathNode parent;
 
     private double totalCost = 0.0;
     private double estimatedCost = 0.0;
@@ -18,14 +15,14 @@ public class TreeNode
     public int MAX_CAPACITY = 10000;
 
 
-    public TreeNode(Vector2d position)
+    public PathNode(Vector2d position)
     {
         this.parent = null;
         this.position = new Vector2d(position);
         this.id = calcNodeId(position);
     }
 
-    public TreeNode(Vector2d position, double totalCost)
+    public PathNode(Vector2d position, double totalCost)
     {
         this.parent = null;
         this.position = new Vector2d(position);
@@ -38,11 +35,11 @@ public class TreeNode
     public int getY() {return position.y;}
     public Vector2d getPosition() {return position; }
 
-    public TreeNode getParent() {
+    public PathNode getParent() {
         return parent;
     }
 
-    public void setParent(TreeNode parent) {
+    public void setParent(PathNode parent) {
         this.parent = parent;
     }
 
@@ -53,7 +50,7 @@ public class TreeNode
     public boolean isVisited() {return visited;}
     public void setVisited(boolean visited) {this.visited = visited;}
 
-    public boolean equals(TreeNode n)
+    public boolean equals(PathNode n)
     {
         return this.id == n.id;
     }

@@ -4,9 +4,9 @@ import core.actions.Action;
 import core.game.GameState;
 import core.actors.units.Unit;
 import utils.Vector2d;
-import utils.graph.NeighbourProvider;
-import utils.graph.TreeNode;
-import utils.graph.TreePathfinder;
+import utils.graph.NeighbourHelper;
+import utils.graph.PathNode;
+import utils.graph.Pathfinder;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -34,13 +34,13 @@ public class Move extends UnitAction
         //TODO: compute all the possible Move actions for super.unit.
 
         // Code below for demonstration purposes only:
-        TreePathfinder tp = new TreePathfinder(unit.getPosition(), new StepMove(gs, unit));
+        Pathfinder tp = new Pathfinder(unit.getPosition(), new StepMove(gs, unit));
 
         //This gets all reachable nodes.
-        ArrayList<TreeNode> reachableNodes = tp.findPaths();
+        ArrayList<PathNode> reachableNodes = tp.findPaths();
 
         //This finds a path to a given destination
-        ArrayList<TreeNode> path = tp.findPathTo(new Vector2d(destX, destY));
+        ArrayList<PathNode> path = tp.findPathTo(new Vector2d(destX, destY));
 
         return new LinkedList<>();
     }
@@ -58,7 +58,7 @@ public class Move extends UnitAction
         return false;
     }
 
-    private class StepMove implements NeighbourProvider
+    private class StepMove implements NeighbourHelper
     {
         private GameState gs;
         private Unit unit;
@@ -73,9 +73,9 @@ public class Move extends UnitAction
         // from: position from which we need neighbours
         // costFrom: is the total move cost computed up to "from"
         // Using this.gs, this.unit, from and costFrom, gets all the adjacent neighbours to tile in position "from"
-        public ArrayList<TreeNode> getNeighbours(Vector2d from, double costFrom) {
+        public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
 
-            ArrayList<TreeNode> neighbours = new ArrayList<>();
+            ArrayList<PathNode> neighbours = new ArrayList<>();
 
             // Each one of the tree nodes added to "neighbours" must have a position (x,y) and also the cost of moving there from "from":
             //  TreeNode tn = new TreeNode (vector2d pos, double stepCost)

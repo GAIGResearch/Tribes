@@ -3,6 +3,9 @@ package core.actors;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
+
+
+import core.actors.units.Unit;
 import core.game.Board;
 import utils.Vector2d;
 import utils.graph.Graph;
@@ -12,7 +15,8 @@ import utils.graph.TreePathfinder;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.LinkedList;
+
+
 
 public class Tribe extends Actor{
 
@@ -42,8 +46,17 @@ public class Tribe extends Actor{
     //Indicates if the position in the board is visible
     private boolean obsGrid[][];
 
+
     //List of city ids connected to the capital (capital not included)
     private ArrayList<Integer> connectedCities = new ArrayList<>();
+
+    //Trade network of this tribe
+    private Graph tradeNetwork;
+
+    private  ArrayList<Types.TRIBE> tribesMet;
+
+    private ArrayList<Integer> extraUnits;
+
 
     public Tribe(Types.TRIBE tribe)
     {
@@ -64,6 +77,10 @@ public class Tribe extends Actor{
         techTree.doResearch(tribe.getInitialTech());
         citiesID = new ArrayList<>();
         stars = TribesConfig.INITIAL_STARS;
+        this.tradeNetwork = new Graph();
+        tribesMet = new ArrayList<>();
+        extraUnits = new ArrayList<>();
+        connectedCities = new ArrayList<>();
     }
 
     public void initObsGrid(int size)
@@ -95,9 +112,19 @@ public class Tribe extends Actor{
         }
 
         tribeCopy.connectedCities = new ArrayList<>();
-        for(int cityID : connectedCities)
-        {
+        for(int cityID : connectedCities) {
             tribeCopy.connectedCities.add(cityID);
+        }
+
+        tribeCopy.tribesMet = new ArrayList<>();
+        for (Types.TRIBE t:tribesMet) {
+            tribeCopy.tribesMet.add(t);
+        }
+
+        tribeCopy.extraUnits = new ArrayList<>();
+
+        for (Integer unitID: extraUnits) {
+            tribeCopy.extraUnits.add(unitID);
         }
 
         return tribeCopy;
@@ -207,20 +234,19 @@ public class Tribe extends Actor{
      * @param b board of the game.
      * @param thisTribesTurn indicates if it is this tribe's turn
      */
-    public void updateNetwork(Graph mainGraph, Board b, boolean thisTribesTurn)
-    {
+    public void updateNetwork(Graph mainGraph, Board b, boolean thisTribesTurn) {
         ArrayList<Integer> lostCities = new ArrayList<>();
         ArrayList<Integer> addedCities = new ArrayList<>();
 
         //We need to start from the capital. If capital is not owned, there's no trade network
-        if(!controlsCapital()) {
+        if (!controlsCapital()) {
 
-            for(int cityId : connectedCities)
+            for (int cityId : connectedCities)
                 lostCities.add(cityId);
 
             connectedCities.clear();
 
-        }else{
+        } else {
 
             //Execute Dijkstra from the capital city to all cities owned by this tribe
             City capital = (City) b.getActor(capitalID);
@@ -258,7 +284,7 @@ public class Tribe extends Actor{
 
 
         //Population adjustments: they only happen if it's this tribe's turn
-        if(thisTribesTurn) {
+        if (thisTribesTurn) {
 
             //All cities that lost connection with the capital lose 1 population
             for (int cityId : lostCities) {
@@ -272,8 +298,10 @@ public class Tribe extends Actor{
                 nonCapitalCity.addPopulation(1);
             }
         }
+    }
 
-
+    public void addConvertedUnit (Unit u){
+        extraUnits.add(u.getActorId());
     }
 
 

@@ -315,5 +315,23 @@ public class Vector2d
     public int hashCode() {
         return x * 20 + y;
     }
+
+
+    public static double manhattanDistance(Vector2d p1, Vector2d p2)
+    {
+        return Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
+    }
+
+    public static double chebychevDistance(Vector2d p1, Vector2d p2)
+    {
+        return Math.max(Math.abs(p1.x-p2.x), Math.abs(p1.y-p2.y));
+    }
+
+    public static double euclideanDistance(Vector2d p1, Vector2d p2)
+    {
+        return Math.sqrt(Math.pow(Math.abs(p1.x - p2.x), 2) + Math.pow(Math.abs(p1.y - p2.y), 2));
+    }
+
+
 }
 

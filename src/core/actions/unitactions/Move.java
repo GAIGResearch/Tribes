@@ -3,7 +3,12 @@ package core.actions.unitactions;
 import core.actions.Action;
 import core.game.GameState;
 import core.actors.units.Unit;
+import utils.Vector2d;
+import utils.graph.NeighbourProvider;
+import utils.graph.TreeNode;
+import utils.graph.TreePathfinder;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Move extends UnitAction
@@ -27,6 +32,16 @@ public class Move extends UnitAction
     @Override
     public LinkedList<Action> computeActionVariants(final GameState gs) {
         //TODO: compute all the possible Move actions for super.unit.
+
+        // Code below for demonstration purposes only:
+        TreePathfinder tp = new TreePathfinder(unit.getPosition(), new StepMove(gs, unit));
+
+        //This gets all reachable nodes.
+        ArrayList<TreeNode> reachableNodes = tp.findPaths();
+
+        //This finds a path to a given destination
+        ArrayList<TreeNode> path = tp.findPathTo(new Vector2d(destX, destY));
+
         return new LinkedList<>();
     }
 
@@ -42,4 +57,38 @@ public class Move extends UnitAction
         //TODO Execute this Move action
         return false;
     }
+
+    private class StepMove implements NeighbourProvider
+    {
+        private GameState gs;
+        private Unit unit;
+
+        StepMove(GameState curGameState, Unit movingUnit)
+        {
+            this.gs = curGameState;
+            this.unit = movingUnit;
+        }
+
+        @Override
+        // from: position from which we need neighbours
+        // costFrom: is the total move cost computed up to "from"
+        // Using this.gs, this.unit, from and costFrom, gets all the adjacent neighbours to tile in position "from"
+        public ArrayList<TreeNode> getNeighbours(Vector2d from, double costFrom) {
+
+            ArrayList<TreeNode> neighbours = new ArrayList<>();
+
+            // Each one of the tree nodes added to "neighbours" must have a position (x,y) and also the cost of moving there from "from":
+            //  TreeNode tn = new TreeNode (vector2d pos, double stepCost)
+
+            // We only add nodes to neighbours if costFrom+stepCost <= total move range of this.unit
+
+            return neighbours;
+        }
+
+        @Override
+        public void addJumpLink(Vector2d from, Vector2d to, boolean reverse) {
+            //No jump links
+        }
+    }
+
 }

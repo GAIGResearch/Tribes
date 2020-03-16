@@ -12,6 +12,9 @@ import utils.graph.Node;
 import utils.graph.TreeNode;
 import utils.graph.TreePathfinder;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import static core.Types.BUILDING.*;
 
 public class Tribe extends Actor {
 
@@ -41,6 +44,10 @@ public class Tribe extends Actor {
 
     //List of city ids connected to the capital (capital not included)
     private ArrayList<Integer> connectedCities = new ArrayList<>();
+
+    //Monument availability
+    private HashMap<Types.BUILDING, MONUMENT_STATUS> monuments;
+
     //Trade network of this tribe
     private Graph tradeNetwork;
 
@@ -48,6 +55,8 @@ public class Tribe extends Actor {
 
     private ArrayList<Integer> extraUnits;
 
+    //Kills by this tribe
+    private int nKills;
 
     public Tribe(Types.TRIBE tribe) {
         this.tribe = tribe;
@@ -70,6 +79,8 @@ public class Tribe extends Actor {
         tribesMet = new ArrayList<>();
         extraUnits = new ArrayList<>();
         connectedCities = new ArrayList<>();
+        monuments = Types.BUILDING.initMonuments();
+        nKills = 0;
     }
 
     public void initObsGrid(int size) {
@@ -84,6 +95,7 @@ public class Tribe extends Actor {
         tribeCopy.winner = this.winner;
         tribeCopy.score = this.score;
         tribeCopy.capitalID = this.capitalID;
+        tribeCopy.nKills = this.nKills;
 
         tribeCopy.techTree = this.techTree.copy();
         if (tradeNetwork != null) {
@@ -116,12 +128,31 @@ public class Tribe extends Actor {
             tribeCopy.extraUnits.add(unitID);
         }
 
+        tribeCopy.monuments = new HashMap<>();
+        for(Types.BUILDING b : monuments.keySet())
+        {
+            tribeCopy.monuments.put(b, monuments.get(b));
+        }
+
         return tribeCopy;
     }
 
 
     public void clearView(int x, int y) {
         clearView(x, y, 1);
+
+        //We may be clearing the last tiles of the board, which grants a monument
+        if(monuments.get(EYE_OF_GOD) == MONUMENT_STATUS.UNAVAILABLE)
+        {
+            for(int i = 0; i <= obsGrid.length; ++i)
+                for(int j = 0; j <= obsGrid[0].length; ++j)
+                {
+                    if(!obsGrid[i][j]) return;
+                }
+
+            //All clear and we couldn't buy monument before. Now we can.
+            monuments.put(EYE_OF_GOD, MONUMENT_STATUS.AVAILABLE);
+        }
     }
 
     public void clearView(int x, int y, int range) {
@@ -211,6 +242,9 @@ public class Tribe extends Actor {
 
     public void addStars(int stars) {
         this.stars += stars;
+
+        if(this.stars >= TribesConfig.EMPERORS_TOMB_STARS && monuments.get(Types.BUILDING.EMPERORS_TOMB) == MONUMENT_STATUS.UNAVAILABLE)
+            monuments.put(EMPERORS_TOMB, MONUMENT_STATUS.AVAILABLE);
     }
 
     public void subtractStars(int stars) {
@@ -235,6 +269,28 @@ public class Tribe extends Actor {
 
     public Vector2d getPosition() {
         return null;
+    }
+
+    public boolean isMonumentBuildable(Types.BUILDING building)
+    {
+        return monuments.get(building) == MONUMENT_STATUS.AVAILABLE;
+    }
+
+    public void monumentIsBuilt(Types.BUILDING building)
+    {
+        monuments.put(building, MONUMENT_STATUS.BUILT);
+    }
+
+    public int getnumKills() {
+        return nKills;
+    }
+
+    public void addKill() {
+        this.nKills++;
+
+        //we may have a new monument availability here
+        if(this.nKills >= TribesConfig.GATE_OF_POWER_KILLS && monuments.get(GATE_OF_POWER) == MONUMENT_STATUS.UNAVAILABLE)
+            monuments.put(GATE_OF_POWER, MONUMENT_STATUS.AVAILABLE);
     }
 
     public ArrayList<Types.TRIBE> getTribesMet() {
@@ -343,6 +399,10 @@ public class Tribe extends Actor {
             //The capital gains 1 population for each city connected, -1 for each city disconnected
             int capitalGain = addedCities.size() - lostCities.size();
             capital.addPopulation(capitalGain);
+
+            //We may be adding a new monument to the pool!
+            if(connectedCities.size() >= TribesConfig.GRAND_BAZAR_CITIES && monuments.get(GRAND_BAZAR) == MONUMENT_STATUS.UNAVAILABLE)
+                monuments.put(GRAND_BAZAR, MONUMENT_STATUS.AVAILABLE);
         }
 
 
@@ -365,5 +425,20 @@ public class Tribe extends Actor {
 
     public boolean controlsCapital() {
         return citiesID.contains(capitalID);
+    }
+
+    public void cityMaxedUp() {
+        if(monuments.get(PARK_OF_FORTUNE) == MONUMENT_STATUS.UNAVAILABLE)
+            monuments.put(PARK_OF_FORTUNE, MONUMENT_STATUS.AVAILABLE);
+    }
+
+    public void allResearched() {
+        if(monuments.get(TOWER_OF_WISDOM) == MONUMENT_STATUS.UNAVAILABLE)
+            monuments.put(TOWER_OF_WISDOM, MONUMENT_STATUS.AVAILABLE);
+    }
+
+    public void addConvertedUnit(Unit target)
+    {
+        extraUnits.add(target.getActorId());
     }
 }

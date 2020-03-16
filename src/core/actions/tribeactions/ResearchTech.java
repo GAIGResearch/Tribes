@@ -59,13 +59,16 @@ public class ResearchTech extends TribeAction {
         if(isFeasible(gs))
         {
             int cost = tech.getCost(tribe.getCitiesID().size());
-            tribe.setStars(tribe.getStars() - cost);
+            tribe.addStars(-cost);
             boolean researched = tribe.getTechTree().doResearch(tech);
             if(!researched)
             {
                 //This shouldn't happen.
                 System.out.println("WARNING: Researchable research not researched!");
                 return false;
+            }else if (tribe.getTechTree().isEverythingResearched())
+            {
+                tribe.allResearched();
             }
             return true;
         }

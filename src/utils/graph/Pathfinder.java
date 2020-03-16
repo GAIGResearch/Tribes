@@ -8,21 +8,21 @@ import java.util.PriorityQueue;
 /**
  * Created by dperez on 13/01/16.
  */
-public class TreePathfinder
+public class Pathfinder
 {
-    public TreeNode root;
-    private NeighbourProvider provider;
+    public PathNode root;
+    private NeighbourHelper provider;
 
-    public TreePathfinder(Vector2d rootPos, NeighbourProvider provider)
+    public Pathfinder(Vector2d rootPos, NeighbourHelper provider)
     {
-        root = new TreeNode(rootPos);
+        root = new PathNode(rootPos);
         this.provider = provider;
     }
 
 
-    private ArrayList<TreeNode> calculatePath(TreeNode node)
+    private ArrayList<PathNode> calculatePath(PathNode node)
     {
-        ArrayList<TreeNode> path = new ArrayList<>();
+        ArrayList<PathNode> path = new ArrayList<>();
         while(node != null)
         {
             if(node.getParent() != null) //to avoid adding the start node.
@@ -35,26 +35,26 @@ public class TreePathfinder
     }
 
     //Dijkstraa to all possible destinations. Returns nodes of all destinations.
-    public ArrayList<TreeNode> findPaths()
+    public ArrayList<PathNode> findPaths()
     {
         return _dijkstra();
     }
 
     //A* to destination
-    public ArrayList<TreeNode> findPathTo(Vector2d goalPosition)
+    public ArrayList<PathNode> findPathTo(Vector2d goalPosition)
     {
-        return _findPath(new TreeNode(goalPosition));
+        return _findPath(new PathNode(goalPosition));
     }
 
 
-    private ArrayList<TreeNode> _dijkstra()
+    private ArrayList<PathNode> _dijkstra()
     {
 
-        ArrayList<TreeNode> destinationsFromStart = new ArrayList<>();
+        ArrayList<PathNode> destinationsFromStart = new ArrayList<>();
         root.setVisited(true);
-        TreeNode node = null;
+        PathNode node = null;
 
-        PriorityQueue<TreeNode> openList = new PriorityQueue<>();
+        PriorityQueue<PathNode> openList = new PriorityQueue<>();
         root.setTotalCost(0.0);
 
         openList.add(root);
@@ -69,11 +69,11 @@ public class TreePathfinder
                 destinationsFromStart.add(root);
             }
 
-            ArrayList<TreeNode> neighbours = provider.getNeighbours(root.getPosition(), root.getTotalCost());
+            ArrayList<PathNode> neighbours = provider.getNeighbours(root.getPosition(), root.getTotalCost());
 
             for(int i = 0; i < neighbours.size(); ++i)
             {
-                TreeNode neighbour = neighbours.get(i);
+                PathNode neighbour = neighbours.get(i);
                 double curDistance = neighbour.getTotalCost();
                 if(!neighbour.isVisited())
                 {
@@ -92,11 +92,11 @@ public class TreePathfinder
         return destinationsFromStart;
     }
 
-    private ArrayList<TreeNode> _findPath(TreeNode goal)
+    private ArrayList<PathNode> _findPath(PathNode goal)
     {
-        TreeNode node = null;
-        PriorityQueue<TreeNode> openList = new PriorityQueue<>();
-        PriorityQueue<TreeNode> closedList = new PriorityQueue<>();
+        PathNode node = null;
+        PriorityQueue<PathNode> openList = new PriorityQueue<>();
+        PriorityQueue<PathNode> closedList = new PriorityQueue<>();
 
         root.setTotalCost(0.0);
         double dist = Vector2d.chebychevDistance(root.getPosition(), goal.getPosition());
@@ -111,11 +111,11 @@ public class TreePathfinder
             if(node.getX() == goal.getX() && node.getY() == goal.getY())
                 return calculatePath(node);
 
-            ArrayList<TreeNode> neighbours = provider.getNeighbours(root.getPosition(), root.getTotalCost());
+            ArrayList<PathNode> neighbours = provider.getNeighbours(root.getPosition(), root.getTotalCost());
 
             for(int i = 0; i < neighbours.size(); ++i)
             {
-                TreeNode neighbour = neighbours.get(i);
+                PathNode neighbour = neighbours.get(i);
                 double curDistance = neighbour.getTotalCost();
 
                 if(!openList.contains(neighbour) && !closedList.contains(neighbour))

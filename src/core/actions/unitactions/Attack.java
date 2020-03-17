@@ -69,11 +69,25 @@ public class Attack extends UnitAction
             float accelerator = 4.5f;
             float totalDamage =attackForce+defenceForce;
             int attackResult = Math.round((attackForce/totalDamage)*this.unit.ATK*accelerator);
+            int defenceResult = Math.round((defenceForce / totalDamage) * target.DEF *accelerator);
             if (target.getCurrentHP() <= attackResult) {
                 unit.addKill();
                 target = null;
             } else {
                 target.setCurrentHP(target.getCurrentHP() - attackResult);
+                Board b = gs.getBoard();
+                //Check if this unit is in target attacking range
+                for (int x = target.getPosition().x - target.RANGE; x < target.getPosition().x + this.unit.RANGE; x++){
+                    for (int y = target.getPosition().y - target.RANGE; y < target.getPosition().y + this.unit.RANGE; y++){
+                        if(b.getUnitAt(x,y).equals(this.unit)){
+                            //Deal damage based on targets defence stat, regardless of this units defence stat
+                            this.unit.setCurrentHP(this.unit.getCurrentHP()-defenceResult);
+                            //Check if attack kills this unit, if it does add a kill to the target
+                            if(this.unit.getCurrentHP() <=0)
+                                target.addKill();
+                        }
+                    }
+                }
             }
             return true;
         }

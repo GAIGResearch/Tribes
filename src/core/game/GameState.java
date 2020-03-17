@@ -27,9 +27,6 @@ public class GameState {
     // Board of the game
     private Board board;
 
-    // Player currently making a move.
-    private int activeTribeID = -1;
-
     //Indicates if this tribe can end its turn.
     private boolean[] canEndTurn;
 
@@ -134,7 +131,7 @@ public class GameState {
      */
     public void computePlayerActions(Tribe tribe)
     {
-        this.activeTribeID = tribe.getTribeId();
+        board.setActiveTribeID(tribe.getTribeId());
 
         if(computedActionTribeIdFlag != -1)
         {
@@ -175,13 +172,14 @@ public class GameState {
             }
         }
 
+        int activeTribeID = board.getActiveTribeID();
         if(done)
         {
             //A city is levelling up. We're done with this city.
-            canEndTurn[this.activeTribeID] = false;
+            canEndTurn[activeTribeID] = false;
             return;
         }else{
-            canEndTurn[this.activeTribeID] = true;
+            canEndTurn[activeTribeID] = true;
         }
 
         //Units!
@@ -259,7 +257,6 @@ public class GameState {
         GameState copy = new GameState(new Random()); //copies of the game state can't have the same random generator.
         copy.board = board.copy(playerIdx!=-1, playerIdx);
         copy.tick = this.tick;
-        copy.activeTribeID = activeTribeID;
 
         int numTribes = getTribes().length;
         copy.canEndTurn = new boolean[numTribes];
@@ -306,13 +303,14 @@ public class GameState {
     }
 
     public Tribe getActiveTribe() {
+        int activeTribeID = board.getActiveTribeID();
         if (activeTribeID != -1) {
             return board.getTribe(activeTribeID);
         } else return null;
     }
 
     public int getActiveTribeID() {
-        return activeTribeID;
+        return board.getActiveTribeID();
     }
 
     public Random getRandomGenerator() {

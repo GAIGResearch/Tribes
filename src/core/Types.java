@@ -7,6 +7,7 @@ import utils.ImageIO;
 import utils.Vector2d;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Types {
@@ -152,34 +153,42 @@ Yellow_dark - 929000
      */
     public enum BUILDING
     {
-        PORT (0,"img/building/port.png", TECHNOLOGY.SAILING, new TERRAIN[]{TERRAIN.SHALLOW_WATER}),
-        MINE (1,"img/building/mine.png", TECHNOLOGY.MINING, new TERRAIN[]{TERRAIN.MOUNTAIN}),
-        FORGE (2,"img/building/forge.png", TECHNOLOGY.SMITHERY, new TERRAIN[]{TERRAIN.PLAIN}),
-        FARM (3, "img/building/farm.png", TECHNOLOGY.FARMING, new TERRAIN[]{TERRAIN.PLAIN}),
-        WINDMILL (4,"img/building/windmill.png", TECHNOLOGY.CONSTRUCTION, new TERRAIN[]{TERRAIN.PLAIN}),
-        ROAD (5,"none.png", TECHNOLOGY.ROADS, new TERRAIN[]{TERRAIN.PLAIN, TERRAIN.FOREST}),
-        CUSTOM_HOUSE (6,"img/building/custom_house.png", TECHNOLOGY.TRADE, new TERRAIN[]{TERRAIN.PLAIN}),
-        LUMBER_HUT(7,"img/building/lumner_hut.png", TECHNOLOGY.MATHEMATICS, new TERRAIN[]{TERRAIN.FOREST}),
-        SAWMILL (8,"img/building/sawmill.png", TECHNOLOGY.MATHEMATICS, new TERRAIN[]{TERRAIN.PLAIN}),
-        TEMPLE (9, "img/building/temple.png", TECHNOLOGY.FREE_SPIRIT, new TERRAIN[]{TERRAIN.PLAIN}),
-        WATER_TEMPLE (10,"img/building/temple.png", TECHNOLOGY.AQUATISM, new TERRAIN[]{TERRAIN.SHALLOW_WATER, TERRAIN.DEEP_WATER}),
-        FOREST_TEMPLE (11,"img/building/temple.png", TECHNOLOGY.SPIRITUALISM, new TERRAIN[]{TERRAIN.FOREST}),
-        MOUNTAIN_TEMPLE (12,"img/building/temple.png", TECHNOLOGY.MEDITATION, new TERRAIN[]{TERRAIN.MOUNTAIN}),
-        ALTAR_OF_PEACE (13,"img/building/monument.png", null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
-        EMPERORS_TOMB (14,"img/building/monument.png", TECHNOLOGY.TRADE, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
-        EYE_OF_GOD (15,"img/building/monument.png", TECHNOLOGY.NAVIGATION, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
-        GATE_OF_POWER (16,"img/building/monument.png", null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
-        GRAND_BAZAR (17,"img/building/monument.png", TECHNOLOGY.ROADS, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
-        PARK_OF_FORTUNE (18,"img/building/monument.png", null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
-        TOWER_OF_WISDOM (19, "img/building/monument.png", TECHNOLOGY.PHILOSOPHY, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN});
+        PORT (0,"img/building/port.png", TribesConfig.PORT_COST, TECHNOLOGY.SAILING, new TERRAIN[]{TERRAIN.SHALLOW_WATER}),
+        MINE (1,"img/building/mine.png", TribesConfig.MINE_COST, TECHNOLOGY.MINING, new TERRAIN[]{TERRAIN.MOUNTAIN}),
+        FORGE (2,"img/building/forge.png", TribesConfig.FORGE_COST, TECHNOLOGY.SMITHERY, new TERRAIN[]{TERRAIN.PLAIN}),
+        FARM (3, "img/building/farm.png", TribesConfig.FARM_COST, TECHNOLOGY.FARMING, new TERRAIN[]{TERRAIN.PLAIN}),
+        WINDMILL (4,"img/building/windmill.png", TribesConfig.WIND_MILL_COST, TECHNOLOGY.CONSTRUCTION, new TERRAIN[]{TERRAIN.PLAIN}),
+        ROAD (5,"none.png", TribesConfig.ROAD_COST, TECHNOLOGY.ROADS, new TERRAIN[]{TERRAIN.PLAIN, TERRAIN.FOREST}),
+        CUSTOM_HOUSE (6,"img/building/custom_house.png", TribesConfig.CUSTOM_COST, TECHNOLOGY.TRADE, new TERRAIN[]{TERRAIN.PLAIN}),
+        LUMBER_HUT(7,"img/building/lumner_hut.png", TribesConfig.LUMBER_HUT_COST, TECHNOLOGY.MATHEMATICS, new TERRAIN[]{TERRAIN.FOREST}),
+        SAWMILL (8,"img/building/sawmill.png", TribesConfig.SAW_MILL_COST, TECHNOLOGY.MATHEMATICS, new TERRAIN[]{TERRAIN.PLAIN}),
+        TEMPLE (9, "img/building/temple.png", TribesConfig.TEMPLE_COST, TECHNOLOGY.FREE_SPIRIT, new TERRAIN[]{TERRAIN.PLAIN}),
+        WATER_TEMPLE (10,"img/building/temple.png", TribesConfig.TEMPLE_COST, TECHNOLOGY.AQUATISM, new TERRAIN[]{TERRAIN.SHALLOW_WATER, TERRAIN.DEEP_WATER}),
+        FOREST_TEMPLE (11,"img/building/temple.png", TribesConfig.TEMPLE_FOREST_COST, TECHNOLOGY.SPIRITUALISM, new TERRAIN[]{TERRAIN.FOREST}),
+        MOUNTAIN_TEMPLE (12,"img/building/temple.png", TribesConfig.TEMPLE_COST, TECHNOLOGY.MEDITATION, new TERRAIN[]{TERRAIN.MOUNTAIN}),
+        ALTAR_OF_PEACE (13,"img/building/monument.png", 0,null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        EMPERORS_TOMB (14,"img/building/monument.png", 0, TECHNOLOGY.TRADE, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        EYE_OF_GOD (15,"img/building/monument.png", 0, TECHNOLOGY.NAVIGATION, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        GATE_OF_POWER (16,"img/building/monument.png", 0, null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        GRAND_BAZAR (17,"img/building/monument.png", 0, TECHNOLOGY.ROADS, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        PARK_OF_FORTUNE (18,"img/building/monument.png", 0, null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
+        TOWER_OF_WISDOM (19, "img/building/monument.png", 0, TECHNOLOGY.PHILOSOPHY, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN});
+
+        public enum MONUMENT_STATUS {
+            UNAVAILABLE,
+            AVAILABLE,
+            BUILT;
+        }
 
         private int key;
         private String imageFile;
         private TECHNOLOGY technologyRequirement;
         private TERRAIN[] terrainRequirements;
-        BUILDING(int numVal, String imageFile, TECHNOLOGY technologyRequirement, TERRAIN[] terrainRequirements)
+        private int cost;
+        BUILDING(int numVal, String imageFile, int cost, TECHNOLOGY technologyRequirement, TERRAIN[] terrainRequirements)
         {
             this.key = numVal;
+            this.cost = cost;
             this.imageFile = imageFile;
             this.technologyRequirement = technologyRequirement;
             this.terrainRequirements = terrainRequirements;
@@ -187,8 +196,23 @@ Yellow_dark - 929000
         public TECHNOLOGY getTechnologyRequirement() { return technologyRequirement; }
         public TERRAIN[] getTerrainRequirements() { return terrainRequirements; }
         public int getKey() {  return key; }
+        public int getCost() {return cost; }
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
+
+
+        public static HashMap<BUILDING, MONUMENT_STATUS> initMonuments()
+        {
+            HashMap<BUILDING, MONUMENT_STATUS> monuments = new HashMap<>();
+            monuments.put(ALTAR_OF_PEACE, MONUMENT_STATUS.UNAVAILABLE);
+            monuments.put(EMPERORS_TOMB, MONUMENT_STATUS.UNAVAILABLE);
+            monuments.put(EYE_OF_GOD, MONUMENT_STATUS.UNAVAILABLE);
+            monuments.put(GATE_OF_POWER, MONUMENT_STATUS.UNAVAILABLE);
+            monuments.put(PARK_OF_FORTUNE, MONUMENT_STATUS.UNAVAILABLE);
+            monuments.put(TOWER_OF_WISDOM, MONUMENT_STATUS.UNAVAILABLE);
+            return monuments;
+        }
     }
+
 
     /**
      * Types of buildings that can be built by cities

@@ -38,10 +38,7 @@ public class Move extends UnitAction
             for(PathNode tile : tp.findPaths()) {
                 Move action = new Move(unit);
                 action.setDestination(tile.getPosition());
-
-                if(action.isFeasible(gs)) {
-                    moves.add(action);
-                }
+                moves.add(action);
             }
         }
         return moves;

@@ -185,7 +185,7 @@ public class Board {
             if (b == Types.BUILDING.PORT) {
                 City c = getCityInBorders(x, y);
                 if (c != null && c.getTribeId() == tribeId) {
-                    embark(toPush, startX, startY, x, y);
+                    embark(toPush, x, y);
                     return true;
                 }
 
@@ -204,16 +204,46 @@ public class Board {
     }
 
 
-    private void embark(Unit unit, int x0, int y0, int xF, int yF) {
+    public void embark(Unit unit, int x, int y) {
         City city = (City) gameActors.get(unit.getCityID());
         removeUnitFromBoard(unit);
         removeUnitFromCity(unit, city);
 
         //We're actually creating a new unit
-        Vector2d newPos = new Vector2d(xF, yF);
+        Vector2d newPos = new Vector2d(x, y);
         Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), Types.UNIT.BOAT);
         boat.setCurrentHP(unit.getCurrentHP());
         addUnit(city, boat);
+    }
+
+    public void disembark(Unit unit, int x, int y) {
+        City city = (City) gameActors.get(unit.getCityID());
+        removeUnitFromBoard(unit);
+        removeUnitFromCity(unit, city);
+        
+        Types.UNIT baseLandUnit;
+        switch (unit.getType())
+        {
+            case BOAT:
+                Boat boat = (Boat) unit; 
+                baseLandUnit = boat.getBaseLandUnit();
+                break;
+            case SHIP:
+                Ship ship = (Ship) unit;
+                baseLandUnit = ship.getBaseLandUnit();  
+                break;
+            case BATTLESHIP:
+                Battleship battleship = (Battleship) unit;
+                baseLandUnit = battleship.getBaseLandUnit();
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + unit.getType());
+        }
+        //We're actually creating a new unit
+        Vector2d newPos = new Vector2d(x, y);
+        Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), baseLandUnit);
+        newUnit.setCurrentHP(unit.getCurrentHP());
+        addUnit(city, newUnit);
     }
 
     private void moveUnit(Unit unit, int x0, int y0, int xF, int yF) {

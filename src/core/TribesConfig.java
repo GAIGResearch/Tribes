@@ -48,6 +48,7 @@ public class TribesConfig
     public static int MINDBENDER_RANGE = 1;
     public static int MINDBENDER_COST = 5;
     public static int MINDBENDER_POINTS = 25;
+    public static int MINDBENDER_HEAL = 4;
 
     //Defender
     public static int DEFENDER_ATTACK = 1;

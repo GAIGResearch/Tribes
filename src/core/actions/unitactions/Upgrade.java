@@ -1,5 +1,6 @@
 package core.actions.unitactions;
 
+import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actors.City;
@@ -35,9 +36,9 @@ public class Upgrade extends UnitAction
 
         switch (unit.getType()){
             case BOAT:
-                if(stars >= 5) { return true; }
+                if(stars >= TribesConfig.SHIP_COST) { return true; }
             case SHIP:
-                if(stars >= 15) { return true; }
+                if(stars >= TribesConfig.BATTLESHIP_COST) { return true; }
         }
 
         return false;
@@ -52,12 +53,12 @@ public class Upgrade extends UnitAction
         if(isFeasible(gs)){
             switch (unit.getType()){
                 case BOAT:
-                    tribe.subtractStars(5);
+                    tribe.subtractStars(TribesConfig.SHIP_COST);
                     Unit ship = Types.UNIT.createUnit(unit.getPosition(), unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), Types.UNIT.SHIP);
                     ship.setCurrentHP(unit.getCurrentHP());
                     board.addUnit(city, ship);
                 case SHIP:
-                    tribe.subtractStars(15);
+                    tribe.subtractStars(TribesConfig.BATTLESHIP_COST);
                     Unit battleship = Types.UNIT.createUnit(unit.getPosition(), unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), Types.UNIT.BATTLESHIP);
                     battleship.setCurrentHP(unit.getCurrentHP());
                     board.addUnit(city, battleship);

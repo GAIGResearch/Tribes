@@ -7,9 +7,9 @@ import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
 import utils.Vector2d;
-import utils.graph.NeighbourProvider;
-import utils.graph.TreeNode;
-import utils.graph.TreePathfinder;
+import utils.graph.NeighbourHelper;
+import utils.graph.PathNode;
+import utils.graph.Pathfinder;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -31,11 +31,11 @@ public class Move extends UnitAction
     public LinkedList<Action> computeActionVariants(final GameState gs)
     {
         LinkedList<Action> moves = new LinkedList<>();
-        TreePathfinder tp = new TreePathfinder(unit.getPosition(), new StepMove(gs, unit));
+        Pathfinder tp = new Pathfinder(unit.getPosition(), new StepMove(gs, unit));
 
         //If a units turn is FINISHED don't do unnecessary calculations.
         if(unit.checkStatus(Types.TURN_STATUS.MOVED)) {
-            for(TreeNode tile : tp.findPaths()) {
+            for(PathNode tile : tp.findPaths()) {
                 Move action = new Move(unit);
                 action.setDestination(tile.getPosition());
 
@@ -50,7 +50,7 @@ public class Move extends UnitAction
     @Override
     public boolean isFeasible(final GameState gs)
     {
-        TreePathfinder tp = new TreePathfinder(unit.getPosition(), new StepMove(gs, unit));
+        Pathfinder tp = new Pathfinder(unit.getPosition(), new StepMove(gs, unit));
 
         if(unit.checkStatus(Types.TURN_STATUS.MOVED)) {
             return !tp.findPathTo(destination).isEmpty();
@@ -69,7 +69,7 @@ public class Move extends UnitAction
         return false;
     }
 
-    private class StepMove implements NeighbourProvider
+    private class StepMove implements NeighbourHelper
     {
         private GameState gs;
         private Unit unit;
@@ -84,9 +84,9 @@ public class Move extends UnitAction
         // from: position from which we need neighbours
         // costFrom: is the total move cost computed up to "from"
         // Using this.gs, this.unit, from and costFrom, gets all the adjacent neighbours to tile in position "from"
-        public ArrayList<TreeNode> getNeighbours(Vector2d from, double costFrom) {
+        public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
             TechnologyTree techTree = gs.getTribe(unit.getTribeId()).getTechTree();
-            ArrayList<TreeNode> neighbours = new ArrayList<>();
+            ArrayList<PathNode> neighbours = new ArrayList<>();
             Board board = gs.getBoard();
             boolean inZoneOfControl = false;
 
@@ -148,7 +148,7 @@ public class Move extends UnitAction
                     stepCost = unit.MOV;
                 }
                 if(costFrom + stepCost <= unit.MOV){
-                    neighbours.add(new TreeNode(tile, costFrom + stepCost));
+                    neighbours.add(new PathNode(tile, costFrom + stepCost));
                 }
             }
             return neighbours;

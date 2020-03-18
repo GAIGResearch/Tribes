@@ -1,5 +1,6 @@
 package core.actions.unitactions;
 
+import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.game.Board;
@@ -56,10 +57,10 @@ public class HealOthers extends UnitAction
     public boolean execute(GameState gs) {
         if(isFeasible(gs)){
             for(Unit target : targets){
-                if(target.getCurrentHP() + 4 >= target.getMaxHP()){
+                if(target.getCurrentHP() + TribesConfig.MINDBENDER_HEAL >= target.getMaxHP()){
                     target.setCurrentHP(target.getMaxHP());
                 }else {
-                    target.setCurrentHP(target.getCurrentHP() + 4);
+                    target.setCurrentHP(target.getCurrentHP() + TribesConfig.MINDBENDER_HEAL);
                 }
             }
             unit.setStatus(Types.TURN_STATUS.ATTACKED);

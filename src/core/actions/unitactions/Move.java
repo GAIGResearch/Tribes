@@ -49,7 +49,8 @@ public class Move extends UnitAction
     {
         Pathfinder tp = new Pathfinder(unit.getPosition(), new StepMove(gs, unit));
 
-        if(unit.checkStatus(Types.TURN_STATUS.MOVED)) {
+        //If the unit can move and the destination is vacant, try to reach it.
+        if(unit.checkStatus(Types.TURN_STATUS.MOVED) && gs.getBoard().getUnitAt(destination.x, destination.y) == null) {
             return !tp.findPathTo(destination).isEmpty();
         }
         return false;
@@ -59,8 +60,20 @@ public class Move extends UnitAction
     public boolean execute(GameState gs)
     {
         if(isFeasible(gs)) {
+            Board board = gs.getBoard();
+            Types.TERRAIN destinationTerrain = board.getTerrainAt(destination.x, destination.y);
+
             unit.setStatus(Types.TURN_STATUS.MOVED);
             unit.setPosition(destination.x, destination.y);
+            if(unit.getType() == Types.UNIT.BOAT || unit.getType() == Types.UNIT.SHIP || unit.getType() == Types.UNIT.BATTLESHIP) {
+                if(destinationTerrain != Types.TERRAIN.SHALLOW_WATER && destinationTerrain != Types.TERRAIN.DEEP_WATER && destinationTerrain != Types.TERRAIN.CITY){
+                    board.disembark(unit, destination.x, destination.y);
+                }
+            }else {
+                if(board.getBuildingAt(destination.x, destination.y) == Types.BUILDING.PORT){
+                    board.embark(unit, destination.x, destination.y);
+                }
+            }
             return true;
         }
         return false;
@@ -78,9 +91,9 @@ public class Move extends UnitAction
         }
 
         @Override
-        // from: position from which we need neighbours
-        // costFrom: is the total move cost computed up to "from"
-        // Using this.gs, this.unit, from and costFrom, gets all the adjacent neighbours to tile in position "from"
+        //from: position from which we need neighbours
+        //costFrom: is the total move cost computed up to "from"
+        //Using this.gs, this.unit, from and costFrom, gets all the adjacent neighbours to tile in position "from"
         public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
             TechnologyTree techTree = gs.getTribe(unit.getTribeId()).getTechTree();
             ArrayList<PathNode> neighbours = new ArrayList<>();
@@ -91,9 +104,9 @@ public class Move extends UnitAction
             for(Vector2d tile : from.neighborhood(1, board.getSize())) {
                 if(board.getUnitAt(tile.x, tile.y).getTribeId() != unit.getTribeId()) { inZoneOfControl = true; }
             }
-            // Each one of the tree nodes added to "neighbours" must have a position (x,y) and also the cost of moving there from "from":
-            //  TreeNode tn = new TreeNode (vector2d pos, double stepCost)
-            // We only add nodes to neighbours if costFrom+stepCost <= total move range of this.unit
+            //Each one of the tree nodes added to "neighbours" must have a position (x,y) and also the cost of moving there from "from":
+            //TreeNode tn = new TreeNode (vector2d pos, double stepCost)
+            //We only add nodes to neighbours if costFrom+stepCost <= total move range of this.unit
 
             for(Vector2d tile : from.neighborhood(1, board.getSize())) {
                 Types.TERRAIN terrain = board.getTerrainAt(tile.x, tile.y);
@@ -102,16 +115,23 @@ public class Move extends UnitAction
                 //Cannot move into tiles that have not been discovered yet.
                 if(!gs.getTribe(unit.getTribeId()).isVisible(tile.x, tile.y)) { continue; }
 
+                //Check if current research allows movement to this tile.
+                if(!board.traversable(tile.x, tile.y, unit.getTribeId())) { continue; }
+
                 //Unit is a water unit
                 if(unit.getType() == Types.UNIT.BOAT || unit.getType() == Types.UNIT.SHIP || unit.getType() == Types.UNIT.BATTLESHIP) {
                     switch (terrain)
                     {
-                        case PLAIN:
                         case CITY:
+                            //TODO : Only allow movement into friendly cities.
+                            continue;
+                        case PLAIN:
                         case FOREST:
                         case VILLAGE:
                         case MOUNTAIN:
-                            continue;
+                            //Disembark takes a turn of movement.
+                            stepCost = unit.MOV;
+                            break;
                         case DEEP_WATER:
                         case SHALLOW_WATER:
                             stepCost = 1.0;
@@ -121,25 +141,19 @@ public class Move extends UnitAction
                     {
                         case SHALLOW_WATER:
                         case DEEP_WATER:
+                            //Embarking takes a turn of movement.
+                            if(board.getBuildingAt(tile.x, tile.y) == Types.BUILDING.PORT) {
+                                stepCost = unit.MOV;
+                            }
                             continue;
                         case PLAIN:
                         case CITY:
                         case VILLAGE:
-                            if(board.getUnitAt(tile.x, tile.y) != null){
-                                continue;
-                            }else{
-                                stepCost = 1.0;
-                            }
+                            stepCost = 1.0;
                         case FOREST:
-                            if(board.getUnitAt(tile.x, tile.y) != null){
-                                continue;
-                            }else{
-                                stepCost = unit.MOV;
-                            }
                         case MOUNTAIN:
-                            if(techTree.isResearched(Types.TECHNOLOGY.CLIMBING)){
-                                stepCost = unit.MOV;
-                            }else{ continue; }
+                            stepCost = unit.MOV;
+
                     }
                 if(inZoneOfControl){
                     stepCost = unit.MOV;

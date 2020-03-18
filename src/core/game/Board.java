@@ -289,7 +289,7 @@ public class Board {
     }
 
 
-    private boolean traversable(int x, int y, int tribeId) {
+    public boolean traversable(int x, int y, int tribeId) {
         if (x >= 0 && y >= 0 && x < size && y < size) {
             //we rule out places we can't be.
             TechnologyTree tt = tribes[tribeId].getTechTree();

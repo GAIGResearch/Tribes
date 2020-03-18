@@ -12,7 +12,7 @@ import java.util.LinkedList;
 
 public class HealOthers extends UnitAction
 {
-    private LinkedList<Unit> targets;
+    private LinkedList<Integer> targets;
 
     public HealOthers(Unit healer)
     {
@@ -29,7 +29,7 @@ public class HealOthers extends UnitAction
             for(Vector2d tile : unit.getPosition().neighborhood(1, board.getSize())){
                 //Avoid adding self as a target
                 if(board.getUnitAt(tile.x, tile.y).getTribeId() == unit.getTribeId() && !tile.equals(unit.getPosition())){
-                    action.targets.add(board.getUnitAt(tile.x, tile.y));
+                    action.targets.add(board.getUnitIDAt(tile.x, tile.y));
                 }
             }
             actions.add(action);
@@ -56,7 +56,8 @@ public class HealOthers extends UnitAction
     @Override
     public boolean execute(GameState gs) {
         if(isFeasible(gs)){
-            for(Unit target : targets){
+            for(Integer targetID : targets){
+                Unit target = (Unit) gs.getBoard().getActor(targetID);
                 if(target.getCurrentHP() + TribesConfig.MINDBENDER_HEAL >= target.getMaxHP()){
                     target.setCurrentHP(target.getMaxHP());
                 }else {

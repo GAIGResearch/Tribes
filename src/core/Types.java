@@ -498,7 +498,7 @@ Yellow_dark - 929000
     public static Vector2d getActionPosition(Action a) {
         Vector2d pos = null;
         if (a instanceof Move) {
-            pos = new Vector2d(((Move) a).getDestX(), ((Move) a).getDestY());
+            pos = new Vector2d(((Move) a).getDestination().x, ((Move) a).getDestination().y);
         } else if (a instanceof Attack) {
             pos = ((Attack) a).getTarget().getPosition();
         } else if (a instanceof Capture || a instanceof Convert || a instanceof Disband || a instanceof Recover ||

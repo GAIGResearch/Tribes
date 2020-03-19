@@ -96,10 +96,12 @@ public class GameView extends JComponent {
         int highlightX = infoView.getHighlightX();
         int highlightY = infoView.getHighlightY();
         if (highlightX != -1) {
+            Point2D p = rotatePoint(highlightX * cellSize, highlightY * cellSize);
+            System.out.println(p.toString());
             Stroke oldStroke = g.getStroke();
             g.setColor(Color.BLUE);
             g.setStroke(new BasicStroke(3));
-            g.drawRect(highlightX * cellSize, highlightY * cellSize, cellSize - 1, cellSize - 1);
+            drawRotatedRect(g, (int)p.getX(), (int)p.getY(), cellSize - 1, cellSize - 1);
             g.setStroke(oldStroke);
             g.setColor(Color.BLACK);
         }
@@ -188,6 +190,14 @@ public class GameView extends JComponent {
         }
     }
 
+    private static void drawRotatedRect(Graphics2D g, int x, int y, int width, int height) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.translate(0, dimension.width/2);
+        g2.rotate(Math.toRadians(isometricAngle));
+        g2.drawRect(x, y, width, height);
+        g2.dispose();
+    }
+
 
     // Take into account rotation of terrain to adjust x, y points
 //    private static void paintImage(Graphics2D gphx, int x, int y, Image img, int imgSize)
@@ -203,15 +213,21 @@ public class GameView extends JComponent {
 //        }
 //    }
     
-    private static Point2D rotatePoint(int x, int y) {
-        Point2D center = new Point2D.Double(0, 0);
+    public static Point2D rotatePoint(int x, int y) {
+        Point2D newPoint = _rotate(x, y, isometricAngle);
+        return new Point2D.Double(newPoint.getX(), newPoint.getY() + dimension.width/2.0);
+    }
 
-        double angle = Math.toRadians(isometricAngle);
+    public static Point2D rotatePointReverse(int x, int y) {
+        y -= dimension.width/2;
+        return _rotate(x, y, -isometricAngle);
+    }
+
+    private static Point2D _rotate(int x, int y, double angle) {
+        Point2D center = new Point2D.Double(0, 0);
         int newX = (int)(center.getX() + (x-center.getX())*Math.cos(angle) - (y-center.getY())*Math.sin(angle));
         int newY = (int)(center.getY() + (x-center.getX())*Math.sin(angle) + (y-center.getY())*Math.cos(angle));
 //        newX += dimension.width/4 + cellSize + cellSize/4;
-        newY += dimension.width/2;
-
         return new Point2D.Double(newX, newY);
     }
 

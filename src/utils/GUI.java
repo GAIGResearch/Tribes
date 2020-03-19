@@ -14,6 +14,7 @@ import players.KeyController;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -95,8 +96,11 @@ public class GUI extends JFrame implements Runnable {
             @Override
             public void mouseClicked(MouseEvent e) {
                 //Only provide information if clicking on a visible tile
-                int x = e.getX() / Constants.CELL_SIZE;
-                int y = e.getY() / Constants.CELL_SIZE;
+                Point2D p = GameView.rotatePointReverse(e.getX(), e.getY());
+                int x = (int)p.getX() / Constants.CELL_SIZE;
+                int y = (int)p.getY() / Constants.CELL_SIZE;
+                System.out.println(e.getX() + " " + e.getY());
+                System.out.println(x + " " + y);
 
                 // If unit highlighted and action at new click valid for unit, execute action
                 Action candidate = getActionAt(x, y, infoView.getHighlightX(), infoView.getHighlightY());

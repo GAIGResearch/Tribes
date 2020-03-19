@@ -21,6 +21,7 @@ public class MindBender extends Unit
         MindBender c = new MindBender(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
+        c.setStatus(getStatus());
         return c;
     }
 }

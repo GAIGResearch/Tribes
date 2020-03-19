@@ -408,13 +408,13 @@ Yellow_dark - 929000
     public enum TERRAIN {
 
         //Types and IDs
-        PLAIN(0, "img/terrain/grass.png", '.'),
-        SHALLOW_WATER(1, "img/terrain/shallow_water.jpg", 's'),
-        DEEP_WATER(2, "img/terrain/deep_water.jpg", 'd'),
-        MOUNTAIN(3, "img/terrain/mountain.png", 'm'),
-        VILLAGE(4, "img/terrain/village.png", 'v'),
+        PLAIN(0, "img/terrain/plain.png", '.'),
+        SHALLOW_WATER(1, "img/terrain/water.png", 's'),
+        DEEP_WATER(2, "img/terrain/deepwater.png", 'd'),
+        MOUNTAIN(3, "img/terrain/mountain3.png", 'm'),
+        VILLAGE(4, "img/terrain/village2.png", 'v'),
         CITY(5, "img/terrain/city.png", 'c'),
-        FOREST(6, "img/terrain/forest.png", 'f');
+        FOREST(6, "img/terrain/forest2.png", 'f');
 
         private String imageFile;
         private int key;
@@ -431,7 +431,13 @@ Yellow_dark - 929000
 
         public int getKey() {  return key; }
         public char getMapChar() {return mapChar;}
-        public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
+        public Image getImage(String suffix) {
+            if (suffix == null || suffix.equals("")) {
+                return ImageIO.GetInstance().getImage(imageFile);
+            }
+            String[] splitPath = imageFile.split("\\.");
+            return ImageIO.GetInstance().getImage(splitPath[0] + "-" + suffix + "." + splitPath[1]);
+        }
 
 
         /**

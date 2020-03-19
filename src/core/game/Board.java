@@ -185,7 +185,7 @@ public class Board {
             if (b == Types.BUILDING.PORT) {
                 City c = getCityInBorders(x, y);
                 if (c != null && c.getTribeId() == tribeId) {
-                    embark(toPush, startX, startY, x, y);
+                    embark(toPush, x, y);
                     return true;
                 }
 
@@ -204,16 +204,46 @@ public class Board {
     }
 
 
-    private void embark(Unit unit, int x0, int y0, int xF, int yF) {
+    public void embark(Unit unit, int x, int y) {
         City city = (City) gameActors.get(unit.getCityID());
         removeUnitFromBoard(unit);
         removeUnitFromCity(unit, city);
 
         //We're actually creating a new unit
-        Vector2d newPos = new Vector2d(xF, yF);
+        Vector2d newPos = new Vector2d(x, y);
         Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), Types.UNIT.BOAT);
         boat.setCurrentHP(unit.getCurrentHP());
         addUnit(city, boat);
+    }
+
+    public void disembark(Unit unit, int x, int y) {
+        City city = (City) gameActors.get(unit.getCityID());
+        removeUnitFromBoard(unit);
+        removeUnitFromCity(unit, city);
+        
+        Types.UNIT baseLandUnit;
+        switch (unit.getType())
+        {
+            case BOAT:
+                Boat boat = (Boat) unit; 
+                baseLandUnit = boat.getBaseLandUnit();
+                break;
+            case SHIP:
+                Ship ship = (Ship) unit;
+                baseLandUnit = ship.getBaseLandUnit();  
+                break;
+            case BATTLESHIP:
+                Battleship battleship = (Battleship) unit;
+                baseLandUnit = battleship.getBaseLandUnit();
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + unit.getType());
+        }
+        //We're actually creating a new unit
+        Vector2d newPos = new Vector2d(x, y);
+        Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), baseLandUnit);
+        newUnit.setCurrentHP(unit.getCurrentHP());
+        addUnit(city, newUnit);
     }
 
     private void moveUnit(Unit unit, int x0, int y0, int xF, int yF) {
@@ -259,7 +289,7 @@ public class Board {
     }
 
 
-    private boolean traversable(int x, int y, int tribeId) {
+    public boolean traversable(int x, int y, int tribeId) {
         if (x >= 0 && y >= 0 && x < size && y < size) {
             //we rule out places we can't be.
             TechnologyTree tt = tribes[tribeId].getTechTree();
@@ -442,16 +472,25 @@ public class Board {
         return tileCityId[x][y];
     }
 
-    // Get all of tiles belong to the city
-    public LinkedList<Vector2d> getCityTiles(int cityId){
+    // Get all the tiles that belong to a city
+    public LinkedList<Vector2d> getCityTiles(int cityID){
         LinkedList<Vector2d> tiles = new LinkedList<>();
-        for (int i=0; i<size; i++){
-            for (int j=0; j<size; j++){
-                if (tileCityId[i][j] == cityId){
-                    tiles.add(new Vector2d(i, j));
+        City targetCity = (City) gameActors.get(cityID);
+        Vector2d targetCityPos = targetCity.getPosition();
+        int radius = 0;
+
+        if(targetCity.getLevel() < 4){ radius = 1; } else{ radius = 2; }
+
+        for(int i = targetCityPos.x - radius; i <= targetCityPos.x + radius; i++) {
+            for(int j = targetCityPos.y - radius; j <= targetCityPos.y + radius; j++) {
+                if(i >= 0 && j >= 0 && i < size && j < size) {
+                    if (tileCityId[i][j] == cityID){
+                        tiles.add(new Vector2d(i, j));
+                    }
                 }
             }
         }
+
         return tiles;
     }
 

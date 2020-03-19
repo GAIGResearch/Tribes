@@ -102,7 +102,8 @@ public class Move extends UnitAction
 
             //Check if there is an enemy unit adjacent.
             for(Vector2d tile : from.neighborhood(1, board.getSize())) {
-                if(board.getUnitAt(tile.x, tile.y).getTribeId() != unit.getTribeId()) { inZoneOfControl = true; }
+                Unit u = board.getUnitAt(tile.x, tile.y);  // There might not be a unit there at all
+                if(u != null && u.getTribeId() != unit.getTribeId()) { inZoneOfControl = true; }
             }
             //Each one of the tree nodes added to "neighbours" must have a position (x,y) and also the cost of moving there from "from":
             //TreeNode tn = new TreeNode (vector2d pos, double stepCost)

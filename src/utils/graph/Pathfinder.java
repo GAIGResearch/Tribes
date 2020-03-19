@@ -3,6 +3,7 @@ package utils.graph;
 import utils.Vector2d;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.PriorityQueue;
 
 /**
@@ -12,6 +13,8 @@ public class Pathfinder
 {
     public PathNode root;
     private NeighbourHelper provider;
+
+    public HashSet<PathNode> nodes;
 
     public Pathfinder(Vector2d rootPos, NeighbourHelper provider)
     {
@@ -49,44 +52,42 @@ public class Pathfinder
 
     private ArrayList<PathNode> _dijkstra()
     {
+        nodes = new HashSet<>();
 
-        ArrayList<PathNode> destinationsFromStart = new ArrayList<>();
         root.setVisited(true);
-        PathNode node = null;
-
-        PriorityQueue<PathNode> openList = new PriorityQueue<>();
         root.setTotalCost(0.0);
 
+        ArrayList<PathNode> destinationsFromStart = new ArrayList<>();
+        PathNode node;
+
+        PriorityQueue<PathNode> openList = new PriorityQueue<>();
+        HashSet<PathNode> visited = new HashSet<>();
+        visited.add(root);
         openList.add(root);
 
-        while(openList.size() != 0)
+        while (openList.size() != 0)
         {
             node = openList.poll();
-            //System.out.println("Remaining in list: " + openList.size());
+            nodes.add(node);
+//            System.out.println("Remaining in list: " + openList.size());
 
-            if(!destinationsFromStart.contains(node) && (node != root))
+            if (!destinationsFromStart.contains(node) && (node != root))
             {
-                destinationsFromStart.add(root);
+                destinationsFromStart.add(node);
             }
 
             ArrayList<PathNode> neighbours = provider.getNeighbours(root.getPosition(), root.getTotalCost());
-
-            for(int i = 0; i < neighbours.size(); ++i)
-            {
-                PathNode neighbour = neighbours.get(i);
+            for (PathNode neighbour : neighbours) {
                 double curDistance = neighbour.getTotalCost();
-                if(!neighbour.isVisited())
-                {
+                if (!visited.contains(neighbour)) {
                     neighbour.setVisited(true);
+                    visited.add(neighbour);
                     neighbour.setTotalCost(curDistance + node.getTotalCost());
                     openList.add(neighbour);
-
-                }else if(curDistance + node.getTotalCost() < neighbour.getTotalCost())
-                {
+                } else if (curDistance + node.getTotalCost() < neighbour.getTotalCost()) {
                     neighbour.setTotalCost(curDistance + node.getTotalCost());
                 }
             }
-
         }
 
         return destinationsFromStart;
@@ -94,6 +95,9 @@ public class Pathfinder
 
     private ArrayList<PathNode> _findPath(PathNode goal)
     {
+        // TODO this method repeats calculations that are already done in _dijsktra above, could be made a lot more
+        // efficient to avoid re-calculating neighbours
+
         PathNode node = null;
         PriorityQueue<PathNode> openList = new PriorityQueue<>();
         PriorityQueue<PathNode> closedList = new PriorityQueue<>();
@@ -113,13 +117,23 @@ public class Pathfinder
 
             ArrayList<PathNode> neighbours = provider.getNeighbours(root.getPosition(), root.getTotalCost());
 
-            for(int i = 0; i < neighbours.size(); ++i)
-            {
-                PathNode neighbour = neighbours.get(i);
+            for (PathNode nb : neighbours) {
+                // This neighbour is a new object, it will not have any of the costs set up
+                // use the cached nodes HashSet to find the correct object with the information available,
+                // only missing estimated distance
+                PathNode neighbour = null;
+                for (PathNode n2 : nodes) {
+                    if (nb.equals(n2)) {
+                        neighbour = n2;
+                        break;
+                    }
+                }
+                if (neighbour == null) {
+                    neighbour = nb;  // Node was not found in cache
+                }
                 double curDistance = neighbour.getTotalCost();
 
-                if(!openList.contains(neighbour) && !closedList.contains(neighbour))
-                {
+                if (!openList.contains(neighbour) && !closedList.contains(neighbour)) {
                     neighbour.setTotalCost(curDistance + node.getTotalCost());
                     dist = Vector2d.chebychevDistance(neighbour.getPosition(), goal.getPosition());
                     neighbour.setEstimatedCost(dist);
@@ -127,15 +141,14 @@ public class Pathfinder
 
                     openList.add(neighbour);
 
-                }else if(curDistance + node.getTotalCost() < neighbour.getTotalCost())
-                {
+                } else if (curDistance + node.getTotalCost() < neighbour.getTotalCost()) {
                     neighbour.setTotalCost(curDistance + node.getTotalCost());
                     neighbour.setParent(node);
 
-                    if(openList.contains(neighbour))
-                        openList.remove(neighbour);
+                    if (openList.contains(neighbour))  // TODO: this check is not necessary, is something wrong in code?
+                        openList.remove(neighbour);  // TODO: why is this removed and then added back in?
 
-                    if(closedList.contains(neighbour))
+                    if (closedList.contains(neighbour))
                         closedList.remove(neighbour);
 
                     openList.add(neighbour);
@@ -144,7 +157,7 @@ public class Pathfinder
 
         }
 
-        if(node.getX() != goal.getX() || node.getY() != goal.getY()) //not the goal
+        if(node == null || node.getX() != goal.getX() || node.getY() != goal.getY()) //not the goal
             return null;
 
         return calculatePath(node);

@@ -213,6 +213,7 @@ public class Board {
         Vector2d newPos = new Vector2d(x, y);
         Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), Types.UNIT.BOAT);
         boat.setCurrentHP(unit.getCurrentHP());
+        ((Boat)boat).setBaseLandUnit(unit.getType());
         addUnit(city, boat);
     }
 

@@ -111,6 +111,8 @@ public class ResourceGathering extends CityAction
                     t.addStars(10);
                     return true;
             }
+            Vector2d position = super.getTargetPos();
+            gs.getBoard().setResourceAt(position.x, position.y, null);
         }
         return false;
     }

@@ -1,6 +1,8 @@
 package core.actions.unitactions;
 
 import core.actions.Action;
+import core.actors.City;
+import core.actors.Tribe;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
@@ -29,6 +31,8 @@ public class Attack extends UnitAction
         Board b = gs.getBoard();
         boolean[][] obsGrid = b.getTribe(this.unit.getTribeId()).getObsGrid();
         Vector2d position = unit.getPosition();
+        int unitCity = this.unit.getCityID();
+        
 
         // Loop through unit range, check if tile observable and action feasible, if so add action
         for(int i = position.x - this.unit.RANGE; i <= position.x + this.unit.RANGE; i++) {
@@ -72,7 +76,23 @@ public class Attack extends UnitAction
             int defenceResult = Math.round((defenceForce / totalDamage) * target.DEF *accelerator);
             if (target.getCurrentHP() <= attackResult) {
                 unit.addKill();
-                target = null;
+                target.setIsKilled(true);
+                gs.getTribe(target.getTribeId()).addKilledUnit(target);
+                //target = null;
+                //Move unit to target position if unit is melee type
+                switch (this.unit.getType()) {
+                    case SHIP:
+                    case DEFENDER:
+                    case SWORDMAN:
+                    case RIDER:
+                    case WARRIOR:
+                    case KNIGHT:
+                    case BOAT:
+                    case BATTLESHIP:
+                    case SUPERUNIT:
+                    gs.getBoard().tryPush(this.unit.getTribeId(), this.unit, this.unit.getPosition().x, this.unit.getPosition().y, target.getPosition().x, target.getPosition().y);
+                }
+
             } else {
                 target.setCurrentHP(target.getCurrentHP() - attackResult);
                 Board b = gs.getBoard();
@@ -83,8 +103,11 @@ public class Attack extends UnitAction
                             //Deal damage based on targets defence stat, regardless of this units defence stat
                             this.unit.setCurrentHP(this.unit.getCurrentHP()-defenceResult);
                             //Check if attack kills this unit, if it does add a kill to the target
-                            if(this.unit.getCurrentHP() <=0)
+                            if(this.unit.getCurrentHP() <=0) {
                                 target.addKill();
+                                this.unit.setIsKilled(true);
+                                gs.getTribe(unit.getTribeId()).addKilledUnit(this.unit);
+                            }
                         }
                     }
                 }

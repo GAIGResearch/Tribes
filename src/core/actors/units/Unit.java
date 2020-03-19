@@ -19,6 +19,7 @@ public abstract class Unit extends Actor
     private int kills;
     private boolean isVeteran;
     private int cityID;
+    private boolean isKilled;
 
     public Unit(int atk, int def, int mov, int max_hp, int range, int cost, Vector2d pos, int kills, boolean isVeteran, int cityID, int tribeID){
         this.ATK = atk;
@@ -34,6 +35,7 @@ public abstract class Unit extends Actor
         this.isVeteran = isVeteran;
         this.cityID = cityID;
         this.tribeId = tribeID;
+        this.isKilled = false;
     }
 
     public void setCurrentHP(int hp){
@@ -71,5 +73,14 @@ public abstract class Unit extends Actor
     public abstract Types.UNIT getType();
 
     public abstract Unit copy();
+
+    public void setIsKilled(boolean isKilled){
+        this.isKilled = isKilled;
+    }
+
+    public boolean getIsKilled(){
+        return isKilled;
+    }
+
 
 }

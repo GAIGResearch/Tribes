@@ -55,6 +55,8 @@ public class Tribe extends Actor {
     //Kills by this tribe
     private int nKills;
 
+    private ArrayList<Integer> killedUnits;
+
     public Tribe(Types.TRIBE tribe) {
         this.tribe = tribe;
         init();
@@ -421,5 +423,8 @@ public class Tribe extends Actor {
     public void addConvertedUnit(Unit target)
     {
         extraUnits.add(target.getActorId());
+    }
+    public void addKilledUnit (Unit target){
+        killedUnits.add(target.getActorId());
     }
 }

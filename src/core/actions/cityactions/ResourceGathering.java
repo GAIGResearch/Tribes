@@ -95,6 +95,8 @@ public class ResourceGathering extends CityAction
     public boolean execute(GameState gs) {
         //Check if action feasible before execution
         if(isFeasible(gs)){
+            Vector2d position = super.getTargetPos();
+            gs.getBoard().setResourceAt(position.x, position.y, null);
             switch (this.resource){
                 case CROPS:
                 case ORE:

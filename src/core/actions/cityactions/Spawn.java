@@ -33,7 +33,9 @@ public class Spawn extends CityAction
         TechnologyTree t = tribe.getTechTree();
         int star = tribe.getStars();
         Vector2d cityPos = city.getPosition();
-        if (gs.getBoard().getUnitAt(cityPos.x, cityPos.y) == null){
+        // For example : City.Population_need = 10 City.Population = -12 => 22 < 10 => False 10/0/10/True 10/8/2/True
+        boolean populationRequirement = (city.getPopulation_need() - city.getPopulation()) <= city.getPopulation_need();
+        if (gs.getBoard().getUnitAt(cityPos.x, cityPos.y) == null && populationRequirement){
             for(Types.UNIT unit: Types.UNIT.values()){
                 // TODO: Update 7 to the the key after the unit enum will not be changed
                 if (unit.getCost() <= star && unit.getKey() <= 7){
@@ -59,7 +61,8 @@ public class Spawn extends CityAction
         if (unit_type.getRequirement() != null){
             techniqueRequirement = gs.getTribe(city.getTribeId()).getTechTree().isResearched(unit_type.getRequirement());
         }
-        return costRequirement && techniqueRequirement;
+        boolean populationRequirement = (city.getPopulation_need() - city.getPopulation()) <= city.getPopulation();
+        return costRequirement && techniqueRequirement && populationRequirement;
     }
 
     @Override

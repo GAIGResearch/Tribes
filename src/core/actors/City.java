@@ -85,6 +85,7 @@ public class City extends Actor{
                         addPopulation(2);
                     }else if(existBuilding.getTYPE() == CUSTOM_HOUSE){
                         addProduction(2);
+                        existBuilding.setProduction(existBuilding.getPRODUCTION() + 2);
                     }else{
                         addPopulation(1);
                     }
@@ -126,6 +127,10 @@ public class City extends Actor{
         return false;
     }
 
+    public boolean addUnitAble(){
+        return unitsID.size() < level;
+    }
+
     public void removeUnit(int id){
         for(int i=0; i<unitsID.size(); i++){
             if (unitsID.get(i) == id){
@@ -136,13 +141,26 @@ public class City extends Actor{
         System.out.println("Error!! Unit ID "+ id +" does not belong to this city");
     }
 
+    public Integer removeUnitByIndex(int index){
+        return unitsID.remove(index);
+    }
+
+    public LinkedList<Integer> moveUnits(){
+        LinkedList<Integer> lists = unitsID;
+        unitsID = new LinkedList<Integer>();
+        return lists;
+    }
 
     public int getLevel() {
         return level;
     }
 
     public int getProduction(){
-        return level + production;
+        // If population less than 0, return start between [0 ~ level+production]
+        if(population > 0) {
+            return level + production;
+        }
+        return Math.max(0, (level + production - population));
     }
 
     public int getPopulation() {

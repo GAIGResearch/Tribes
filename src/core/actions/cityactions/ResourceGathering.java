@@ -38,8 +38,7 @@ public class ResourceGathering extends CityAction
                 continue;
             ResourceGathering resource = new ResourceGathering(this.city);
             resource.setResource(r);
-            resource.targetX = pos.x;
-            resource.targetY = pos.y;
+            resource.setTargetPos(new Vector2d(pos.x, pos.y));
             if (resource.isFeasible(gs)) {
                 resources.add(resource);
             }
@@ -54,7 +53,7 @@ public class ResourceGathering extends CityAction
         Board b = gs.getBoard();
         Tribe t = b.getTribe(this.city.getTribeId());
         // Check if resource in range
-        if(b.getResourceAt(targetX,targetY) == this.resource){
+        if(b.getResourceAt(targetPos.x, targetPos.y) == this.resource){
             switch (this.resource){
                 case ANIMAL:
                     if(t.getTechTree().isResearched(Types.TECHNOLOGY.HUNTING) && t.getStars() >=2)

@@ -1,5 +1,6 @@
 package core.actions.unitactions;
 
+import core.Types;
 import core.actions.Action;
 import core.actors.Tribe;
 import core.game.Board;
@@ -9,6 +10,7 @@ import core.actors.units.Unit;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Random;
 
 public class Capture extends UnitAction
 {

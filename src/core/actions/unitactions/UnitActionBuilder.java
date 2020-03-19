@@ -36,6 +36,9 @@ public class UnitActionBuilder
         //Make Veteran
         allActions.addAll(new MakeVeteran(unit).computeActionVariants(gs));
 
+        //Move
+        allActions.addAll(new Move(unit).computeActionVariants(gs));
+
         //Recover
         allActions.addAll(new Recover(unit).computeActionVariants(gs));
 

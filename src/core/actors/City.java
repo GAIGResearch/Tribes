@@ -16,31 +16,19 @@ public class City extends Actor{
     private int production = 0;
     private int pointsPerTurn = 0;
     private boolean hasWalls = false;
+    private int bound;
 
     private LinkedList<Integer> unitsID = new LinkedList<>();
     private LinkedList<Building> buildings = new LinkedList<>();
-    int bound;
 
     // The constructor to initial the valley
     public City(int x, int y, int tribeId) {
         this.position = new Vector2d(x,y);
+        this.tribeId = tribeId;
         population_need = 2; //level 1 requires population_need = 2
         bound = 1; //cities start with 1 tile around it for territory
         level = 1; //and starting level is 1
         isCapital = false;
-        this.tribeId = tribeId;
-    }
-
-    public City(int x, int y, int level, int population, int population_need, boolean isCapital, int production, LinkedList<Building> buildings, int tribeId, LinkedList<Integer> unitsID) {
-        this.position = new Vector2d(x,y);
-        this.level = level;
-        this.population = population;
-        this.population_need = population_need;
-        this.isCapital = isCapital;
-        this.production = production;
-        this.buildings = buildings;
-        this.tribeId = tribeId;
-        this.unitsID = unitsID;
     }
 
     // Increase population
@@ -48,10 +36,6 @@ public class City extends Actor{
         population += number;
     }
 
-    // Decrease population
-    public void subtractPopulation(int number){
-        population += number;
-    }
 
     public void addBuilding(Building building){
         if (building.getTYPE() == WINDMILL || building.getTYPE() == SAWMILL ||
@@ -183,7 +167,6 @@ public class City extends Actor{
         return population;
     }
 
-
     public boolean isCapital() {
         return isCapital;
     }
@@ -198,6 +181,20 @@ public class City extends Actor{
     }
 
 
+    // Get the point for each turn
+    public int getPoints() {
+        return pointsPerTurn;
+    }
+
+
+    public void setUnitsID(LinkedList<Integer> unitsID) {
+        this.unitsID = unitsID;
+    }
+
+    public void setBuildings(LinkedList<Building> buildings) {
+        this.buildings = buildings;
+    }
+
     public LinkedList<Building> copyBuildings() {
         LinkedList<Building> copyList = new LinkedList<>();
         for(Building building : buildings) {
@@ -206,22 +203,27 @@ public class City extends Actor{
         return copyList;
     }
 
-    // Get the point for each turn
-    public int getPoints() {
-        return pointsPerTurn;
-    }
 
     public LinkedList<Integer> copyUnitsID() {
         LinkedList<Integer> copyUnits = new LinkedList<>();
-        for (Integer integer : unitsID) {
-            copyUnits.add(integer);
+        for (Integer id : unitsID) {
+            copyUnits.add(id);
         }
         return copyUnits;
     }
 
+
     public City copy(){
-        City c = new City(position.x, position.y, level, population, population_need, isCapital, production, copyBuildings(), tribeId, copyUnitsID());
+        City c = new City(position.x, position.y, tribeId);
+        c.level = level;
+        c.population = population;
+        c.population_need = population_need;
+        c.isCapital = isCapital;
+        c.production = production;
+        c.bound = bound;
         c.setWalls(hasWalls);
+        c.setBuildings(copyBuildings());
+        c.setUnitsID(copyUnitsID());
         return c;
     }
 

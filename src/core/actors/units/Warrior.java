@@ -21,6 +21,7 @@ public class Warrior extends Unit
         Warrior c = new Warrior(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
+        c.setStatus(getStatus());
         return c;
     }
 }

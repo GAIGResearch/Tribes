@@ -1,5 +1,7 @@
 package utils;
 
+import java.util.LinkedList;
+
 /**
  * This class represents a vector, or a position, in the map.
  * PTSP-Competition
@@ -314,6 +316,41 @@ public class Vector2d
     @Override
     public int hashCode() {
         return x * 20 + y;
+    }
+
+    /**
+     * Returns a list a neighbouring vectors from target for a given radius.
+     * @param radius the size of the neighborhood ( radius = 1, gives a 3x3 neighborhood ).
+     * @param size the size of the Board so as to check if vectors are out-of-bounds.
+     * @return A list of neighbors.
+     */
+    public LinkedList<Vector2d> neighborhood(int radius, int size)
+    {
+        LinkedList<Vector2d> vectors = new LinkedList<>();
+
+        for(int i = x - radius; i <= x + radius; i++) {
+            for(int j = y - radius; j <= y + radius; j++) {
+                if(i >= 0 && j >= 0 && i < size && j < size) {
+                    vectors.add(new Vector2d(i, j));
+                }
+            }
+        }
+        return vectors;
+    }
+
+    public static double manhattanDistance(Vector2d p1, Vector2d p2)
+    {
+        return Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
+    }
+
+    public static double chebychevDistance(Vector2d p1, Vector2d p2)
+    {
+        return Math.max(Math.abs(p1.x-p2.x), Math.abs(p1.y-p2.y));
+    }
+
+    public static double euclideanDistance(Vector2d p1, Vector2d p2)
+    {
+        return Math.sqrt(Math.pow(Math.abs(p1.x - p2.x), 2) + Math.pow(Math.abs(p1.y - p2.y), 2));
     }
 }
 

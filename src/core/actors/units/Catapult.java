@@ -21,6 +21,7 @@ public class Catapult extends Unit
         Catapult c = new Catapult(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
+        c.setStatus(getStatus());
         return c;
     }
 }

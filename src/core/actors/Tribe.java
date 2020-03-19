@@ -119,12 +119,6 @@ public class Tribe extends Actor {
             tribeCopy.monuments.put(b, monuments.get(b));
         }
 
-        tribeCopy.unitsID = new ArrayList<>();
-        for(int unitID : unitsID)
-        {
-            tribeCopy.unitsID.add(unitID);
-        }
-
         return tribeCopy;
     }
 

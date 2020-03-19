@@ -74,7 +74,7 @@ public class Destroy extends CityAction
                 if(removedBuilding.getTYPE() == Types.BUILDING.PORT)
                 {
                     //If a port is removed, then the tile stops belonging to the trade network
-                    b.setTradeNetwork(position.x, position.y, false);
+                    b.setTradeNetwork(targetPos.x, targetPos.y, false);
                 }
 
 

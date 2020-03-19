@@ -28,7 +28,8 @@ public class HealOthers extends UnitAction
         if(isFeasible(gs)){
             for(Vector2d tile : unit.getPosition().neighborhood(1, board.getSize())){
                 //Avoid adding self as a target
-                if(board.getUnitAt(tile.x, tile.y).getTribeId() == unit.getTribeId() && !tile.equals(unit.getPosition())){
+                Unit u = board.getUnitAt(tile.x, tile.y);  // There might not be a unit there at all
+                if(u != null && u.getTribeId() == unit.getTribeId() && !tile.equals(unit.getPosition())){
                     action.targets.add(board.getUnitIDAt(tile.x, tile.y));
                 }
             }
@@ -45,7 +46,8 @@ public class HealOthers extends UnitAction
         //Even if that unit has max HP. (Do we want that?)
         if(unit.checkStatus(Types.TURN_STATUS.ATTACKED)){
             for(Vector2d tile : unit.getPosition().neighborhood(1, board.getSize())){
-                if(board.getUnitAt(tile.x, tile.y).getTribeId() == unit.getTribeId()){
+                Unit u = board.getUnitAt(tile.x, tile.y);
+                if(u != null && u.getTribeId() == unit.getTribeId()){
                     return true;
                 }
             }

@@ -101,7 +101,8 @@ public class Move extends UnitAction
 
             //Check if there is an enemy unit adjacent.
             for(Vector2d tile : from.neighborhood(1, board.getSize())) {
-                if(board.getUnitAt(tile.x, tile.y).getTribeId() != unit.getTribeId()) { inZoneOfControl = true; }
+                Unit u = board.getUnitAt(tile.x, tile.y);  // There might not be a unit there at all
+                if(u != null && u.getTribeId() != unit.getTribeId()) { inZoneOfControl = true; }
             }
             //Each one of the tree nodes added to "neighbours" must have a position (x,y) and also the cost of moving there from "from":
             //TreeNode tn = new TreeNode (vector2d pos, double stepCost)
@@ -122,8 +123,6 @@ public class Move extends UnitAction
                     switch (terrain)
                     {
                         case CITY:
-                            //TODO : Only allow movement into friendly cities.
-                            continue;
                         case PLAIN:
                         case FOREST:
                         case VILLAGE:
@@ -134,6 +133,7 @@ public class Move extends UnitAction
                         case DEEP_WATER:
                         case SHALLOW_WATER:
                             stepCost = 1.0;
+                            break;
                     }
                 }else //Ground unit
                     switch (terrain)
@@ -144,14 +144,16 @@ public class Move extends UnitAction
                             if(board.getBuildingAt(tile.x, tile.y) == Types.BUILDING.PORT) {
                                 stepCost = unit.MOV;
                             }
-                            continue;
+                            break;
                         case PLAIN:
                         case CITY:
                         case VILLAGE:
                             stepCost = 1.0;
+                            break;
                         case FOREST:
                         case MOUNTAIN:
                             stepCost = unit.MOV;
+                            break;
 
                     }
                 if(inZoneOfControl){
@@ -168,13 +170,6 @@ public class Move extends UnitAction
         public void addJumpLink(Vector2d from, Vector2d to, boolean reverse) {
             //No jump links
         }
-    }
-
-    private boolean adjacentToEnemy(Board board, Vector2d pos) {
-        for(Vector2d tile : pos.neighborhood(1, board.getSize())) {
-            if(board.getUnitAt(tile.x, tile.y).getTribeId() != unit.getTribeId()) { return true; }
-        }
-        return false;
     }
 
 }

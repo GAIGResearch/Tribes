@@ -2,6 +2,8 @@ package core.actors;
 
 import core.Types;
 import core.actors.buildings.Building;
+import core.game.Board;
+import core.game.GameState;
 import utils.Vector2d;
 
 import java.util.LinkedList;
@@ -47,9 +49,7 @@ public class City extends Actor{
     }
 
 
-    public void addBuilding(Building building){
-
-        //TODO: We have to check the other cities of this tribe!
+    public void addBuilding(GameState gameState, Building building){
 
         switch (building.type) {
             case FARM:
@@ -58,14 +58,14 @@ public class City extends Actor{
             case WINDMILL:
             case SAWMILL:
             case FORGE:
-                changePopulation(building);
+                changeBonus(gameState, building, true, 1);
                 break;
             case PORT:
                 addPopulation(building.type.getBonus());
-                changeProduction(building);
+                changeBonus(gameState, building, false, 1);
                 break;
             case CUSTOM_HOUSE:
-                changeProduction(building);
+                changeBonus(gameState, building, false, 1);
                 break;
             case TEMPLE:
             case WATER_TEMPLE:
@@ -86,49 +86,8 @@ public class City extends Actor{
         buildings.add(building);
     }
 
-    private void changePopulation(Building building) {
-        changePopulation(building, 1);
-    }
 
-    private void changePopulation(Building building, int multiplier) {
-        int popAdd;
-        boolean isBase = building.type.isBase();
-
-        //Population added by the base building.
-        if(isBase) addPopulation(building.getBonus());
-
-        //Population added due to adjacency to other matching buildings.
-        for (Building existingBuilding : buildings) {
-            if(building.isMatchingBuilding(existingBuilding) && existingBuilding.adjacent(building))
-            {
-                // if building is base we add the bonus of the matching building. If it's not a base, the own building.
-                popAdd = isBase ? existingBuilding.getBonus() : building.getBonus();
-                addPopulation(popAdd * multiplier);
-            }
-        }
-    }
-
-    private void changeProduction(Building building) {
-        changeProduction(building, 1);
-    }
-
-    private void changeProduction(Building building, int multiplier){
-
-        int prodAdd;
-        boolean isBase = building.type.isBase();
-
-        //For all neighbouring buildings to 'building'
-        for(Building existingBuilding: buildings){
-            if(building.isMatchingBuilding(existingBuilding) && existingBuilding.adjacent(building))
-            {
-                prodAdd = isBase ? existingBuilding.getBonus() : building.getBonus();
-                addProduction(prodAdd * multiplier);
-            }
-        }
-    }
-
-
-    public void removeBuilding(Building building)
+    public void removeBuilding(GameState gameState, Building building)
     {
         switch (building.type) {
             case FARM:
@@ -137,14 +96,14 @@ public class City extends Actor{
             case WINDMILL:
             case SAWMILL:
             case FORGE:
-                changePopulation(building, -1);
+                changeBonus(gameState, building, true, -1);
                 break;
             case PORT:
                 addPopulation(-building.type.getBonus());
-                changeProduction(building, -1);
+                changeBonus(gameState, building, false, -1);
                 break;
             case CUSTOM_HOUSE:
-                changeProduction(building, -1);
+                changeBonus(gameState, building, false,-1);
                 break;
             case TEMPLE:
             case WATER_TEMPLE:
@@ -164,6 +123,51 @@ public class City extends Actor{
 
         buildings.remove(building);
     }
+
+
+
+    private void changeBonus(GameState gameState, Building building, boolean isPopulation, int multiplier){
+
+        int toAdd;
+        boolean isBase = building.type.isBase();
+        Board board = gameState.getBoard();
+        Tribe tribe = (Tribe) gameState.getActor(this.tribeId);
+
+        //Population added by the base building.
+        if(isBase && isPopulation) addPopulation(building.getBonus());
+
+        //Check all buildings next to the new building position.
+        for(Vector2d adjPosition : building.position.neighborhood(1, 0, board.getSize()))
+        {
+            //For each position, if there's a building and of the production matching point
+            Types.BUILDING b = board.getBuildingAt(adjPosition.x, adjPosition.y);
+            if(b != null && building.type.getMatchingBuilding() == b)
+            {
+                //Retrieve this building, which could be form this city or from another one from the tribe.
+                Building existingBuilding = null;
+                int cityId = board.getCityIdAt(adjPosition.x, adjPosition.y);
+                if(cityId == actorId)
+                {
+                    //the matching building belongs to this city
+                    existingBuilding = this.getBuilding(building.position.x, building.position.y);
+                }else if(tribe.getCitiesID().contains(cityId)) {
+                    //the matching building belongs to a city from a different tribe
+                    City city = (City) gameState.getActor(cityId);
+                    existingBuilding = city.getBuilding(building.position.x, building.position.y);
+
+                }else return; //This may happen if the building belongs to a city from another tribe.
+
+                toAdd = isBase ? existingBuilding.getBonus() : building.getBonus();
+
+                if(isPopulation)
+                    addPopulation(toAdd * multiplier);
+                else
+                    addProduction(toAdd * multiplier);
+
+            }
+        }
+    }
+
 
 
     public int getProduction(){

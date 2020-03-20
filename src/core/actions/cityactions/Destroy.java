@@ -41,7 +41,7 @@ public class Destroy extends CityAction
                 b.setTradeNetwork(targetPos.x, targetPos.y, false);
             }
 
-            city.removeBuilding(buildingToRemove);
+            city.removeBuilding(gs, buildingToRemove);
             return true;
         }
         return false;

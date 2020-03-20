@@ -88,41 +88,41 @@ public class Build extends CityAction
 
             switch (buildingType) {
                 case FARM:
-                    city.addBuilding(new Farm(targetPos.x, targetPos.y));
+                    city.addBuilding(gs, new Farm(targetPos.x, targetPos.y));
                     return true;
                 case MINE:
-                    city.addBuilding(new Mine(targetPos.x, targetPos.y));
+                    city.addBuilding(gs, new Mine(targetPos.x, targetPos.y));
                     return true;
                 case PORT:
-                    city.addBuilding(new Port(targetPos.x, targetPos.y));
+                    city.addBuilding(gs, new Port(targetPos.x, targetPos.y));
                     board.setTradeNetwork(targetPos.x, targetPos.y, true);
                     return true;
                 case FORGE:
-                    city.addBuilding(new Forge(targetPos.x, targetPos.y));
+                    city.addBuilding(gs, new Forge(targetPos.x, targetPos.y));
                     return true;
                 case TEMPLE:
-                    city.addBuilding(new Temple(targetPos.x, targetPos.y, Types.BUILDING.TEMPLE));
+                    city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, Types.BUILDING.TEMPLE));
                     return true;
                 case MOUNTAIN_TEMPLE:
-                    city.addBuilding(new Temple(targetPos.x, targetPos.y, Types.BUILDING.MOUNTAIN_TEMPLE));
+                    city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, Types.BUILDING.MOUNTAIN_TEMPLE));
                     return true;
                 case WATER_TEMPLE:
-                    city.addBuilding(new Temple(targetPos.x, targetPos.y, Types.BUILDING.WATER_TEMPLE));
+                    city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, Types.BUILDING.WATER_TEMPLE));
                     return true;
                 case FOREST_TEMPLE:
-                    city.addBuilding(new Temple(targetPos.x, targetPos.y, Types.BUILDING.FOREST_TEMPLE));
+                    city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, Types.BUILDING.FOREST_TEMPLE));
                     return true;
                 case SAWMILL:
-                    city.addBuilding(new Sawmill(targetPos.x, targetPos.y));
+                    city.addBuilding(gs, new Sawmill(targetPos.x, targetPos.y));
                     return true;
                 case WINDMILL:
-                    city.addBuilding(new Windmill(targetPos.x, targetPos.y));
+                    city.addBuilding(gs, new Windmill(targetPos.x, targetPos.y));
                     return true;
                 case LUMBER_HUT:
-                    city.addBuilding(new LumberHut(targetPos.x, targetPos.y));
+                    city.addBuilding(gs, new LumberHut(targetPos.x, targetPos.y));
                     return true;
                 case CUSTOM_HOUSE:
-                    city.addBuilding(new CustomHouse(targetPos.x, targetPos.y));
+                    city.addBuilding(gs, new CustomHouse(targetPos.x, targetPos.y));
                     return true;
 
                 case ALTAR_OF_PEACE:
@@ -131,7 +131,7 @@ public class Build extends CityAction
                 case GATE_OF_POWER:
                 case PARK_OF_FORTUNE:
                 case TOWER_OF_WISDOM:
-                    city.addBuilding(new Monument(targetPos.x, targetPos.y, buildingType));
+                    city.addBuilding(gs, new Monument(targetPos.x, targetPos.y, buildingType));
                     tribe.monumentIsBuilt(buildingType);
                     break;
             }
@@ -175,4 +175,8 @@ public class Build extends CityAction
 
         return true;
     }
+
+
+
+
 }

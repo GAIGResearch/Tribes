@@ -163,7 +163,7 @@ public class Board {
 
     }
 
-    private boolean tryPush(int tribeId, Unit toPush, int startX, int startY, int x, int y) {
+    public boolean tryPush(int tribeId, Unit toPush, int startX, int startY, int x, int y) {
         //there's no unit?
         if (units[x][y] > 0)
             return false;

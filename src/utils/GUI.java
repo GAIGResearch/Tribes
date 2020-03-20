@@ -1,5 +1,6 @@
 package utils;
 
+import core.actions.tribeactions.EndTurn;
 import core.actors.units.Unit;
 import core.game.Game;
 import core.game.GameState;
@@ -200,7 +201,7 @@ public class GUI extends JFrame implements Runnable {
 
         c.gridy++;
         JButton endTurn = new JButton("End Turn");
-        endTurn.addActionListener(e -> ac.addAction(new EndTurn(), gs));  TODO: no more end turn?
+        endTurn.addActionListener(e -> ac.addAction(new EndTurn(), gs));
         sidePanel.add(endTurn, c);
 
         c.gridy++;

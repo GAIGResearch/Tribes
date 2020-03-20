@@ -170,9 +170,9 @@ public class GameView extends JComponent {
 
     private static void paintFog(Graphics2D gphx, int i, int j, int cellSize)
     {
-        Rectangle rect = new Rectangle(j*cellSize, i*cellSize, cellSize, cellSize);
+        Point2D p = rotatePoint(j, i);
         gphx.setColor(Color.black);
-        gphx.fill(rect);
+        fillRotatedRect(gphx, (int)p.getX() - 1, (int)p.getY() - 1, cellSize + 2, cellSize + 2);
     }
 
     private static void paintImageRotated(Graphics2D gphx, int x, int y, Image img, int imgSize)
@@ -206,6 +206,13 @@ public class GameView extends JComponent {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.rotate(Math.toRadians(isometricAngle), x, y);
         g2.drawRect(x, y, width, height);
+        g2.dispose();
+    }
+
+    private static void fillRotatedRect(Graphics2D g, int x, int y, int width, int height) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.rotate(Math.toRadians(isometricAngle), x, y);
+        g2.fillRect(x, y, width, height);
         g2.dispose();
     }
 

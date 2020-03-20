@@ -245,6 +245,8 @@ public class GUI extends JFrame implements Runnable {
 
     @Override
     public void run() {
+        // TODO: if active tribe changed, remove highlights
+
         finishedUpdate = false;
         view.paint(gs);
         tribeView.paint(gs);

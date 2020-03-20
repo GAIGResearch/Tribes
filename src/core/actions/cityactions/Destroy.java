@@ -1,14 +1,11 @@
 package core.actions.cityactions;
 
 import core.Types;
-import core.actions.Action;
+import core.actors.Tribe;
 import core.actors.buildings.Building;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.City;
-import utils.Vector2d;
-
-import java.util.LinkedList;
 
 public class Destroy extends CityAction
 {
@@ -30,37 +27,22 @@ public class Destroy extends CityAction
     public boolean execute(GameState gs) {
         if (isFeasible(gs)){
             City city = (City) gs.getActor(this.cityId);
-            Building removedBuilding = city.removeBuilding(targetPos.x, targetPos.y);
-            if (removedBuilding != null) {
+            Tribe tribe = (Tribe) gs.getActor(city.getTribeId());
+            Building buildingToRemove = city.getBuilding(targetPos.x, targetPos.y);
 
-                Board b = gs.getBoard();
-                b.setBuildingAt(targetPos.x, targetPos.y, null);
+            Board b = gs.getBoard();
+            b.setBuildingAt(targetPos.x, targetPos.y, null);
 
-                if (removedBuilding.getTYPE() != Types.BUILDING.CUSTOM_HOUSE) {
-                    city.addPopulation(-removedBuilding.getPRODUCTION());
-                }
+            tribe.addScore(buildingToRemove.getPoints());
 
-                // TODO: Should be check if the building enum is changed
-                if (removedBuilding.getTYPE().getKey() >= Types.BUILDING.TEMPLE.getKey()) {
-                    gs.getTribe(city.getTribeId()).subtractScore(removedBuilding.getPoints());
-                }
-
-                int removedType = removedBuilding.getTYPE().getKey();
-                if(removedType == Types.BUILDING.TEMPLE.getKey()
-                        || removedType == Types.BUILDING.WATER_TEMPLE.getKey()
-                        || removedType == Types.BUILDING.FOREST_TEMPLE.getKey()
-                        || removedType == Types.BUILDING.MOUNTAIN_TEMPLE.getKey()){
-                    city.subtractLongTermPoints(removedBuilding.getPoints());
-                }
-
-                if(removedBuilding.getTYPE() == Types.BUILDING.PORT)
-                {
-                    //If a port is removed, then the tile stops belonging to the trade network
-                    b.setTradeNetwork(targetPos.x, targetPos.y, false);
-                }
-
-                return true;
+            if(buildingToRemove.type == Types.BUILDING.PORT)
+            {
+                //If a port is removed, then the tile stops belonging to the trade network
+                b.setTradeNetwork(targetPos.x, targetPos.y, false);
             }
+
+            city.removeBuilding(gs, buildingToRemove);
+            return true;
         }
         return false;
     }

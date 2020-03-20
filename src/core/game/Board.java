@@ -496,77 +496,46 @@ public class Board {
 
     /**
      * Captures a city or village for tribe t
-     * @param t tribe that captures
+     * @param capturingTribe tribe that captures
      * @param x position of the city to capture
      * @param y position of the city to capture
      * @return true if city was captured.
      */
-    public boolean capture(Tribe t, int x, int y, Random rnd){
+    public boolean capture(GameState gameState, Tribe capturingTribe, int x, int y){
 
+        Random rnd = gameState.getRandomGenerator();
         Types.TERRAIN ter = terrains[x][y];
-        City capital = (City) getActor(t.getCapitalID());
-        LinkedList<Integer> cities = new LinkedList<>(t.getCitiesID());
-        cities.remove((Integer)t.getCapitalID());
-        boolean ownCapital = t.controlsCapital();
-        City c;
+
         if(ter == Types.TERRAIN.VILLAGE)
         {
             //Not a city. Needs to be created, assigned and its border calculated.
-            c = new City(x, y, t.getTribeId());
-            // Move the unit from one city to village. Rank: capital -> cities -> None
-            if(ownCapital && capital.getUnitsID().size() > 0){
-                moveBelongingCity(capital, c, rnd);
-            }else{
-                while (cities.size() > 0){
-                    int index = rnd.nextInt(cities.size());
-                    City originalCity = (City)getActor(cities.get(index));
-                    if (originalCity.getUnitsID().size() > 0){
-                        moveBelongingCity(originalCity, c, rnd);
-                        break;
-                    }else{
-                        cities.remove(index);
-                    }
-                }
-            }
-            addCityToTribe(c);
-            setBorderHelper(c, c.getBound());
+            City newCity = new City(x, y, capturingTribe.getTribeId());
 
+            // Move the unit from one city to village. Rank: capital -> cities -> None
+            moveOneToNewCity(newCity, capturingTribe, rnd);
+
+            //Add city to board and set its borders
+            addCityToTribe(newCity);
+            setBorderHelper(newCity, newCity.getBound());
 
         }else if(ter == Types.TERRAIN.CITY)
         {
-            //The city exists, needs to change owner.
-            c = (City) gameActors.get(tileCityId[x][y]);
-            int cityId = c.getActorId();
-            int prevTribeId = c.getTribeId();
-            c.setTribeId(t.getTribeId());
-            tribes[t.getTribeId()].addCity(cityId);
-            tribes[prevTribeId].removeCity(cityId);
-            // Move units to previous Tribe. Rank: capital -> cities -> Tribe
-            City preCapital = (City) getActor(tribes[prevTribeId].getCapitalID());
-            LinkedList<Integer> preCities = new LinkedList<>(tribes[prevTribeId].getCitiesID());
-            preCities.remove(tribes[prevTribeId].getCapitalID());
-            boolean preOwnCapital = tribes[prevTribeId].controlsCapital();
-            LinkedList<Integer> units = c.moveUnits();
-            while (preOwnCapital && preCapital.addUnitAble() && units.size() > 0){
-                preCapital.addUnit(units.getFirst());
-                units.removeFirst();
-            }
-            while (preCities.size() > 0 && units.size() > 0){
-                int index = rnd.nextInt(preCities.size());
-                City originalCity = (City)getActor(preCities.get(index));
-                while (originalCity.addUnitAble() && units.size() > 0){
-                    originalCity.addUnit(units.getFirst());
-                    units.removeFirst();
-                }
-                preCities.remove(index);
-            }
-            if (units.size() > 0){
-                tribes[prevTribeId].moveAllUnits(units);
-            }
+            City capturedCity = (City) gameActors.get(tileCityId[x][y]);
+            Tribe previousOwner = tribes[capturedCity.getTribeId()];
+
+            //The city exists, needs to change owner, tribes notified and production & population updated
+            capturingTribe.capturedCity(gameState, capturedCity);
+            previousOwner.lostCity(gameState, capturedCity);
+
+            // TRIBE that lost the city: Move units to other cities (before the capturing tribe moves their unit)
+            moveAllFromCity(capturedCity, previousOwner, rnd);
+
+            // TRIBE that captured this city. One unit moves there.
+            moveOneToNewCity(capturedCity, capturingTribe, rnd);
 
         }else
         {
-            System.out.println("Warning: Tribe " + t.getTribeId() + " trying to caputre a non-city.");
+            System.out.println("Warning: Tribe " + capturingTribe.getTribeId() + " trying to caputre a non-city.");
             return false;
         }
 
@@ -574,8 +543,67 @@ public class Board {
         return true;
     }
 
-    public void moveBelongingCity(City originalCity, City targetCity, Random rnd){
-        int index = rnd.nextInt(originalCity.getUnitsID().size());
+    private void moveOneToNewCity(City destCity, Tribe tribe, Random rnd)
+    {
+        //Capital is special, we start taking unnits from there.
+        boolean ownsCapital = tribe.controlsCapital();
+        City capital = (City) getActor(tribe.getCapitalID());
+        LinkedList<Integer> cities = new LinkedList<>(tribe.getCitiesID());
+        cities.remove((Integer)tribe.getCapitalID());
+
+        // Move the unit from one city to village. Rank: capital -> cities -> None
+        if(ownsCapital && capital.getUnitsID().size() > 0){
+            moveBelongingCity(capital, destCity);
+        }else{
+            boolean moved = false;
+            //Capital is empty or not owned. Check the other cities at random
+            Collections.shuffle(cities, rnd);
+            while (!moved && cities.size() > 0){
+                City originalCity = (City)getActor(cities.removeFirst());
+                if (originalCity.getUnitsID().size() > 0){
+                    moveBelongingCity(originalCity, destCity);
+                    moved = true;
+                }
+            }
+        }
+    }
+
+    private void moveAllFromCity(City fromCity, Tribe tribe, Random rnd)
+    {
+        //Capital is special, we start taking unnits from there.
+        boolean ownsCapital = tribe.controlsCapital();
+        City capital = (City) getActor(tribe.getCapitalID());
+
+        //Units to move
+        LinkedList<Integer> units = fromCity.moveUnits();
+
+        //First to capital
+        while (ownsCapital && capital.canAddUnit() && units.size() > 0){
+            capital.addUnit(units.removeFirst());
+        }
+
+        //Then, to all the other cities, picked at random.
+        if(units.size() > 0)
+        {
+            LinkedList<Integer> cities = new LinkedList<>(tribe.getCitiesID());
+            cities.remove((Integer)tribe.getCapitalID());
+            Collections.shuffle(cities, rnd);
+            while (cities.size() > 0 && units.size() > 0){
+                City destCity = (City)getActor(cities.removeFirst());
+                while (destCity.canAddUnit() && units.size() > 0){
+                    destCity.addUnit(units.removeFirst());
+                }
+            }
+
+            //If there are still units, they go to the tribe.
+            if (units.size() > 0){
+                tribe.moveAllUnits(units);
+            }
+        }
+    }
+
+    private void moveBelongingCity(City originalCity, City targetCity){
+        int index = originalCity.getUnitsID().size()-1;
         int actorID = originalCity.removeUnitByIndex(index);
         targetCity.addUnit(actorID);
     }

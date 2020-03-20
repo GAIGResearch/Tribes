@@ -2,27 +2,25 @@ package core.actors.buildings;
 
 import core.TribesConfig;
 import core.Types;
+import core.actors.City;
+import core.game.GameState;
 
 public class Forge extends Building {
 
-    private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.PLAIN;
 
     // Building Purpose -> The production will set up inside the addBuilding in City
     public Forge(int x, int y) {
-        super(x, y, TribesConfig.FORGE_COST, Types.BUILDING.FORGE, 0);
+        super(x, y);
+        this.type = Types.BUILDING.FORGE;
     }
 
-    // Copy Purpose
-    public Forge(int x, int y, int production) {
-        super(x, y, TribesConfig.FORGE_COST, Types.BUILDING.FORGE, production);
-    }
-
-    public void setProduction(int production) {
-        super.setProduction(production*2);
+    public int computeBonusPopulation(City c, GameState gs) {
+        //TODO: Depends on number of adjacent mines
+        return -1;
     }
 
     @Override
     public Building copy() {
-        return new Forge(position.x, position.y, getPRODUCTION());
+        return new Forge(position.x, position.y);
     }
 }

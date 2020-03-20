@@ -2,21 +2,21 @@ package core.actors.buildings;
 
 import core.TribesConfig;
 import core.Types;
+import core.actors.City;
 import core.game.Board;
+import core.game.GameState;
 
 public class Monument extends Building{
 
-    public Monument(int x, int y, Types.BUILDING type) {
-        super(x, y, 0, type, TribesConfig.MONUMENT_PRODUCTION, TribesConfig.MONUMENT_POINT);
+    public Monument(int x, int y, Types.BUILDING monumentType) {
+        super(x, y);
+        this.type = monumentType;
     }
 
-    @Override
-    public boolean is_buildable(Board board) {
-        return board.getTerrainAt(position.x, position.y) == Types.TERRAIN.PLAIN || board.getTerrainAt(position.x, position.y) == Types.TERRAIN.SHALLOW_WATER;
-    }
+    public int computeBonusPopulation(City c, GameState gs) { return type.getBonus();}
 
     @Override
     public Building copy() {
-        return new Monument(position.x, position.y, getTYPE());
+        return new Monument(position.x, position.y, type);
     }
 }

@@ -321,16 +321,17 @@ public class Vector2d
     /**
      * Returns a list a neighbouring vectors from target for a given radius.
      * @param radius the size of the neighborhood ( radius = 1, gives a 3x3 neighborhood ).
-     * @param size the size of the Board so as to check if vectors are out-of-bounds.
+     * @param min the minimum value to keep it in bounds (inclusive).
+     * @param max the maximum value to keep it in bounds (exclusive).
      * @return A list of neighbors.
      */
-    public LinkedList<Vector2d> neighborhood(int radius, int size)
+    public LinkedList<Vector2d> neighborhood(int radius, int min, int max)
     {
         LinkedList<Vector2d> vectors = new LinkedList<>();
 
         for(int i = x - radius; i <= x + radius; i++) {
             for(int j = y - radius; j <= y + radius; j++) {
-                if(i >= 0 && j >= 0 && i < size && j < size) {
+                if(i >= min && j >= min && i < max && j < max) {
                     vectors.add(new Vector2d(i, j));
                 }
             }

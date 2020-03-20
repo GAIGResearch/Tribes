@@ -2,73 +2,58 @@ package core.actions.unitactions;
 
 import core.TribesConfig;
 import core.Types;
-import core.actions.Action;
 import core.actors.City;
 import core.actors.Tribe;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
+import static core.Types.UNIT.*;
 
 public class Upgrade extends UnitAction
 {
-    public Upgrade(Unit target)
+    public Upgrade(int unitId)
     {
-        super.unit = target;
-    }
-
-    @Override
-    public LinkedList<Action> computeActionVariants(final GameState gs) {
-        LinkedList<Action> upgradeActions = new LinkedList<>();
-        Upgrade action = new Upgrade(unit);
-
-        if(isFeasible(gs)){
-            upgradeActions.add(action);
-        }
-        return upgradeActions;
+        super.unitId = unitId;
     }
 
     @Override
     public boolean isFeasible(final GameState gs) {
+        Unit unit = (Unit) gs.getActor(this.unitId);
         int stars = gs.getTribe(unit.getTribeId()).getStars();
-
-        switch (unit.getType()){
-            case BOAT:
-                if(stars >= TribesConfig.SHIP_COST) { return true; }
-            case SHIP:
-                if(stars >= TribesConfig.BATTLESHIP_COST) { return true; }
-        }
-
-        return false;
+        return ((unit.getType() == BOAT && stars >= TribesConfig.SHIP_COST) ||
+                (unit.getType() == SHIP && stars >= TribesConfig.BATTLESHIP_COST));
     }
 
     @Override
     public boolean execute(GameState gs) {
+        Unit unit = (Unit) gs.getActor(this.unitId);
         Tribe tribe = gs.getTribe(unit.getTribeId());
         Board board = gs.getBoard();
         City city = (City) board.getActor(unit.getCityID());
 
         if(isFeasible(gs)){
-            switch (unit.getType()){
-                case BOAT:
-                    tribe.subtractStars(TribesConfig.SHIP_COST);
-                    Unit ship = Types.UNIT.createUnit(unit.getPosition(), unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), Types.UNIT.SHIP);
-                    ship.setCurrentHP(unit.getCurrentHP());
-                    board.addUnit(city, ship);
-                case SHIP:
-                    tribe.subtractStars(TribesConfig.BATTLESHIP_COST);
-                    Unit battleship = Types.UNIT.createUnit(unit.getPosition(), unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), Types.UNIT.BATTLESHIP);
-                    battleship.setCurrentHP(unit.getCurrentHP());
-                    board.addUnit(city, battleship);
-            }
+            Types.UNIT unitType = unit.getType();
+            Types.UNIT nextType;
+
+            //get the correct type - or nothing!
+            if(unitType == BOAT) nextType = SHIP;
+            else if(unitType == SHIP) nextType = BATTLESHIP;
+            else return false; //this shouldn't happen, isFeasible should've captured this case
+
+            //Create the new unit
+            Unit newUnit = Types.UNIT.createUnit(unit.getPosition(), unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), nextType);
+            newUnit.setCurrentHP(unit.getCurrentHP());
+
+            //adjustments in tribe and board.
+            tribe.subtractStars(nextType.getCost());
+
+            //We first remove the unit, so there's space for the new one to take its place.
             board.removeUnitFromBoard(unit);
             board.removeUnitFromCity(unit, city);
+            board.addUnit(city, newUnit);
             return true;
         }
-
-
         return false;
     }
 }

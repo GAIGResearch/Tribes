@@ -2,6 +2,8 @@ package core.actors.buildings;
 
 import core.TribesConfig;
 import core.Types;
+import core.actors.City;
+import core.game.GameState;
 
 public class CustomHouse extends Building {
 
@@ -21,6 +23,13 @@ public class CustomHouse extends Building {
     public void setProduction(int production) {
         super.setProduction(production);
     }
+
+    public int computeProduction(City c, GameState gs)
+    {
+        //TODO: Computes and returns the production of this custom house: 2 * num_adjacent_ports
+        return -1;
+    }
+
 
     @Override
     public Building copy() {

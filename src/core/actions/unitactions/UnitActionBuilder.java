@@ -16,34 +16,34 @@ public class UnitActionBuilder
         ArrayList<Action> allActions = new ArrayList<>();
 
         //Attack
-        allActions.addAll(new Attack(unit).computeActionVariants(gs));
+        allActions.addAll(new AttackFactory().computeActionVariants(unit, gs));
 
         //Capture
-        allActions.addAll(new Capture(unit).computeActionVariants(gs));
+        allActions.addAll(new CaptureFactory().computeActionVariants(unit, gs));
 
         //Convert
-        allActions.addAll(new Convert(unit).computeActionVariants(gs));
+        allActions.addAll(new ConvertFactory().computeActionVariants(unit, gs));
 
         //Disband
-        allActions.addAll(new Disband(unit).computeActionVariants(gs));
+        allActions.addAll(new DisbandFactory().computeActionVariants(unit, gs));
 
         //Examine
-        allActions.addAll(new Examine(unit).computeActionVariants(gs));
+        allActions.addAll(new ExamineFactory().computeActionVariants(unit, gs));
 
         //Heal Others
-        allActions.addAll(new HealOthers(unit).computeActionVariants(gs));
+        allActions.addAll(new HealOthersFactory().computeActionVariants(unit, gs));
 
         //Make Veteran
-        allActions.addAll(new MakeVeteran(unit).computeActionVariants(gs));
+        allActions.addAll(new MakeVeteranFactory().computeActionVariants(unit, gs));
 
         //Move
-        allActions.addAll(new Move(unit).computeActionVariants(gs));
+        allActions.addAll(new MoveFactory().computeActionVariants(unit, gs));
 
         //Recover
-        allActions.addAll(new Recover(unit).computeActionVariants(gs));
+        allActions.addAll(new RecoverFactory().computeActionVariants(unit, gs));
 
         //Upgrade
-        allActions.addAll(new Upgrade(unit).computeActionVariants(gs));
+        allActions.addAll(new UpgradeFactory().computeActionVariants(unit, gs));
 
         return allActions;
     }

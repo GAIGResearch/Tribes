@@ -13,36 +13,26 @@ import java.util.LinkedList;
 
 public class Disband extends UnitAction
 {
-    public Disband(Unit target)
+    public Disband(int unitId)
     {
-        super.unit = target;
-    }
-
-    @Override
-    public LinkedList<Action> computeActionVariants(final GameState gs) {
-        LinkedList<Action> disbands = new LinkedList();
-
-        Disband disbandAction = new Disband(this.unit);
-        if(disbandAction.isFeasible(gs))
-            disbands.add(disbandAction);
-
-        return disbands;
+        super.unitId = unitId;
     }
 
     @Override
     public boolean isFeasible(final GameState gs)
     {
+        Unit unit = (Unit) gs.getActor(this.unitId);
         TechnologyTree tt = gs.getTribe(unit.getTribeId()).getTechTree();
-        if(tt.isResearched(Types.TECHNOLOGY.FREE_SPIRIT))
-            return true;
-        return false;
+        return tt.isResearched(Types.TECHNOLOGY.FREE_SPIRIT);
     }
 
     @Override
     public boolean execute(GameState gs) {
+        Unit unit = (Unit) gs.getActor(this.unitId);
         Board b = gs.getBoard();
         Tribe t = gs.getTribe(unit.getTribeId());
         City c = (City) b.getActor(unit.getCityID());
+
         if(isFeasible(gs))
         {
             int starsGained = (int) (unit.COST / 2.0); //half, rounded down

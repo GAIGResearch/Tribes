@@ -2,6 +2,7 @@ package core.actors;
 
 import core.Types;
 import core.actors.buildings.Building;
+import core.actors.buildings.CustomHouse;
 import utils.Vector2d;
 
 import java.util.LinkedList;
@@ -48,9 +49,7 @@ public class City extends Actor{
             addPointsPerTurn(building.getPoints());
         }
 
-        if (building.getTYPE() == CUSTOM_HOUSE){
-            addProduction(building.getPRODUCTION());
-        }else {
+        if (building.getTYPE() != CUSTOM_HOUSE){
             addPopulation(building.getPRODUCTION());
         }
 
@@ -249,15 +248,13 @@ public class City extends Actor{
     }
 
     public Building removeBuilding(int x, int y){
-        Building removeBuilding = null;
         for(Building building :buildings){
             if (building.getPosition().x == x && building.getPosition().y == y){
                 buildings.remove(building);
-                removeBuilding = building;
-
+                return building;
             }
         }
-        return removeBuilding;
+        return null;
     }
 
     public void subtractLongTermPoints(int points){

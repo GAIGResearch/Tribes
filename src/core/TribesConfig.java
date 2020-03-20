@@ -113,6 +113,13 @@ public class TribesConfig
     //Explorer
     public static int NUM_STEPS = 15;
 
+    //General Unit constants
+    public static double ATTACK_MODIFIER = 4.5;
+    public static int VETERAN_KILLS = 3;
+    public static int VETERAN_PLUS_HP = 5;
+    public static int RECOVER_PLUS_HP = 2;
+    public static int RECOVER_IN_CITY_PLUS_HP = 2;
+
     /* BUILDINGS */
 
     // Farm
@@ -157,11 +164,26 @@ public class TribesConfig
     public static int TEMPLE_PRODUCTION = 3;
     public static int TEMPLE_POINT = 100;
 
+
+    //Resources
+    public static int ANIMAL_COST = 2;
+    public static int FISH_COST = 2;
+    public static int WHALES_COST = 0;
+    public static int FRUIT_COST = 2;
+    public static int ANIMAL_POP = 1;
+    public static int FISH_POP = 1;
+    public static int WHALES_STARS = 10;
+    public static int FRUIT_POP = 1;
+
+
     // ROAD
     public static int ROAD_COST = 2;
 
     // City
-
+    public static int CITY_LEVEL_UP_WORKSHOP_PROD = 1;
+    public static int CITY_LEVEL_UP_RESOURCES = 5;
+    public static int CITY_LEVEL_UP_POP_GROWTH = 3;
+    public static int CITY_LEVEL_UP_PARK = 250;
     public static int CITY_BORDER_POINTS = 20;
 
     /* TRIBES */

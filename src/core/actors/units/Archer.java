@@ -22,6 +22,7 @@ public class Archer extends Unit
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
+        c.setIsKilled(getIsKilled());
         return c;
     }
 }

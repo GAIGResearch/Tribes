@@ -1,7 +1,9 @@
 import core.Types;
 import core.actions.Action;
 import core.actions.tribeactions.ResearchTech;
+import core.actions.tribeactions.ResearchTechFactory;
 import core.actions.unitactions.Recover;
+import core.actions.unitactions.RecoverFactory;
 import core.actors.Tribe;
 import core.actors.units.Unit;
 import core.actors.units.Warrior;
@@ -19,13 +21,13 @@ public class Test
         Tribe t = new Tribe(Types.TRIBE.XIN_XI);
         t.addCity(0); //We need to add a city or I'm actually unable to research anything.
 
-        LinkedList<Action> allResearchable = new ResearchTech(t).computeActionVariants(null);
+        LinkedList<Action> allResearchable = new ResearchTechFactory().computeActionVariants(t, null);
         for(Action act : allResearchable)
         {
             System.out.println(act.toString());
         }
 
-        ResearchTech rt = new ResearchTech(t);
+        ResearchTech rt = new ResearchTech(t.getActorId());
         rt.setTech(MINING);
         System.out.println("Tech feasible: " + rt.toString() + ", " + rt.isFeasible(null));
 
@@ -47,7 +49,7 @@ public class Test
 
         t.addStars(10);
 
-        allResearchable = new ResearchTech(t).computeActionVariants(null);
+        allResearchable = new ResearchTechFactory().computeActionVariants(t, null);
         for(Action act : allResearchable)
         {
             System.out.println(act.toString());
@@ -66,8 +68,8 @@ public class Test
 
     private static void testRecovery(Unit warrior) {
         LinkedList<Action> warriorAction;
-        if (new Recover(warrior).isFeasible(null)) {
-            warriorAction = new Recover(warrior).computeActionVariants(null);
+        if (new Recover(warrior.getActorId()).isFeasible(null)) {
+            warriorAction = new RecoverFactory().computeActionVariants(warrior, null);
             System.out.println(warriorAction.size());
             warriorAction.get(0).execute(null);
             System.out.println("Increase HP");

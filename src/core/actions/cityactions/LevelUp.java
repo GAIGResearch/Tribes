@@ -1,5 +1,6 @@
 package core.actions.cityactions;
 
+import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actors.City;
@@ -16,32 +17,14 @@ public class LevelUp extends CityAction {
 
     private CITY_LEVEL_UP bonus;
 
-    public LevelUp(City c)
+    public LevelUp(int cityId)
     {
-        super.city = c;
-    }
-
-    @Override
-    public LinkedList<Action> computeActionVariants(GameState gs) {
-
-        LinkedList<Action> actions = new LinkedList<>();
-
-        if (isFeasible(gs))
-        {
-            int curLevel = city.getLevel();
-            LinkedList<CITY_LEVEL_UP> bonuses = CITY_LEVEL_UP.getActions(curLevel);
-            for (CITY_LEVEL_UP bonus : bonuses) {
-                LevelUp lUp = new LevelUp(city);
-                lUp.setBonus(bonus);
-                actions.add(lUp);
-            }
-        }
-
-        return actions;
+        super.cityId = cityId;
     }
 
     @Override
     public boolean isFeasible(GameState gs) {
+        City city = (City) gs.getActor(this.cityId);
         return city.canLevelUp() && bonus.validType(city.getLevel());
     }
 
@@ -50,13 +33,15 @@ public class LevelUp extends CityAction {
 
         if(!isFeasible(gs))
             return false;
+
+        City city = (City) gs.getActor(this.cityId);
         Tribe tribe = gs.getBoard().getTribe(city.getTribeId());
         Vector2d cityPos = city.getPosition();
 
         switch(bonus)
         {
             case WORKSHOP:
-                city.addProduction(1);
+                city.addProduction(TribesConfig.CITY_LEVEL_UP_WORKSHOP_PROD);
                 break;
             case EXPLORER:
                 gs.getBoard().launchExplorer(cityPos.x, cityPos.y, city.getTribeId(), gs.getRandomGenerator());
@@ -65,16 +50,16 @@ public class LevelUp extends CityAction {
                 city.setWalls(true);
                 break;
             case RESOURCES:
-                tribe.addStars(5);
+                tribe.addStars(TribesConfig.CITY_LEVEL_UP_RESOURCES);
                 break;
             case POP_GROWTH:
-                city.addPopulation(3);
+                city.addPopulation(TribesConfig.CITY_LEVEL_UP_POP_GROWTH);
                 break;
             case BORDER_GROWTH:
                 gs.getBoard().expandBorder(city);
                 break;
             case PARK:
-                tribe.addScore(250);
+                tribe.addScore(TribesConfig.CITY_LEVEL_UP_PARK);
                 tribe.cityMaxedUp();
                 break;
             case SUPERUNIT:

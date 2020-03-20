@@ -21,7 +21,7 @@ public class CityActionBuilder
         ArrayList<Action> allActions = new ArrayList<>();
 
         //Level Up
-        allActions.addAll(new LevelUp(city).computeActionVariants(gs));
+        allActions.addAll(new LevelUpFactory().computeActionVariants(city, gs));
 
         if(allActions.size() > 0)
         {
@@ -31,25 +31,25 @@ public class CityActionBuilder
         }
 
         //Build
-        allActions.addAll(new Build(city).computeActionVariants(gs));
+        allActions.addAll(new BuildFactory().computeActionVariants(city, gs));
 
         //Burn forest
-        allActions.addAll(new BurnForest(city).computeActionVariants(gs));
+        allActions.addAll(new BurnForestFactory().computeActionVariants(city, gs));
 
         //Clear Forest
-        allActions.addAll(new ClearForest(city).computeActionVariants(gs));
+        allActions.addAll(new ClearForestFactory().computeActionVariants(city, gs));
 
         //Destroy
-        allActions.addAll(new Destroy(city).computeActionVariants(gs));
+        allActions.addAll(new DestroyFactory().computeActionVariants(city, gs));
 
         //Grow Forest
-        allActions.addAll(new GrowForest(city).computeActionVariants(gs));
+        allActions.addAll(new GrowForestFactory().computeActionVariants(city, gs));
 
         //ResourceGathering
-        allActions.addAll(new ResourceGathering(city).computeActionVariants(gs));
+        allActions.addAll(new ResourceGatheringFactory().computeActionVariants(city, gs));
 
         //Spawn
-        allActions.addAll(new Spawn(city).computeActionVariants(gs));
+        allActions.addAll(new SpawnFactory().computeActionVariants(city, gs));
 
         return allActions;
     }

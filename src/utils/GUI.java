@@ -1,7 +1,7 @@
 package utils;
 
 import core.Constants;
-import core.actions.tribeactions.EndTurnAction;
+import core.actions.tribeactions.EndTurn;
 import core.game.Game;
 import core.game.GameState;
 import players.ActionController;
@@ -10,8 +10,6 @@ import players.KeyController;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-
-import static core.Constants.FRAME_DELAY;
 
 public class GUI extends JFrame implements Runnable {
     private JLabel appTurn;
@@ -187,7 +185,7 @@ public class GUI extends JFrame implements Runnable {
 
         c.gridy++;
         JButton endTurn = new JButton("End Turn");
-        endTurn.addActionListener(e -> ac.addAction(new EndTurnAction(), gs));
+        endTurn.addActionListener(e -> ac.addAction(new EndTurn(), gs));
         sidePanel.add(endTurn, c);
 
         c.gridy++;

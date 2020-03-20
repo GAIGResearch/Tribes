@@ -2,18 +2,15 @@ package core.actors.buildings;
 
 import core.TribesConfig;
 import core.Types;
+import core.actors.City;
+import core.game.GameState;
 
 public class LumberHut extends Building{
 
-    private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.FOREST;
-
     public LumberHut(int x, int y) {
-        super(x, y, TribesConfig.LUMBER_HUT_COST, Types.BUILDING.LUMBER_HUT, TribesConfig.LUMBER_HUT_PRODUCTION);
+        super(x, y);
+        this.type = Types.BUILDING.LUMBER_HUT;
     }
-
-    // This type of building has no setProduction Ability
-    @Override
-    public void setProduction(int production){}
 
     @Override
     public Building copy() {

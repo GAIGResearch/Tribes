@@ -2,7 +2,6 @@ package core.actors;
 
 import core.Types;
 import core.actors.buildings.Building;
-import core.actors.buildings.CustomHouse;
 import utils.Vector2d;
 
 import java.util.LinkedList;
@@ -39,18 +38,18 @@ public class City extends Actor{
 
 
     public void addBuilding(Building building){
-        if (building.getTYPE() == WINDMILL || building.getTYPE() == SAWMILL ||
-                building.getTYPE() == FORGE || building.getTYPE() == CUSTOM_HOUSE){
+        if (building.type == WINDMILL || building.type == SAWMILL ||
+                building.type == FORGE || building.type == CUSTOM_HOUSE){
             setProduction(building);
-        }else if (building.getTYPE() == FARM || building.getTYPE() == LUMBER_HUT ||
-                building.getTYPE() == MINE || building.getTYPE() == PORT){
+        }else if (building.type == FARM || building.type == LUMBER_HUT ||
+                building.type == MINE || building.type == PORT){
             changeProduction(building);
-        }else if (building.getTYPE() == TEMPLE || building.getTYPE() == WATER_TEMPLE){
+        }else if (building.type == TEMPLE || building.type == WATER_TEMPLE){
             addPointsPerTurn(building.getPoints());
         }
 
-        if (building.getTYPE() != CUSTOM_HOUSE){
-            addPopulation(building.getPRODUCTION());
+        if (building.type != CUSTOM_HOUSE){
+            addPopulation(building.getBonus());
         }
 
         buildings.add(building);
@@ -61,30 +60,30 @@ public class City extends Actor{
     }
 
     public void setProduction(Building building){
-        Vector2d pos = building.getPosition();
+        Vector2d pos = building.position;
         int production = 0;
         for(Building existBuilding: buildings){
-            Vector2d existingPos = existBuilding.getPosition();
+            Vector2d existingPos = existBuilding.position;
             if ( (existingPos.x >= pos.x-1 && existingPos.x <= pos.x+1) && (existingPos.y >= pos.y-1 && existingPos.y <= pos.y+1)){
                 if (checkMatchedBuilding(existBuilding, building)){
                     production++;
                 }
             }
         }
-        building.setProduction(production);
+        //TODO: building.setProduction(production);
     }
 
     public void changeProduction(Building building){
-        Vector2d pos = building.getPosition();
+        Vector2d pos = building.position;
         for(Building existBuilding: buildings){
-            Vector2d existingPos = existBuilding.getPosition();
+            Vector2d existingPos = existBuilding.position;
             if ( (existingPos.x >= pos.x-1 && existingPos.x <= pos.x+1) && (existingPos.y >= pos.y-1 && existingPos.y <= pos.y+1)){
                 if (checkMatchedBuilding(building, existBuilding)){
-                    if (existBuilding.getTYPE() == FORGE){
+                    if (existBuilding.type == FORGE){
                         addPopulation(2);
-                    }else if(existBuilding.getTYPE() == CUSTOM_HOUSE){
+                    }else if(existBuilding.type == CUSTOM_HOUSE){
                         addProduction(2);
-                        existBuilding.setProduction(existBuilding.getPRODUCTION() + 2);
+                        //TODO: existBuilding.setProduction(existBuilding.getBonus() + 2);
                     }else{
                         addPopulation(1);
                     }
@@ -95,10 +94,10 @@ public class City extends Actor{
     }
 
     public boolean checkMatchedBuilding(Building original, Building functional){
-        return (original.getTYPE() == FARM && functional.getTYPE() == Types.BUILDING.WINDMILL) ||
-                (original.getTYPE() == LUMBER_HUT && functional.getTYPE() == SAWMILL) ||
-                (original.getTYPE() == MINE && functional.getTYPE() == FORGE) ||
-                (original.getTYPE() == PORT && functional.getTYPE() == CUSTOM_HOUSE);
+        return (original.type == FARM && functional.type == Types.BUILDING.WINDMILL) ||
+                (original.type == LUMBER_HUT && functional.type == SAWMILL) ||
+                (original.type == MINE && functional.type == FORGE) ||
+                (original.type == PORT && functional.type == CUSTOM_HOUSE);
     }
 
     public boolean canLevelUp()
@@ -249,7 +248,7 @@ public class City extends Actor{
 
     public Building removeBuilding(int x, int y){
         for(Building building :buildings){
-            if (building.getPosition().x == x && building.getPosition().y == y){
+            if (building.position.x == x && building.position.y == y){
                 buildings.remove(building);
                 return building;
             }

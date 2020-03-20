@@ -2,30 +2,24 @@ package core.actors.buildings;
 
 import core.TribesConfig;
 import core.Types;
+import core.actors.City;
+import core.game.GameState;
 
 public class Windmill extends Building {
 
-    private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.PLAIN;
-
     // Building Purpose -> The production will set up inside the addBuilding in City
     public Windmill(int x, int y) {
-        super(x, y, TribesConfig.WIND_MILL_COST, Types.BUILDING.WINDMILL, 0);
+        super(x, y);
+        this.type = Types.BUILDING.WINDMILL;
     }
 
-    // Copy Purpose
-    public Windmill(int x, int y, int production) {
-        super(x, y, TribesConfig.WIND_MILL_COST, Types.BUILDING.WINDMILL, production);
-    }
-
-    @Override
-    public void setProduction(int production) {
-        super.setProduction(production);
+    public int computeBonusPopulation(City c, GameState gs) {
+        //TODO: Depends on number of adjacent farms
+        return -1;
     }
 
     @Override
     public Building copy() {
-        return new Windmill(position.x, position.y, getPRODUCTION());
+        return new Windmill(position.x, position.y);
     }
-
-
 }

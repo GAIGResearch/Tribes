@@ -100,16 +100,16 @@ public class Build extends CityAction
                     city.addBuilding(new Forge(targetPos.x, targetPos.y));
                     return true;
                 case TEMPLE:
-                    city.addBuilding(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_COST, Types.BUILDING.TEMPLE));
+                    city.addBuilding(new Temple(targetPos.x, targetPos.y, Types.BUILDING.TEMPLE));
                     return true;
                 case MOUNTAIN_TEMPLE:
-                    city.addBuilding(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_COST, Types.BUILDING.MOUNTAIN_TEMPLE));
+                    city.addBuilding(new Temple(targetPos.x, targetPos.y, Types.BUILDING.MOUNTAIN_TEMPLE));
                     return true;
                 case WATER_TEMPLE:
-                    city.addBuilding(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_COST, Types.BUILDING.WATER_TEMPLE));
+                    city.addBuilding(new Temple(targetPos.x, targetPos.y, Types.BUILDING.WATER_TEMPLE));
                     return true;
                 case FOREST_TEMPLE:
-                    city.addBuilding(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_FOREST_COST, Types.BUILDING.FOREST_TEMPLE));
+                    city.addBuilding(new Temple(targetPos.x, targetPos.y, Types.BUILDING.FOREST_TEMPLE));
                     return true;
                 case SAWMILL:
                     city.addBuilding(new Sawmill(targetPos.x, targetPos.y));

@@ -1,14 +1,10 @@
 package core.actions.cityactions;
 
 import core.Types;
-import core.actions.Action;
 import core.actors.buildings.Building;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.City;
-import utils.Vector2d;
-
-import java.util.LinkedList;
 
 public class Destroy extends CityAction
 {
@@ -36,16 +32,16 @@ public class Destroy extends CityAction
                 Board b = gs.getBoard();
                 b.setBuildingAt(targetPos.x, targetPos.y, null);
 
-                if (removedBuilding.getTYPE() != Types.BUILDING.CUSTOM_HOUSE) {
-                    city.addPopulation(-removedBuilding.getPRODUCTION());
+                if (removedBuilding.type != Types.BUILDING.CUSTOM_HOUSE) {
+                    city.addPopulation(-removedBuilding.getBonus());
                 }
 
                 // TODO: Should be check if the building enum is changed
-                if (removedBuilding.getTYPE().getKey() >= Types.BUILDING.TEMPLE.getKey()) {
+                if (removedBuilding.type.getKey() >= Types.BUILDING.TEMPLE.getKey()) {
                     gs.getTribe(city.getTribeId()).subtractScore(removedBuilding.getPoints());
                 }
 
-                int removedType = removedBuilding.getTYPE().getKey();
+                int removedType = removedBuilding.type.getKey();
                 if(removedType == Types.BUILDING.TEMPLE.getKey()
                         || removedType == Types.BUILDING.WATER_TEMPLE.getKey()
                         || removedType == Types.BUILDING.FOREST_TEMPLE.getKey()
@@ -53,7 +49,7 @@ public class Destroy extends CityAction
                     city.subtractLongTermPoints(removedBuilding.getPoints());
                 }
 
-                if(removedBuilding.getTYPE() == Types.BUILDING.PORT)
+                if(removedBuilding.type == Types.BUILDING.PORT)
                 {
                     //If a port is removed, then the tile stops belonging to the trade network
                     b.setTradeNetwork(targetPos.x, targetPos.y, false);

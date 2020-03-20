@@ -1,9 +1,10 @@
-package core.actions.cityactions;
+package core.actions.cityactions.factory;
 
 import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actions.ActionFactory;
+import core.actions.cityactions.GrowForest;
 import core.actors.Actor;
 import core.actors.City;
 import core.game.Board;

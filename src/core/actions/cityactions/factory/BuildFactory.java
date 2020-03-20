@@ -1,9 +1,10 @@
-package core.actions.cityactions;
+package core.actions.cityactions.factory;
 
 import core.TechnologyTree;
 import core.Types;
 import core.actions.Action;
 import core.actions.ActionFactory;
+import core.actions.cityactions.Build;
 import core.actions.tribeactions.ResearchTech;
 import core.actors.Actor;
 import core.actors.City;

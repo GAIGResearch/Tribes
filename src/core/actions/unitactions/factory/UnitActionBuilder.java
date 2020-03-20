@@ -1,8 +1,7 @@
-package core.actions.unitactions;
+package core.actions.unitactions.factory;
 
 import core.actions.Action;
-import core.actions.cityactions.*;
-import core.actors.City;
+import core.actions.unitactions.factory.*;
 import core.actors.units.Unit;
 import core.game.GameState;
 

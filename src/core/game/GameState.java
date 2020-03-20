@@ -1,9 +1,9 @@
 package core.game;
 
 import core.actions.Action;
-import core.actions.cityactions.CityActionBuilder;
-import core.actions.tribeactions.TribeActionBuilder;
-import core.actions.unitactions.UnitActionBuilder;
+import core.actions.cityactions.factory.CityActionBuilder;
+import core.actions.tribeactions.factory.TribeActionBuilder;
+import core.actions.unitactions.factory.UnitActionBuilder;
 import core.actors.Actor;
 import core.actors.City;
 import core.actors.Tribe;

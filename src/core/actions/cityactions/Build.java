@@ -33,10 +33,10 @@ public class Build extends CityAction
     public boolean isFeasible(final GameState gs) {
 
         switch (buildingType) {
-            case ROAD:
-                //Not this way.
-                System.out.println("ERROR: Action Build can't built roads. Use tribeactions.BuildRoad instead.");
-                return false;
+//            case ROAD:
+//                //Not this way.
+//                System.out.println("ERROR: Action Build can't built roads. Use tribeactions.BuildRoad instead.");
+//                return false;
 
             //Buildings that can be repeated in a city:
             case PORT:

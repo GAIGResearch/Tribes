@@ -15,7 +15,6 @@ import core.game.GameState;
 import core.actions.Action;
 
 import static core.Constants.*;
-import static core.Types.getActionPosition;
 
 public class GameView extends JComponent {
 
@@ -154,7 +153,7 @@ public class GameView extends JComponent {
                     Image actionImg = Types.ACTION.getImage(a);
 
                     if (actionImg != null) {
-                        Vector2d pos = getActionPosition(gameState, a);
+                        Vector2d pos = GUI.getActionPosition(gameState, a);
 
                         if (pos != null) {
                             paintImageRotated(g, pos.y * CELL_SIZE, pos.x * CELL_SIZE, actionImg, CELL_SIZE);

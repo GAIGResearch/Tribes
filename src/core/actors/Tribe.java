@@ -57,6 +57,8 @@ public class Tribe extends Actor {
     //Kills by this tribe
     private int nKills;
 
+    private ArrayList<Integer> killedUnits;
+
     public Tribe(Types.TRIBE tribe) {
         this.tribe = tribe;
         init();
@@ -434,11 +436,15 @@ public class Tribe extends Actor {
      * Checks if the tribe can build roads
      * @return if tribe can build roads
      */
-    public boolean canBuildRoads()
-    {
+    public boolean canBuildRoads() {
         //Factors for tree building in general: tech and enough stars.
         boolean canBuildRoad = techTree.isResearched(Types.TECHNOLOGY.ROADS);
         boolean hasMoney = stars >= TribesConfig.ROAD_COST;
         return canBuildRoad && hasMoney;
+    }
+
+    public void addKilledUnit (Unit target){
+        killedUnits.add(target.getActorId());
+
     }
 }

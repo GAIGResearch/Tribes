@@ -2,6 +2,8 @@ package core.actions.unitactions;
 
 import core.TribesConfig;
 import core.actions.Action;
+import core.actors.City;
+import core.actors.Tribe;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
@@ -54,11 +56,22 @@ public class Attack extends UnitAction
             int defenceResult = (int) Math.round((defenceForce / totalDamage) * target.DEF *accelerator);
 
             if (target.getCurrentHP() <= attackResult) {
-                attacker.addKill();
-                //TODO: We need to do something with this target that has been killed.
-                target = null;
 
-                //TODO: The attacking unit _may_ move to the target's previous position
+                attacker.addKill();
+                target.setIsKilled(true);
+                
+                gs.getTribe(target.getTribeId()).addKilledUnit(target);
+
+                //Move unit to target position if unit is melee type
+                switch (attacker.getType()) {
+                    case DEFENDER:
+                    case SWORDMAN:
+                    case RIDER:
+                    case WARRIOR:
+                    case KNIGHT:
+                    case SUPERUNIT:
+                    gs.getBoard().tryPush(attacker.getTribeId(), attacker, attacker.getPosition().x, attacker.getPosition().y, target.getPosition().x, target.getPosition().y);
+                }
 
             } else {
 
@@ -75,7 +88,8 @@ public class Attack extends UnitAction
                     //Check if attack kills this unit, if it does add a kill to the target
                     if(attacker.getCurrentHP() <=0 ) {
                         target.addKill();
-                        //TODO: attacker is killed here. We need to manage this.
+                        attacker.setIsKilled(true);
+                        gs.getTribe(target.getTribeId()).addKilledUnit(target);
                     }
                 }
 

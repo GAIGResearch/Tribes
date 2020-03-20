@@ -7,8 +7,6 @@ import core.game.GameState;
 
 public class Farm extends Building{
 
-    private final Types.RESOURCE RESOURCE_CONSTRAINT = Types.RESOURCE.CROPS;
-
     public Farm(int x, int y) {
         super(x, y);
         this.type = Types.BUILDING.FARM;

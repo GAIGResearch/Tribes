@@ -184,6 +184,12 @@ public class Types {
         public int getPoints() {return points; }
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
 
+        public Types.RESOURCE getResourceConstraint()
+        {
+            if(this == MINE) return MINE_RES_CONSTRAINT;
+            if(this == FARM) return FARM_RES_CONSTRAINT;
+            else return null;
+        }
 
         public static HashMap<BUILDING, MONUMENT_STATUS> initMonuments()
         {

@@ -155,6 +155,16 @@ public class Build extends CityAction
             if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){ return false; }
         }
 
+        //Resource constraint
+        Types.RESOURCE resNeeded = buildingType.getResourceConstraint();
+        if (resNeeded != null)
+        {
+            //if there's a constraint, resource at location must be what's needed.
+            Types.RESOURCE resAtLocation = board.getResourceAt(targetPos.x, targetPos.y);
+            if(resAtLocation == null || resNeeded != resAtLocation)
+                return false;
+        }
+
         //Uniqueness constrain
         if(checkIfUnique) {
             for(Vector2d tile : board.getCityTiles(this.cityId)) {
@@ -164,5 +174,4 @@ public class Build extends CityAction
 
         return true;
     }
-
 }

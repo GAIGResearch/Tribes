@@ -1,5 +1,7 @@
 package core;
 
+import static core.Types.RESOURCE.*;
+
 public class TribesConfig
 {
     /* UNITS */
@@ -126,6 +128,7 @@ public class TribesConfig
     public static int FARM_COST = 5;
     public static int FARM_BONUS = 2;
     public static int FARM_POINTS = 10;
+    public static Types.RESOURCE FARM_RES_CONSTRAINT = CROPS;
 
     //WindMill
     public static int WIND_MILL_COST = 5;
@@ -146,6 +149,7 @@ public class TribesConfig
     public static int MINE_COST = 5;
     public static int MINE_BONUS = 2;
     public static int MINE_POINTS = 10;
+    public static Types.RESOURCE MINE_RES_CONSTRAINT = ORE;
 
     // Forge
     public static int FORGE_COST = 5;

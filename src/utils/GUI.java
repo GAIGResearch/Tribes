@@ -1,15 +1,22 @@
 package utils;
 
-import core.Constants;
 import core.actions.tribeactions.EndTurn;
+import core.actions.unitactions.*;
+import core.actors.units.Unit;
 import core.game.Game;
 import core.game.GameState;
+import core.actions.Action;
 import players.ActionController;
 import players.KeyController;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class GUI extends JFrame implements Runnable {
     private JLabel appTurn;
@@ -85,10 +92,18 @@ public class GUI extends JFrame implements Runnable {
             @Override
             public void mouseClicked(MouseEvent e) {
                 //Only provide information if clicking on a visible tile
-                int x = e.getX() / Constants.CELL_SIZE;
-                int y = e.getY() / Constants.CELL_SIZE;
+                Point2D p = GameView.rotatePointReverse(e.getX(), e.getY());
+//                System.out.println(i + " " + j);
 
-                infoView.setHighlight(x,y);
+                // If unit highlighted and action at new click valid for unit, execute action
+                Action candidate = getActionAt((int)p.getX(), (int)p.getY(), infoView.getHighlightX(), infoView.getHighlightY());
+                if (candidate != null) {
+                    ac.addAction(candidate, gs);
+                    infoView.resetHighlight();
+                } else {
+                    // Otherwise highlight new cell
+                    infoView.setHighlight((int)p.getX(), (int)p.getY());
+                }
             }
 
             @Override
@@ -206,8 +221,31 @@ public class GUI extends JFrame implements Runnable {
         return finishedUpdate;
     }
 
+    /**
+     * Retrieves action at specific location given by (actionX, actionY) coordinates, to be performed by
+     * unit at coordinates (unitX, unitY).
+     */
+    private Action getActionAt(int actionX, int actionY, int unitX, int unitY) {
+        HashMap<Unit, ArrayList<Action>> possibleActions = gs.getUnitActions();
+        for (Map.Entry<Unit, ArrayList<Action>> e: possibleActions.entrySet()) {
+            Unit u = e.getKey();
+
+            // Only draw actions for highlighted unit
+            if (u.getPosition().x == unitY && u.getPosition().y == unitX) {
+                for (Action a: e.getValue()) {
+                    Vector2d pos = getActionPosition(gs, a);
+                    if (pos != null && pos.x == actionY && pos.y == actionX) return a;
+                }
+                return null;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void run() {
+        // TODO: if active tribe changed, remove highlights
+
         finishedUpdate = false;
         view.paint(gs);
         tribeView.paint(gs);
@@ -224,5 +262,21 @@ public class GUI extends JFrame implements Runnable {
             e.printStackTrace();
         }
         finishedUpdate = true;
+    }
+
+
+    public static Vector2d getActionPosition(GameState gs, Action a) {
+        Vector2d pos = null;
+        if (a instanceof Move) {
+            pos = new Vector2d(((Move) a).getDestination().x, ((Move) a).getDestination().y);
+        } else if (a instanceof Attack) {
+            Unit target = (Unit) gs.getActor(((Attack) a).getTargetId());
+            pos = target.getPosition();
+        } else if (a instanceof Capture || a instanceof Convert || a instanceof Disband || a instanceof Recover ||
+                a instanceof Upgrade) {
+            Unit u = (Unit) gs.getActor(((UnitAction) a).getUnitId());
+            pos = u.getPosition();
+        }
+        return pos;
     }
 }

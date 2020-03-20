@@ -240,8 +240,9 @@ public class Game {
                     }
                 }
 
-                frame.update(getGameState(-1));
+//                frame.update(getGameState(-1));
 //                frame.update(getGameState(gs.getTick() % gs.getTribes().length));        //Partial Obs
+                frame.update(getGameState(gs.getActiveTribeID()));        //Partial Obs
                 Thread gui = new Thread(frame);
                 gui.start();
             }

@@ -2,7 +2,6 @@ package utils;
 
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 
 public class ImageIO {
@@ -21,7 +20,7 @@ public class ImageIO {
 
     private ImageIO()
     {
-        images = new HashMap<String, Image>();
+        images = new HashMap<>();
     }
 
 
@@ -38,8 +37,6 @@ public class ImageIO {
                 return g;
             }
 
-        } catch (IOException e) {
-            //e.printStackTrace();
         } catch (Exception e) {
             //e.printStackTrace();
         }

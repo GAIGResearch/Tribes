@@ -1,5 +1,7 @@
 package core;
 
+import core.actions.Action;
+import core.actions.unitactions.*;
 import core.actors.units.*;
 import utils.ImageIO;
 import utils.Vector2d;
@@ -56,17 +58,25 @@ public class Types {
     }
 
     public enum TRIBE{
-        XIN_XI(0, "Xin-Xi", CLIMBING, WARRIOR),
-        IMPERIUS(1, "Imperius", ORGANIZATION, WARRIOR),
-        BARDUR(2, "Bardur", HUNTING, WARRIOR),
-        OUMAJI(3, "Oumaji", RIDING, RIDER);
+        XIN_XI(0, "Xin-Xi", CLIMBING, WARRIOR,
+                new Color(251, 2, 7), new Color(253, 130, 123), new Color(174, 66, 48)),
+        IMPERIUS(1, "Imperius", ORGANIZATION, WARRIOR,
+                new Color(0, 0, 255), new Color(102, 125, 255), new Color(50, 73, 177)),
+        BARDUR(2, "Bardur", HUNTING, WARRIOR,
+                new Color(76, 76, 76), new Color(176, 178, 178), new Color(70, 58, 58)),
+        OUMAJI(3, "Oumaji", RIDING, RIDER,
+                new Color(255, 255, 10), new Color(242, 255, 100), new Color(146, 144, 0));
 
         private int key;
         private String name;
         private TECHNOLOGY initialTech;
         private UNIT startingUnit;
-        TRIBE(int numVal, String name, TECHNOLOGY initialTech, UNIT startingUnit) {
+        private Color color, color_light, color_dark;
+        TRIBE(int numVal, String name, TECHNOLOGY initialTech, UNIT startingUnit, Color color, Color color_light, Color color_dark) {
             this.key = numVal;  this.name = name; this.initialTech = initialTech; this.startingUnit = startingUnit;
+            this.color = color;
+            this.color_light = color_light;
+            this.color_dark = color_dark;
         }
         public int getKey() {  return key; }
         public String getName() { return name; }
@@ -74,7 +84,36 @@ public class Types {
             return initialTech;
         }
         public UNIT getStartingUnit() {return startingUnit;}
+        public Color getColor() {return color;}
+        public Color getColorLight() {return color_light;}
+        public Color getColorDark() {return color_dark;}
     }
+
+
+
+
+        /*
+         * Tribes colours as used in the unit scripts
+        0 -
+Red - FB0207
+Red_light - FD827B
+Red_dark - ae4230
+
+1 -
+Bule - 0000FF
+Blue_light - 667DFF
+Blue_dark - 3249b1
+
+2 -
+Grey - 4C4C4C
+Grey_light - B0B2B2
+Grey_dark - 463a3a
+
+3 -
+Yellow - FFFF0A
+Yellow_light - F2FF64
+Yellow_dark - 929000
+         */
 
     /**
      * Defines the status of the turn for an  (May be in java?)
@@ -359,6 +398,8 @@ public class Types {
         }
         public int getKey() {  return key; }
         public Image getImage(int playerID) { return ImageIO.GetInstance().getImage(imageFile + playerID + ".png"); }
+        public String getImageStr(int playerID) { return imageFile + playerID + ".png"; }
+        public String getImageFile() { return imageFile; }
         public int getCost() {
             return cost;
         }
@@ -450,13 +491,13 @@ public class Types {
     public enum TERRAIN {
 
         //Types and IDs
-        PLAIN(0, "img/terrain/grass.png", '.'),
-        SHALLOW_WATER(1, "img/terrain/shallow_water.jpg", 's'),
-        DEEP_WATER(2, "img/terrain/deep_water.jpg", 'd'),
-        MOUNTAIN(3, "img/terrain/mountain.png", 'm'),
-        VILLAGE(4, "img/terrain/village.png", 'v'),
+        PLAIN(0, "img/terrain/plain.png", '.'),
+        SHALLOW_WATER(1, "img/terrain/water.png", 's'),
+        DEEP_WATER(2, "img/terrain/deepwater.png", 'd'),
+        MOUNTAIN(3, "img/terrain/mountain3.png", 'm'),
+        VILLAGE(4, "img/terrain/village2.png", 'v'),
         CITY(5, "img/terrain/city.png", 'c'),
-        FOREST(6, "img/terrain/forest.png", 'f');
+        FOREST(6, "img/terrain/forest2.png", 'f');
 
         private String imageFile;
         private int key;
@@ -473,7 +514,13 @@ public class Types {
 
         public int getKey() {  return key; }
         public char getMapChar() {return mapChar;}
-        public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
+        public Image getImage(String suffix) {
+            if (suffix == null || suffix.equals("")) {
+                return ImageIO.GetInstance().getImage(imageFile);
+            }
+            String[] splitPath = imageFile.split("\\.");
+            return ImageIO.GetInstance().getImage(splitPath[0] + "-" + suffix + "." + splitPath[1]);
+        }
 
 
         /**
@@ -499,28 +546,35 @@ public class Types {
         }
     }
 
+    public enum ACTION {
+        MOVE("img/actions/move.png"),
+        ATTACK("img/actions/attack.png"),
+        CAPTURE("img/actions/capture.png"),
+        DISBAND("img/actions/disband.png"),
+        HEAL("img/actions/heal.png"),
+        UPGRADE("img/actions/upgrade.png");
+
+        private String imgPath;
+
+        ACTION(String imgPath) {
+            this.imgPath = imgPath;
+        }
+
+        public static Image getImage(Action a) {
+            if (a instanceof Move) {
+                return ImageIO.GetInstance().getImage(MOVE.imgPath);
+            } else if (a instanceof Attack) {
+                return ImageIO.GetInstance().getImage(ATTACK.imgPath);
+            } else if (a instanceof Capture || a instanceof Convert) {
+                return ImageIO.GetInstance().getImage(CAPTURE.imgPath);
+            } else if (a instanceof Disband) {
+                return ImageIO.GetInstance().getImage(DISBAND.imgPath);
+            } else if (a instanceof Recover) {
+                return ImageIO.GetInstance().getImage(HEAL.imgPath);
+            } else if (a instanceof Upgrade) {
+                return ImageIO.GetInstance().getImage(UPGRADE.imgPath);
+            }
+            return null;
+        }
+    }
 }
-
-
-/*
- * Tribes colours as used in the unit scripts
-        0 -
-        Red - FB0207
-        Red_light - FD827B
-        Red_dark - ae4230
-
-        1 -
-        Bule - 0000FF
-        Blue_light - 667DFF
-        Blue_dark - 3249b1
-
-        2 -
-        Grey - 4C4C4C
-        Grey_light - B0B2B2
-        Grey_dark - 463a3a
-
-        3 -
-        Yellow - FFFF0A
-        Yellow_light - F2FF64
-        Yellow_dark - 929000
-*/

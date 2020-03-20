@@ -18,7 +18,10 @@ public class TechnologyTree {
     }
 
     public boolean isResearched(Types.TECHNOLOGY target) {
-        return researched[target.ordinal()];
+        if (target != null) {
+            return researched[target.ordinal()];
+        }
+        return false;
     }
 
     public TechnologyTree copy(){

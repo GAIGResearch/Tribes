@@ -262,7 +262,9 @@ public class GameState {
         copy.canEndTurn = new boolean[numTribes];
         for(int i = 0; i < numTribes; ++i)
             copy.canEndTurn[i] = canEndTurn[i];
-
+        copy.tribeActions = tribeActions;
+        copy.unitActions = unitActions;
+        copy.cityActions = cityActions;
 
         return copy;
     }

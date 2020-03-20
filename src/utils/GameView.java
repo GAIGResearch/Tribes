@@ -154,7 +154,7 @@ public class GameView extends JComponent {
                     Image actionImg = Types.ACTION.getImage(a);
 
                     if (actionImg != null) {
-                        Vector2d pos = getActionPosition(a);
+                        Vector2d pos = getActionPosition(gameState, a);
 
                         if (pos != null) {
                             paintImageRotated(g, pos.y * CELL_SIZE, pos.x * CELL_SIZE, actionImg, CELL_SIZE);

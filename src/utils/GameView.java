@@ -282,7 +282,7 @@ public class GameView extends JComponent {
         } else {
             g.setColor(negativeColor);
         }
-        int pw = progress * sectionWidth;
+        int pw = Math.abs(progress) * sectionWidth;
         Rectangle pgRect = new Rectangle(bgRect.x, bgRect.y, pw, bgRect.height);
         g.fillRoundRect(pgRect.x, pgRect.y, pgRect.width, pgRect.height, roundRectArc, roundRectArc);
 

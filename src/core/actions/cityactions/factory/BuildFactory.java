@@ -31,7 +31,7 @@ public class BuildFactory implements ActionFactory {
                 if(board.getBuildingAt(tile.x, tile.y) == null) {
                     Build action = new Build(city.getActorId());
                     action.setBuildingType(building);
-                    action.targetPos = tile.copy();
+                    action.setTargetPos(tile.copy());
                     if (action.isFeasible(gs)) {
                         actions.add(action);
                     }

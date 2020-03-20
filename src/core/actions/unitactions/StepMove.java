@@ -16,7 +16,7 @@ public class StepMove implements NeighbourHelper
     private GameState gs;
     private Unit unit;
 
-    StepMove(GameState curGameState, Unit movingUnit)
+    public StepMove(GameState curGameState, Unit movingUnit)
     {
         this.gs = curGameState;
         this.unit = movingUnit;

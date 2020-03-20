@@ -10,8 +10,6 @@ public abstract class Building {
 
     public Vector2d position;
     public  Types.BUILDING type;
-    public int points = 0;
-
 
     public Building(int x, int y) {
         this.position = new Vector2d(x, y);
@@ -30,4 +28,13 @@ public abstract class Building {
     public int computeProduction(City c, GameState gs) { return 0;}
     public int computeBonusPopulation(City c, GameState gs) { return type.getBonus();}
 
+    public boolean adjacent(Building other)
+    {
+        return Vector2d.chebychevDistance(position, other.position) == 1;
+    }
+
+    public boolean isMatchingBuilding(Building existingBuilding)
+    {
+        return type.getMatchingBuilding() == existingBuilding.type;
+    }
 }

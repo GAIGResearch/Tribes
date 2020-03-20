@@ -26,7 +26,7 @@ public class HealOthers extends UnitAction
         if(unit.getType() != Types.UNIT.MIND_BENDER) return false;
 
         //Feasible if this unit can heal this turn and if there is at least one friendly unit adjacent.
-        for(Vector2d tile : unit.getPosition().neighborhood(unit.RANGE, board.getSize())){
+        for(Vector2d tile : unit.getPosition().neighborhood(unit.RANGE, 0, board.getSize())){
             Unit u = board.getUnitAt(tile.x, tile.y);
             if(canBeHealed(u, board.getUnitAt(tile.x, tile.y)))
                 return true;
@@ -42,7 +42,7 @@ public class HealOthers extends UnitAction
             Unit unit = (Unit) gs.getActor(this.unitId);
             Board board = gs.getBoard();
 
-            for(Vector2d tile : unit.getPosition().neighborhood(unit.RANGE, board.getSize())){
+            for(Vector2d tile : unit.getPosition().neighborhood(unit.RANGE, 0, board.getSize())){
                 Unit target  = board.getUnitAt(tile.x, tile.y);
                 if(canBeHealed(unit, target))
                 {

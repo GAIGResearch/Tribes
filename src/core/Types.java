@@ -191,6 +191,27 @@ public class Types {
             else return null;
         }
 
+        public BUILDING getMatchingBuilding()
+        {
+            switch (this)
+            {
+                case PORT: return CUSTOM_HOUSE;
+                case FARM: return WINDMILL;
+                case MINE: return FORGE;
+                case LUMBER_HUT: return SAWMILL;
+                case CUSTOM_HOUSE: return PORT;
+                case WINDMILL: return FARM;
+                case FORGE: return MINE;
+                case SAWMILL: return LUMBER_HUT;
+            }
+            return null;
+        }
+
+        public boolean isBase()
+        {
+            return this == FARM || this == MINE || this == LUMBER_HUT;
+        }
+
         public static HashMap<BUILDING, MONUMENT_STATUS> initMonuments()
         {
             HashMap<BUILDING, MONUMENT_STATUS> monuments = new HashMap<>();

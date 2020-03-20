@@ -35,69 +35,143 @@ public class City extends Actor{
     public void addPopulation(int number){
         population += number;
     }
+    private void changePointsPerTurn(int points){
+        changePointsPerTurn(points, 1);
+    }
+    private void changePointsPerTurn(int points, int multiplier){
+        this.pointsPerTurn = points*multiplier;
+    }
+    public void addProduction(int prod) {
+        production += prod;
+        if(production < 0) production = 0;
+    }
 
 
     public void addBuilding(Building building){
-        if (building.type == WINDMILL || building.type == SAWMILL ||
-                building.type == FORGE || building.type == CUSTOM_HOUSE){
-            setProduction(building);
-        }else if (building.type == FARM || building.type == LUMBER_HUT ||
-                building.type == MINE || building.type == PORT){
-            changeProduction(building);
-        }else if (building.type == TEMPLE || building.type == WATER_TEMPLE){
-            addPointsPerTurn(building.getPoints());
-        }
 
-        if (building.type != CUSTOM_HOUSE){
-            addPopulation(building.getBonus());
+        //TODO: We have to check the other cities of this tribe!
+
+        switch (building.type) {
+            case FARM:
+            case LUMBER_HUT:
+            case MINE:
+            case WINDMILL:
+            case SAWMILL:
+            case FORGE:
+                changePopulation(building);
+                break;
+            case PORT:
+                addPopulation(building.type.getBonus());
+                changeProduction(building);
+                break;
+            case CUSTOM_HOUSE:
+                changeProduction(building);
+                break;
+            case TEMPLE:
+            case WATER_TEMPLE:
+            case MOUNTAIN_TEMPLE:
+            case FOREST_TEMPLE:
+                changePointsPerTurn(building.getPoints());
+                break;
+            case ALTAR_OF_PEACE:
+            case EMPERORS_TOMB:
+            case EYE_OF_GOD:
+            case GATE_OF_POWER:
+            case PARK_OF_FORTUNE:
+            case TOWER_OF_WISDOM:
+                addPopulation(building.type.getBonus());
+                break;
         }
 
         buildings.add(building);
     }
 
-    private void addPointsPerTurn(int points){
-        this.pointsPerTurn = points;
+    private void changePopulation(Building building) {
+        changePopulation(building, 1);
     }
 
-    public void setProduction(Building building){
-        Vector2d pos = building.position;
-        int production = 0;
-        for(Building existBuilding: buildings){
-            Vector2d existingPos = existBuilding.position;
-            if ( (existingPos.x >= pos.x-1 && existingPos.x <= pos.x+1) && (existingPos.y >= pos.y-1 && existingPos.y <= pos.y+1)){
-                if (checkMatchedBuilding(existBuilding, building)){
-                    production++;
-                }
-            }
-        }
-        //TODO: building.setProduction(production);
-    }
+    private void changePopulation(Building building, int multiplier) {
+        int popAdd;
+        boolean isBase = building.type.isBase();
 
-    public void changeProduction(Building building){
-        Vector2d pos = building.position;
-        for(Building existBuilding: buildings){
-            Vector2d existingPos = existBuilding.position;
-            if ( (existingPos.x >= pos.x-1 && existingPos.x <= pos.x+1) && (existingPos.y >= pos.y-1 && existingPos.y <= pos.y+1)){
-                if (checkMatchedBuilding(building, existBuilding)){
-                    if (existBuilding.type == FORGE){
-                        addPopulation(2);
-                    }else if(existBuilding.type == CUSTOM_HOUSE){
-                        addProduction(2);
-                        //TODO: existBuilding.setProduction(existBuilding.getBonus() + 2);
-                    }else{
-                        addPopulation(1);
-                    }
+        //Population added by the base building.
+        if(isBase) addPopulation(building.getBonus());
 
-                }
+        //Population added due to adjacency to other matching buildings.
+        for (Building existingBuilding : buildings) {
+            if(building.isMatchingBuilding(existingBuilding) && existingBuilding.adjacent(building))
+            {
+                // if building is base we add the bonus of the matching building. If it's not a base, the own building.
+                popAdd = isBase ? existingBuilding.getBonus() : building.getBonus();
+                addPopulation(popAdd * multiplier);
             }
         }
     }
 
-    public boolean checkMatchedBuilding(Building original, Building functional){
-        return (original.type == FARM && functional.type == Types.BUILDING.WINDMILL) ||
-                (original.type == LUMBER_HUT && functional.type == SAWMILL) ||
-                (original.type == MINE && functional.type == FORGE) ||
-                (original.type == PORT && functional.type == CUSTOM_HOUSE);
+    private void changeProduction(Building building) {
+        changeProduction(building, 1);
+    }
+
+    private void changeProduction(Building building, int multiplier){
+
+        int prodAdd;
+        boolean isBase = building.type.isBase();
+
+        //For all neighbouring buildings to 'building'
+        for(Building existingBuilding: buildings){
+            if(building.isMatchingBuilding(existingBuilding) && existingBuilding.adjacent(building))
+            {
+                prodAdd = isBase ? existingBuilding.getBonus() : building.getBonus();
+                addProduction(prodAdd * multiplier);
+            }
+        }
+    }
+
+
+    public void removeBuilding(Building building)
+    {
+        switch (building.type) {
+            case FARM:
+            case LUMBER_HUT:
+            case MINE:
+            case WINDMILL:
+            case SAWMILL:
+            case FORGE:
+                changePopulation(building, -1);
+                break;
+            case PORT:
+                addPopulation(-building.type.getBonus());
+                changeProduction(building, -1);
+                break;
+            case CUSTOM_HOUSE:
+                changeProduction(building, -1);
+                break;
+            case TEMPLE:
+            case WATER_TEMPLE:
+            case MOUNTAIN_TEMPLE:
+            case FOREST_TEMPLE:
+                changePointsPerTurn(building.getPoints(), -1);
+                break;
+            case ALTAR_OF_PEACE:
+            case EMPERORS_TOMB:
+            case EYE_OF_GOD:
+            case GATE_OF_POWER:
+            case PARK_OF_FORTUNE:
+            case TOWER_OF_WISDOM:
+                addPopulation(-building.type.getBonus());
+                break;
+        }
+
+        buildings.remove(building);
+    }
+
+
+    public int getProduction(){
+        // If population less than 0, return start between [0 ~ level+production]
+        if(population > 0) {
+            return level + production;
+        }
+        return Math.max(0, (level + production - population));
     }
 
     public boolean canLevelUp()
@@ -109,12 +183,7 @@ public class City extends Actor{
     public void levelUp(){
         level++;
         population = population - population_need;
-        population_need = level + 1;
-    }
-
-
-    public void addProduction(int prod) {
-        production += prod;
+        population_need = level;
     }
 
     public boolean addUnit(int id){
@@ -125,7 +194,7 @@ public class City extends Actor{
         return false;
     }
 
-    public boolean addUnitAble(){
+    public boolean canAddUnit(){
         return unitsID.size() < level;
     }
 
@@ -153,13 +222,6 @@ public class City extends Actor{
         return level;
     }
 
-    public int getProduction(){
-        // If population less than 0, return start between [0 ~ level+production]
-        if(population > 0) {
-            return level + production;
-        }
-        return Math.max(0, (level + production - population));
-    }
 
     public int getPopulation() {
         return population;
@@ -246,10 +308,9 @@ public class City extends Actor{
         return unitsID;
     }
 
-    public Building removeBuilding(int x, int y){
+    public Building getBuilding(int x, int y){
         for(Building building :buildings){
             if (building.position.x == x && building.position.y == y){
-                buildings.remove(building);
                 return building;
             }
         }

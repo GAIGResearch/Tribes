@@ -33,7 +33,7 @@ public class Spawn extends CityAction
         if(t.getStars() < unit_type.getCost()) return false;
 
         //I have enough space in this city.
-        if(!city.addUnitAble()) return false;
+        if(!city.canAddUnit()) return false;
 
         //There's no one in the city's position
         Vector2d cityPos = city.getPosition();

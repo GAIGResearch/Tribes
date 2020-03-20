@@ -21,6 +21,7 @@ public class SuperUnit extends Unit
         SuperUnit c = new SuperUnit(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
+        c.setStatus(getStatus());
         return c;
     }
 }

@@ -2,7 +2,9 @@ package utils.graph;
 
 import utils.Vector2d;
 
-public class PathNode
+import java.util.Objects;
+
+public class PathNode implements Comparable<PathNode>
 {
     private int id;
     private Vector2d position;
@@ -61,7 +63,25 @@ public class PathNode
         return pos.x * MAX_CAPACITY + pos.y;
     }
 
-//    public TreeNode copy()
+    @Override
+    public int compareTo(PathNode o) {
+        return Double.compare(totalCost, o.totalCost);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PathNode pathNode = (PathNode) o;
+        return position.equals(pathNode.position);
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
+    //    public TreeNode copy()
 //    {
 //        TreeNode other = new TreeNode(this.id, this.position.x, this.position.y);
 //        other.totalCost = totalCost;

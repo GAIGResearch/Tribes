@@ -44,7 +44,6 @@ public class Board {
     // Player currently making a move.
     private int activeTribeID = -1;
 
-
     // Constructor for board
     public Board() {
         this.gameActors = new HashMap<>();
@@ -185,7 +184,7 @@ public class Board {
             if (b == Types.BUILDING.PORT) {
                 City c = getCityInBorders(x, y);
                 if (c != null && c.getTribeId() == tribeId) {
-                    embark(toPush, startX, startY, x, y);
+                    embark(toPush, x, y);
                     return true;
                 }
 
@@ -204,16 +203,47 @@ public class Board {
     }
 
 
-    private void embark(Unit unit, int x0, int y0, int xF, int yF) {
+    public void embark(Unit unit, int x, int y) {
         City city = (City) gameActors.get(unit.getCityID());
         removeUnitFromBoard(unit);
         removeUnitFromCity(unit, city);
 
         //We're actually creating a new unit
-        Vector2d newPos = new Vector2d(xF, yF);
+        Vector2d newPos = new Vector2d(x, y);
         Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), Types.UNIT.BOAT);
         boat.setCurrentHP(unit.getCurrentHP());
+        ((Boat)boat).setBaseLandUnit(unit.getType());
         addUnit(city, boat);
+    }
+
+    public void disembark(Unit unit, int x, int y) {
+        City city = (City) gameActors.get(unit.getCityID());
+        removeUnitFromBoard(unit);
+        removeUnitFromCity(unit, city);
+        
+        Types.UNIT baseLandUnit;
+        switch (unit.getType())
+        {
+            case BOAT:
+                Boat boat = (Boat) unit; 
+                baseLandUnit = boat.getBaseLandUnit();
+                break;
+            case SHIP:
+                Ship ship = (Ship) unit;
+                baseLandUnit = ship.getBaseLandUnit();  
+                break;
+            case BATTLESHIP:
+                Battleship battleship = (Battleship) unit;
+                baseLandUnit = battleship.getBaseLandUnit();
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + unit.getType());
+        }
+        //We're actually creating a new unit
+        Vector2d newPos = new Vector2d(x, y);
+        Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), baseLandUnit);
+        newUnit.setCurrentHP(unit.getCurrentHP());
+        addUnit(city, newUnit);
     }
 
     private void moveUnit(Unit unit, int x0, int y0, int xF, int yF) {
@@ -259,7 +289,7 @@ public class Board {
     }
 
 
-    private boolean traversable(int x, int y, int tribeId) {
+    public boolean traversable(int x, int y, int tribeId) {
         if (x >= 0 && y >= 0 && x < size && y < size) {
             //we rule out places we can't be.
             TechnologyTree tt = tribes[tribeId].getTechTree();
@@ -442,16 +472,25 @@ public class Board {
         return tileCityId[x][y];
     }
 
-    // Get all of tiles belong to the city
-    public LinkedList<Vector2d> getCityTiles(int cityId){
+    // Get all the tiles that belong to a city
+    public LinkedList<Vector2d> getCityTiles(int cityID){
         LinkedList<Vector2d> tiles = new LinkedList<>();
-        for (int i=0; i<size; i++){
-            for (int j=0; j<size; j++){
-                if (tileCityId[i][j] == cityId){
-                    tiles.add(new Vector2d(i, j));
+        City targetCity = (City) gameActors.get(cityID);
+        Vector2d targetCityPos = targetCity.getPosition();
+        int radius = 0;
+
+        if(targetCity.getLevel() < 4){ radius = 1; } else{ radius = 2; }
+
+        for(int i = targetCityPos.x - radius; i <= targetCityPos.x + radius; i++) {
+            for(int j = targetCityPos.y - radius; j <= targetCityPos.y + radius; j++) {
+                if(i >= 0 && j >= 0 && i < size && j < size) {
+                    if (tileCityId[i][j] == cityID){
+                        tiles.add(new Vector2d(i, j));
+                    }
                 }
             }
         }
+
         return tiles;
     }
 
@@ -462,16 +501,36 @@ public class Board {
      * @param y position of the city to capture
      * @return true if city was captured.
      */
-    public boolean capture(Tribe t, int x, int y){
+    public boolean capture(Tribe t, int x, int y, Random rnd){
 
         Types.TERRAIN ter = terrains[x][y];
+        City capital = (City) getActor(t.getCapitalID());
+        LinkedList<Integer> cities = new LinkedList<>(t.getCitiesID());
+        cities.remove((Integer)t.getCapitalID());
+        boolean ownCapital = t.controlsCapital();
         City c;
         if(ter == Types.TERRAIN.VILLAGE)
         {
             //Not a city. Needs to be created, assigned and its border calculated.
             c = new City(x, y, t.getTribeId());
+            // Move the unit from one city to village. Rank: capital -> cities -> None
+            if(ownCapital && capital.getUnitsID().size() > 0){
+                moveBelongingCity(capital, c, rnd);
+            }else{
+                while (cities.size() > 0){
+                    int index = rnd.nextInt(cities.size());
+                    City originalCity = (City)getActor(cities.get(index));
+                    if (originalCity.getUnitsID().size() > 0){
+                        moveBelongingCity(originalCity, c, rnd);
+                        break;
+                    }else{
+                        cities.remove(index);
+                    }
+                }
+            }
             addCityToTribe(c);
             setBorderHelper(c, c.getBound());
+
 
         }else if(ter == Types.TERRAIN.CITY)
         {
@@ -482,6 +541,28 @@ public class Board {
             c.setTribeId(t.getTribeId());
             tribes[t.getTribeId()].addCity(cityId);
             tribes[prevTribeId].removeCity(cityId);
+            // Move units to previous Tribe. Rank: capital -> cities -> Tribe
+            City preCapital = (City) getActor(tribes[prevTribeId].getCapitalID());
+            LinkedList<Integer> preCities = new LinkedList<>(tribes[prevTribeId].getCitiesID());
+            preCities.remove(tribes[prevTribeId].getCapitalID());
+            boolean preOwnCapital = tribes[prevTribeId].controlsCapital();
+            LinkedList<Integer> units = c.moveUnits();
+            while (preOwnCapital && preCapital.addUnitAble() && units.size() > 0){
+                preCapital.addUnit(units.getFirst());
+                units.removeFirst();
+            }
+            while (preCities.size() > 0 && units.size() > 0){
+                int index = rnd.nextInt(preCities.size());
+                City originalCity = (City)getActor(preCities.get(index));
+                while (originalCity.addUnitAble() && units.size() > 0){
+                    originalCity.addUnit(units.getFirst());
+                    units.removeFirst();
+                }
+                preCities.remove(index);
+            }
+            if (units.size() > 0){
+                tribes[prevTribeId].moveAllUnits(units);
+            }
 
         }else
         {
@@ -493,7 +574,12 @@ public class Board {
         return true;
     }
 
-
+    public void moveBelongingCity(City originalCity, City targetCity, Random rnd){
+        int index = rnd.nextInt(originalCity.getUnitsID().size());
+        int actorID = originalCity.removeUnitByIndex(index);
+        targetCity.addUnit(actorID);
+    }
+  
     private void computeTradeNetwork()
     {
         for(Tribe t : tribes) {

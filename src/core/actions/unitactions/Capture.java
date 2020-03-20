@@ -1,5 +1,6 @@
 package core.actions.unitactions;
 
+import core.Types;
 import core.actions.Action;
 import core.actors.Tribe;
 import core.game.Board;
@@ -9,6 +10,7 @@ import core.actors.units.Unit;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Random;
 
 public class Capture extends UnitAction
 {
@@ -59,6 +61,6 @@ public class Capture extends UnitAction
         // Change city tribe id to execute action
         Board b = gs.getBoard();
         Tribe t = b.getTribe(this.unit.getTribeId());
-        return b.capture(t,this.targetCity.getPosition().x,this.targetCity.getPosition().y);
+        return b.capture(t,this.targetCity.getPosition().x,this.targetCity.getPosition().y, gs.getRandomGenerator());
     }
 }

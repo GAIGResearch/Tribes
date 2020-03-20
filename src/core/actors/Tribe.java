@@ -57,8 +57,6 @@ public class Tribe extends Actor {
     //Kills by this tribe
     private int nKills;
 
-    private ArrayList<Integer> killedUnits;
-
     public Tribe(Types.TRIBE tribe) {
         this.tribe = tribe;
         init();
@@ -443,8 +441,4 @@ public class Tribe extends Actor {
         return canBuildRoad && hasMoney;
     }
 
-    public void addKilledUnit (Unit target){
-        killedUnits.add(target.getActorId());
-
-    }
 }

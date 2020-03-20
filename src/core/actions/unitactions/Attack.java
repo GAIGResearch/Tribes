@@ -59,8 +59,6 @@ public class Attack extends UnitAction
 
                 attacker.addKill();
                 target.setIsKilled(true);
-                
-                gs.getTribe(target.getTribeId()).addKilledUnit(target);
 
                 //Move unit to target position if unit is melee type
                 switch (attacker.getType()) {
@@ -89,7 +87,6 @@ public class Attack extends UnitAction
                     if(attacker.getCurrentHP() <=0 ) {
                         target.addKill();
                         attacker.setIsKilled(true);
-                        gs.getTribe(target.getTribeId()).addKilledUnit(target);
                     }
                 }
 

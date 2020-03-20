@@ -139,7 +139,8 @@ public class Build extends CityAction
     }
 
     private boolean isBuildable(final GameState gs, int cost, boolean checkIfUnique) {
-        Tribe tribe = gs.getTribe(this.cityId);
+        City city = (City) gs.getActor(this.cityId);
+        Tribe tribe = gs.getTribe(city.getTribeId());
         Board board = gs.getBoard();
         TechnologyTree techTree = tribe.getTechTree();
         int stars = tribe.getStars();

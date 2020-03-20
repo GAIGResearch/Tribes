@@ -133,7 +133,7 @@ public class GameState {
     {
         board.setActiveTribeID(tribe.getTribeId());
 
-        if(computedActionTribeIdFlag != -1)
+        if(computedActionTribeIdFlag != -1 && computedActionTribeIdFlag == tribe.getTribeId())
         {
             //Actions already computed and next() hasn't been called. No need to recompute again.
             return;

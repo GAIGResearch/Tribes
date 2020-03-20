@@ -122,10 +122,12 @@ public class Pathfinder
                 // use the cached nodes HashSet to find the correct object with the information available,
                 // only missing estimated distance
                 PathNode neighbour = null;
-                for (PathNode n2 : nodes) {
-                    if (nb.equals(n2)) {
-                        neighbour = n2;
-                        break;
+                if (nodes != null) {
+                    for (PathNode n2 : nodes) {
+                        if (nb.equals(n2)) {
+                            neighbour = n2;
+                            break;
+                        }
                     }
                 }
                 if (neighbour == null) {

@@ -1,15 +1,14 @@
 import core.Types;
 import core.actions.Action;
 import core.actions.tribeactions.ResearchTech;
-import core.actions.tribeactions.ResearchTechFactory;
+import core.actions.tribeactions.factory.ResearchTechFactory;
 import core.actions.unitactions.Recover;
-import core.actions.unitactions.RecoverFactory;
+import core.actions.unitactions.factory.RecoverFactory;
 import core.actors.Tribe;
 import core.actors.units.Unit;
 import core.actors.units.Warrior;
 import utils.Vector2d;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import static core.Types.TECHNOLOGY.*;

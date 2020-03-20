@@ -1,9 +1,10 @@
-package core.actions.cityactions;
+package core.actions.cityactions.factory;
 
 import core.TechnologyTree;
 import core.Types;
 import core.actions.Action;
 import core.actions.ActionFactory;
+import core.actions.cityactions.Build;
 import core.actions.tribeactions.ResearchTech;
 import core.actors.Actor;
 import core.actors.City;
@@ -30,7 +31,7 @@ public class BuildFactory implements ActionFactory {
                 if(board.getBuildingAt(tile.x, tile.y) == null) {
                     Build action = new Build(city.getActorId());
                     action.setBuildingType(building);
-                    action.targetPos = tile.copy();
+                    action.setTargetPos(tile.copy());
                     if (action.isFeasible(gs)) {
                         actions.add(action);
                     }

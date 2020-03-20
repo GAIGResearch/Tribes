@@ -1,8 +1,10 @@
-package core.actions.unitactions;
+package core.actions.unitactions.factory;
 
 import core.Types;
 import core.actions.Action;
 import core.actions.ActionFactory;
+import core.actions.unitactions.Move;
+import core.actions.unitactions.StepMove;
 import core.actors.Actor;
 import core.actors.units.Unit;
 import core.game.GameState;

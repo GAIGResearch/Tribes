@@ -1,6 +1,9 @@
-package core.actions.tribeactions;
+package core.actions.tribeactions.factory;
 
 import core.actions.Action;
+import core.actions.tribeactions.factory.BuildRoadFactory;
+import core.actions.tribeactions.factory.EndTurnFactory;
+import core.actions.tribeactions.factory.ResearchTechFactory;
 import core.actors.Tribe;
 import core.game.GameState;
 

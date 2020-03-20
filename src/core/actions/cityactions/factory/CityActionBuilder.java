@@ -1,11 +1,12 @@
-package core.actions.cityactions;
+package core.actions.cityactions.factory;
 
 import core.actions.Action;
+import core.actions.cityactions.LevelUpFactory;
+import core.actions.cityactions.factory.*;
 import core.actors.City;
 import core.game.GameState;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class CityActionBuilder
 {

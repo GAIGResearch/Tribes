@@ -1,7 +1,8 @@
-package core.actions.tribeactions;
+package core.actions.tribeactions.factory;
 
 import core.actions.Action;
 import core.actions.ActionFactory;
+import core.actions.tribeactions.EndTurn;
 import core.actors.Actor;
 import core.actors.Tribe;
 import core.game.GameState;

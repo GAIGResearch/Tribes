@@ -1,5 +1,8 @@
 package core;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 public class TechnologyTree {
 
     private boolean[] researched;
@@ -231,5 +234,21 @@ public class TechnologyTree {
 
        return true;
    }
+
+   public boolean researchAtRandom(Random rnd)
+   {
+       if(isEverythingResearched()) return false;
+
+       ArrayList<Types.TECHNOLOGY> available = new ArrayList<>();
+       for(Types.TECHNOLOGY tech : Types.TECHNOLOGY.values())
+       {
+           if(!isResearched(tech))
+               available.add(tech);
+       }
+
+       Types.TECHNOLOGY t = available.get(rnd.nextInt(available.size()));
+       return doResearch(t);
+   }
+
 
 }

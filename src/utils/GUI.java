@@ -1,9 +1,5 @@
 package utils;
 
-import core.Constants;
-import core.Types;
-import core.actions.tribeactions.EndTurnAction;
-import core.actions.unitactions.*;
 import core.actors.units.Unit;
 import core.game.Game;
 import core.game.GameState;
@@ -19,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static core.Constants.CELL_SIZE;
 import static core.Types.getActionPosition;
 
 
@@ -205,7 +200,7 @@ public class GUI extends JFrame implements Runnable {
 
         c.gridy++;
         JButton endTurn = new JButton("End Turn");
-        endTurn.addActionListener(e -> ac.addAction(new EndTurnAction(), gs));
+        endTurn.addActionListener(e -> ac.addAction(new EndTurn(), gs));  TODO: no more end turn?
         sidePanel.add(endTurn, c);
 
         c.gridy++;

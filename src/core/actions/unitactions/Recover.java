@@ -7,46 +7,40 @@ import core.actors.units.Unit;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import static core.TribesConfig.RECOVER_IN_CITY_PLUS_HP;
+import static core.TribesConfig.RECOVER_PLUS_HP;
+
 public class Recover extends UnitAction
 {
-    public Recover(Unit target)
+    public Recover(int unitId)
     {
-        super.unit = target;
+        super.unitId = unitId;
     }
 
-
-    @Override
-    public LinkedList<Action> computeActionVariants(final GameState gs) {
-
-        LinkedList<Action> actions = new LinkedList<>();
-        Recover newAction = new Recover(unit);
-        float currentHP = unit.getCurrentHP();
-        if (currentHP < unit.getMaxHP() && currentHP > 0){
-            actions.add(newAction);
-        }
-        return actions;
-    }
 
     @Override
     public boolean isFeasible(final GameState gs) {
+        Unit unit = (Unit) gs.getActor(this.unitId);
         float currentHP = unit.getCurrentHP();
         return currentHP < unit.getMaxHP() && currentHP > 0;
     }
 
     @Override
     public boolean execute(GameState gs) {
+        Unit unit = (Unit) gs.getActor(this.unitId);
         int currentHP = unit.getCurrentHP();
-        int addHP = 2;
-        if (currentHP < unit.getMaxHP() && currentHP > 0) {
-            if (gs != null){
-               int cityID = gs.getBoard().getCityIdAt(unit.getPosition().x, unit.getPosition().y);
-               if (cityID != -1){
-                   ArrayList<Integer> citesID = gs.getTribe(unit.getTribeId()).getCitiesID();
-                   if (citesID.contains(cityID)){
-                       addHP += 2;
-                   }
-                }
+        int addHP = RECOVER_PLUS_HP;
+
+        if (isFeasible(gs)) {
+
+           int cityID = gs.getBoard().getCityIdAt(unit.getPosition().x, unit.getPosition().y);
+           if (cityID != -1){
+               ArrayList<Integer> citesID = gs.getTribe(unit.getTribeId()).getCitiesID();
+               if (citesID.contains(cityID)){
+                   addHP += RECOVER_IN_CITY_PLUS_HP;
+               }
             }
+
             unit.setCurrentHP(Math.min(currentHP + addHP, unit.getMaxHP()));
             return true;
         }

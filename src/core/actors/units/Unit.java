@@ -19,7 +19,10 @@ public abstract class Unit extends Actor
     private int kills;
     private boolean isVeteran;
     private int cityID;
+    private boolean isKilled;
+
     private Types.TURN_STATUS status;
+
 
     public Unit(int atk, int def, int mov, int max_hp, int range, int cost, Vector2d pos, int kills, boolean isVeteran, int cityID, int tribeID){
         this.ATK = atk;
@@ -35,6 +38,7 @@ public abstract class Unit extends Actor
         this.isVeteran = isVeteran;
         this.cityID = cityID;
         this.tribeId = tribeID;
+        this.isKilled = false;
         this.status = Types.TURN_STATUS.FRESH;
     }
 
@@ -161,5 +165,14 @@ public abstract class Unit extends Actor
     }
 
     public abstract Unit copy();
+
+    public void setIsKilled(boolean isKilled){
+        this.isKilled = isKilled;
+    }
+
+    public boolean getIsKilled(){
+        return isKilled;
+    }
+
 
 }

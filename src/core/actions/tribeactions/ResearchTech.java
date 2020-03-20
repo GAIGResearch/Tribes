@@ -12,39 +12,18 @@ public class ResearchTech extends TribeAction {
 
     private Types.TECHNOLOGY tech;
 
-    public ResearchTech(Tribe tribe)
+    public ResearchTech(int tribeId)
     {
-        this.tribe = tribe;
+        this.tribeId = tribeId;
     }
-
     public void setTech(Types.TECHNOLOGY tech) {this.tech = tech;}
     public Types.TECHNOLOGY getTech() {return this.tech;}
-
-    @Override
-    public LinkedList<Action> computeActionVariants(final GameState gs) {
-
-        LinkedList<Action> actions = new LinkedList<>();
-        TechnologyTree techTree = this.tribe.getTechTree();
-        int stars = tribe.getStars();
-        int numCities = tribe.getCitiesID().size();
-
-        //Technically, we can do faster than this (by pruning branches of the
-        // tech tree that are not reachable), although this makes the code more general.
-        for(Types.TECHNOLOGY tech : Types.TECHNOLOGY.values())
-        {
-            if(stars >= tech.getCost(numCities) && techTree.isResearchable(tech))
-            {
-                ResearchTech newAction = new ResearchTech(this.tribe);
-                newAction.setTech(tech);
-                actions.add(newAction);
-            }
-        }
-        return actions;
-    }
 
 
     @Override
     public boolean isFeasible(final GameState gs) {
+        Tribe tribe = (Tribe) gs.getActor(tribeId);
+
         if(tech == null)
             return false;
 
@@ -56,17 +35,16 @@ public class ResearchTech extends TribeAction {
 
     @Override
     public boolean execute(GameState gs) {
+        Tribe tribe = (Tribe) gs.getActor(tribeId);
         if(isFeasible(gs))
         {
-            int cost = tech.getCost(tribe.getCitiesID().size());
-            tribe.addStars(-cost);
-            boolean researched = tribe.getTechTree().doResearch(tech);
-            if(!researched)
-            {
-                //This shouldn't happen.
-                System.out.println("WARNING: Researchable research not researched!");
-                return false;
-            }else if (tribe.getTechTree().isEverythingResearched())
+            //Research tech
+            int techCost = tech.getCost(tribe.getCitiesID().size());
+            tribe.addStars(-techCost);
+            tribe.getTechTree().doResearch(tech);
+
+            //Flag if research tree is completed.
+            if (tribe.getTechTree().isEverythingResearched())
             {
                 tribe.allResearched();
             }

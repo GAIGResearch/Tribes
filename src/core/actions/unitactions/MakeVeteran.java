@@ -1,5 +1,6 @@
 package core.actions.unitactions;
 
+import core.TribesConfig;
 import core.actions.Action;
 import core.game.GameState;
 import core.actors.units.Unit;
@@ -8,30 +9,25 @@ import java.util.LinkedList;
 
 public class MakeVeteran extends UnitAction
 {
-    public MakeVeteran(Unit target)
+    public MakeVeteran(int unitId)
     {
-        super.unit = target;
+        super.unitId = unitId;
     }
 
-    @Override
-    public LinkedList<Action> computeActionVariants(final GameState gs) {
-        LinkedList<Action> actions = new LinkedList<>();
-        MakeVeteran action = new MakeVeteran(unit);
-        if(isFeasible(gs)){ actions.add(action); }
-        return actions;
-    }
 
     @Override
     public boolean isFeasible(final GameState gs) {
-        return unit.getKills() >= 3 && !unit.isVeteran();
+        Unit unit = (Unit) gs.getActor(this.unitId);
+        return unit.getKills() >= TribesConfig.VETERAN_KILLS && !unit.isVeteran();
     }
 
     @Override
     public boolean execute(GameState gs) {
+        Unit unit = (Unit) gs.getActor(this.unitId);
         if(isFeasible(gs))
         {
             unit.setVeteran(true);
-            unit.setMaxHP(unit.getMaxHP() + 5);
+            unit.setMaxHP(unit.getMaxHP() + TribesConfig.VETERAN_PLUS_HP);
             unit.setCurrentHP(unit.getMaxHP());
             return true;
         }

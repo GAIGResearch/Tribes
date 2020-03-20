@@ -6,29 +6,23 @@ import core.game.GameState;
 
 import java.util.LinkedList;
 
-public class EndTurnAction extends TribeAction {
+public class EndTurn extends TribeAction {
 
-    public EndTurnAction(){}
-    public EndTurnAction(Tribe tribe)
+    public EndTurn(){}
+    public EndTurn(int tribeId)
     {
-        this.tribe = tribe;
-    }
-
-    @Override
-    public LinkedList<Action> computeActionVariants(final GameState gs) {
-        LinkedList<Action> endTurns = new LinkedList<>();
-        if(isFeasible(gs))
-            endTurns.add(new EndTurnAction(this.tribe));
-        return endTurns;
+        this.tribeId = tribeId;
     }
 
     @Override
     public boolean isFeasible(final GameState gs) {
+        Tribe tribe = (Tribe) gs.getActor(tribeId);
         return gs.canEndTurn(tribe.getTribeId());
     }
 
     @Override
     public boolean execute(GameState gs) {
+        Tribe tribe = (Tribe) gs.getActor(tribeId);
         if(isFeasible(gs))
         {
             gs.endTurn(tribe.getTribeId());

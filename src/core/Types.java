@@ -9,6 +9,7 @@ import utils.Vector2d;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Random;
 
 public class Types {
 
@@ -124,20 +125,31 @@ Yellow_dark - 929000
      */
     public enum RESOURCE
     {
-        FISH(0, "img/resource/fish.png", 'h'),
-        FRUIT(1, "img/resource/fruit.png", 'f'),
-        ANIMAL(2, "img/resource/animal.png", 'a'),
-        WHALES(3, "img/resource/whale.png", 'w'),
-        ORE(5, "img/resource/ore.png", 'o'),
-        CROPS(6, "img/resource/crops.png", 'c'),
-        RUINS(7, "img/resource/ruins.png", 'r');
+        FISH(0, "img/resource/fish.png", 'h', TribesConfig.FISH_COST, TribesConfig.FISH_POP),
+        FRUIT(1, "img/resource/fruit.png", 'f', TribesConfig.FRUIT_COST, TribesConfig.FRUIT_POP),
+        ANIMAL(2, "img/resource/animal.png", 'a', TribesConfig.ANIMAL_COST, TribesConfig.ANIMAL_POP),
+        WHALES(3, "img/resource/whale.png", 'w', TribesConfig.WHALES_COST, TribesConfig.WHALES_STARS),
+        ORE(5, "img/resource/ore.png", 'o', 0, 0),
+        CROPS(6, "img/resource/crops.png", 'c', 0, 0),
+        RUINS(7, "img/resource/ruins.png", 'r', 0, 0);
 
         private int key;
         private String imageFile;
         private char mapChar;
-        RESOURCE(int numVal, String imageFile, char mapChar) {  this.key = numVal;  this.imageFile = imageFile; this.mapChar = mapChar;}
+        private int cost;
+        private int bonus;
+
+        RESOURCE(int numVal, String imageFile, char mapChar, int cost, int bonus) {
+            this.key = numVal;
+            this.imageFile = imageFile;
+            this.mapChar = mapChar;
+            this.cost = cost;
+            this.bonus = bonus;
+        }
         public int getKey() {  return key; }
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
+        public int getCost() {return cost;}
+        public int getBonus() {return bonus;}
 
         public static RESOURCE getType(char resourceChar) {
             for(RESOURCE r : Types.RESOURCE.values()){
@@ -213,6 +225,25 @@ Yellow_dark - 929000
         }
     }
 
+    public enum EXAMINE_BONUS
+    {
+        SUPERUNIT(0,0),
+        RESEARCH(1,0),
+        POP_GROWTH(2,3),
+        EXPLORER(3,0),
+        RESOURCES(4,10);
+
+        private int bonus, key;
+        EXAMINE_BONUS(int key, int bonus) {this.key = key; this.bonus = bonus;}
+        public int getBonus() { return bonus;  }
+        public int getKey() {return key;}
+
+        public static EXAMINE_BONUS random(Random r)
+        {
+            EXAMINE_BONUS[] bonuses = EXAMINE_BONUS.values();
+            return bonuses[r.nextInt(bonuses.length)];
+        }
+    }
 
     /**
      * Types of buildings that can be built by cities

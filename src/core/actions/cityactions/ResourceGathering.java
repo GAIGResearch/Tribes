@@ -1,5 +1,6 @@
 package core.actions.cityactions;
 
+import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actors.Tribe;
@@ -14,9 +15,9 @@ public class ResourceGathering extends CityAction
 {
     private Types.RESOURCE resource;
 
-    public ResourceGathering(City c)
+    public ResourceGathering(int cityId)
     {
-        super.city = c;
+        super.cityId = cityId;
     }
 
     public void setResource(Types.RESOURCE resource) {this.resource = resource;}
@@ -25,91 +26,45 @@ public class ResourceGathering extends CityAction
     }
 
     @Override
-    public LinkedList<Action> computeActionVariants(final GameState gs) {
-        Board b = gs.getBoard();
-        LinkedList<Action> resources = new LinkedList<>();
-        LinkedList<Vector2d> cityTiles = b.getCityTiles(b.getCityIdAt(this.city.getPosition().x,this.city.getPosition().y));
-        // loop through bounds of city and add resource actions if they are feasible
-        // TODO: Find more effecient method other than asking board for city tiles
-        for(int i = 0; i<cityTiles.size(); i++) {
-            Vector2d pos = cityTiles.get(i);
-            Types.RESOURCE r = b.getResourceAt(pos.x, pos.y);
-            if (r == null)
-                continue;
-            ResourceGathering resource = new ResourceGathering(this.city);
-            resource.setResource(r);
-            resource.targetX = pos.x;
-            resource.targetY = pos.y;
-            if (resource.isFeasible(gs)) {
-                resources.add(resource);
-            }
-
-        }
-        return resources;
-    }
-
-    @Override
     public boolean isFeasible(final GameState gs)
     {
+        City city = (City) gs.getActor(this.cityId);
         Board b = gs.getBoard();
-        Tribe t = b.getTribe(this.city.getTribeId());
-        // Check if resource in range
-        if(b.getResourceAt(targetX,targetY) == this.resource){
+        Tribe t = b.getTribe(city.getTribeId());
+
+        // Check if resource can be gathered
+        if(b.getResourceAt(targetPos.x, targetPos.y) == this.resource && t.getStars() >= this.resource.getCost()){
             switch (this.resource){
                 case ANIMAL:
-                    if(t.getTechTree().isResearched(Types.TECHNOLOGY.HUNTING) && t.getStars() >=2)
-                        return true;
-                    else
-                        return false;
+                    return t.getTechTree().isResearched(Types.TECHNOLOGY.HUNTING);
                 case FISH:
-                    if(t.getTechTree().isResearched(Types.TECHNOLOGY.FISHING) && t.getStars() >=2)
-                        return true;
-                    else
-                        return false;
-                case ORE:
-                    if(t.getTechTree().isResearched(Types.TECHNOLOGY.MINING) && t.getStars() >=5)
-                        return true;
-                    else
-                        return false;
-                    case WHALES:
-                    if(t.getTechTree().isResearched(Types.TECHNOLOGY.WHALING))
-                        return true;
-                    else
-                        return false;
+                    return t.getTechTree().isResearched(Types.TECHNOLOGY.FISHING);
+                case WHALES:
+                    return t.getTechTree().isResearched(Types.TECHNOLOGY.WHALING);
                 case FRUIT:
-                    if(t.getTechTree().isResearched(Types.TECHNOLOGY.ORGANIZATION) && t.getStars() >=2)
-                        return true;
-                    else
-                        return false;
-                case CROPS:
-                    if(t.getTechTree().isResearched(Types.TECHNOLOGY.FARMING) && t.getStars() >=2 ||t.getTechTree().isResearched(Types.TECHNOLOGY.ORGANIZATION) && t.getStars() >=2 )
-                        return true;
-                    else
-                        return false;
+                    return t.getTechTree().isResearched(Types.TECHNOLOGY.ORGANIZATION);
             }
         }
         return false;
     }
 
-
     @Override
     public boolean execute(GameState gs) {
         //Check if action feasible before execution
         if(isFeasible(gs)){
+            City city = (City) gs.getActor(this.cityId);
+            Vector2d position = super.getTargetPos();
+            gs.getBoard().setResourceAt(position.x, position.y, null);
             switch (this.resource){
-                case CROPS:
-                case ORE:
-                    this.city.addPopulation(2);
-                    return true;
                 case FISH:
                 case ANIMAL:
                 case FRUIT:
-                    this.city.addPopulation(1);
+                    city.addPopulation(this.resource.getBonus());
                     return true;
                 case WHALES: //Whaling is the only resource which provides extra stars
                     Board b = gs.getBoard();
-                    Tribe t  = b.getTribe(this.city.getTribeId());
-                    t.addStars(10);
+                    Tribe t  = b.getTribe(city.getTribeId());
+                    t.addStars(this.resource.getBonus());
                     return true;
             }
         }

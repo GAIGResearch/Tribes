@@ -10,9 +10,11 @@ import utils.Vector2d;
 import utils.graph.PathNode;
 import utils.graph.Pathfinder;
 import java.util.ArrayList;
-import java.util.HashMap;
 
+import java.util.LinkedList;
+import java.util.HashMap;
 import static core.Types.BUILDING.*;
+
 
 public class Tribe extends Actor {
 
@@ -254,12 +256,17 @@ public class Tribe extends Actor {
         return null;
     }
 
+    public void moveAllUnits(LinkedList<Integer> units){
+        extraUnits.addAll(units);
+    }
+
     public boolean isMonumentBuildable(Types.BUILDING building)
     {
         return monuments.get(building) == MONUMENT_STATUS.AVAILABLE;
     }
 
     public void monumentIsBuilt(Types.BUILDING building)
+
     {
         monuments.put(building, MONUMENT_STATUS.BUILT);
     }
@@ -418,8 +425,20 @@ public class Tribe extends Actor {
             monuments.put(TOWER_OF_WISDOM, MONUMENT_STATUS.AVAILABLE);
     }
 
-    public void addConvertedUnit(Unit target)
+    public void addExtraUnit(Unit target)
     {
         extraUnits.add(target.getActorId());
     }
+
+    /**
+     * Checks if the tribe can build roads
+     * @return if tribe can build roads
+     */
+    public boolean canBuildRoads() {
+        //Factors for tree building in general: tech and enough stars.
+        boolean canBuildRoad = techTree.isResearched(Types.TECHNOLOGY.ROADS);
+        boolean hasMoney = stars >= TribesConfig.ROAD_COST;
+        return canBuildRoad && hasMoney;
+    }
+
 }

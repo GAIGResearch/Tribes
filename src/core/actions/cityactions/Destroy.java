@@ -12,78 +12,52 @@ import java.util.LinkedList;
 
 public class Destroy extends CityAction
 {
-    private Vector2d position;
-
-    public Destroy(City c)
+    public Destroy(int cityId)
     {
-        super.city = c;
-    }
-
-    public void setPosition(int x, int y){
-        this.position = new Vector2d(x, y);
-    }
-    public Vector2d getPosition() {
-        return position;
-    }
-
-    @Override
-    public LinkedList<Action> computeActionVariants(final GameState gs) {
-        LinkedList<Action> actions = new LinkedList<>();
-        Board currentBoard = gs.getBoard();
-        LinkedList<Vector2d> tiles = currentBoard.getCityTiles(city.getActorId());
-        boolean techReq = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.CONSTRUCTION);
-        if (techReq){
-            for(Vector2d tile: tiles){
-                if (currentBoard.getBuildingAt(tile.x, tile.y) != null){
-                    Destroy action = new Destroy(city);
-                    action.setPosition(tile.x, tile.y);
-                    actions.add(action);
-                }
-            }
-        }
-        return actions;
+        super.cityId = cityId;
     }
 
     @Override
     public boolean isFeasible(final GameState gs)
     {
-        boolean isBuilding = gs.getBoard().getBuildingAt(position.x, position.y) != null;
-        boolean isBelonging = gs.getBoard().getCityIdAt(position.x, position.y) == city.getActorId();
-        boolean isResearched = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.CONSTRUCTION);
-        return isBuilding && isBelonging && isResearched;
+        City city = (City) gs.getActor(this.cityId);
+        if(gs.getBoard().getBuildingAt(targetPos.x, targetPos.y) == null) return false;
+        if(gs.getBoard().getCityIdAt(targetPos.x, targetPos.y) != this.cityId) return false;
+        return gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.CONSTRUCTION);
     }
 
     @Override
     public boolean execute(GameState gs) {
         if (isFeasible(gs)){
-            Building removedBuilding = city.removeBuilding(position.x, position.y);
+            City city = (City) gs.getActor(this.cityId);
+            Building removedBuilding = city.removeBuilding(targetPos.x, targetPos.y);
             if (removedBuilding != null) {
+
                 Board b = gs.getBoard();
-                b.setBuildingAt(position.x, position.y, null);
+                b.setBuildingAt(targetPos.x, targetPos.y, null);
+
                 if (removedBuilding.getTYPE() != Types.BUILDING.CUSTOM_HOUSE) {
                     city.addPopulation(-removedBuilding.getPRODUCTION());
-                }else{
-                    //TODO: Is this correct? The production of a custom house depends on the number of Ports around it,
-                    // so I'm not sure this should be a constant value.
-                    city.subtractProduction(removedBuilding.getPRODUCTION());
                 }
+
                 // TODO: Should be check if the building enum is changed
                 if (removedBuilding.getTYPE().getKey() >= Types.BUILDING.TEMPLE.getKey()) {
                     gs.getTribe(city.getTribeId()).subtractScore(removedBuilding.getPoints());
                 }
 
-                boolean isTemple = removedBuilding.getTYPE().getKey() >= Types.BUILDING.TEMPLE.getKey() && removedBuilding.getTYPE().getKey() <= Types.BUILDING.MOUNTAIN_TEMPLE.getKey();
-                if(isTemple){
+                int removedType = removedBuilding.getTYPE().getKey();
+                if(removedType == Types.BUILDING.TEMPLE.getKey()
+                        || removedType == Types.BUILDING.WATER_TEMPLE.getKey()
+                        || removedType == Types.BUILDING.FOREST_TEMPLE.getKey()
+                        || removedType == Types.BUILDING.MOUNTAIN_TEMPLE.getKey()){
                     city.subtractLongTermPoints(removedBuilding.getPoints());
                 }
 
                 if(removedBuilding.getTYPE() == Types.BUILDING.PORT)
                 {
                     //If a port is removed, then the tile stops belonging to the trade network
-                    b.setTradeNetwork(position.x, position.y, false);
+                    b.setTradeNetwork(targetPos.x, targetPos.y, false);
                 }
-
-
 
                 return true;
             }

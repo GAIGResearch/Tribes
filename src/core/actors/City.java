@@ -2,6 +2,7 @@ package core.actors;
 
 import core.Types;
 import core.actors.buildings.Building;
+import core.actors.buildings.CustomHouse;
 import utils.Vector2d;
 
 import java.util.LinkedList;
@@ -48,9 +49,7 @@ public class City extends Actor{
             addPointsPerTurn(building.getPoints());
         }
 
-        if (building.getTYPE() == CUSTOM_HOUSE){
-            addProduction(building.getPRODUCTION());
-        }else {
+        if (building.getTYPE() != CUSTOM_HOUSE){
             addPopulation(building.getPRODUCTION());
         }
 
@@ -85,6 +84,7 @@ public class City extends Actor{
                         addPopulation(2);
                     }else if(existBuilding.getTYPE() == CUSTOM_HOUSE){
                         addProduction(2);
+                        existBuilding.setProduction(existBuilding.getPRODUCTION() + 2);
                     }else{
                         addPopulation(1);
                     }
@@ -126,6 +126,10 @@ public class City extends Actor{
         return false;
     }
 
+    public boolean addUnitAble(){
+        return unitsID.size() < level;
+    }
+
     public void removeUnit(int id){
         for(int i=0; i<unitsID.size(); i++){
             if (unitsID.get(i) == id){
@@ -136,13 +140,26 @@ public class City extends Actor{
         System.out.println("Error!! Unit ID "+ id +" does not belong to this city");
     }
 
+    public Integer removeUnitByIndex(int index){
+        return unitsID.remove(index);
+    }
+
+    public LinkedList<Integer> moveUnits(){
+        LinkedList<Integer> lists = unitsID;
+        unitsID = new LinkedList<Integer>();
+        return lists;
+    }
 
     public int getLevel() {
         return level;
     }
 
     public int getProduction(){
-        return level + production;
+        // If population less than 0, return start between [0 ~ level+production]
+        if(population > 0) {
+            return level + production;
+        }
+        return Math.max(0, (level + production - population));
     }
 
     public int getPopulation() {
@@ -231,15 +248,13 @@ public class City extends Actor{
     }
 
     public Building removeBuilding(int x, int y){
-        Building removeBuilding = null;
         for(Building building :buildings){
             if (building.getPosition().x == x && building.getPosition().y == y){
                 buildings.remove(building);
-                removeBuilding = building;
-
+                return building;
             }
         }
-        return removeBuilding;
+        return null;
     }
 
     public void subtractLongTermPoints(int points){

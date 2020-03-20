@@ -18,37 +18,15 @@ public class Build extends CityAction
 {
     private Types.BUILDING buildingType;
 
-    public Build(City c)
+    public Build(int cityId)
     {
-        super.city = c;
+        super.cityId = cityId;
     }
 
     public void setBuildingType(Types.BUILDING buildingType) {this.buildingType = buildingType;}
 
     public Types.BUILDING getBuildingType() {
         return buildingType;
-    }
-
-    @Override
-    public LinkedList<Action> computeActionVariants(final GameState gs) {
-        LinkedList<Action> actions = new LinkedList<>();
-        Board board = gs.getBoard();
-        LinkedList<Vector2d> tiles = board.getCityTiles(city.getActorId());
-
-        for(Vector2d tile : tiles){
-            for(Types.BUILDING building: Types.BUILDING.values()){
-                //check if tile is empty
-                if(board.getBuildingAt(tile.x, tile.y) == null) {
-                    Build action = new Build(city);
-                    action.setBuildingType(building);
-                    action.targetPos = tile;
-                    if (action.isFeasible(gs)) {
-                        actions.add(action);
-                    }
-                }
-            }
-        }
-        return actions;
     }
 
     @Override
@@ -86,6 +64,7 @@ public class Build extends CityAction
             case PARK_OF_FORTUNE:
             case TOWER_OF_WISDOM:
                 boolean buildingConstraintsOk = isBuildable(gs, buildingType.getCost(), false);
+                City city = (City) gs.getActor(this.cityId);
                 Tribe tribe = gs.getTribe(city.getTribeId());
                 if(buildingConstraintsOk)
                     return tribe.isMonumentBuildable(buildingType);
@@ -97,6 +76,7 @@ public class Build extends CityAction
     @Override
     public boolean execute(GameState gs) {
         //TODO: Make sure all the side effects for Buildings are counted.
+        City city = (City) gs.getActor(this.cityId);
         Tribe tribe = gs.getTribe(city.getTribeId());
         Board board = gs.getBoard();
 
@@ -159,7 +139,7 @@ public class Build extends CityAction
     }
 
     private boolean isBuildable(final GameState gs, int cost, boolean checkIfUnique) {
-        Tribe tribe = gs.getTribe(city.getTribeId());
+        Tribe tribe = gs.getTribe(this.cityId);
         Board board = gs.getBoard();
         TechnologyTree techTree = tribe.getTechTree();
         int stars = tribe.getStars();
@@ -168,7 +148,8 @@ public class Build extends CityAction
         if(cost > 0 && stars < cost) { return false; }
 
         //Technology constraint
-        if(!techTree.isResearched(buildingType.getTechnologyRequirement())) { return false; }
+        if(buildingType.getTechnologyRequirement() == null ||
+                !techTree.isResearched(buildingType.getTechnologyRequirement())) { return false; }
 
         //Terrain constraint
         for(Types.TERRAIN goodTerrain : buildingType.getTerrainRequirements()) {
@@ -177,7 +158,7 @@ public class Build extends CityAction
 
         //Uniqueness constrain
         if(checkIfUnique) {
-            for(Vector2d tile : board.getCityTiles(city.getActorId())) {
+            for(Vector2d tile : board.getCityTiles(this.cityId)) {
                 if(board.getBuildingAt(tile.x, tile.y) == buildingType) { return false; }
             }
         }

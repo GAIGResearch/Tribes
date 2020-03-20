@@ -3,6 +3,7 @@ package core.actions.cityactions;
 import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
+import core.actors.Tribe;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.City;
@@ -12,54 +13,32 @@ import java.util.LinkedList;
 
 public class BurnForest extends CityAction
 {
-    private Vector2d position;
-
-    public BurnForest(City c) {
-        super.city = c;
-    }
-    public void setPosition(int x, int y){
-        this.position = new Vector2d(x, y);
-    }
-    public Vector2d getPosition() {
-        return position;
-    }
-
-    @Override
-    public LinkedList<Action> computeActionVariants(final GameState gs) {
-        LinkedList<Action> actions = new LinkedList<>();
-        Board currentBoard = gs.getBoard();
-        LinkedList<Vector2d> tiles = currentBoard.getCityTiles(city.getActorId());
-        boolean techReq = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.CHIVALRY);
-        boolean costReq = gs.getTribe(city.getTribeId()).getStars() >= TribesConfig.FOREST_COST;
-        if (techReq && costReq){
-            for(Vector2d tile: tiles){
-                if (currentBoard.getTerrainAt(tile.x, tile.y) == Types.TERRAIN.FOREST){
-                    BurnForest action = new BurnForest(city);
-                    action.setPosition(tile.x, tile.y);
-                    actions.add(action);
-                }
-            }
-        }
-        return actions;
+    public BurnForest(int cityId) {
+        super.cityId = cityId;
     }
 
     @Override
     public boolean isFeasible(final GameState gs) {
-        boolean isForest = gs.getBoard().getTerrainAt(position.x, position.y) == Types.TERRAIN.FOREST;
-        boolean isBelonging = gs.getBoard().getCityIdAt(position.x, position.y) == city.getActorId();
-        boolean isBuildable = gs.getTribe(city.getTribeId()).getStars() >= TribesConfig.FOREST_COST;
-        boolean isResearched = gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.CHIVALRY);
-        return isForest && isBelonging && isBuildable && isResearched;
+        City city = (City) gs.getActor(this.cityId);
+
+        Board b = gs.getBoard();
+        if(b.getTerrainAt(targetPos.x, targetPos.y) != Types.TERRAIN.FOREST) return false;
+        if(b.getCityIdAt(targetPos.x, targetPos.y) != this.cityId) return false;
+
+        Tribe t = gs.getTribe(city.getTribeId());
+        if(t.getStars() < TribesConfig.FOREST_COST) return false;
+        return t.getTechTree().isResearched(Types.TECHNOLOGY.CHIVALRY);
     }
 
     @Override
     public boolean execute(GameState gs) {
+        City city = (City) gs.getActor(this.cityId);
         if (isFeasible(gs)){
-            gs.getBoard().setTerrainAt(position.x, position.y, Types.TERRAIN.PLAIN);
-            if (gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.ORGANIZATION)) {
-                gs.getBoard().setResourceAt(position.x, position.y, Types.RESOURCE.CROPS);
-            }
-            gs.getTribe(city.getTribeId()).subtractStars(TribesConfig.FOREST_COST);
+            Board b = gs.getBoard();
+            Tribe t = gs.getTribe(city.getTribeId());
+            b.setTerrainAt(targetPos.x, targetPos.y, Types.TERRAIN.PLAIN);
+            b.setResourceAt(targetPos.x, targetPos.y, Types.RESOURCE.CROPS);
+            t.subtractStars(TribesConfig.FOREST_COST);
             return true;
         }
         return false;

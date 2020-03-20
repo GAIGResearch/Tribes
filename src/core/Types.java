@@ -9,6 +9,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 
+import static core.TribesConfig.*;
+import static core.Types.BUILDING.MONUMENT_STATUS.*;
+import static core.Types.TECHNOLOGY.*;
+import static core.Types.TERRAIN.*;
+import static core.Types.UNIT.*;
+
 public class Types {
 
     public enum TECHNOLOGY {
@@ -50,10 +56,10 @@ public class Types {
     }
 
     public enum TRIBE{
-        XIN_XI(0, "Xin-Xi", TECHNOLOGY.CLIMBING, UNIT.WARRIOR),
-        IMPERIUS(1, "Imperius", TECHNOLOGY.ORGANIZATION, UNIT.WARRIOR),
-        BARDUR(2, "Bardur", TECHNOLOGY.HUNTING, UNIT.WARRIOR),
-        OUMAJI(3, "Oumaji", TECHNOLOGY.RIDING, UNIT.RIDER);
+        XIN_XI(0, "Xin-Xi", CLIMBING, WARRIOR),
+        IMPERIUS(1, "Imperius", ORGANIZATION, WARRIOR),
+        BARDUR(2, "Bardur", HUNTING, WARRIOR),
+        OUMAJI(3, "Oumaji", RIDING, RIDER);
 
         private int key;
         private String name;
@@ -71,7 +77,7 @@ public class Types {
     }
 
     /**
-     * Defines the status of the turn for an unit. (May be in Unit.java?)
+     * Defines the status of the turn for an  (May be in java?)
      */
     public enum TURN_STATUS {
         FRESH,
@@ -86,10 +92,10 @@ public class Types {
      */
     public enum RESOURCE
     {
-        FISH(0, "img/resource/fish.png", 'h', TribesConfig.FISH_COST, TribesConfig.FISH_POP),
-        FRUIT(1, "img/resource/fruit.png", 'f', TribesConfig.FRUIT_COST, TribesConfig.FRUIT_POP),
-        ANIMAL(2, "img/resource/animal.png", 'a', TribesConfig.ANIMAL_COST, TribesConfig.ANIMAL_POP),
-        WHALES(3, "img/resource/whale.png", 'w', TribesConfig.WHALES_COST, TribesConfig.WHALES_STARS),
+        FISH(0, "img/resource/fish.png", 'h', FISH_COST, FISH_POP),
+        FRUIT(1, "img/resource/fruit.png", 'f', FRUIT_COST, FRUIT_POP),
+        ANIMAL(2, "img/resource/animal.png", 'a', ANIMAL_COST, ANIMAL_POP),
+        WHALES(3, "img/resource/whale.png", 'w', WHALES_COST, WHALES_STARS),
         ORE(5, "img/resource/ore.png", 'o', 0, 0),
         CROPS(6, "img/resource/crops.png", 'c', 0, 0),
         RUINS(7, "img/resource/ruins.png", 'r', 0, 0);
@@ -126,26 +132,26 @@ public class Types {
      */
     public enum BUILDING
     {
-        PORT (0,"img/building/port.png", TribesConfig.PORT_COST, TECHNOLOGY.SAILING, new TERRAIN[]{TERRAIN.SHALLOW_WATER}),
-        MINE (1,"img/building/mine.png", TribesConfig.MINE_COST, TECHNOLOGY.MINING, new TERRAIN[]{TERRAIN.MOUNTAIN}),
-        FORGE (2,"img/building/forge.png", TribesConfig.FORGE_COST, TECHNOLOGY.SMITHERY, new TERRAIN[]{TERRAIN.PLAIN}),
-        FARM (3, "img/building/farm.png", TribesConfig.FARM_COST, TECHNOLOGY.FARMING, new TERRAIN[]{TERRAIN.PLAIN}),
-        WINDMILL (4,"img/building/windmill.png", TribesConfig.WIND_MILL_COST, TECHNOLOGY.CONSTRUCTION, new TERRAIN[]{TERRAIN.PLAIN}),
-        ROAD (5,"none.png", TribesConfig.ROAD_COST, TECHNOLOGY.ROADS, new TERRAIN[]{TERRAIN.PLAIN, TERRAIN.FOREST}),
-        CUSTOM_HOUSE (6,"img/building/custom_house.png", TribesConfig.CUSTOM_COST, TECHNOLOGY.TRADE, new TERRAIN[]{TERRAIN.PLAIN}),
-        LUMBER_HUT(7,"img/building/lumner_hut.png", TribesConfig.LUMBER_HUT_COST, TECHNOLOGY.MATHEMATICS, new TERRAIN[]{TERRAIN.FOREST}),
-        SAWMILL (8,"img/building/sawmill.png", TribesConfig.SAW_MILL_COST, TECHNOLOGY.MATHEMATICS, new TERRAIN[]{TERRAIN.PLAIN}),
-        TEMPLE (9, "img/building/temple.png", TribesConfig.TEMPLE_COST, TECHNOLOGY.FREE_SPIRIT, new TERRAIN[]{TERRAIN.PLAIN}),
-        WATER_TEMPLE (10,"img/building/temple.png", TribesConfig.TEMPLE_COST, TECHNOLOGY.AQUATISM, new TERRAIN[]{TERRAIN.SHALLOW_WATER, TERRAIN.DEEP_WATER}),
-        FOREST_TEMPLE (11,"img/building/temple.png", TribesConfig.TEMPLE_FOREST_COST, TECHNOLOGY.SPIRITUALISM, new TERRAIN[]{TERRAIN.FOREST}),
-        MOUNTAIN_TEMPLE (12,"img/building/temple.png", TribesConfig.TEMPLE_COST, TECHNOLOGY.MEDITATION, new TERRAIN[]{TERRAIN.MOUNTAIN}),
-        ALTAR_OF_PEACE (13,"img/building/monument.png", 0,null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
-        EMPERORS_TOMB (14,"img/building/monument.png", 0, TECHNOLOGY.TRADE, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
-        EYE_OF_GOD (15,"img/building/monument.png", 0, TECHNOLOGY.NAVIGATION, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
-        GATE_OF_POWER (16,"img/building/monument.png", 0, null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
-        GRAND_BAZAR (17,"img/building/monument.png", 0, TECHNOLOGY.ROADS, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
-        PARK_OF_FORTUNE (18,"img/building/monument.png", 0, null, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN}),
-        TOWER_OF_WISDOM (19, "img/building/monument.png", 0, TECHNOLOGY.PHILOSOPHY, new TERRAIN[]{TERRAIN.SHALLOW_WATER,TERRAIN.PLAIN});
+        PORT (0,"img/building/port.png", PORT_COST, PORT_BONUS, PORT_POINTS, SAILING, new TERRAIN[]{SHALLOW_WATER}),
+        MINE (1,"img/building/mine.png", MINE_COST, MINE_BONUS, MINE_POINTS, MINING, new TERRAIN[]{MOUNTAIN}),
+        FORGE (2,"img/building/forge.png", FORGE_COST, FORGE_BONUS, FORGE_POINTS, SMITHERY, new TERRAIN[]{PLAIN}),
+        FARM (3, "img/building/farm.png", FARM_COST, FARM_BONUS, FARM_POINTS, FARMING, new TERRAIN[]{PLAIN}),
+        WINDMILL (4,"img/building/windmill.png", WIND_MILL_COST, WIND_MILL_BONUS, WIND_MILL_POINTS, CONSTRUCTION, new TERRAIN[]{PLAIN}),
+        ROAD (5,"none.png", ROAD_COST, 0, 0, ROADS, new TERRAIN[]{PLAIN, FOREST}),
+        CUSTOM_HOUSE (6,"img/building/custom_house.png", CUSTOM_COST, CUSTOM_BONUS, CUSTOM_POINTS, TRADE, new TERRAIN[]{PLAIN}),
+        LUMBER_HUT(7,"img/building/lumner_hut.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, LUMBER_HUT_POINTS, MATHEMATICS, new TERRAIN[]{FOREST}),
+        SAWMILL (8,"img/building/sawmill.png", SAW_MILL_COST, SAW_MILL_BONUS, SAW_MILL_POINTS, MATHEMATICS, new TERRAIN[]{PLAIN}),
+        TEMPLE (9, "img/building/temple.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, FREE_SPIRIT, new TERRAIN[]{PLAIN}),
+        WATER_TEMPLE (10,"img/building/temple.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, AQUATISM, new TERRAIN[]{SHALLOW_WATER, DEEP_WATER}),
+        FOREST_TEMPLE (11,"img/building/temple.png", TEMPLE_FOREST_COST, TEMPLE_BONUS, TEMPLE_POINTS, SPIRITUALISM, new TERRAIN[]{FOREST}),
+        MOUNTAIN_TEMPLE (12,"img/building/temple.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, MEDITATION, new TERRAIN[]{MOUNTAIN}),
+        ALTAR_OF_PEACE (13,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new TERRAIN[]{SHALLOW_WATER,PLAIN}),
+        EMPERORS_TOMB (14,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, TRADE, new TERRAIN[]{SHALLOW_WATER,PLAIN}),
+        EYE_OF_GOD (15,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, NAVIGATION, new TERRAIN[]{SHALLOW_WATER,PLAIN}),
+        GATE_OF_POWER (16,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new TERRAIN[]{SHALLOW_WATER,PLAIN}),
+        GRAND_BAZAR (17,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, ROADS, new TERRAIN[]{SHALLOW_WATER,PLAIN}),
+        PARK_OF_FORTUNE (18,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new TERRAIN[]{SHALLOW_WATER,PLAIN}),
+        TOWER_OF_WISDOM (19, "img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, PHILOSOPHY, new TERRAIN[]{SHALLOW_WATER,PLAIN});
 
         public enum MONUMENT_STATUS {
             UNAVAILABLE,
@@ -158,10 +164,14 @@ public class Types {
         private TECHNOLOGY technologyRequirement;
         private TERRAIN[] terrainRequirements;
         private int cost;
-        BUILDING(int numVal, String imageFile, int cost, TECHNOLOGY technologyRequirement, TERRAIN[] terrainRequirements)
+        private int bonus;
+        private int points;
+        BUILDING(int numVal, String imageFile, int cost, int bonus, int points, TECHNOLOGY technologyRequirement, TERRAIN[] terrainRequirements)
         {
             this.key = numVal;
             this.cost = cost;
+            this.bonus = bonus;
+            this.points = points;
             this.imageFile = imageFile;
             this.technologyRequirement = technologyRequirement;
             this.terrainRequirements = terrainRequirements;
@@ -170,18 +180,47 @@ public class Types {
         public TERRAIN[] getTerrainRequirements() { return terrainRequirements; }
         public int getKey() {  return key; }
         public int getCost() {return cost; }
+        public int getBonus() {return bonus; }
+        public int getPoints() {return points; }
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
 
+        public Types.RESOURCE getResourceConstraint()
+        {
+            if(this == MINE) return MINE_RES_CONSTRAINT;
+            if(this == FARM) return FARM_RES_CONSTRAINT;
+            else return null;
+        }
+
+        public BUILDING getMatchingBuilding()
+        {
+            switch (this)
+            {
+                case PORT: return CUSTOM_HOUSE;
+                case FARM: return WINDMILL;
+                case MINE: return FORGE;
+                case LUMBER_HUT: return SAWMILL;
+                case CUSTOM_HOUSE: return PORT;
+                case WINDMILL: return FARM;
+                case FORGE: return MINE;
+                case SAWMILL: return LUMBER_HUT;
+            }
+            return null;
+        }
+
+        public boolean isBase()
+        {
+            return this == FARM || this == MINE || this == LUMBER_HUT;
+        }
 
         public static HashMap<BUILDING, MONUMENT_STATUS> initMonuments()
         {
             HashMap<BUILDING, MONUMENT_STATUS> monuments = new HashMap<>();
-            monuments.put(ALTAR_OF_PEACE, MONUMENT_STATUS.UNAVAILABLE);
-            monuments.put(EMPERORS_TOMB, MONUMENT_STATUS.UNAVAILABLE);
-            monuments.put(EYE_OF_GOD, MONUMENT_STATUS.UNAVAILABLE);
-            monuments.put(GATE_OF_POWER, MONUMENT_STATUS.UNAVAILABLE);
-            monuments.put(PARK_OF_FORTUNE, MONUMENT_STATUS.UNAVAILABLE);
-            monuments.put(TOWER_OF_WISDOM, MONUMENT_STATUS.UNAVAILABLE);
+            monuments.put(ALTAR_OF_PEACE, UNAVAILABLE);
+            monuments.put(EMPERORS_TOMB, UNAVAILABLE);
+            monuments.put(EYE_OF_GOD, UNAVAILABLE);
+            monuments.put(GATE_OF_POWER, UNAVAILABLE);
+            monuments.put(PARK_OF_FORTUNE, UNAVAILABLE);
+            monuments.put(TOWER_OF_WISDOM, UNAVAILABLE);
             return monuments;
         }
     }
@@ -280,18 +319,18 @@ public class Types {
      */
     public enum UNIT
     {
-        WARRIOR (0,"img/unit/warrior/", TribesConfig.WARRIOR_COST, null, TribesConfig.WARRIOR_POINTS), //+10
-        RIDER (1,"img/unit/rider/", TribesConfig.RIDER_COST, TECHNOLOGY.RIDING, TribesConfig.RIDER_POINTS), //+15
-        DEFENDER (2,"img/unit/defender/", TribesConfig.DEFENDER_COST, TECHNOLOGY.SHIELDS, TribesConfig.DEFENDER_POINTS), // +15
-        SWORDMAN (3,"img/unit/swordman/", TribesConfig.SWORDMAN_COST, TECHNOLOGY.SMITHERY, TribesConfig.SWORDMAN_POINTS), //+25
-        ARCHER (4,"img/unit/archer/", TribesConfig.ARCHER_COST, TECHNOLOGY.ARCHERY, TribesConfig.ARCHER_POINTS),//+15
-        CATAPULT (5,"img/unit/", TribesConfig.CATAPULT_COST, TECHNOLOGY.MATHEMATICS, TribesConfig.CATAPULT_POINTS), //+40
-        KNIGHT (6,"img/unit/knight/", TribesConfig.KNIGHT_COST, TECHNOLOGY.CHIVALRY, TribesConfig.KNIGHT_POINTS), //+40
-        MIND_BENDER(7,"img/unit/mind_bender/", TribesConfig.MINDBENDER_COST, TECHNOLOGY.PHILOSOPHY, TribesConfig.MINDBENDER_POINTS), //+25
-        BOAT(8,"img/unit/boat/", TribesConfig.BOAT_COST, TECHNOLOGY.SAILING, TribesConfig.BOAT_POINTS), //+0
-        SHIP(9,"img/unit/ship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.SAILING, TribesConfig.SHIP_POINTS),//+0
-        BATTLESHIP(10,"img/unit/battleship/", TribesConfig.BATTLESHIP_COST, TECHNOLOGY.NAVIGATION, TribesConfig.BATTLESHIP_POINTS),//+0
-        SUPERUNIT(11, "img/unit/superunit/", TribesConfig.SUPERUNIT_COST, null, TribesConfig.SUPERUNIT_POINTS); //+50
+        WARRIOR (0,"img/unit/warrior/", WARRIOR_COST, null, WARRIOR_POINTS), //+10
+        RIDER (1,"img/unit/rider/", RIDER_COST, RIDING, RIDER_POINTS), //+15
+        DEFENDER (2,"img/unit/defender/", DEFENDER_COST, SHIELDS, DEFENDER_POINTS), // +15
+        SWORDMAN (3,"img/unit/swordman/", SWORDMAN_COST, SMITHERY, SWORDMAN_POINTS), //+25
+        ARCHER (4,"img/unit/archer/", ARCHER_COST, ARCHERY, ARCHER_POINTS),//+15
+        CATAPULT (5,"img/unit/", CATAPULT_COST, MATHEMATICS, CATAPULT_POINTS), //+40
+        KNIGHT (6,"img/unit/knight/", KNIGHT_COST, CHIVALRY, KNIGHT_POINTS), //+40
+        MIND_BENDER(7,"img/unit/mind_bender/", MINDBENDER_COST, PHILOSOPHY, MINDBENDER_POINTS), //+25
+        BOAT(8,"img/unit/boat/", BOAT_COST, SAILING, BOAT_POINTS), //+0
+        SHIP(9,"img/unit/ship/", BATTLESHIP_COST, SAILING, SHIP_POINTS),//+0
+        BATTLESHIP(10,"img/unit/battleship/", BATTLESHIP_COST, NAVIGATION, BATTLESHIP_POINTS),//+0
+        SUPERUNIT(11, "img/unit/superunit/", SUPERUNIT_COST, null, SUPERUNIT_POINTS); //+50
 
         private int key;
         private String imageFile;
@@ -333,7 +372,7 @@ public class Types {
                 case SUPERUNIT: return new SuperUnit(pos, kills, isVeteran, ownerID, tribeID);
 
                 default:
-                    System.out.println("WARNING: Types.Unit.createUnit(), type creation not implemented.");
+                    System.out.println("WARNING: TypescreateUnit(), type creation not implemented.");
             }
             return null;
         }

@@ -7,22 +7,13 @@ import core.game.GameState;
 
 public class CustomHouse extends Building {
 
-    private final Types.TERRAIN TERRAIN_CONSTRAINT = Types.TERRAIN.PLAIN;
-
     // Building Purpose -> The production will set up inside the addBuilding in City
     public CustomHouse(int x, int y) {
-        super(x, y, TribesConfig.CUSTOM_COST, Types.BUILDING.CUSTOM_HOUSE, 0);
+        super(x, y);
+        this.type = Types.BUILDING.CUSTOM_HOUSE;
     }
 
-    // Copy Purpose
-    public CustomHouse(int x, int y, int production) {
-        super(x, y, TribesConfig.CUSTOM_COST, Types.BUILDING.CUSTOM_HOUSE, production);
-    }
-
-    @Override
-    public void setProduction(int production) {
-        super.setProduction(production);
-    }
+    public int computeBonusPopulation(City c, GameState gs) { return 0;}
 
     public int computeProduction(City c, GameState gs)
     {
@@ -30,9 +21,8 @@ public class CustomHouse extends Building {
         return -1;
     }
 
-
     @Override
     public Building copy() {
-        return new CustomHouse(position.x, position.y, getPRODUCTION());
+        return new CustomHouse(position.x, position.y);
     }
 }

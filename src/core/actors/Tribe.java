@@ -3,6 +3,7 @@ package core.actors;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
+import core.actors.buildings.Building;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
@@ -439,6 +440,35 @@ public class Tribe extends Actor {
         boolean canBuildRoad = techTree.isResearched(Types.TECHNOLOGY.ROADS);
         boolean hasMoney = stars >= TribesConfig.ROAD_COST;
         return canBuildRoad && hasMoney;
+    }
+
+    public void capturedCity(GameState gameState, City captured)
+    {
+        this.addCity(captured.getActorId());
+        captured.setTribeId(actorId);
+
+        //manage production and population of this new city (and others!)
+        for(Building building : captured.getBuildings())
+        {
+            captured.updateBuildingEffects(gameState, building, false, true);
+        }
+    }
+
+
+    public void lostCity(GameState gameState, City lostCity)
+    {
+        this.removeCity(lostCity.getActorId());
+        //manage the effect of losing this in the production and population of other cities.
+
+        //manage production and population of this new city (and others!)
+        for(Building building : lostCity.getBuildings())
+        {
+            if(building.type.isBase() || building.type == Types.BUILDING.PORT)
+            {
+                lostCity.updateBuildingEffects(gameState, building, true, true);
+            }
+        }
+
     }
 
 }

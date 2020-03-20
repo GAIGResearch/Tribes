@@ -28,9 +28,12 @@ public class AttackFactory implements ActionFactory {
                 if(i != position.x || j != position.y) {
 
                     Attack a = new Attack(unit.getActorId());
-                    a.setTargetId(b.getUnitAt(i, j).getActorId());
-                    if (a.isFeasible(gs)) {
-                        attacks.add(a);
+                    Unit other = b.getUnitAt(i, j);
+                    if (other != null) {  // Check if there is actually a unit there
+                        a.setTargetId(other.getActorId());
+                        if (a.isFeasible(gs)) {
+                            attacks.add(a);
+                        }
                     }
                 }
             }

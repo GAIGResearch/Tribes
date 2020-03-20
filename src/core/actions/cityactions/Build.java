@@ -140,7 +140,8 @@ public class Build extends CityAction
     }
 
     private boolean isBuildable(final GameState gs, int cost, boolean checkIfUnique) {
-        Tribe tribe = gs.getTribe(this.cityId);
+        City city = (City) gs.getActor(this.cityId);
+        Tribe tribe = gs.getTribe(city.getTribeId());
         Board board = gs.getBoard();
         TechnologyTree techTree = tribe.getTechTree();
         int stars = tribe.getStars();
@@ -149,7 +150,8 @@ public class Build extends CityAction
         if(cost > 0 && stars < cost) { return false; }
 
         //Technology constraint
-        if(!techTree.isResearched(buildingType.getTechnologyRequirement())) { return false; }
+        if(buildingType.getTechnologyRequirement() == null ||
+                !techTree.isResearched(buildingType.getTechnologyRequirement())) { return false; }
 
         //Terrain constraint
         for(Types.TERRAIN goodTerrain : buildingType.getTerrainRequirements()) {

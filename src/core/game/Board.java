@@ -246,7 +246,7 @@ public class Board {
         addUnit(city, newUnit);
     }
 
-    private void moveUnit(Unit unit, int x0, int y0, int xF, int yF) {
+    public void moveUnit(Unit unit, int x0, int y0, int xF, int yF) {
         units[x0][y0] = 0;
         units[xF][yF] = unit.getActorId();
         unit.setPosition(xF, yF);

@@ -148,7 +148,8 @@ public class Build extends CityAction
         if(cost > 0 && stars < cost) { return false; }
 
         //Technology constraint
-        if(!techTree.isResearched(buildingType.getTechnologyRequirement())) { return false; }
+        if(buildingType.getTechnologyRequirement() == null ||
+                !techTree.isResearched(buildingType.getTechnologyRequirement())) { return false; }
 
         //Terrain constraint
         for(Types.TERRAIN goodTerrain : buildingType.getTerrainRequirements()) {

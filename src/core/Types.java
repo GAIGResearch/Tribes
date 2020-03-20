@@ -3,7 +3,6 @@ package core;
 import core.actions.Action;
 import core.actions.unitactions.*;
 import core.actors.units.*;
-import core.game.GameState;
 import utils.ImageIO;
 import utils.Vector2d;
 
@@ -578,20 +577,5 @@ Yellow_dark - 929000
             }
             return null;
         }
-    }
-
-    public static Vector2d getActionPosition(GameState gs, Action a) {
-        Vector2d pos = null;
-        if (a instanceof Move) {
-            pos = new Vector2d(((Move) a).getDestination().x, ((Move) a).getDestination().y);
-        } else if (a instanceof Attack) {
-            Unit target = (Unit) gs.getActor(((Attack) a).getTargetId());
-            pos = target.getPosition();
-        } else if (a instanceof Capture || a instanceof Convert || a instanceof Disband || a instanceof Recover ||
-                a instanceof Upgrade) {
-            Unit u = (Unit) gs.getActor(((UnitAction) a).getUnitId());
-            pos = u.getPosition();
-        }
-        return pos;
     }
 }

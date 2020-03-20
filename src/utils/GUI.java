@@ -1,6 +1,7 @@
 package utils;
 
 import core.actions.tribeactions.EndTurn;
+import core.actions.unitactions.*;
 import core.actors.units.Unit;
 import core.game.Game;
 import core.game.GameState;
@@ -15,8 +16,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import static core.Types.getActionPosition;
 
 
 public class GUI extends JFrame implements Runnable {
@@ -263,5 +262,21 @@ public class GUI extends JFrame implements Runnable {
             e.printStackTrace();
         }
         finishedUpdate = true;
+    }
+
+
+    public static Vector2d getActionPosition(GameState gs, Action a) {
+        Vector2d pos = null;
+        if (a instanceof Move) {
+            pos = new Vector2d(((Move) a).getDestination().x, ((Move) a).getDestination().y);
+        } else if (a instanceof Attack) {
+            Unit target = (Unit) gs.getActor(((Attack) a).getTargetId());
+            pos = target.getPosition();
+        } else if (a instanceof Capture || a instanceof Convert || a instanceof Disband || a instanceof Recover ||
+                a instanceof Upgrade) {
+            Unit u = (Unit) gs.getActor(((UnitAction) a).getUnitId());
+            pos = u.getPosition();
+        }
+        return pos;
     }
 }

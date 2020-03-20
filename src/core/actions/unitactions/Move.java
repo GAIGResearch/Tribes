@@ -48,7 +48,8 @@ public class Move extends UnitAction
             Types.TERRAIN destinationTerrain = board.getTerrainAt(destination.x, destination.y);
 
             unit.setStatus(Types.TURN_STATUS.MOVED);
-            unit.setPosition(destination.x, destination.y);
+            board.moveUnit(unit, unit.getPosition().x, unit.getPosition().y, destination.x, destination.y);
+
             if(unit.getType() == Types.UNIT.BOAT || unit.getType() == Types.UNIT.SHIP || unit.getType() == Types.UNIT.BATTLESHIP) {
                 if(destinationTerrain != Types.TERRAIN.SHALLOW_WATER && destinationTerrain != Types.TERRAIN.DEEP_WATER && destinationTerrain != Types.TERRAIN.CITY){
                     board.disembark(unit, destination.x, destination.y);

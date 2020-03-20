@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static core.Constants.CELL_SIZE;
 import static core.Types.getActionPosition;
 
 
@@ -96,20 +97,22 @@ public class GUI extends JFrame implements Runnable {
             @Override
             public void mouseClicked(MouseEvent e) {
                 //Only provide information if clicking on a visible tile
-                Point2D p = GameView.rotatePointReverse(e.getX(), e.getY());
-                int x = (int)p.getX() / Constants.CELL_SIZE;
-                int y = (int)p.getY() / Constants.CELL_SIZE;
-                System.out.println(e.getX() + " " + e.getY());
-                System.out.println(x + " " + y);
+//                Point2D p = GameView.rotatePointReverse(e.getX(), e.getY());
+                int d = (int)Math.sqrt(2*CELL_SIZE*CELL_SIZE);
+                int y = e.getY() - GameView.dimension.width/2;
+                int x = e.getX();
+                int j = (int)((x*(CELL_SIZE-d/5.0) - y*d/2.0)/(CELL_SIZE*CELL_SIZE - 2*CELL_SIZE*d/5.0 + (d/5)*(d/5) + d*d/4.0));
+                int i = (int)((y + j * d/2.0)/(CELL_SIZE - d/5.0));
+//                System.out.println(i + " " + j);
 
                 // If unit highlighted and action at new click valid for unit, execute action
-                Action candidate = getActionAt(x, y, infoView.getHighlightX(), infoView.getHighlightY());
+                Action candidate = getActionAt((int)j, (int)i, infoView.getHighlightX(), infoView.getHighlightY());
                 if (candidate != null) {
                     ac.addAction(candidate, gs);
                     infoView.resetHighlight();
                 } else {
                     // Otherwise highlight new cell
-                    infoView.setHighlight(x,y);
+                    infoView.setHighlight((int)j, (int)i);
                 }
             }
 

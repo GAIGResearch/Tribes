@@ -2,6 +2,7 @@ package utils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +20,8 @@ import static core.Types.getActionPosition;
 
 public class GameView extends JComponent {
 
-    private static int cellSize, gridSize;
+    private static int cellSize;
+    static int gridSize;
     private Board board; //This only counts terrains. Needs to be enhanced with actors, resources, etc.
     private GameState gameState;
 //    private Image backgroundImg;
@@ -33,7 +35,7 @@ public class GameView extends JComponent {
     /**
      * Dimensions of the window.
      */
-    private static Dimension dimension;
+    public static Dimension dimension;
     private static double isometricAngle = -45;
 
     GameView(Board board, InfoView inforView)
@@ -96,12 +98,15 @@ public class GameView extends JComponent {
         int highlightX = infoView.getHighlightX();
         int highlightY = infoView.getHighlightY();
         if (highlightX != -1) {
-            Point2D p = rotatePoint(highlightX * cellSize, highlightY * cellSize);
-            System.out.println(p.toString());
+            int d = (int)Math.sqrt(2*CELL_SIZE*CELL_SIZE);
+            int x = highlightX * CELL_SIZE + highlightY * d/2 - highlightX * d/5;
+            int y = highlightY * CELL_SIZE - highlightY * d/5 - highlightX * d/2;
+            y += dimension.width/2;
+
             Stroke oldStroke = g.getStroke();
             g.setColor(Color.BLUE);
             g.setStroke(new BasicStroke(3));
-            drawRotatedRect(g, (int)p.getX(), (int)p.getY(), cellSize - 1, cellSize - 1);
+            drawRotatedRect(g, x, y, cellSize - 1, cellSize - 1);
             g.setStroke(oldStroke);
             g.setColor(Color.BLACK);
         }
@@ -187,13 +192,21 @@ public class GameView extends JComponent {
             g2.rotate(Math.toRadians(isometricAngle));
             g2.drawImage(img, x + cellSize/2 - imgSize/2, y + cellSize/2 - imgSize/2, (int) (w*scaleX), (int) (h*scaleY), null);
             g2.dispose();
+
+//            int d = (int)Math.sqrt(2*CELL_SIZE*CELL_SIZE);
+//            x /= CELL_SIZE;
+//            y /= CELL_SIZE;
+//            int x2 = (int)(x * CELL_SIZE + y * d*0.5 - x * d*0.2);
+//            int y2 = (int)(y * CELL_SIZE - y * d*0.2 - x * d*0.5);
+//            y2 += dimension.width/2;
+//            gphx.fillRect(x2, y2, 20, 20);
         }
     }
 
     private static void drawRotatedRect(Graphics2D g, int x, int y, int width, int height) {
         Graphics2D g2 = (Graphics2D) g.create();
-        g2.translate(0, dimension.width/2);
-        g2.rotate(Math.toRadians(isometricAngle));
+//        g2.translate(0, dimension.width/2);
+        g2.rotate(Math.toRadians(isometricAngle), x, y);
         g2.drawRect(x, y, width, height);
         g2.dispose();
     }
@@ -219,15 +232,13 @@ public class GameView extends JComponent {
     }
 
     public static Point2D rotatePointReverse(int x, int y) {
-        y -= dimension.width/2;
-        return _rotate(x, y, -isometricAngle);
+        return _rotate(x, y - dimension.width/2, -isometricAngle);
     }
 
     private static Point2D _rotate(int x, int y, double angle) {
         Point2D center = new Point2D.Double(0, 0);
         int newX = (int)(center.getX() + (x-center.getX())*Math.cos(angle) - (y-center.getY())*Math.sin(angle));
         int newY = (int)(center.getY() + (x-center.getX())*Math.sin(angle) + (y-center.getY())*Math.cos(angle));
-//        newX += dimension.width/4 + cellSize + cellSize/4;
         return new Point2D.Double(newX, newY);
     }
 
@@ -480,5 +491,41 @@ public class GameView extends JComponent {
             }
         }
         return toPaint;
+    }
+
+    public static Point2D[] rotateRectangle(int imgSize, int x, int y) {
+        Point2D[] rotatedCorners = new Point2D[4];
+
+        // create original corner points
+        Point2D a0 = new Point2D.Double(x, y);
+        Point2D b0 = new Point2D.Double(x+imgSize, y);
+        Point2D c0 = new Point2D.Double(x, y+imgSize);
+        Point2D d0 = new Point2D.Double(x+imgSize, y+imgSize);
+        Point2D[] originalCorners = { a0, b0, c0, d0 };
+
+        // create affine rotation transform
+        AffineTransform transform = AffineTransform.getRotateInstance(isometricAngle);
+
+        // transform original corners to rotated corners
+        transform.transform(originalCorners, 0, rotatedCorners, 0, originalCorners.length);
+
+//        // determine rotated width and height as difference between maximum and
+//        // minimum rotated coordinates
+//        double minRotatedX = Double.POSITIVE_INFINITY;
+//        double maxRotatedX = Double.NEGATIVE_INFINITY;
+//        double minRotatedY = Double.POSITIVE_INFINITY;
+//        double maxRotatedY = Double.NEGATIVE_INFINITY;
+//
+//        for (Point2D rotatedCorner: rotatedCorners) {
+//            minRotatedX = Math.min(minRotatedX, rotatedCorner.getX());
+//            maxRotatedX = Math.max(maxRotatedX, rotatedCorner.getX());
+//            minRotatedY = Math.min(minRotatedY, rotatedCorner.getY());
+//            maxRotatedY = Math.max(maxRotatedY, rotatedCorner.getY());
+//        }
+//        // the bounding box is the rectangle with minimum rotated X and Y as offset
+//        double rotatedWidth = maxRotatedX - minRotatedX;
+//        double rotatedHeight = maxRotatedY - minRotatedY;
+
+        return rotatedCorners;
     }
 }

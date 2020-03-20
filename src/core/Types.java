@@ -188,7 +188,16 @@ public class Types {
         {
             if(this == MINE) return MINE_RES_CONSTRAINT;
             if(this == FARM) return FARM_RES_CONSTRAINT;
-            else return null;
+            return null;
+        }
+
+        public Types.BUILDING getAdjacencyConstraint()
+        {
+            if(this == CUSTOM_HOUSE) return PORT;
+            if(this == WINDMILL) return FARM;
+            if(this == FORGE) return MINE;
+            if(this == SAWMILL) return LUMBER_HUT;
+            return null;
         }
 
         public BUILDING getMatchingBuilding()
@@ -210,6 +219,11 @@ public class Types {
         public boolean isBase()
         {
             return this == FARM || this == MINE || this == LUMBER_HUT;
+        }
+        public boolean isMonument()
+        {
+            return this == ALTAR_OF_PEACE || this == EMPERORS_TOMB || this == EYE_OF_GOD ||
+                    this == GATE_OF_POWER || this == PARK_OF_FORTUNE || this == TOWER_OF_WISDOM;
         }
 
         public static HashMap<BUILDING, MONUMENT_STATUS> initMonuments()

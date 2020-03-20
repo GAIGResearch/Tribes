@@ -1,13 +1,11 @@
 package core.actors;
 
 import core.Types;
-import core.actors.buildings.Building;
 import core.game.Board;
 import core.game.GameState;
 import utils.Vector2d;
 
 import java.util.LinkedList;
-import static core.Types.BUILDING.*;
 
 public class City extends Actor{
 

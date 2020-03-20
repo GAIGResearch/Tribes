@@ -3,7 +3,6 @@ package core.actors;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
-import core.actors.buildings.Building;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
@@ -453,7 +452,6 @@ public class Tribe extends Actor {
             captured.updateBuildingEffects(gameState, building, false, true);
         }
     }
-
 
     public void lostCity(GameState gameState, City lostCity)
     {

@@ -1,18 +1,13 @@
 package core.actions.cityactions;
 
 import core.TechnologyTree;
-import core.TribesConfig;
 import core.Types;
-import core.actions.Action;
+import core.actors.Building;
 import core.actors.Tribe;
-import core.actors.buildings.*;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.City;
 import utils.Vector2d;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class Build extends CityAction
 {
@@ -75,7 +70,6 @@ public class Build extends CityAction
 
     @Override
     public boolean execute(GameState gs) {
-        //TODO: Make sure all the side effects for Buildings are counted.
         City city = (City) gs.getActor(this.cityId);
         Tribe tribe = gs.getTribe(city.getTribeId());
         Board board = gs.getBoard();
@@ -86,55 +80,13 @@ public class Build extends CityAction
             tribe.addScore(buildingType.getPoints());
             board.setBuildingAt(targetPos.x, targetPos.y, buildingType);
 
-            switch (buildingType) {
-                case FARM:
-                    city.addBuilding(gs, new Farm(targetPos.x, targetPos.y));
-                    return true;
-                case MINE:
-                    city.addBuilding(gs, new Mine(targetPos.x, targetPos.y));
-                    return true;
-                case PORT:
-                    city.addBuilding(gs, new Port(targetPos.x, targetPos.y));
-                    board.setTradeNetwork(targetPos.x, targetPos.y, true);
-                    return true;
-                case FORGE:
-                    city.addBuilding(gs, new Forge(targetPos.x, targetPos.y));
-                    return true;
-                case TEMPLE:
-                    city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, Types.BUILDING.TEMPLE));
-                    return true;
-                case MOUNTAIN_TEMPLE:
-                    city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, Types.BUILDING.MOUNTAIN_TEMPLE));
-                    return true;
-                case WATER_TEMPLE:
-                    city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, Types.BUILDING.WATER_TEMPLE));
-                    return true;
-                case FOREST_TEMPLE:
-                    city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, Types.BUILDING.FOREST_TEMPLE));
-                    return true;
-                case SAWMILL:
-                    city.addBuilding(gs, new Sawmill(targetPos.x, targetPos.y));
-                    return true;
-                case WINDMILL:
-                    city.addBuilding(gs, new Windmill(targetPos.x, targetPos.y));
-                    return true;
-                case LUMBER_HUT:
-                    city.addBuilding(gs, new LumberHut(targetPos.x, targetPos.y));
-                    return true;
-                case CUSTOM_HOUSE:
-                    city.addBuilding(gs, new CustomHouse(targetPos.x, targetPos.y));
-                    return true;
+            city.addBuilding(gs, new Building(targetPos.x, targetPos.y, buildingType));
+            if(buildingType == Types.BUILDING.PORT)
+                board.setTradeNetwork(targetPos.x, targetPos.y, true);
+            if(buildingType.isMonument())
+                tribe.monumentIsBuilt(buildingType);
 
-                case ALTAR_OF_PEACE:
-                case EMPERORS_TOMB:
-                case EYE_OF_GOD:
-                case GATE_OF_POWER:
-                case PARK_OF_FORTUNE:
-                case TOWER_OF_WISDOM:
-                    city.addBuilding(gs, new Monument(targetPos.x, targetPos.y, buildingType));
-                    tribe.monumentIsBuilt(buildingType);
-                    break;
-            }
+            return true;
         }
         return false;
     }
@@ -166,6 +118,23 @@ public class Build extends CityAction
             Types.RESOURCE resAtLocation = board.getResourceAt(targetPos.x, targetPos.y);
             if(resAtLocation == null || resNeeded != resAtLocation)
                 return false;
+        }
+
+        //Adjacency constraint
+        Types.BUILDING buildingNeeded = buildingType.getAdjacencyConstraint();
+        if(buildingNeeded != null)
+        {
+            boolean adjFound = false;
+            for(Vector2d adjPos : targetPos.neighborhood(1,0,board.getSize()))
+            {
+                if(board.getBuildingAt(adjPos.x, adjPos.y) == buildingNeeded)
+                {
+                    adjFound = true;
+                    break;
+                }
+            }
+
+            if(!adjFound) return false;
         }
 
         //Uniqueness constrain

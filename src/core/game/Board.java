@@ -501,32 +501,34 @@ public class Board {
      * @param y position of the city to capture
      * @return true if city was captured.
      */
-    public boolean capture(Tribe capturingTribe, int x, int y, Random rnd){
+    public boolean capture(GameState gameState, Tribe capturingTribe, int x, int y){
 
+        Random rnd = gameState.getRandomGenerator();
         Types.TERRAIN ter = terrains[x][y];
 
         if(ter == Types.TERRAIN.VILLAGE)
         {
             //Not a city. Needs to be created, assigned and its border calculated.
             City newCity = new City(x, y, capturingTribe.getTribeId());
+
             // Move the unit from one city to village. Rank: capital -> cities -> None
             moveOneToNewCity(newCity, capturingTribe, rnd);
+
             //Add city to board and set its borders
             addCityToTribe(newCity);
             setBorderHelper(newCity, newCity.getBound());
 
         }else if(ter == Types.TERRAIN.CITY)
         {
-            //The city exists, needs to change owner and tribes notified.
             City capturedCity = (City) gameActors.get(tileCityId[x][y]);
-            int capturedCityId = capturedCity.getActorId();
-            capturedCity.setTribeId(capturingTribe.getTribeId());
-            tribes[capturingTribe.getTribeId()].addCity(capturedCityId);
-            int prevTribeId = capturedCity.getTribeId();
-            tribes[prevTribeId].removeCity(capturedCityId);
+            Tribe previousOwner = tribes[capturedCity.getTribeId()];
+
+            //The city exists, needs to change owner, tribes notified and production & population updated
+            capturingTribe.capturedCity(gameState, capturedCity);
+            previousOwner.lostCity(gameState, capturedCity);
 
             // TRIBE that lost the city: Move units to other cities (before the capturing tribe moves their unit)
-            moveAllFromCity(capturedCity, tribes[prevTribeId], rnd);
+            moveAllFromCity(capturedCity, previousOwner, rnd);
 
             // TRIBE that captured this city. One unit moves there.
             moveOneToNewCity(capturedCity, capturingTribe, rnd);

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static core.Constants.GUI_MIN_PAN;
+import static core.Constants.*;
 
 
 public class GUI extends JFrame implements Runnable {
@@ -140,6 +140,22 @@ public class GUI extends JFrame implements Runnable {
 
             }
         });
+        mainPanel.addMouseWheelListener(e -> {
+            Point2D mouseLocation = MouseInfo.getPointerInfo().getLocation();
+            Point2D panelLocation = mainPanel.getLocationOnScreen();
+            Point2D viewCenter = new Point2D.Double(view.getPreferredSize().width/2.0, view.getPreferredSize().height/2.0);
+            Point2D diff = new Point2D.Double((mouseLocation.getX() - panelLocation.getX() - viewCenter.getX())/GUI_ZOOM_FACTOR,
+                    (mouseLocation.getY() - panelLocation.getY() - viewCenter.getY())/GUI_ZOOM_FACTOR);
+            if (e.getWheelRotation() < 0) {
+                // Zooming in
+                CELL_SIZE += GUI_ZOOM_FACTOR;
+                diff = new Point2D.Double(diff.getX()*-1, diff.getY()*-1);
+            } else {
+                // Zooming out
+                CELL_SIZE -= GUI_ZOOM_FACTOR;
+            }
+            view.updatePan(diff);
+        });
 
         mainPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -228,8 +244,9 @@ public class GUI extends JFrame implements Runnable {
      * Paints the GUI, to be called at every game tick.
      */
     public void update(GameState gs) {
-        if (this.gs != null && this.gs.getActiveTribeID() != gs.getActiveTribeID()) {
+        if (this.gs == null || this.gs.getActiveTribeID() != gs.getActiveTribeID()) {
             infoView.resetHighlight();
+            view.setPanToTribe(gs);
         }
         this.gs = gs;
     }

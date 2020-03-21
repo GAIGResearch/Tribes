@@ -161,6 +161,7 @@ public class InfoView extends JComponent {
         sb.append("<li><b>Defence:</b> " + u.DEF + "</li>");
         sb.append("<li><b>Movement:</b> " + u.MOV + "</li>");
         sb.append("<li><b>Range:</b> " + u.RANGE + "</li>");
+        sb.append("<li><b>Status:</b> " + u.getStatus() + "</li>");
         sb.append("</ul>");
         return sb.toString();
     }

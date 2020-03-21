@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import core.Types;
+import core.actors.Actor;
 import core.actors.City;
+import core.actors.Tribe;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
@@ -44,9 +46,9 @@ public class GameView extends JComponent {
         this.panTranslate = panTranslate;
 
         gridSize = board.getSize();
-        int size = gridSize * CELL_SIZE;
-        int d = (int) Math.sqrt(size * size * 2);
-        dimension = new Dimension(d, d);
+//        int size = gridSize * CELL_SIZE;
+//        int d = (int) Math.sqrt(size * size * 2);
+        dimension = new Dimension(VIEW_SIZE, VIEW_SIZE);
 
 //        backgroundImg = Types.TERRAIN.PLAIN.getImage(null);
         starImg = ImageIO.GetInstance().getImage("img/decorations/star.png");
@@ -70,6 +72,7 @@ public class GameView extends JComponent {
         //For a better graphics, enable this: (be aware this could bring performance issues depending on your HW & OS).
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        // TODO: black background rotated and translated
 //        g.setColor(Color.BLACK);
 //        g.fillRect(0, dimension.height, dimension.width, dimension.height);
 
@@ -177,8 +180,7 @@ public class GameView extends JComponent {
     {
         Point2D p = rotatePoint(j, i);
         gphx.setColor(Color.black);
-        fillRotatedRect(gphx, (int)(p.getX() - 1 + panTranslate.getX()), (int)(p.getY() - 1 + panTranslate.getY()),
-                cellSize + 2, cellSize + 2, panTranslate);
+        fillRotatedRect(gphx, (int)(p.getX() - 1), (int)(p.getY() - 1), cellSize + 2, cellSize + 2, panTranslate);
     }
 
     private static void paintImageRotated(Graphics2D gphx, int x, int y, Image img, int imgSize, Point2D panTranslate)
@@ -222,8 +224,10 @@ public class GameView extends JComponent {
 
     private static void fillRotatedRect(Graphics2D g, int x, int y, int width, int height, Point2D panTranslate) {
         Graphics2D g2 = (Graphics2D) g.create();
+        x += panTranslate.getX();
+        y += panTranslate.getY();
         g2.rotate(Math.toRadians(isometricAngle), x, y);
-        g2.fillRect((int)(x + panTranslate.getX()), (int)(y + panTranslate.getY()), width, height);
+        g2.fillRect(x, y, width, height);
         g2.dispose();
     }
 
@@ -250,7 +254,13 @@ public class GameView extends JComponent {
     }
 
     private void drawCityDecorations(Graphics2D g, int i, int j) {
+        // TODO: if city not capital, remove from city tag the capital sign and shorten tag background
+        // TODO: transparency name tag
+
         int d = (int)Math.sqrt(CELL_SIZE*CELL_SIZE*2);
+        int fontSize = CELL_SIZE/3;
+        Font textFont = new Font(getFont().getName(), Font.PLAIN, fontSize);
+        g.setFont(textFont);
 
         int cityID = board.getCityIdAt(i,j);
         City c = (City) board.getActor(cityID);
@@ -264,26 +274,27 @@ public class GameView extends JComponent {
         String production = "" + c.getProduction();
 
         double h = d/4.0;
-        double nameWidth = 20 + 2*h;
+        double nameWidth = 20 + 3*h;
         Point2D namePos = rotatePoint(j,i);
-        Rectangle nameRect = new Rectangle((int)(namePos.getX() + d/2.0 - nameWidth/2.0),
+        Rectangle nameRect = new Rectangle((int)(namePos.getX() + d/2.0 - nameWidth*2/3.0),
                 (int)(namePos.getY() + d/2.0 - h), (int)nameWidth, (int)h);
         drawRectShadowHighlight(g, nameRect);
         g.setColor(col);
         g.fillRect((int)(nameRect.x + panTranslate.getX()), (int)(nameRect.y + panTranslate.getY()), nameRect.width, nameRect.height);
         g.setColor(Color.WHITE);
-        g.drawString(cityName, (int)(nameRect.x + nameRect.width/2.0 - 4*cityName.length() + panTranslate.getX()),
-                (int)(nameRect.y+h-2 + panTranslate.getY()));
+
+        g.drawString(cityName, (int)(nameRect.x + h + fontSize/4.0 + panTranslate.getX()),
+                (int)(nameRect.y + h*1.1 - fontSize/4.0 + panTranslate.getY()));
 
         // Draw number of stars
-        paintImage(g, (int)(nameRect.x + nameRect.width - h + shadowOffset),
+        paintImage(g, (int)(nameRect.x + nameRect.width*0.55 + shadowOffset),
                 nameRect.y + shadowOffset, starShadow, (int)h, panTranslate);
-        paintImage(g, (int)(nameRect.x + nameRect.width - h), nameRect.y, starImg, (int)h, panTranslate);
-        drawStringShadow(g, production, (int)(nameRect.x + nameRect.width + h),
-                (int)(nameRect.y+h-2 + panTranslate.getY()));
+        paintImage(g, (int)(nameRect.x + nameRect.width*0.55), nameRect.y, starImg, (int)h, panTranslate);
+        drawStringShadow(g, production, (int)(nameRect.x + nameRect.width - fontSize*0.75),
+                (int)(nameRect.y + h*1.1 - fontSize/4.0));
         g.setColor(Color.WHITE);
-        g.drawString(production, (int)(nameRect.x + nameRect.width + h + panTranslate.getX()),
-                (int)(nameRect.y+h-2 + panTranslate.getY()));
+        g.drawString(production, (int)(nameRect.x + nameRect.width - fontSize*0.75 + panTranslate.getX()),
+                (int)(nameRect.y + h*1.1 - fontSize/4.0 + panTranslate.getY()));
 
         // Draw capital sign
         if (c.isCapital()) {
@@ -292,7 +303,7 @@ public class GameView extends JComponent {
         }
 
         // Draw level
-        int sectionWidth = 10;
+        int sectionWidth = CELL_SIZE/4;
         int w = level * sectionWidth;
         Rectangle bgRect = new Rectangle(nameRect.x + nameRect.width/2 - w/2, nameRect.y + nameRect.height, w, (int)h);
         drawRoundRectShadowHighlight(g, bgRect);
@@ -370,6 +381,19 @@ public class GameView extends JComponent {
     void updatePan(Point2D panTranslate) {
         this.panTranslate = new Point2D.Double(this.panTranslate.getX() + panTranslate.getX(),
                 this.panTranslate.getY() + panTranslate.getY());
+    }
+
+    void setPanToTribe(GameState gs) {
+        // Focus on capital of tribe
+        Tribe t = gs.getTribe(gs.getActiveTribeID());
+        int capitalID = t.getCapitalID();
+        Actor a = gs.getActor(capitalID);
+        Vector2d pos = a.getPosition();
+
+        // Get position in screen coordinates, and set pan to the negative difference to center
+        Point2D screenPoint = rotatePoint(pos.y, pos.x);
+        panTranslate = new Point2D.Double(-screenPoint.getX() - CELL_SIZE/2.0 + dimension.width/2.0,
+                -screenPoint.getY() - CELL_SIZE/2.0 + dimension.height/2.0);
     }
 
     public Point2D getPanTranslate() {

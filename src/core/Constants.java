@@ -7,7 +7,9 @@ public class Constants {
     public static long TURN_TIME_MILLIS = 10000000; //10000; //10 seconds.
 
     // Display settings
-    public static int CELL_SIZE = 35;
-    public static int GUI_MIN_PAN = CELL_SIZE;
+    public static int CELL_SIZE = 80;
+    public static int VIEW_SIZE = 800;
+    public static int GUI_MIN_PAN = 35;
+    public static int GUI_ZOOM_FACTOR = 5;
 
 }

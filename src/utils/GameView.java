@@ -24,6 +24,7 @@ public class GameView extends JComponent {
     private Board board; //This only counts terrains. Needs to be enhanced with actors, resources, etc.
     private GameState gameState;
 //    private Image backgroundImg;
+    private Image fogImg;
     private InfoView infoView;
     private Point2D panTranslate;  // Used to translate all coordinates for objects drawn on screen
 
@@ -51,6 +52,7 @@ public class GameView extends JComponent {
         dimension = new Dimension(VIEW_SIZE, VIEW_SIZE);
 
 //        backgroundImg = Types.TERRAIN.PLAIN.getImage(null);
+        fogImg = ImageIO.GetInstance().getImage("img/fog.png");
         starImg = ImageIO.GetInstance().getImage("img/decorations/star.png");
         starShadow = ImageIO.GetInstance().getImage("img/decorations/starShadow.png");
         capitalImg = ImageIO.GetInstance().getImage("img/decorations/capital.png");
@@ -72,16 +74,16 @@ public class GameView extends JComponent {
         //For a better graphics, enable this: (be aware this could bring performance issues depending on your HW & OS).
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // TODO: black background rotated and translated
-//        g.setColor(Color.BLACK);
-//        g.fillRect(0, dimension.height, dimension.width, dimension.height);
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, dimension.width, dimension.height);
 
         for(int i = 0; i < gridSize; ++i) {
             for(int j = 0; j < gridSize; ++j) {
                 // We paint all base terrains, resources and buildings first
                 Types.TERRAIN t = board.getTerrainAt(i,j);
                 if(t == null) {
-                    paintFog(g, i, j, CELL_SIZE, panTranslate);
+                    paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, fogImg, CELL_SIZE, panTranslate);
+//                    paintFog(g, i, j, CELL_SIZE, panTranslate);
                 } else {
                     Image toPaint = getContextImg(i, j, t);
                     paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, toPaint, CELL_SIZE, panTranslate);

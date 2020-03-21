@@ -269,6 +269,8 @@ public class Game {
         //Get all cities of this tribe
         ArrayList<Integer> tribeCities = tribe.getCitiesID();
         ArrayList<Integer> allTribeUnits = new ArrayList<>();
+        GameState gs = gameStateObservations[tribe.getTribeId()];
+
 
         //1. Compute stars and score per turn
         int acumProd = 0, turnScore = 0;
@@ -304,14 +306,12 @@ public class Game {
             if(unit.getStatus() == Types.TURN_STATUS.PUSHED)
                 //Pushed units in the previous turn start as if they moved already.
                 unit.setStatus(Types.TURN_STATUS.MOVED);
-            else {
+            else
                 unit.setStatus(Types.TURN_STATUS.FRESH);
-            }
         }
 
         //3. Compute the actions available for this player.
         gs.computePlayerActions(tribe);
-        updateAssignedGameStates();
     }
 
 

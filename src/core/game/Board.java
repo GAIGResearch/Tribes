@@ -253,7 +253,7 @@ public class Board {
         unit.setPosition(xF, yF);
         Tribe t = tribes[unit.getTribeId()];
 
-        int partialObsRangeClear = unit.RANGE;
+        int partialObsRangeClear = 1;
         if (getTerrainAt(xF, yF) == Types.TERRAIN.MOUNTAIN) {
             partialObsRangeClear += 1;
         }

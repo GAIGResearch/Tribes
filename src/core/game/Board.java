@@ -251,6 +251,13 @@ public class Board {
         units[x0][y0] = 0;
         units[xF][yF] = unit.getActorId();
         unit.setPosition(xF, yF);
+        Tribe t = tribes[unit.getTribeId()];
+
+        int partialObsRangeClear = unit.RANGE;
+        if (getTerrainAt(xF, yF) == Types.TERRAIN.MOUNTAIN) {
+            partialObsRangeClear += 1;
+        }
+        t.clearView(xF, yF, partialObsRangeClear);
     }
 
     public void launchExplorer(int x0, int y0, int tribeId, Random rnd) {

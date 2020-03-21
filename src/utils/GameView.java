@@ -276,7 +276,7 @@ public class GameView extends JComponent {
         Point2D p = rotatePoint(j-bound, i-bound);
         g.setColor(col);
         Stroke oldStroke = g.getStroke();
-        g.setStroke(new BasicStroke(3));
+        g.setStroke(new BasicStroke(5, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0));
         drawRotatedRect(g, (int)p.getX(), (int)p.getY(), CELL_SIZE*(2*bound + 1), CELL_SIZE*(2*bound+1), panTranslate);
         g.setStroke(oldStroke);
 

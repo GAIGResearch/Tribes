@@ -261,9 +261,9 @@ public class GUI extends JFrame implements Runnable {
      * unit at coordinates (unitX, unitY).
      */
     private Action getActionAt(int actionX, int actionY, int unitX, int unitY) {
-        HashMap<Unit, ArrayList<Action>> possibleActions = gs.getUnitActions();
-        for (Map.Entry<Unit, ArrayList<Action>> e: possibleActions.entrySet()) {
-            Unit u = e.getKey();
+        HashMap<Integer, ArrayList<Action>> possibleActions = gs.getUnitActions();
+        for (Map.Entry<Integer, ArrayList<Action>> e: possibleActions.entrySet()) {
+            Unit u = (Unit) gs.getActor(e.getKey());
 
             // Only draw actions for highlighted unit
             if (u.getPosition().x == unitY && u.getPosition().y == unitX) {

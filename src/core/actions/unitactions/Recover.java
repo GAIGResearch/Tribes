@@ -46,4 +46,9 @@ public class Recover extends UnitAction
         }
         return false;
     }
+
+    @Override
+    public Action copy() {
+        return new Recover(this.unitId);
+    }
 }

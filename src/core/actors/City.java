@@ -5,6 +5,7 @@ import core.game.Board;
 import core.game.GameState;
 import utils.Vector2d;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class City extends Actor{
@@ -18,7 +19,7 @@ public class City extends Actor{
     private boolean hasWalls = false;
     private int bound;
 
-    private LinkedList<Integer> unitsID = new LinkedList<>();
+    private ArrayList<Integer> unitsID = new ArrayList<>();
     private LinkedList<Building> buildings = new LinkedList<>();
 
     // The constructor to initial the valley
@@ -187,9 +188,9 @@ public class City extends Actor{
         return unitsID.remove(index);
     }
 
-    public LinkedList<Integer> moveUnits(){
-        LinkedList<Integer> lists = unitsID;
-        unitsID = new LinkedList<Integer>();
+    public ArrayList<Integer> moveUnits(){
+        ArrayList<Integer> lists = unitsID;
+        unitsID = new ArrayList<Integer>();
         return lists;
     }
 
@@ -217,12 +218,12 @@ public class City extends Actor{
 
 
     // Get the point for each turn
-    public int getPoints() {
+    public int getPointsPerTurn() {
         return pointsPerTurn;
     }
 
 
-    public void setUnitsID(LinkedList<Integer> unitsID) {
+    public void setUnitsID(ArrayList<Integer> unitsID) {
         this.unitsID = unitsID;
     }
 
@@ -239,15 +240,6 @@ public class City extends Actor{
     }
 
 
-    public LinkedList<Integer> copyUnitsID() {
-        LinkedList<Integer> copyUnits = new LinkedList<>();
-        for (Integer id : unitsID) {
-            copyUnits.add(id);
-        }
-        return copyUnits;
-    }
-
-
     public City copy(){
         City c = new City(position.x, position.y, tribeId);
         c.level = level;
@@ -258,7 +250,7 @@ public class City extends Actor{
         c.bound = bound;
         c.setWalls(hasWalls);
         c.setBuildings(copyBuildings());
-        c.setUnitsID(copyUnitsID());
+        c.setUnitsID(new ArrayList<>(unitsID));
         return c;
     }
 
@@ -279,7 +271,7 @@ public class City extends Actor{
         this.bound = b;
     }
 
-    public LinkedList<Integer> getUnitsID() {
+    public ArrayList<Integer> getUnitsID() {
         return unitsID;
     }
 

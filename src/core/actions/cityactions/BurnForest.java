@@ -43,4 +43,11 @@ public class BurnForest extends CityAction
         }
         return false;
     }
+
+    @Override
+    public Action copy() {
+        BurnForest burn = new BurnForest(this.cityId);
+        burn.setTargetPos(this.targetPos.copy());
+        return burn;
+    }
 }

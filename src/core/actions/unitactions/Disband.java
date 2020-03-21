@@ -45,4 +45,9 @@ public class Disband extends UnitAction
 
         return false;
     }
+
+    @Override
+    public Action copy() {
+        return new Disband(this.unitId);
+    }
 }

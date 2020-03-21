@@ -1,6 +1,7 @@
 package core.actions.cityactions;
 
 import core.Types;
+import core.actions.Action;
 import core.actors.Tribe;
 import core.actors.units.Unit;
 import core.game.GameState;
@@ -61,5 +62,13 @@ public class Spawn extends CityAction
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Action copy() {
+        Spawn spawn = new Spawn(this.cityId);
+        spawn.setUnitType(this.unit_type);
+        spawn.setTargetPos(this.targetPos.copy());
+        return spawn;
     }
 }

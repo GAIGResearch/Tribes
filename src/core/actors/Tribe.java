@@ -31,7 +31,7 @@ public class Tribe extends Actor {
     private TechnologyTree techTree;
 
     //Current number of stars (resources) of this tribe.
-    private int stars; //TODO: compute this amount at the beginning of each turn.
+    private int stars;
 
     //Game result for this player.
     private Types.RESULT winner = Types.RESULT.INCOMPLETE;
@@ -257,7 +257,7 @@ public class Tribe extends Actor {
         return null;
     }
 
-    public void moveAllUnits(LinkedList<Integer> units){
+    public void moveAllUnits(ArrayList<Integer> units){
         extraUnits.addAll(units);
     }
 
@@ -470,4 +470,7 @@ public class Tribe extends Actor {
 
     }
 
+    public ArrayList<Integer> getExtraUnits() {
+        return extraUnits;
+    }
 }

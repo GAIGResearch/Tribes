@@ -245,8 +245,9 @@ public class GUI extends JFrame implements Runnable {
      */
     public void update(GameState gs) {
         if (this.gs == null || this.gs.getActiveTribeID() != gs.getActiveTribeID()) {
-            infoView.resetHighlight();
-            view.setPanToTribe(gs);
+            infoView.resetHighlight();  // Reset highlights on turn change
+            view.setPanToTribe(gs);  // Pan camera to tribe capital on turn change
+            ac.reset();  // Clear action queue on turn change
         }
         this.gs = gs;
     }

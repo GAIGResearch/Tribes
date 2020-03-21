@@ -38,4 +38,8 @@ public class ActionController {
     public ActionController copy() {
         return new ActionController(actionsQueue);
     }
+
+    public void reset() {
+        actionsQueue.clear();
+    }
 }

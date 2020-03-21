@@ -283,7 +283,7 @@ public class Game {
             boolean produces = true;
             Vector2d cityPos = city.getPosition();
             int unitIDAt = gs.getBoard().getUnitIDAt(cityPos.x, cityPos.y);
-            if(unitIDAt != -1)
+            if(unitIDAt > 0)
             {
                 Unit u = (Unit) gs.getActor(unitIDAt);
                 produces = (u.getTribeId() == tribe.getTribeId());

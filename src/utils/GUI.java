@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static core.Constants.*;
+
 
 public class GUI extends JFrame implements Runnable {
     private JLabel appTurn;
@@ -33,6 +35,9 @@ public class GUI extends JFrame implements Runnable {
 
     private boolean finishedUpdate = true;
 
+    // Zoomed screen dragging vars
+    private Point2D startDrag, endDrag, panTranslate;
+
     /**
      * Constructor
      * @param title Title of the window.
@@ -43,8 +48,9 @@ public class GUI extends JFrame implements Runnable {
         this.ac = ac;
 
         infoView = new InfoView();
+        panTranslate = new Point2D.Double(0,0);
 //        tribeView = new TribeView();
-        view = new GameView(game.getBoard(), infoView);
+        view = new GameView(game.getBoard(), infoView, panTranslate);
 
         // Create frame layout
         GridBagLayout gbl = new GridBagLayout();
@@ -92,8 +98,9 @@ public class GUI extends JFrame implements Runnable {
             @Override
             public void mouseClicked(MouseEvent e) {
                 //Only provide information if clicking on a visible tile
-                Point2D p = GameView.rotatePointReverse(e.getX(), e.getY());
-//                System.out.println(i + " " + j);
+                Point2D translate = view.getPanTranslate();
+                Point2D ep = new Point2D.Double(e.getX() - translate.getX(), e.getY() - translate.getY());
+                Point2D p = GameView.rotatePointReverse((int)ep.getX(), (int)ep.getY());
 
                 // If unit highlighted and action at new click valid for unit, execute action
                 Action candidate = getActionAt((int)p.getX(), (int)p.getY(), infoView.getHighlightX(), infoView.getHighlightY());
@@ -108,12 +115,19 @@ public class GUI extends JFrame implements Runnable {
 
             @Override
             public void mousePressed(MouseEvent e) {
-
+                startDrag = new Point2D.Double(e.getX(), e.getY());
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-
+                endDrag = new Point2D.Double(e.getX(), e.getY());
+                if (startDrag != null && !(startDrag.equals(endDrag))) {
+                    panTranslate = new Point2D.Double(+ endDrag.getX() - startDrag.getX(), + endDrag.getY() - startDrag.getY());
+                    if (panTranslate.distance(0, 0) >= GUI_MIN_PAN) {
+                        view.updatePan(panTranslate);
+                        infoView.resetHighlight();
+                    }
+                }
             }
 
             @Override
@@ -125,6 +139,22 @@ public class GUI extends JFrame implements Runnable {
             public void mouseExited(MouseEvent e) {
 
             }
+        });
+        mainPanel.addMouseWheelListener(e -> {
+            Point2D mouseLocation = MouseInfo.getPointerInfo().getLocation();
+            Point2D panelLocation = mainPanel.getLocationOnScreen();
+            Point2D viewCenter = new Point2D.Double(view.getPreferredSize().width/2.0, view.getPreferredSize().height/2.0);
+            Point2D diff = new Point2D.Double((mouseLocation.getX() - panelLocation.getX() - viewCenter.getX())/GUI_ZOOM_FACTOR,
+                    (mouseLocation.getY() - panelLocation.getY() - viewCenter.getY())/GUI_ZOOM_FACTOR);
+            if (e.getWheelRotation() < 0) {
+                // Zooming in
+                CELL_SIZE += GUI_ZOOM_FACTOR;
+                diff = new Point2D.Double(diff.getX()*-1, diff.getY()*-1);
+            } else {
+                // Zooming out
+                CELL_SIZE -= GUI_ZOOM_FACTOR;
+            }
+            view.updatePan(diff);
         });
 
         mainPanel.setLayout(new GridBagLayout());
@@ -163,7 +193,7 @@ public class GUI extends JFrame implements Runnable {
 
         JTabbedPane tribeResearchInfo = new JTabbedPane();
         tribeView = new TribeView();
-        techView = new TechView();
+        techView = new TechView(ac);
         tribeResearchInfo.setPreferredSize(new Dimension(400, 300));
         tribeResearchInfo.add("Tribe Info", tribeView);
         tribeResearchInfo.add("Tech Tree", new JScrollPane(techView));
@@ -214,6 +244,11 @@ public class GUI extends JFrame implements Runnable {
      * Paints the GUI, to be called at every game tick.
      */
     public void update(GameState gs) {
+        if (this.gs == null || this.gs.getActiveTribeID() != gs.getActiveTribeID()) {
+            infoView.resetHighlight();  // Reset highlights on turn change
+            view.setPanToTribe(gs);  // Pan camera to tribe capital on turn change
+            ac.reset();  // Clear action queue on turn change
+        }
         this.gs = gs;
     }
 
@@ -244,8 +279,6 @@ public class GUI extends JFrame implements Runnable {
 
     @Override
     public void run() {
-        // TODO: if active tribe changed, remove highlights
-
         finishedUpdate = false;
         view.paint(gs);
         tribeView.paint(gs);

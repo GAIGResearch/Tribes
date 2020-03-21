@@ -1,12 +1,9 @@
 package core.actions.tribeactions;
 
-import core.TechnologyTree;
 import core.Types;
-import core.actions.Action;
 import core.actors.Tribe;
 import core.game.GameState;
 
-import java.util.LinkedList;
 
 public class ResearchTech extends TribeAction {
 
@@ -22,7 +19,7 @@ public class ResearchTech extends TribeAction {
 
     @Override
     public boolean isFeasible(final GameState gs) {
-        Tribe tribe = (Tribe) gs.getActor(tribeId);
+        Tribe tribe = gs.getTribe(tribeId);
 
         if(tech == null)
             return false;
@@ -35,7 +32,7 @@ public class ResearchTech extends TribeAction {
 
     @Override
     public boolean execute(GameState gs) {
-        Tribe tribe = (Tribe) gs.getActor(tribeId);
+        Tribe tribe = gs.getTribe(tribeId);
         if(isFeasible(gs))
         {
             //Research tech

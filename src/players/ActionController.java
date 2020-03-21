@@ -21,7 +21,7 @@ public class ActionController {
     {
         if (candidate != null && gs.getActiveTribe() != null) {
             if (candidate instanceof TribeAction) {
-                ((TribeAction) candidate).setTribeId(gs.getActiveTribe().getActorId());
+                ((TribeAction) candidate).setTribeId(gs.getActiveTribeID());
             }
             actionsQueue.add(candidate);
         }

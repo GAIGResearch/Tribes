@@ -193,7 +193,7 @@ public class GUI extends JFrame implements Runnable {
 
         JTabbedPane tribeResearchInfo = new JTabbedPane();
         tribeView = new TribeView();
-        techView = new TechView();
+        techView = new TechView(ac);
         tribeResearchInfo.setPreferredSize(new Dimension(400, 300));
         tribeResearchInfo.add("Tribe Info", tribeView);
         tribeResearchInfo.add("Tech Tree", new JScrollPane(techView));

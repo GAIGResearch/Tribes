@@ -247,7 +247,6 @@ public class Game {
                 }
 
 //                frame.update(getGameState(-1));
-//                frame.update(getGameState(gs.getTick() % gs.getTribes().length));        //Partial Obs
                 frame.update(getGameState(gs.getActiveTribeID()));        //Partial Obs
                 Thread gui = new Thread(frame);
                 gui.start();
@@ -270,7 +269,7 @@ public class Game {
         //Get all cities of this tribe
         ArrayList<Integer> tribeCities = tribe.getCitiesID();
         ArrayList<Integer> allTribeUnits = new ArrayList<>();
-        GameState gs = gameStateObservations[tribe.getActorId()];
+        GameState gs = gameStateObservations[tribe.getTribeId()];
 
 
         //1. Compute stars and score per turn

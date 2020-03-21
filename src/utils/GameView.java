@@ -269,9 +269,18 @@ public class GameView extends JComponent {
         int level = c.getLevel();
         int progress = c.getPopulation();
         int units = c.getUnitsID().size();
+        int bound = c.getBound();
+        Color col = Types.TRIBE.values()[c.getTribeId()].getColorDark();
+
+        // Draw city border
+        Point2D p = rotatePoint(j-bound, i-bound);
+        g.setColor(col);
+        Stroke oldStroke = g.getStroke();
+        g.setStroke(new BasicStroke(3));
+        drawRotatedRect(g, (int)p.getX(), (int)p.getY(), CELL_SIZE*(2*bound + 1), CELL_SIZE*(2*bound+1), panTranslate);
+        g.setStroke(oldStroke);
 
         // Draw capital img + city name/ID + number of stars
-        Color col = Types.TRIBE.values()[c.getTribeId()].getColorDark();
         String cityName = ""+cityID;
         String production = "" + c.getProduction();
 

@@ -89,6 +89,7 @@ public class Tribe extends Actor {
 
     public Tribe copy() {
         Tribe tribeCopy = new Tribe(this.tribe);
+        tribeCopy.actorId = this.actorId;
         tribeCopy.tribeId = this.tribeId;
         tribeCopy.stars = this.stars;
         tribeCopy.winner = this.winner;

@@ -247,7 +247,6 @@ public class Game {
                 }
 
 //                frame.update(getGameState(-1));
-//                frame.update(getGameState(gs.getTick() % gs.getTribes().length));        //Partial Obs
                 frame.update(getGameState(gs.getActiveTribeID()));        //Partial Obs
                 Thread gui = new Thread(frame);
                 gui.start();
@@ -281,7 +280,7 @@ public class Game {
             boolean produces = true;
             Vector2d cityPos = city.getPosition();
             int unitIDAt = gs.getBoard().getUnitIDAt(cityPos.x, cityPos.y);
-            if(unitIDAt != -1)
+            if(unitIDAt > 0)
             {
                 Unit u = (Unit) gs.getActor(unitIDAt);
                 produces = (u.getTribeId() == tribe.getTribeId());

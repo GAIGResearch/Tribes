@@ -1,6 +1,7 @@
 package core.actions.tribeactions;
 
 import core.Types;
+import core.actions.Action;
 import core.actors.Tribe;
 import core.game.GameState;
 

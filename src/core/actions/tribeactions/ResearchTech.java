@@ -32,7 +32,6 @@ public class ResearchTech extends TribeAction {
         return false;
     }
 
-
     @Override
     public boolean execute(GameState gs) {
         Tribe tribe = (Tribe) gs.getActor(tribeId);
@@ -51,6 +50,13 @@ public class ResearchTech extends TribeAction {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Action copy() {
+        ResearchTech resTech = new ResearchTech(this.tribeId);
+        resTech.setTech(this.tech);
+        return resTech;
     }
 
     public String toString()

@@ -143,9 +143,9 @@ public class GameView extends JComponent {
         }
 
         // Draw unit actions
-        HashMap<Unit, ArrayList<Action>> possibleActions = gameState.getUnitActions();
-        for (Map.Entry<Unit, ArrayList<Action>> e: possibleActions.entrySet()) {
-            Unit u = e.getKey();
+        HashMap<Integer, ArrayList<Action>> possibleActions = gameState.getUnitActions();
+        for (Map.Entry<Integer, ArrayList<Action>> e: possibleActions.entrySet()) {
+            Unit u = (Unit) gameState.getActor(e.getKey());
 
             // Only draw actions for highlighted unit
             if (u.getPosition().x == highlightY && u.getPosition().y == highlightX) {

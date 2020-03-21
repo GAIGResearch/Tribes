@@ -41,4 +41,11 @@ public class GrowForest extends CityAction
         }
         return false;
     }
+
+    @Override
+    public Action copy() {
+        GrowForest grow = new GrowForest(this.cityId);
+        grow.setTargetPos(this.targetPos.copy());
+        return grow;
+    }
 }

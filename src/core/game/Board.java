@@ -155,7 +155,8 @@ public class Board {
             idx++;
         }
 
-        //TODO: A pushed unit loses its next turn! (manage through TURN_STATUS).
+        //A pushed unit moves to PUSHED status - essentially its turn is over.
+        toPush.setStatus(Types.TURN_STATUS.PUSHED);
 
         if (!pushed) {
             //TODO: if a unit can't be pushed, unit must disappear
@@ -575,11 +576,12 @@ public class Board {
         City capital = (City) getActor(tribe.getCapitalID());
 
         //Units to move
-        LinkedList<Integer> units = fromCity.moveUnits();
+        ArrayList<Integer> units = fromCity.moveUnits();
 
         //First to capital
         while (ownsCapital && capital.canAddUnit() && units.size() > 0){
-            capital.addUnit(units.removeFirst());
+            capital.addUnit(units.get(0));
+            units.remove(0);
         }
 
         //Then, to all the other cities, picked at random.
@@ -591,7 +593,8 @@ public class Board {
             while (cities.size() > 0 && units.size() > 0){
                 City destCity = (City)getActor(cities.removeFirst());
                 while (destCity.canAddUnit() && units.size() > 0){
-                    destCity.addUnit(units.removeFirst());
+                    destCity.addUnit(units.get(0));
+                    units.remove(0);
                 }
             }
 

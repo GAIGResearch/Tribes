@@ -21,6 +21,12 @@ public class LevelUp extends CityAction {
     {
         super.cityId = cityId;
     }
+    public CITY_LEVEL_UP getBonus() {
+        return bonus;
+    }
+    public void setBonus(CITY_LEVEL_UP bonus) {
+        this.bonus = bonus;
+    }
 
     @Override
     public boolean isFeasible(GameState gs) {
@@ -80,11 +86,11 @@ public class LevelUp extends CityAction {
         return true;
     }
 
-    public CITY_LEVEL_UP getBonus() {
-        return bonus;
-    }
-
-    public void setBonus(CITY_LEVEL_UP bonus) {
-        this.bonus = bonus;
+    @Override
+    public Action copy() {
+        LevelUp lUp = new LevelUp(this.cityId);
+        lUp.setBonus(this.bonus);
+        lUp.setTargetPos(this.targetPos.copy());
+        return lUp;
     }
 }

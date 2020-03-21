@@ -2,6 +2,7 @@ package core.actions.cityactions;
 
 import core.TechnologyTree;
 import core.Types;
+import core.actions.Action;
 import core.actors.Building;
 import core.actors.Tribe;
 import core.game.Board;
@@ -84,6 +85,14 @@ public class Build extends CityAction
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Action copy() {
+        Build build = new Build(this.cityId);
+        build.setBuildingType(this.buildingType);
+        build.setTargetPos(this.targetPos.copy());
+        return build;
     }
 
     private boolean isBuildable(final GameState gs, int cost, boolean checkIfUnique) {

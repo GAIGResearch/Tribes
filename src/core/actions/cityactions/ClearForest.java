@@ -37,4 +37,11 @@ public class ClearForest extends CityAction
         }
         return false;
     }
+
+    @Override
+    public Action copy() {
+        ClearForest clear = new ClearForest(this.cityId);
+        clear.setTargetPos(this.targetPos.copy());
+        return clear;
+    }
 }

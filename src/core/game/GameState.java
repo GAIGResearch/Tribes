@@ -260,9 +260,37 @@ public class GameState {
 
         int numTribes = getTribes().length;
         copy.canEndTurn = new boolean[numTribes];
-        for(int i = 0; i < numTribes; ++i)
-            copy.canEndTurn[i] = canEndTurn[i];
+        System.arraycopy(canEndTurn, 0, copy.canEndTurn, 0, numTribes);
 
+        copy.tribeActions = new ArrayList<>();
+        for(Action ta : tribeActions)
+        {
+            copy.tribeActions.add(ta.copy());
+        }
+
+        copy.unitActions = new HashMap<>();
+        for(int unitId : unitActions.keySet())
+        {
+            ArrayList<Action> actions = unitActions.get(unitId);
+            ArrayList<Action> actionsC = new ArrayList<>();
+            for(Action act : actions)
+            {
+                actionsC.add(act.copy());
+            }
+            copy.unitActions.put(unitId, actionsC);
+        }
+
+        copy.cityActions = new HashMap<>();
+        for(int cityId : cityActions.keySet())
+        {
+            ArrayList<Action> actions = cityActions.get(cityId);
+            ArrayList<Action> actionsC = new ArrayList<>();
+            for(Action act : actions)
+            {
+                actionsC.add(act.copy());
+            }
+            copy.cityActions.put(cityId, actionsC);
+        }
 
         return copy;
     }

@@ -64,6 +64,7 @@ public class Tribe extends Actor {
 
     public Tribe(int tribeID, int cityID, Types.TRIBE tribe) {
         this.tribeId = tribeID;
+        citiesID = new ArrayList<>();
         citiesID.add(cityID);
         this.tribe = tribe;
         init();

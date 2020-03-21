@@ -219,8 +219,10 @@ public class City extends Actor{
         c.population_need = population_need;
         c.isCapital = isCapital;
         c.production = production;
+        c.pointsPerTurn = pointsPerTurn;
+        c.hasWalls = hasWalls;
         c.bound = bound;
-        c.setWalls(hasWalls);
+        c.actorId = actorId;
         c.setBuildings(copyBuildings());
         c.setUnitsID(copyUnitsID());
         return c;

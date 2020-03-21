@@ -39,15 +39,14 @@ public class TribeView extends JComponent {
 
     private void paintWithGraphics(Graphics2D g)
     {
-        if(gs != null)
-        {
+        if (gs != null) {
             //For a better graphics, enable this: (be aware this could bring performance issues depending on your HW & OS).
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             Tribe[] tribes = gs.getTribes();
 
             String s = "";
 
-            for (Tribe t: tribes) {
+            for (Tribe t : tribes) {
                 s += "<p><b>" + t.getName() + "</b>  ...........  " + t.getScore() + " points (stars: " + t.getStars() + ")</p>";
             }
 

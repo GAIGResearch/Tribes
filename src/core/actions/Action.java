@@ -34,4 +34,6 @@ public interface Action
      * @return false if it couldn't be executed.
      */
     boolean execute(GameState gs);
+
+    Action copy();
 }

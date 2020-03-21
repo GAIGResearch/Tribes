@@ -33,7 +33,7 @@ public class StepMove implements NeighbourHelper
         boolean inZoneOfControl = false;
 
         //Check if there is an enemy unit adjacent.
-        for(Vector2d tile : from.neighborhood(1, board.getSize())) {
+        for(Vector2d tile : from.neighborhood(1, 0, board.getSize())) {
             Unit u = board.getUnitAt(tile.x, tile.y);  // There might not be a unit there at all
             if(u != null && u.getTribeId() != unit.getTribeId()) { inZoneOfControl = true; }
         }
@@ -41,7 +41,7 @@ public class StepMove implements NeighbourHelper
         //TreeNode tn = new TreeNode (vector2d pos, double stepCost)
         //We only add nodes to neighbours if costFrom+stepCost <= total move range of this.unit
 
-        for(Vector2d tile : from.neighborhood(1, board.getSize())) {
+        for(Vector2d tile : from.neighborhood(1, 0, board.getSize())) {
             Types.TERRAIN terrain = board.getTerrainAt(tile.x, tile.y);
             double stepCost = 0.0;
 

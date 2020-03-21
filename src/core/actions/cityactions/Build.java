@@ -1,18 +1,14 @@
 package core.actions.cityactions;
 
 import core.TechnologyTree;
-import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
+import core.actors.Building;
 import core.actors.Tribe;
-import core.actors.buildings.*;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.City;
 import utils.Vector2d;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class Build extends CityAction
 {
@@ -33,11 +29,6 @@ public class Build extends CityAction
     public boolean isFeasible(final GameState gs) {
 
         switch (buildingType) {
-            case ROAD:
-                //Not this way.
-                System.out.println("ERROR: Action Build can't built roads. Use tribeactions.BuildRoad instead.");
-                return false;
-
             //Buildings that can be repeated in a city:
             case PORT:
             case FARM:
@@ -75,7 +66,6 @@ public class Build extends CityAction
 
     @Override
     public boolean execute(GameState gs) {
-        //TODO: Make sure all the side effects for Buildings are counted.
         City city = (City) gs.getActor(this.cityId);
         Tribe tribe = gs.getTribe(city.getTribeId());
         Board board = gs.getBoard();
@@ -83,59 +73,26 @@ public class Build extends CityAction
         if(isFeasible(gs)) {
 
             tribe.subtractStars(buildingType.getCost());
+            tribe.addScore(buildingType.getPoints());
             board.setBuildingAt(targetPos.x, targetPos.y, buildingType);
 
-            switch (buildingType) {
-                case FARM:
-                    city.addBuilding(new Farm(targetPos.x, targetPos.y));
-                    return true;
-                case MINE:
-                    city.addBuilding(new Mine(targetPos.x, targetPos.y));
-                    return true;
-                case PORT:
-                    city.addBuilding(new Port(targetPos.x, targetPos.y));
-                    board.setTradeNetwork(targetPos.x, targetPos.y, true);
-                    return true;
-                case FORGE:
-                    city.addBuilding(new Forge(targetPos.x, targetPos.y));
-                    return true;
-                case TEMPLE:
-                    city.addBuilding(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_COST, Types.BUILDING.TEMPLE));
-                    return true;
-                case MOUNTAIN_TEMPLE:
-                    city.addBuilding(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_COST, Types.BUILDING.MOUNTAIN_TEMPLE));
-                    return true;
-                case WATER_TEMPLE:
-                    city.addBuilding(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_COST, Types.BUILDING.WATER_TEMPLE));
-                    return true;
-                case FOREST_TEMPLE:
-                    city.addBuilding(new Temple(targetPos.x, targetPos.y, TribesConfig.TEMPLE_FOREST_COST, Types.BUILDING.FOREST_TEMPLE));
-                    return true;
-                case SAWMILL:
-                    city.addBuilding(new Sawmill(targetPos.x, targetPos.y));
-                    return true;
-                case WINDMILL:
-                    city.addBuilding(new Windmill(targetPos.x, targetPos.y));
-                    return true;
-                case LUMBER_HUT:
-                    city.addBuilding(new LumberHut(targetPos.x, targetPos.y));
-                    return true;
-                case CUSTOM_HOUSE:
-                    city.addBuilding(new CustomHouse(targetPos.x, targetPos.y));
-                    return true;
+            city.addBuilding(gs, new Building(targetPos.x, targetPos.y, buildingType));
+            if(buildingType == Types.BUILDING.PORT)
+                board.setTradeNetwork(targetPos.x, targetPos.y, true);
+            if(buildingType.isMonument())
+                tribe.monumentIsBuilt(buildingType);
 
-                case ALTAR_OF_PEACE:
-                case EMPERORS_TOMB:
-                case EYE_OF_GOD:
-                case GATE_OF_POWER:
-                case PARK_OF_FORTUNE:
-                case TOWER_OF_WISDOM:
-                    city.addBuilding(new Monument(targetPos.x, targetPos.y, buildingType));
-                    tribe.monumentIsBuilt(buildingType);
-                    break;
-            }
+            return true;
         }
         return false;
+    }
+
+    @Override
+    public Action copy() {
+        Build build = new Build(this.cityId);
+        build.setBuildingType(this.buildingType);
+        build.setTargetPos(this.targetPos.copy());
+        return build;
     }
 
     private boolean isBuildable(final GameState gs, int cost, boolean checkIfUnique) {
@@ -157,6 +114,33 @@ public class Build extends CityAction
             if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){ return false; }
         }
 
+        //Resource constraint
+        Types.RESOURCE resNeeded = buildingType.getResourceConstraint();
+        if (resNeeded != null)
+        {
+            //if there's a constraint, resource at location must be what's needed.
+            Types.RESOURCE resAtLocation = board.getResourceAt(targetPos.x, targetPos.y);
+            if(resAtLocation == null || resNeeded != resAtLocation)
+                return false;
+        }
+
+        //Adjacency constraint
+        Types.BUILDING buildingNeeded = buildingType.getAdjacencyConstraint();
+        if(buildingNeeded != null)
+        {
+            boolean adjFound = false;
+            for(Vector2d adjPos : targetPos.neighborhood(1,0,board.getSize()))
+            {
+                if(board.getBuildingAt(adjPos.x, adjPos.y) == buildingNeeded)
+                {
+                    adjFound = true;
+                    break;
+                }
+            }
+
+            if(!adjFound) return false;
+        }
+
         //Uniqueness constrain
         if(checkIfUnique) {
             for(Vector2d tile : board.getCityTiles(this.cityId)) {
@@ -166,5 +150,8 @@ public class Build extends CityAction
 
         return true;
     }
+
+
+
 
 }

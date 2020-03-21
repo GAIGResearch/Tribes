@@ -1,8 +1,6 @@
 package core.actions.cityactions.factory;
 
 import core.actions.Action;
-import core.actions.cityactions.LevelUpFactory;
-import core.actions.cityactions.factory.*;
 import core.actors.City;
 import core.game.GameState;
 

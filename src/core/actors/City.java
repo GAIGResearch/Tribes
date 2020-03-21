@@ -1,12 +1,12 @@
 package core.actors;
 
 import core.Types;
-import core.actors.buildings.Building;
-import core.actors.buildings.CustomHouse;
+import core.game.Board;
+import core.game.GameState;
 import utils.Vector2d;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
-import static core.Types.BUILDING.*;
 
 public class City extends Actor{
 
@@ -19,7 +19,7 @@ public class City extends Actor{
     private boolean hasWalls = false;
     private int bound;
 
-    private LinkedList<Integer> unitsID = new LinkedList<>();
+    private ArrayList<Integer> unitsID = new ArrayList<>();
     private LinkedList<Building> buildings = new LinkedList<>();
 
     // The constructor to initial the valley
@@ -36,69 +36,118 @@ public class City extends Actor{
     public void addPopulation(int number){
         population += number;
     }
+    private void changePointsPerTurn(int points){
+        changePointsPerTurn(points, 1);
+    }
+    private void changePointsPerTurn(int points, int multiplier){
+        this.pointsPerTurn = points*multiplier;
+    }
+    public void addProduction(int prod) {
+        production += prod;
+        if(production < 0) production = 0;
+    }
 
-
-    public void addBuilding(Building building){
-        if (building.getTYPE() == WINDMILL || building.getTYPE() == SAWMILL ||
-                building.getTYPE() == FORGE || building.getTYPE() == CUSTOM_HOUSE){
-            setProduction(building);
-        }else if (building.getTYPE() == FARM || building.getTYPE() == LUMBER_HUT ||
-                building.getTYPE() == MINE || building.getTYPE() == PORT){
-            changeProduction(building);
-        }else if (building.getTYPE() == TEMPLE || building.getTYPE() == WATER_TEMPLE){
-            addPointsPerTurn(building.getPoints());
-        }
-
-        if (building.getTYPE() != CUSTOM_HOUSE){
-            addPopulation(building.getPRODUCTION());
-        }
-
+    public void addBuilding(GameState gameState, Building building)
+    {
+        updateBuildingEffects(gameState, building, false, false);
         buildings.add(building);
     }
 
-    private void addPointsPerTurn(int points){
-        this.pointsPerTurn = points;
+    public void removeBuilding(GameState gameState, Building building)
+    {
+        updateBuildingEffects(gameState, building, true, false);
+        buildings.remove(building);
     }
 
-    public void setProduction(Building building){
-        Vector2d pos = building.getPosition();
-        int production = 0;
-        for(Building existBuilding: buildings){
-            Vector2d existingPos = existBuilding.getPosition();
-            if ( (existingPos.x >= pos.x-1 && existingPos.x <= pos.x+1) && (existingPos.y >= pos.y-1 && existingPos.y <= pos.y+1)){
-                if (checkMatchedBuilding(existBuilding, building)){
-                    production++;
-                }
+    public void updateBuildingEffects(GameState gameState, Building building, boolean negative, boolean onlyMatching)
+    {
+        int multiplier = negative ? -1 : 1;
+        switch (building.type) {
+            case FARM:
+            case LUMBER_HUT:
+            case MINE:
+            case WINDMILL:
+            case SAWMILL:
+            case FORGE:
+                changeBonus(gameState, building, true, onlyMatching, multiplier);
+                break;
+            case PORT:
+                if(!onlyMatching) addPopulation(building.type.getBonus() * multiplier);
+                changeBonus(gameState, building, false, onlyMatching, multiplier);
+                break;
+            case CUSTOM_HOUSE:
+                changeBonus(gameState, building, false, onlyMatching, multiplier);
+                break;
+            case TEMPLE:
+            case WATER_TEMPLE:
+            case MOUNTAIN_TEMPLE:
+            case FOREST_TEMPLE:
+                if(!onlyMatching) changePointsPerTurn(building.getPoints(), multiplier);
+                break;
+            case ALTAR_OF_PEACE:
+            case EMPERORS_TOMB:
+            case EYE_OF_GOD:
+            case GATE_OF_POWER:
+            case PARK_OF_FORTUNE:
+            case TOWER_OF_WISDOM:
+                if(!onlyMatching) addPopulation(building.type.getBonus() * multiplier);
+                break;
+        }
+    }
+
+
+    private void changeBonus(GameState gameState, Building building, boolean isPopulation, boolean onlyMatching, int multiplier){
+
+        int bonusToAdd;
+        boolean isBase = building.type.isBase();
+        City cityToAddTo = this;
+        Board board = gameState.getBoard();
+        Tribe tribe = (Tribe) gameState.getActor(this.tribeId);
+
+        //Population added by the base building.
+        if(isBase && isPopulation && !onlyMatching) addPopulation(building.getBonus());
+
+        //Check all buildings next to the new building position.
+        for(Vector2d adjPosition : building.position.neighborhood(1, 0, board.getSize()))
+        {
+            //For each position, if there's a building and of the production matching point
+            Types.BUILDING b = board.getBuildingAt(adjPosition.x, adjPosition.y);
+            if(b != null && building.type.getMatchingBuilding() == b)
+            {
+                //Retrieve this building, which could be form this city or from another one from the tribe.
+                Building existingBuilding = null;
+                int cityId = board.getCityIdAt(adjPosition.x, adjPosition.y);
+                if(cityId == actorId)
+                {
+                    //the matching building belongs to this city
+                    existingBuilding = this.getBuilding(building.position.x, building.position.y);
+                }else if(tribe.getCitiesID().contains(cityId)) {
+                    //the matching building belongs to a city from a different tribe
+                    City city = (City) gameState.getActor(cityId);
+                    existingBuilding = city.getBuilding(building.position.x, building.position.y);
+                    cityToAddTo = city;
+
+                }else return; //This may happen if the building belongs to a city from another tribe.
+
+                bonusToAdd = isBase ? existingBuilding.getBonus() : building.getBonus();
+
+                if(isPopulation)
+                    cityToAddTo.addPopulation(bonusToAdd * multiplier);
+                else
+                    cityToAddTo.addProduction(bonusToAdd * multiplier);
+
             }
         }
-        building.setProduction(production);
     }
 
-    public void changeProduction(Building building){
-        Vector2d pos = building.getPosition();
-        for(Building existBuilding: buildings){
-            Vector2d existingPos = existBuilding.getPosition();
-            if ( (existingPos.x >= pos.x-1 && existingPos.x <= pos.x+1) && (existingPos.y >= pos.y-1 && existingPos.y <= pos.y+1)){
-                if (checkMatchedBuilding(building, existBuilding)){
-                    if (existBuilding.getTYPE() == FORGE){
-                        addPopulation(2);
-                    }else if(existBuilding.getTYPE() == CUSTOM_HOUSE){
-                        addProduction(2);
-                        existBuilding.setProduction(existBuilding.getPRODUCTION() + 2);
-                    }else{
-                        addPopulation(1);
-                    }
 
-                }
-            }
+
+    public int getProduction(){
+        // If population less than 0, return start between [0 ~ level+production]
+        if(population > 0) {
+            return level + production;
         }
-    }
-
-    public boolean checkMatchedBuilding(Building original, Building functional){
-        return (original.getTYPE() == FARM && functional.getTYPE() == Types.BUILDING.WINDMILL) ||
-                (original.getTYPE() == LUMBER_HUT && functional.getTYPE() == SAWMILL) ||
-                (original.getTYPE() == MINE && functional.getTYPE() == FORGE) ||
-                (original.getTYPE() == PORT && functional.getTYPE() == CUSTOM_HOUSE);
+        return Math.max(0, (level + production - population));
     }
 
     public boolean canLevelUp()
@@ -110,12 +159,7 @@ public class City extends Actor{
     public void levelUp(){
         level++;
         population = population - population_need;
-        population_need = level + 1;
-    }
-
-
-    public void addProduction(int prod) {
-        production += prod;
+        population_need = level;
     }
 
     public boolean addUnit(int id){
@@ -126,7 +170,7 @@ public class City extends Actor{
         return false;
     }
 
-    public boolean addUnitAble(){
+    public boolean canAddUnit(){
         return unitsID.size() < level;
     }
 
@@ -144,9 +188,9 @@ public class City extends Actor{
         return unitsID.remove(index);
     }
 
-    public LinkedList<Integer> moveUnits(){
-        LinkedList<Integer> lists = unitsID;
-        unitsID = new LinkedList<Integer>();
+    public ArrayList<Integer> moveUnits(){
+        ArrayList<Integer> lists = unitsID;
+        unitsID = new ArrayList<Integer>();
         return lists;
     }
 
@@ -154,13 +198,6 @@ public class City extends Actor{
         return level;
     }
 
-    public int getProduction(){
-        // If population less than 0, return start between [0 ~ level+production]
-        if(population > 0) {
-            return level + production;
-        }
-        return Math.max(0, (level + production - population));
-    }
 
     public int getPopulation() {
         return population;
@@ -181,12 +218,12 @@ public class City extends Actor{
 
 
     // Get the point for each turn
-    public int getPoints() {
+    public int getPointsPerTurn() {
         return pointsPerTurn;
     }
 
 
-    public void setUnitsID(LinkedList<Integer> unitsID) {
+    public void setUnitsID(ArrayList<Integer> unitsID) {
         this.unitsID = unitsID;
     }
 
@@ -203,15 +240,6 @@ public class City extends Actor{
     }
 
 
-    public LinkedList<Integer> copyUnitsID() {
-        LinkedList<Integer> copyUnits = new LinkedList<>();
-        for (Integer id : unitsID) {
-            copyUnits.add(id);
-        }
-        return copyUnits;
-    }
-
-
     public City copy(){
         City c = new City(position.x, position.y, tribeId);
         c.level = level;
@@ -224,7 +252,7 @@ public class City extends Actor{
         c.bound = bound;
         c.actorId = actorId;
         c.setBuildings(copyBuildings());
-        c.setUnitsID(copyUnitsID());
+        c.setUnitsID(new ArrayList<>(unitsID));
         return c;
     }
 
@@ -245,14 +273,13 @@ public class City extends Actor{
         this.bound = b;
     }
 
-    public LinkedList<Integer> getUnitsID() {
+    public ArrayList<Integer> getUnitsID() {
         return unitsID;
     }
 
-    public Building removeBuilding(int x, int y){
+    public Building getBuilding(int x, int y){
         for(Building building :buildings){
-            if (building.getPosition().x == x && building.getPosition().y == y){
-                buildings.remove(building);
+            if (building.position.x == x && building.position.y == y){
                 return building;
             }
         }
@@ -275,5 +302,9 @@ public class City extends Actor{
 
     public void setTribeId(int tribeId) {
         this.tribeId = tribeId;
+    }
+
+    public LinkedList<Building> getBuildings() {
+        return buildings;
     }
 }

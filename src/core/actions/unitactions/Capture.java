@@ -55,8 +55,15 @@ public class Capture extends UnitAction
             City targetCity = (City) gs.getActor(this.targetCityId);
             Board b = gs.getBoard();
             Tribe t = b.getTribe(unit.getTribeId());
-            return b.capture(t, targetCity.getPosition().x, targetCity.getPosition().y, gs.getRandomGenerator());
+            return b.capture(gs, t, targetCity.getPosition().x, targetCity.getPosition().y);
         }
         return false;
+    }
+
+    @Override
+    public Action copy() {
+        Capture capture = new Capture(this.unitId);
+        capture.setTargetCity(this.targetCityId);
+        return capture;
     }
 }

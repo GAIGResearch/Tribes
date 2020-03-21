@@ -31,7 +31,7 @@ public class Tribe extends Actor {
     private TechnologyTree techTree;
 
     //Current number of stars (resources) of this tribe.
-    private int stars; //TODO: compute this amount at the beginning of each turn.
+    private int stars;
 
     //Game result for this player.
     private Types.RESULT winner = Types.RESULT.INCOMPLETE;
@@ -257,7 +257,7 @@ public class Tribe extends Actor {
         return null;
     }
 
-    public void moveAllUnits(LinkedList<Integer> units){
+    public void moveAllUnits(ArrayList<Integer> units){
         extraUnits.addAll(units);
     }
 
@@ -442,4 +442,35 @@ public class Tribe extends Actor {
         return canBuildRoad && hasMoney;
     }
 
+    public void capturedCity(GameState gameState, City captured)
+    {
+        this.addCity(captured.getActorId());
+        captured.setTribeId(actorId);
+
+        //manage production and population of this new city (and others!)
+        for(Building building : captured.getBuildings())
+        {
+            captured.updateBuildingEffects(gameState, building, false, true);
+        }
+    }
+
+    public void lostCity(GameState gameState, City lostCity)
+    {
+        this.removeCity(lostCity.getActorId());
+        //manage the effect of losing this in the production and population of other cities.
+
+        //manage production and population of this new city (and others!)
+        for(Building building : lostCity.getBuildings())
+        {
+            if(building.type.isBase() || building.type == Types.BUILDING.PORT)
+            {
+                lostCity.updateBuildingEffects(gameState, building, true, true);
+            }
+        }
+
+    }
+
+    public ArrayList<Integer> getExtraUnits() {
+        return extraUnits;
+    }
 }

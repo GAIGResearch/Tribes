@@ -2,6 +2,7 @@ package core.actions.unitactions;
 
 import core.TechnologyTree;
 import core.Types;
+import core.actions.Action;
 import core.actors.City;
 import core.actors.Tribe;
 import core.game.Board;
@@ -79,5 +80,10 @@ public class Examine extends UnitAction
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Action copy() {
+        return new Examine(this.unitId);
     }
 }

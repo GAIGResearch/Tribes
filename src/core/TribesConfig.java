@@ -1,5 +1,7 @@
 package core;
 
+import static core.Types.RESOURCE.*;
+
 public class TribesConfig
 {
     /* UNITS */
@@ -124,36 +126,50 @@ public class TribesConfig
 
     // Farm
     public static int FARM_COST = 5;
-    public static int FARM_PRODUCTION = 2;
+    public static int FARM_BONUS = 2;
+    public static int FARM_POINTS = 10;
+    public static Types.RESOURCE FARM_RES_CONSTRAINT = CROPS;
 
     //WindMill
     public static int WIND_MILL_COST = 5;
+    public static int WIND_MILL_BONUS = 1;
+    public static int WIND_MILL_POINTS = 5;
 
     // LumberHut
     public static int LUMBER_HUT_COST = 2;
-    public static int LUMBER_HUT_PRODUCTION = 1;
+    public static int LUMBER_HUT_BONUS = 1;
+    public static int LUMBER_HUT_POINTS = 5;
 
     // SawMill
     public static int SAW_MILL_COST = 5;
+    public static int SAW_MILL_BONUS = 1;
+    public static int SAW_MILL_POINTS = 5;
 
     //Mine
     public static int MINE_COST = 5;
-    public static int MINE_PRODUCTION = 2;
+    public static int MINE_BONUS = 2;
+    public static int MINE_POINTS = 10;
+    public static Types.RESOURCE MINE_RES_CONSTRAINT = ORE;
 
     // Forge
     public static int FORGE_COST = 5;
+    public static int FORGE_BONUS = 2;
+    public static int FORGE_POINTS = 10;
 
     // Port
     public static int PORT_COST = 10;
-    public static int PORT_PRODUCTION = 2;
+    public static int PORT_BONUS = 2;
     public static int PORT_TRADE_DISTANCE = 3;
+    public static int PORT_POINTS = 10;
 
     // Custom House
     public static int CUSTOM_COST = 5;
+    public static int CUSTOM_BONUS = 2;
+    public static int CUSTOM_POINTS = 0;
 
     //Monuments
-    public static int MONUMENT_PRODUCTION = 3;
-    public static int MONUMENT_POINT = 400;
+    public static int MONUMENT_BONUS = 3;
+    public static int MONUMENT_POINTS = 400;
     public static int EMPERORS_TOMB_STARS = 100;
     public static int GATE_OF_POWER_KILLS = 10;
     public static int GRAND_BAZAR_CITIES = 5;
@@ -161,8 +177,8 @@ public class TribesConfig
     // Temple
     public static int TEMPLE_COST = 20;
     public static int TEMPLE_FOREST_COST = 15;
-    public static int TEMPLE_PRODUCTION = 3;
-    public static int TEMPLE_POINT = 100;
+    public static int TEMPLE_BONUS = 1;
+    public static int TEMPLE_POINTS = 100;
 
 
     //Resources

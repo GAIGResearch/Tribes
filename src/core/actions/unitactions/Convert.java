@@ -1,5 +1,6 @@
 package core.actions.unitactions;
 
+import core.actions.Action;
 import core.game.GameState;
 import core.actors.units.Unit;
 
@@ -44,5 +45,12 @@ public class Convert extends UnitAction
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Action copy() {
+        Convert convert = new Convert(this.unitId);
+        convert.setTargetId(this.targetId);
+        return convert;
     }
 }

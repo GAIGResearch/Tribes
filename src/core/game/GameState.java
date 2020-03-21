@@ -2,6 +2,7 @@ package core.game;
 
 import core.actions.Action;
 import core.actions.cityactions.factory.CityActionBuilder;
+import core.actions.tribeactions.TribeAction;
 import core.actions.tribeactions.factory.TribeActionBuilder;
 import core.actions.unitactions.factory.UnitActionBuilder;
 import core.actors.Actor;
@@ -31,8 +32,8 @@ public class GameState {
     private boolean[] canEndTurn;
 
     //Actions per city, unit and tribe. These are computed when computePlayerActions() is called
-    private HashMap<City, ArrayList<Action>> cityActions;
-    private HashMap<Unit, ArrayList<Action>> unitActions;
+    private HashMap<Integer, ArrayList<Action>> cityActions;
+    private HashMap<Integer, ArrayList<Action>> unitActions;
     private ArrayList<Action> tribeActions;
 
     /**
@@ -154,23 +155,26 @@ public class GameState {
 
         while (!done && i < numCities)
         {
-            City c = (City) board.getActor(cities.get(i));
+            int cityId = cities.get(i);
+            City c = (City) board.getActor(cityId);
             ArrayList<Action> actions = cab.getActions(this, c);
 
             if(actions.size() > 0)
             {
-                cityActions.put(c, actions);
+                cityActions.put(cityId, actions);
             }
 
             done = cab.cityLevelsUp();
             if(!done)
             {
-                //TODO: This misses the converted units that do not belong to any city. FIX!!!
-                LinkedList<Integer> unitIds = c.getUnitsID();
+                ArrayList<Integer> unitIds = c.getUnitsID();
                 allUnits.addAll(unitIds);
                 i++;
             }
         }
+
+        //Add the extra units that don't belong to any city.
+        allUnits.addAll(tribe.getExtraUnits());
 
         int activeTribeID = board.getActiveTribeID();
         if(done)
@@ -189,7 +193,7 @@ public class GameState {
             Unit u = (Unit) board.getActor(unitId);
             ArrayList<Action> actions = uab.getActions(this, u);
             if(actions.size() > 0)
-                unitActions.put(u, actions);
+                unitActions.put(unitId, actions);
         }
 
         //This tribe
@@ -346,11 +350,11 @@ public class GameState {
     }
 
 
-    public HashMap<City, ArrayList<Action>> getCityActions() {
+    public HashMap<Integer, ArrayList<Action>> getCityActions() {
         return cityActions;
     }
 
-    public HashMap<Unit, ArrayList<Action>> getUnitActions() {
+    public HashMap<Integer, ArrayList<Action>> getUnitActions() {
         return unitActions;
     }
 

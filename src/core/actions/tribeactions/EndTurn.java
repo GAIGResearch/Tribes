@@ -29,4 +29,9 @@ public class EndTurn extends TribeAction {
         }
         return false;
     }
+
+    @Override
+    public Action copy() {
+        return new EndTurn(this.tribeId);
+    }
 }

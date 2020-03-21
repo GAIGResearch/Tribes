@@ -33,4 +33,9 @@ public class MakeVeteran extends UnitAction
         }
         return false;
     }
+
+    @Override
+    public Action copy() {
+        return new MakeVeteran(this.unitId);
+    }
 }

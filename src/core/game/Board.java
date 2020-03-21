@@ -333,6 +333,7 @@ public class Board {
         for (int i = 0; i < numTribes; ++i) {
             this.tribes[i] = tribes[i];
             this.tribes[i].setTribeId(i);
+            this.tribes[i].setActorId(i);
         }
     }
 

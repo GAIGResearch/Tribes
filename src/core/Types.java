@@ -123,6 +123,7 @@ Yellow_dark - 929000
         MOVED,
         ATTACKED,
         MOVED_AND_ATTACKED,
+        PUSHED,
         FINISHED
     }
 

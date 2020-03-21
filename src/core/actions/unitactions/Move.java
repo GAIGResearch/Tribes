@@ -64,4 +64,11 @@ public class Move extends UnitAction
         return false;
     }
 
+    @Override
+    public Action copy() {
+        Move move = new Move(this.unitId);
+        move.setDestination(this.destination);
+        return move;
+    }
+
 }

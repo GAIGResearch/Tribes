@@ -1,6 +1,7 @@
 package core.actions.cityactions;
 
 import core.Types;
+import core.actions.Action;
 import core.actors.Tribe;
 import core.actors.Building;
 import core.game.Board;
@@ -45,5 +46,12 @@ public class Destroy extends CityAction
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Action copy() {
+        Destroy destroy = new Destroy(this.cityId);
+        destroy.setTargetPos(this.targetPos.copy());
+        return destroy;
     }
 }

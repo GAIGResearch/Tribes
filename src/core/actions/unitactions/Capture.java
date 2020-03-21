@@ -59,4 +59,11 @@ public class Capture extends UnitAction
         }
         return false;
     }
+
+    @Override
+    public Action copy() {
+        Capture capture = new Capture(this.unitId);
+        capture.setTargetCity(this.targetCityId);
+        return capture;
+    }
 }

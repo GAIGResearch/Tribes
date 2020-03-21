@@ -56,6 +56,11 @@ public class HealOthers extends UnitAction
         return false;
     }
 
+    @Override
+    public Action copy() {
+        return new HealOthers(this.unitId);
+    }
+
     private boolean canBeHealed(Unit healer, Unit target)
     {
         if(target != null && target.getActorId() != healer.getActorId()){

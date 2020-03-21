@@ -1,5 +1,6 @@
 package core.actions.tribeactions;
 import core.TribesConfig;
+import core.actions.Action;
 import core.actors.Tribe;
 import core.game.GameState;
 import utils.Vector2d;
@@ -42,5 +43,12 @@ public class BuildRoad extends TribeAction {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Action copy() {
+        BuildRoad buildRoad = new BuildRoad(this.tribeId);
+        buildRoad.setPosition(position.x, position.y);
+        return buildRoad;
     }
 }

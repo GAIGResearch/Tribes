@@ -2,6 +2,7 @@ package core.actions.unitactions;
 
 import core.TribesConfig;
 import core.Types;
+import core.actions.Action;
 import core.actors.City;
 import core.actors.Tribe;
 import core.game.Board;
@@ -55,5 +56,10 @@ public class Upgrade extends UnitAction
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Action copy() {
+        return new Upgrade(this.unitId);
     }
 }

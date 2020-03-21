@@ -97,4 +97,11 @@ public class Attack extends UnitAction
         }
         return false;
     }
+
+    @Override
+    public Action copy() {
+        Attack attack = new Attack(this.unitId);
+        attack.setTargetId(this.targetId);
+        return attack;
+    }
 }

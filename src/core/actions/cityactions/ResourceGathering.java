@@ -70,4 +70,12 @@ public class ResourceGathering extends CityAction
         }
         return false;
     }
+
+    @Override
+    public Action copy() {
+        ResourceGathering res = new ResourceGathering(this.cityId);
+        res.setResource(this.resource);
+        res.setTargetPos(targetPos.copy());
+        return res;
+    }
 }

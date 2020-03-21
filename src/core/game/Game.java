@@ -2,13 +2,19 @@ package core.game;
 
 import core.Types;
 import core.actions.Action;
+import core.actions.unitactions.Recover;
+import core.actions.unitactions.factory.RecoverFactory;
+import core.actors.City;
 import core.actors.Tribe;
+import core.actors.units.Unit;
 import players.Agent;
 import utils.ElapsedCpuTimer;
 import utils.GUI;
+import utils.Vector2d;
 import utils.WindowInput;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 
 import static core.Constants.*;
@@ -170,7 +176,7 @@ public class Game {
     /**
      * Ticks the game forward. Asks agents for actions and applies returned actions to obtain the next game state.
      */
-    void tick (GUI frame) {
+    private void tick (GUI frame) {
         if (VERBOSE) {
             //System.out.println("tick: " + gs.getTick());
         }
@@ -199,13 +205,13 @@ public class Game {
      * @param playerID ID of the player whose turn is being processed.
      * @param tribe tribe that corresponds to this player.
      */
-    void processTurn(int playerID, Tribe tribe, GUI frame)
+    private void processTurn(int playerID, Tribe tribe, GUI frame)
     {
+        //Init the turn for this tribe (stars, unit reset, etc).
+        this.initTurn(tribe);
+
         //Take the player for this turn
         Agent ag = players[playerID];
-
-        //compute the actions available for this player.
-        gs.computePlayerActions(tribe);
 
         //start the timer to the max duration
         ElapsedCpuTimer ect = new ElapsedCpuTimer();
@@ -250,8 +256,100 @@ public class Game {
             //the timer needs to be updated to the remaining time, not counting action computation.
             ect.setMaxTimeMillis(remaining);
         }
+
+        //Ends the turn for this tribe (units that didn't move heal).
+        this.endTurn(tribe);
     }
 
+    /**
+     * Inits the turn for this player
+     * @param tribe whose turn is starting
+     */
+    private void initTurn(Tribe tribe)
+    {
+        //Get all cities of this tribe
+        ArrayList<Integer> tribeCities = tribe.getCitiesID();
+        ArrayList<Integer> allTribeUnits = new ArrayList<>();
+        GameState gs = gameStateObservations[tribe.getActorId()];
+
+
+        //1. Compute stars and score per turn
+        int acumProd = 0, turnScore = 0;
+        for(int cityId : tribeCities)
+        {
+            City city = (City) gs.getActor(cityId);
+
+            //Cities with an enemy unit in the city's tile don't generate production.
+            boolean produces = true;
+            Vector2d cityPos = city.getPosition();
+            int unitIDAt = gs.getBoard().getUnitIDAt(cityPos.x, cityPos.y);
+            if(unitIDAt != -1)
+            {
+                Unit u = (Unit) gs.getActor(unitIDAt);
+                produces = (u.getTribeId() == tribe.getTribeId());
+            }
+
+            if(produces)
+                acumProd += city.getProduction();
+
+            turnScore += city.getPointsPerTurn();
+            allTribeUnits.addAll(city.getUnitsID());
+        }
+        tribe.addStars(acumProd);
+        tribe.addScore(turnScore);
+
+        //2. Units: all become available. This needs to be done here as some units may have become
+        // pushed during other player's turn.
+        allTribeUnits.addAll(tribe.getExtraUnits());    //Add the extra units that don't belong to a city.
+        for(int unitId : allTribeUnits)
+        {
+            Unit unit = (Unit) gs.getActor(unitId);
+            if(unit.getStatus() == Types.TURN_STATUS.PUSHED)
+                //Pushed units in the previous turn start as if they moved already.
+                unit.setStatus(Types.TURN_STATUS.MOVED);
+            else
+                unit.setStatus(Types.TURN_STATUS.FRESH);
+        }
+
+        //3. Compute the actions available for this player.
+        gs.computePlayerActions(tribe);
+    }
+
+
+    /**
+     * Ends this turn. Executes a Recover action on all the units that are not fresh
+     * @param tribe tribe whose turn is ending.
+     */
+    private void endTurn(Tribe tribe)
+    {
+        //For all units that didn't execute any action, a Recover action is executed.
+        ArrayList<Integer> allTribeUnits = new ArrayList<>();
+        ArrayList<Integer> tribeCities = tribe.getCitiesID();
+        GameState gs = gameStateObservations[tribe.getActorId()];
+
+        //1. Get all units
+        for(int cityId : tribeCities)
+        {
+            City city = (City) gs.getActor(cityId);
+            allTribeUnits.addAll(city.getUnitsID());
+        }
+
+        //Heal the ones that were in a FRESH state.
+        allTribeUnits.addAll(tribe.getExtraUnits());    //Add the extra units that don't belong to a city.
+        for(int unitId : allTribeUnits)
+        {
+            Unit unit = (Unit) gs.getActor(unitId);
+            if(unit.getStatus() == Types.TURN_STATUS.FRESH)
+            {
+                LinkedList<Action> recoverActions = new RecoverFactory().computeActionVariants(unit, gs);
+                if(recoverActions.size() > 0)
+                {
+                    Recover recoverAction = (Recover)recoverActions.get(0);
+                    recoverAction.execute(gs);
+                }
+            }
+        }
+    }
 
     /**
      * This method terminates the game, assigning the winner/result state to all players.

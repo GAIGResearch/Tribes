@@ -218,6 +218,8 @@ public class InfoView extends JComponent {
 
         highlightX0 = -1;
         highlightY0 = -1;
+
+        textArea.setText("");
     }
 
     public int getHighlightX() {return highlightX0;}

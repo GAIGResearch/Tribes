@@ -23,6 +23,7 @@ public class GameView extends JComponent {
     private GameState gameState;
 //    private Image backgroundImg;
     private InfoView infoView;
+    private Point2D panTranslate;  // Used to translate all coordinates for objects drawn on screen
 
     private int shadowOffset = 1;
     private int roundRectArc = 5;
@@ -36,10 +37,11 @@ public class GameView extends JComponent {
     public static Dimension dimension;
     private static double isometricAngle = -45;
 
-    GameView(Board board, InfoView inforView)
+    GameView(Board board, InfoView inforView, Point2D panTranslate)
     {
         this.board = board.copy();
         this.infoView = inforView;
+        this.panTranslate = panTranslate;
 
         gridSize = board.getSize();
         int size = gridSize * CELL_SIZE;
@@ -68,26 +70,26 @@ public class GameView extends JComponent {
         //For a better graphics, enable this: (be aware this could bring performance issues depending on your HW & OS).
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g.setColor(Color.BLACK);
-        g.fillRect(0, dimension.height, dimension.width, dimension.height);
+//        g.setColor(Color.BLACK);
+//        g.fillRect(0, dimension.height, dimension.width, dimension.height);
 
         for(int i = 0; i < gridSize; ++i) {
             for(int j = 0; j < gridSize; ++j) {
                 // We paint all base terrains, resources and buildings first
                 Types.TERRAIN t = board.getTerrainAt(i,j);
                 if(t == null) {
-                    paintFog(g, i, j, CELL_SIZE);
+                    paintFog(g, i, j, CELL_SIZE, panTranslate);
                 } else {
                     Image toPaint = getContextImg(i, j, t);
-                    paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, toPaint, CELL_SIZE);
+                    paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, toPaint, CELL_SIZE, panTranslate);
                 }
 
                 Types.RESOURCE r = board.getResourceAt(i,j);
                 int imgSize = (int) (CELL_SIZE * 0.75);
-                paintImageRotated(g, j*CELL_SIZE, i*CELL_SIZE, (r == null) ? null : r.getImage(), imgSize);
+                paintImageRotated(g, j*CELL_SIZE, i*CELL_SIZE, (r == null) ? null : r.getImage(), imgSize, panTranslate);
 
                 Types.BUILDING b = board.getBuildingAt(i,j);
-                paintImageRotated(g, j*CELL_SIZE, i*CELL_SIZE, (b == null) ? null : b.getImage(), CELL_SIZE);
+                paintImageRotated(g, j*CELL_SIZE, i*CELL_SIZE, (b == null) ? null : b.getImage(), CELL_SIZE, panTranslate);
             }
         }
 
@@ -101,7 +103,7 @@ public class GameView extends JComponent {
             g.setStroke(new BasicStroke(3));
 
             Point2D p = rotatePoint(highlightX, highlightY);
-            drawRotatedRect(g, (int)p.getX(), (int)p.getY(), CELL_SIZE - 1, CELL_SIZE - 1);
+            drawRotatedRect(g, (int)p.getX(), (int)p.getY(), CELL_SIZE - 1, CELL_SIZE - 1, panTranslate);
             g.setStroke(oldStroke);
             g.setColor(Color.BLACK);
         }
@@ -124,19 +126,23 @@ public class GameView extends JComponent {
                     if (exhausted) {
                         String exhaustedStr = imgFile + imgFile.split("/")[2] + "Exhausted.png";
                         Image exhaustedImg = ImageIO.GetInstance().getImage(exhaustedStr);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - shadowOffset, i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - shadowOffset,
-                                exhaustedImg, imgSize);
+                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - shadowOffset,
+                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - shadowOffset,
+                                exhaustedImg, imgSize, panTranslate);
                     } else {
                         String highlightStr = imgFile + imgFile.split("/")[2] + "Highlight.png";
                         String shadowStr = imgFile + imgFile.split("/")[2] + "Shadow.png";
                         Image highlight = ImageIO.GetInstance().getImage(highlightStr);
                         Image shadow = ImageIO.GetInstance().getImage(shadowStr);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - shadowOffset, i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - shadowOffset,
-                                highlight, imgSize);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 + shadowOffset, i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 + shadowOffset,
-                                shadow, imgSize);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2, i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2,
-                                u.getType().getImage(u.getTribeId()), imgSize);
+                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - shadowOffset,
+                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - shadowOffset,
+                                highlight, imgSize, panTranslate);
+                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 + shadowOffset,
+                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 + shadowOffset,
+                                shadow, imgSize, panTranslate);
+                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2,
+                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2,
+                                u.getType().getImage(u.getTribeId()), imgSize, panTranslate);
                     }
                 }
             }
@@ -156,7 +162,7 @@ public class GameView extends JComponent {
                         Vector2d pos = GUI.getActionPosition(gameState, a);
 
                         if (pos != null) {
-                            paintImageRotated(g, pos.y * CELL_SIZE, pos.x * CELL_SIZE, actionImg, CELL_SIZE);
+                            paintImageRotated(g, pos.y * CELL_SIZE, pos.x * CELL_SIZE, actionImg, CELL_SIZE, panTranslate);
                         }
                     }
                 }
@@ -167,14 +173,15 @@ public class GameView extends JComponent {
         //player.draw(g); //if we want to give control to the agent to paint something (for debug), start here.
     }
 
-    private static void paintFog(Graphics2D gphx, int i, int j, int cellSize)
+    private static void paintFog(Graphics2D gphx, int i, int j, int cellSize, Point2D panTranslate)
     {
         Point2D p = rotatePoint(j, i);
         gphx.setColor(Color.black);
-        fillRotatedRect(gphx, (int)p.getX() - 1, (int)p.getY() - 1, cellSize + 2, cellSize + 2);
+        fillRotatedRect(gphx, (int)(p.getX() - 1 + panTranslate.getX()), (int)(p.getY() - 1 + panTranslate.getY()),
+                cellSize + 2, cellSize + 2, panTranslate);
     }
 
-    private static void paintImageRotated(Graphics2D gphx, int x, int y, Image img, int imgSize)
+    private static void paintImageRotated(Graphics2D gphx, int x, int y, Image img, int imgSize, Point2D panTranslate)
     {
         if (img != null) {
             int w = img.getWidth(null);
@@ -183,35 +190,40 @@ public class GameView extends JComponent {
             float scaleY = (float)imgSize/h;
 
             Graphics2D g2 = (Graphics2D)gphx.create();
-            g2.translate(0, dimension.width/2);
+            g2.translate(panTranslate.getX(), panTranslate.getY() + dimension.width/2.0);
             g2.rotate(Math.toRadians(isometricAngle));
-            g2.drawImage(img, x + CELL_SIZE/2 - imgSize/2, y + CELL_SIZE/2 - imgSize/2, (int) (w*scaleX), (int) (h*scaleY), null);
+            g2.drawImage(img, (int)(x + CELL_SIZE/2.0 - imgSize/2.0),
+                    (int)(y + CELL_SIZE/2.0 - imgSize/2.0),
+                    (int) (w*scaleX), (int) (h*scaleY), null);
             g2.dispose();
         }
     }
 
-    private static void paintImage(Graphics2D gphx, int x, int y, Image img, int imgSize)
+    private static void paintImage(Graphics2D gphx, int x, int y, Image img, int imgSize, Point2D panTranslate)
     {
         if (img != null) {
             int w = img.getWidth(null);
             int h = img.getHeight(null);
             float scaleX = (float)imgSize/w;
             float scaleY = (float)imgSize/h;
-            gphx.drawImage(img, x, y, (int) (w*scaleX), (int) (h*scaleY), null);
+            gphx.drawImage(img, (int)(x + panTranslate.getX()), (int)(y + panTranslate.getY()),
+                    (int) (w*scaleX), (int) (h*scaleY), null);
         }
     }
 
-    private static void drawRotatedRect(Graphics2D g, int x, int y, int width, int height) {
+    private static void drawRotatedRect(Graphics2D g, int x, int y, int width, int height, Point2D panTranslate) {
         Graphics2D g2 = (Graphics2D) g.create();
+        x += panTranslate.getX();
+        y += panTranslate.getY();
         g2.rotate(Math.toRadians(isometricAngle), x, y);
         g2.drawRect(x, y, width, height);
         g2.dispose();
     }
 
-    private static void fillRotatedRect(Graphics2D g, int x, int y, int width, int height) {
+    private static void fillRotatedRect(Graphics2D g, int x, int y, int width, int height, Point2D panTranslate) {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.rotate(Math.toRadians(isometricAngle), x, y);
-        g2.fillRect(x, y, width, height);
+        g2.fillRect((int)(x + panTranslate.getX()), (int)(y + panTranslate.getY()), width, height);
         g2.dispose();
     }
 
@@ -254,24 +266,29 @@ public class GameView extends JComponent {
         double h = d/4.0;
         double nameWidth = 20 + 2*h;
         Point2D namePos = rotatePoint(j,i);
-        Rectangle nameRect = new Rectangle((int)(namePos.getX() + d/2.0 - nameWidth/2), (int)(namePos.getY() + d/2.0 - h), (int)nameWidth, (int)h);
+        Rectangle nameRect = new Rectangle((int)(namePos.getX() + d/2.0 - nameWidth/2.0),
+                (int)(namePos.getY() + d/2.0 - h), (int)nameWidth, (int)h);
         drawRectShadowHighlight(g, nameRect);
         g.setColor(col);
-        g.fillRect(nameRect.x, nameRect.y, nameRect.width, nameRect.height);
+        g.fillRect((int)(nameRect.x + panTranslate.getX()), (int)(nameRect.y + panTranslate.getY()), nameRect.width, nameRect.height);
         g.setColor(Color.WHITE);
-        g.drawString(cityName, nameRect.x + nameRect.width/2 - 4*cityName.length(), (int)(nameRect.y+h-2));
+        g.drawString(cityName, (int)(nameRect.x + nameRect.width/2.0 - 4*cityName.length() + panTranslate.getX()),
+                (int)(nameRect.y+h-2 + panTranslate.getY()));
 
         // Draw number of stars
-        paintImage(g, (int)(nameRect.x + nameRect.width - h + shadowOffset), nameRect.y + shadowOffset, starShadow, (int)h);
-        paintImage(g, (int)(nameRect.x + nameRect.width - h), nameRect.y, starImg, (int)h);
-        drawStringShadow(g, production, (int)(nameRect.x + nameRect.width + h), (int)(nameRect.y+h-2));
+        paintImage(g, (int)(nameRect.x + nameRect.width - h + shadowOffset),
+                nameRect.y + shadowOffset, starShadow, (int)h, panTranslate);
+        paintImage(g, (int)(nameRect.x + nameRect.width - h), nameRect.y, starImg, (int)h, panTranslate);
+        drawStringShadow(g, production, (int)(nameRect.x + nameRect.width + h),
+                (int)(nameRect.y+h-2 + panTranslate.getY()));
         g.setColor(Color.WHITE);
-        g.drawString(production, (int)(nameRect.x + nameRect.width + h), (int)(nameRect.y+h-2));
+        g.drawString(production, (int)(nameRect.x + nameRect.width + h + panTranslate.getX()),
+                (int)(nameRect.y+h-2 + panTranslate.getY()));
 
         // Draw capital sign
         if (c.isCapital()) {
-            paintImage(g, nameRect.x + shadowOffset, nameRect.y + shadowOffset, capitalShadow, (int)h);
-            paintImage(g, nameRect.x, nameRect.y, capitalImg, (int)h);
+            paintImage(g, nameRect.x + shadowOffset, nameRect.y + shadowOffset, capitalShadow, (int)h, panTranslate);
+            paintImage(g, nameRect.x, nameRect.y, capitalImg, (int)h, panTranslate);
         }
 
         // Draw level
@@ -280,7 +297,8 @@ public class GameView extends JComponent {
         Rectangle bgRect = new Rectangle(nameRect.x + nameRect.width/2 - w/2, nameRect.y + nameRect.height, w, (int)h);
         drawRoundRectShadowHighlight(g, bgRect);
         g.setColor(Color.WHITE);
-        g.fillRoundRect(bgRect.x, bgRect.y, bgRect.width, bgRect.height, roundRectArc, roundRectArc);
+        g.fillRoundRect((int)(bgRect.x + panTranslate.getX()), (int)(bgRect.y + panTranslate.getY()),
+                bgRect.width, bgRect.height, roundRectArc, roundRectArc);
 
         // Draw population/progress
         if (progress >= 0) {
@@ -290,42 +308,49 @@ public class GameView extends JComponent {
         }
         int pw = Math.abs(progress) * sectionWidth;
         Rectangle pgRect = new Rectangle(bgRect.x, bgRect.y, pw, bgRect.height);
-        g.fillRoundRect(pgRect.x, pgRect.y, pgRect.width, pgRect.height, roundRectArc, roundRectArc);
+        g.fillRoundRect((int)(pgRect.x + panTranslate.getX()), (int)(pgRect.y +  + panTranslate.getY()),
+                pgRect.width, pgRect.height, roundRectArc, roundRectArc);
 
         // Draw unit counts
         g.setColor(Color.black);
         double radius = h/2.0;
         double unitHeight = bgRect.y + h/2 - radius/2;
         for (int u = 0; u < units; u++) {
-            g.fillOval((int)(bgRect.x + sectionWidth * u + sectionWidth/2.0 - radius/2.0), (int)unitHeight, (int)radius, (int)radius);
+            g.fillOval((int)(bgRect.x + sectionWidth * u + sectionWidth/2.0 - radius/2.0 + panTranslate.getX()),
+                    (int)(unitHeight  + panTranslate.getY()), (int)radius, (int)radius);
         }
 
         // Draw section separations
         for (int l = 0; l < level - 1; l++) {
             int lx = bgRect.x + sectionWidth * (l + 1);
-            g.drawLine(lx, bgRect.y, lx, bgRect.y + bgRect.height);
+            g.drawLine((int)(lx + panTranslate.getX()), (int)(bgRect.y + panTranslate.getY()),
+                    lx, bgRect.y + bgRect.height);
         }
     }
 
     private void drawRoundRectShadowHighlight(Graphics2D g, Rectangle rect) {
         g.setColor(new Color(0, 0, 0, 122));
-        g.fillRoundRect(rect.x + shadowOffset, rect.y + shadowOffset, rect.width, rect.height,
+        g.fillRoundRect((int)(rect.x + shadowOffset + panTranslate.getX()),
+                (int)(rect.y + shadowOffset + panTranslate.getY()), rect.width, rect.height,
                 roundRectArc, roundRectArc);
         g.setColor(new Color(255, 255, 255, 122));
-        g.fillRoundRect(rect.x - shadowOffset, rect.y - shadowOffset, rect.width, rect.height,
+        g.fillRoundRect((int)(rect.x - shadowOffset + panTranslate.getX()),
+                (int)(rect.y - shadowOffset + panTranslate.getY()), rect.width, rect.height,
                 roundRectArc, roundRectArc);
     }
 
     private void drawRectShadowHighlight(Graphics2D g, Rectangle rect) {
         g.setColor(new Color(0, 0, 0, 122));
-        g.fillRect(rect.x + shadowOffset, rect.y + shadowOffset, rect.width, rect.height);
+        g.fillRect((int)(rect.x + shadowOffset + panTranslate.getX()),
+                (int)(rect.y + shadowOffset + panTranslate.getY()), rect.width, rect.height);
         g.setColor(new Color(255, 255, 255, 122));
-        g.fillRect(rect.x - shadowOffset, rect.y - shadowOffset, rect.width, rect.height);
+        g.fillRect((int)(rect.x - shadowOffset + panTranslate.getX()),
+                (int)(rect.y - shadowOffset + panTranslate.getY()), rect.width, rect.height);
     }
 
     private void drawStringShadow (Graphics2D g, String s, int x, int y) {
         g.setColor(new Color(0, 0, 0, 122));
-        g.drawString(s, x+shadowOffset, y+shadowOffset);
+        g.drawString(s, (int)(x+shadowOffset + panTranslate.getX()), (int)(y+shadowOffset + panTranslate.getY()));
     }
 
 
@@ -340,6 +365,15 @@ public class GameView extends JComponent {
         gameState = gs; //.copy(gameTurn);
         board = gameState.getBoard();
         this.repaint();
+    }
+
+    void updatePan(Point2D panTranslate) {
+        this.panTranslate = new Point2D.Double(this.panTranslate.getX() + panTranslate.getX(),
+                this.panTranslate.getY() + panTranslate.getY());
+    }
+
+    public Point2D getPanTranslate() {
+        return panTranslate;
     }
 
     /**

@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static core.Constants.GUI_MIN_PAN;
+
 
 public class GUI extends JFrame implements Runnable {
     private JLabel appTurn;
@@ -33,6 +35,9 @@ public class GUI extends JFrame implements Runnable {
 
     private boolean finishedUpdate = true;
 
+    // Zoomed screen dragging vars
+    private Point2D startDrag, endDrag, panTranslate;
+
     /**
      * Constructor
      * @param title Title of the window.
@@ -43,8 +48,9 @@ public class GUI extends JFrame implements Runnable {
         this.ac = ac;
 
         infoView = new InfoView();
+        panTranslate = new Point2D.Double(0,0);
 //        tribeView = new TribeView();
-        view = new GameView(game.getBoard(), infoView);
+        view = new GameView(game.getBoard(), infoView, panTranslate);
 
         // Create frame layout
         GridBagLayout gbl = new GridBagLayout();
@@ -92,8 +98,9 @@ public class GUI extends JFrame implements Runnable {
             @Override
             public void mouseClicked(MouseEvent e) {
                 //Only provide information if clicking on a visible tile
-                Point2D p = GameView.rotatePointReverse(e.getX(), e.getY());
-//                System.out.println(i + " " + j);
+                Point2D translate = view.getPanTranslate();
+                Point2D ep = new Point2D.Double(e.getX() - translate.getX(), e.getY() - translate.getY());
+                Point2D p = GameView.rotatePointReverse((int)ep.getX(), (int)ep.getY());
 
                 // If unit highlighted and action at new click valid for unit, execute action
                 Action candidate = getActionAt((int)p.getX(), (int)p.getY(), infoView.getHighlightX(), infoView.getHighlightY());
@@ -108,12 +115,19 @@ public class GUI extends JFrame implements Runnable {
 
             @Override
             public void mousePressed(MouseEvent e) {
-
+                startDrag = new Point2D.Double(e.getX(), e.getY());
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-
+                endDrag = new Point2D.Double(e.getX(), e.getY());
+                if (startDrag != null && !(startDrag.equals(endDrag))) {
+                    panTranslate = new Point2D.Double(+ endDrag.getX() - startDrag.getX(), + endDrag.getY() - startDrag.getY());
+                    if (panTranslate.distance(0, 0) >= GUI_MIN_PAN) {
+                        view.updatePan(panTranslate);
+                        infoView.resetHighlight();
+                    }
+                }
             }
 
             @Override
@@ -214,6 +228,9 @@ public class GUI extends JFrame implements Runnable {
      * Paints the GUI, to be called at every game tick.
      */
     public void update(GameState gs) {
+        if (this.gs != null && this.gs.getActiveTribeID() != gs.getActiveTribeID()) {
+            infoView.resetHighlight();
+        }
         this.gs = gs;
     }
 
@@ -244,8 +261,6 @@ public class GUI extends JFrame implements Runnable {
 
     @Override
     public void run() {
-        // TODO: if active tribe changed, remove highlights
-
         finishedUpdate = false;
         view.paint(gs);
         tribeView.paint(gs);

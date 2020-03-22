@@ -1,5 +1,6 @@
 package core.actors;
 
+import core.TribesConfig;
 import core.Types;
 import core.game.Board;
 import core.game.GameState;
@@ -144,10 +145,11 @@ public class City extends Actor{
 
     public int getProduction(){
         // If population less than 0, return start between [0 ~ level+production]
-        if(population > 0) {
-            return level + production;
+        if(population >= 0) {
+            int capitalBonus = isCapital ? TribesConfig.PROD_CAPITAL_BONUS : 0;
+            return level + capitalBonus;
         }
-        return Math.max(0, (level + production - population));
+        return (level + production - population);
     }
 
     public boolean canLevelUp()

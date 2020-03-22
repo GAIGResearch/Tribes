@@ -44,11 +44,12 @@ public class TribeView extends JComponent {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             Tribe[] tribes = gs.getTribes();
 
-            String s = "";
+            Tribe t = tribes[gs.getActiveTribeID()];
+            String s = "<p><b>" + t.getName() + "</b>  ...........  " + t.getScore() + " points. Stars: " + t.getStars() + " (+" + t.getTotalProduction() + ")</p>";
 
-            for (Tribe t : tribes) {
-                s += "<p><b>" + t.getName() + "</b>  ...........  " + t.getScore() + " points (stars: " + t.getStars() + ")</p>";
-            }
+//            for (Tribe t : tribes) {
+//                s += "<p><b>" + t.getName() + "</b>  ...........  " + t.getScore() + " points, (stars " + t.getStars() + ")</p>";
+//            }
 
             if (!textArea.getText().equals(s)) {
                 textArea.setText(s);

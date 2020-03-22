@@ -57,7 +57,7 @@ public class TechView extends JComponent {
                 for (int i = 0; i < Types.TECHNOLOGY.values().length; i++) {
                     Types.TECHNOLOGY opt = Types.TECHNOLOGY.values()[i];
                     boolean researched = tt.isResearched(opt);
-                    boolean researchable = tt.isResearchable(opt);
+                    boolean researchable = tt.isResearchable(opt) && t.getStars() >= opt.getCost(t.getCitiesID().size());
                     if (!(researchable || researched)) {
                         techs[i].setEnabled(false);
                         techs[i].setBackground(Color.DARK_GRAY);

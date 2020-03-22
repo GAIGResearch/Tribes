@@ -106,29 +106,39 @@ public class Types {
      */
     public enum RESOURCE
     {
-        FISH(0, "img/resource/fish.png", 'h', FISH_COST, FISH_POP),
-        FRUIT(1, "img/resource/fruit.png", 'f', FRUIT_COST, FRUIT_POP),
-        ANIMAL(2, "img/resource/animal.png", 'a', ANIMAL_COST, ANIMAL_POP),
-        WHALES(3, "img/resource/whale.png", 'w', WHALES_COST, WHALES_STARS),
-        ORE(5, "img/resource/ore.png", 'o', 0, 0),
-        CROPS(6, "img/resource/crops.png", 'c', 0, 0),
-        RUINS(7, "img/resource/ruins.png", 'r', 0, 0);
+        FISH(0, "img/resource/fish2.png", null,'h', FISH_COST, FISH_POP),
+        FRUIT(1, "img/resource/fruit2.png", null, 'f', FRUIT_COST, FRUIT_POP),
+        ANIMAL(2, "img/resource/animal2.png", null, 'a', ANIMAL_COST, ANIMAL_POP),
+        WHALES(3, "img/resource/whale2.png", "img/resource/whale3.png", 'w', WHALES_COST, WHALES_STARS),
+        ORE(5, "img/resource/ore2.png", null, 'o', 0, 0),
+        CROPS(6, "img/resource/crops.png", null, 'c', 0, 0),
+        RUINS(7, "img/resource/ruins.png", null, 'r', 0, 0);
 
         private int key;
-        private String imageFile;
+        private String imageFile, secondaryImageFile;
         private char mapChar;
         private int cost;
         private int bonus;
 
-        RESOURCE(int numVal, String imageFile, char mapChar, int cost, int bonus) {
+        RESOURCE(int numVal, String imageFile, String secondaryImageFile, char mapChar, int cost, int bonus) {
             this.key = numVal;
             this.imageFile = imageFile;
+            this.secondaryImageFile = secondaryImageFile;
             this.mapChar = mapChar;
             this.cost = cost;
             this.bonus = bonus;
         }
         public int getKey() {  return key; }
-        public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
+        public Image getImage(TERRAIN t) {
+            if (this == WHALES && t != null) {
+                if (t == DEEP_WATER) {
+                    return ImageIO.GetInstance().getImage(imageFile);
+                } else {
+                    return ImageIO.GetInstance().getImage(secondaryImageFile);
+                }
+            }
+            return ImageIO.GetInstance().getImage(imageFile);
+        }
         public int getCost() {return cost;}
         public int getBonus() {return bonus;}
 

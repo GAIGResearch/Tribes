@@ -225,6 +225,10 @@ public class Tribe extends Actor {
         return score;
     }
 
+    public int getReverseScore() {
+        return -score;
+    }
+
     public void setScore(int score) {
         this.score = score;
     }

@@ -23,7 +23,7 @@ public class BuildRoad extends TribeAction {
     public boolean isFeasible(final GameState gs) {
 
         //Retrieve tribe
-        Tribe tribe = (Tribe) gs.getActor(tribeId);
+        Tribe tribe = gs.getTribe(tribeId);
 
         //This tribe should be able to build roads in general.
         if(!tribe.canBuildRoads())
@@ -37,7 +37,7 @@ public class BuildRoad extends TribeAction {
     public boolean execute(GameState gs) {
         if(isFeasible(gs))
         {
-            Tribe tribe = (Tribe) gs.getActor(tribeId);
+            Tribe tribe = gs.getTribe(tribeId);
             tribe.addStars(-TribesConfig.ROAD_COST);
             gs.getBoard().addRoad(position.x, position.y);
             return true;

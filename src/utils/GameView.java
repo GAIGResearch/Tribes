@@ -153,21 +153,21 @@ public class GameView extends JComponent {
             }
         }
 
-        // Draw unit actions
-        HashMap<Integer, ArrayList<Action>> possibleActions = gameState.getUnitActions();
-        for (Map.Entry<Integer, ArrayList<Action>> e: possibleActions.entrySet()) {
-            Unit u = (Unit) gameState.getActor(e.getKey());
+        // Draw unit actions for highlighted unit
+        if (infoView.highlightInGridBounds()) {
+            Unit u = board.getUnitAt(highlightY, highlightX);
+            if (u != null && !infoView.clickedTwice()) {
+                ArrayList<Action> possibleActions = gameState.getUnitActions(u);
+                if (possibleActions != null && possibleActions.size() > 0) {
+                    for (Action a : possibleActions) {
+                        Image actionImg = Types.ACTION.getImage(a);
 
-            // Only draw actions for highlighted unit
-            if (u.getPosition().x == highlightY && u.getPosition().y == highlightX) {
-                for (Action a: e.getValue()) {
-                    Image actionImg = Types.ACTION.getImage(a);
+                        if (actionImg != null) {
+                            Vector2d pos = GUI.getActionPosition(gameState, a);
 
-                    if (actionImg != null) {
-                        Vector2d pos = GUI.getActionPosition(gameState, a);
-
-                        if (pos != null) {
-                            paintImageRotated(g, pos.y * CELL_SIZE, pos.x * CELL_SIZE, actionImg, CELL_SIZE, panTranslate);
+                            if (pos != null) {
+                                paintImageRotated(g, pos.y * CELL_SIZE, pos.x * CELL_SIZE, actionImg, CELL_SIZE, panTranslate);
+                            }
                         }
                     }
                 }

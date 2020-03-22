@@ -47,7 +47,7 @@ public class GUI extends JFrame implements Runnable {
         this.ki = ki;
         this.ac = ac;
 
-        infoView = new InfoView();
+        infoView = new InfoView(ac);
         panTranslate = new Point2D.Double(0,0);
 //        tribeView = new TribeView();
         view = new GameView(game.getBoard(), infoView, panTranslate);

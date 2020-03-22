@@ -23,16 +23,16 @@ public class Play {
         ArrayList<Agent> players = new ArrayList<>();
         ArrayList<Tribe> tribes = new ArrayList<>();
 
-        Agent ag1 = new DoNothingAgent(seed);
+        Agent ag1 = new HumanAgent(ac);
         players.add(ag1);
         tribes.add(new Tribe(Types.TRIBE.XIN_XI));
 
-        Agent ag2 = new DoNothingAgent(seed);
+        Agent ag2 = new HumanAgent(ac);
         players.add(ag2);
         tribes.add(new Tribe(Types.TRIBE.IMPERIUS));
 
 
-        Agent ag3 = new DoNothingAgent(seed);
+        Agent ag3 = new HumanAgent(ac);
         players.add(ag3);
         tribes.add(new Tribe(Types.TRIBE.BARDUR));
 

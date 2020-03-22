@@ -363,11 +363,11 @@ public class GameState {
     }
 
     public ArrayList<Action> getCityActions(City c) {
-        return cityActions.get(c);
+        return cityActions.get(c.getActorId());
     }
 
     public ArrayList<Action> getUnitActions(Unit u) {
-        return unitActions.get(u);
+        return unitActions.get(u.getActorId());
     }
 
 }

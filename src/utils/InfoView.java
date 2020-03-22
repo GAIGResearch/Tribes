@@ -1,14 +1,22 @@
 package utils;
 
 import core.Types;
+import core.actions.cityactions.*;
 import core.actors.City;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
+import core.actions.Action;
+import players.ActionController;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import static utils.GameView.gridSize;
 
 @SuppressWarnings({"SuspiciousNameCombination", "StringConcatenationInsideStringBufferAppend"})
 public class InfoView extends JComponent {
@@ -17,25 +25,32 @@ public class InfoView extends JComponent {
     private Dimension size;
     private JEditorPane textArea;
 
-    private int highlightX0, highlightY0;
-    private int highlightX1, highlightY1;
-    private int highlightX2, highlightY2;
+    int actionPanelHeight = 100;
+    int sidePanelWidth = 400;
+    int sidePanelHeight = 400;
+    private JButton actionBF, actionCF, actionD, actionGF, actionRG;
+    private JButton[] actionB, actionS;
+    private CityActionListener listenerBF, listenerCF, listenerD, listenerGF, listenerRG;
+    private CityActionListener[] listenerB, listenerS;
+    private ActionController ac;
 
-    private Board board;
+    private int highlightX, highlightY;
+    private int highlightXprev, highlightYprev;
 
-    InfoView()
+    private GameState gs;
+
+    InfoView(ActionController ac)
     {
-        this.size = new Dimension(400, 300);
+        this.size = new Dimension(sidePanelWidth, sidePanelHeight);
+        this.ac = ac;
 
-        highlightX0 = -1;
-        highlightY0 = -1;
-        highlightX1 = -1;
-        highlightY1 = -1;
-        highlightX2 = -1;
-        highlightY2 = -1;
+        highlightX = -1;
+        highlightY = -1;
+        highlightXprev = -1;
+        highlightYprev = -1;
 
         textArea = new JEditorPane("text/html", "");
-        textArea.setPreferredSize(this.size);
+        textArea.setPreferredSize(new Dimension(sidePanelWidth, sidePanelHeight - actionPanelHeight));
         Font textFont = new Font(textArea.getFont().getName(), Font.PLAIN, 12);
         textArea.setFont(textFont);
         textArea.setEditable(false);
@@ -43,9 +58,64 @@ public class InfoView extends JComponent {
         DefaultCaret caret = (DefaultCaret)textArea.getCaret();
         caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 
+        JPanel actionPanel = new JPanel();
+        actionPanel.setPreferredSize(new Dimension(sidePanelWidth, 220));
+
+        // Simple actions: BurnForest, ClearForest, Destroy, GrowForest, GatherResource
+        actionBF = new JButton("Burn");  // If forest
+        listenerBF = new CityActionListener();
+        actionBF.addActionListener(listenerBF);
+        actionBF.setVisible(false);
+        actionCF = new JButton("Clear");  // If forest
+        listenerCF = new CityActionListener();
+        actionCF.addActionListener(listenerCF);
+        actionCF.setVisible(false);
+        actionD = new JButton("Destroy");  // If building
+        listenerD = new CityActionListener();
+        actionD.addActionListener(listenerD);
+        actionD.setVisible(false);
+        actionGF = new JButton("Grow");  // If plain
+        listenerGF = new CityActionListener();
+        actionGF.addActionListener(listenerGF);
+        actionGF.setVisible(false);
+        actionRG = new JButton("Gather");  // If resource
+        listenerRG = new CityActionListener();
+        actionRG.addActionListener(listenerRG);
+        actionRG.setVisible(false);
+        actionPanel.add(actionRG);
+        actionPanel.add(actionBF);
+        actionPanel.add(actionCF);
+        actionPanel.add(actionD);
+        actionPanel.add(actionGF);
+
+        // Complex actions: Build X, Spawn X
+        int nBuildings = Types.BUILDING.values().length;
+        actionB = new JButton[nBuildings];
+        listenerB = new CityActionListener[nBuildings];
+        for (int i = 0; i < nBuildings; i++) {
+            actionB[i] = new JButton("Build " + Types.BUILDING.values()[i]);
+            listenerB[i] = new CityActionListener();
+            actionB[i].addActionListener(listenerB[i]);
+            actionB[i].setVisible(false);
+            actionPanel.add(actionB[i]);
+        }
+        int nUnits = Types.UNIT.values().length;
+        actionS = new JButton[nUnits];
+        listenerS = new CityActionListener[nUnits];
+        for (int i = 0; i < nUnits; i++) {
+            actionS[i] = new JButton("Spawn " + Types.UNIT.values()[i]);
+            listenerS[i] = new CityActionListener();
+            actionS[i].addActionListener(listenerS[i]);
+            actionS[i].setVisible(false);
+            actionPanel.add(actionS[i]);
+        }
+
         this.setLayout(new FlowLayout());
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        this.add(scrollPane);
+        JScrollPane scrollPane1 = new JScrollPane(textArea);
+        JScrollPane scrollPane2 = new JScrollPane(actionPanel);
+        scrollPane2.setPreferredSize(new Dimension(sidePanelWidth, actionPanelHeight));
+        this.add(scrollPane1);
+        this.add(scrollPane2);
     }
 
 
@@ -57,87 +127,65 @@ public class InfoView extends JComponent {
 
     private void paintWithGraphics(Graphics2D g)
     {
+        if (gs == null) return;
+
         //For a better graphics, enable this: (be aware this could bring performance issues depending on your HW & OS).
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Board board = gs.getBoard();
 
-        if (highlightX0 != -1) {
+        if (highlightInGridBounds()) {
 
-            Types.TERRAIN t = board.getTerrainAt(highlightY0, highlightX0);
-            Types.RESOURCE r = board.getResourceAt(highlightY0, highlightX0);
-            Types.BUILDING b = board.getBuildingAt(highlightY0, highlightX0);
-            Unit u = board.getUnitAt(highlightY0, highlightX0);
+            Types.TERRAIN t = board.getTerrainAt(highlightY, highlightX);
+            Types.RESOURCE r = board.getResourceAt(highlightY, highlightX);
+            Types.BUILDING b = board.getBuildingAt(highlightY, highlightX);
+            Unit u = board.getUnitAt(highlightY, highlightX);
 
-            // t < r < u
-            // r < b < u
-            // t < b < u
+            // t < r < b < u
 
-            String s = "";
-            if (highlightX1 == highlightX0 && highlightY1 == highlightY0) {
-                if (highlightX2 == highlightX1 && highlightY2 == highlightX2) { // Clicked thrice in same spot, show third layer
-                    if (u != null && b != null && r != null) {
-                        // Show resource if it's third layer
-                        s = "<h1>Resource: " + r.toString() + "</h1>";
-                    } else { // Otherwise just show terrain
-                        if (t != null) {
-                            if (t == Types.TERRAIN.CITY) { // It's a city
-                                s = getCityInfo();
-                            } else {
-                                s = "<h1>Terrain: " + t.toString() + "</h1>";
-                            }
-                        }
-                    }
-                } else { // Clicked twice in same spot, show second layer
-                    if (u != null && b != null) {
-                        // Show building if second
-                        s = "<h1>Building: " + b.toString() + "</h1>";
+            String s;
+
+            if (u != null && !clickedTwice()) {
+                // Unit is always on top, show this, unless clicked twice
+                s = getUnitInfo(u);
+            } else {
+                s = "<h1>";
+                if (t != null) {
+                    if (t == Types.TERRAIN.CITY) { // It's a city, show just this
+                        s = getCityInfo();
                     } else {
-                        if (u != null && r != null) {
-                            // Resource if second
-                            s = "<h1>Resource: " + r.toString() + "</h1>";
-                        } else {
-                            if (t != null) { // Lastly just show terrain
-                                if (t == Types.TERRAIN.CITY) { // It's a city
-                                    s = getCityInfo();
-                                } else {
-                                    s = "<h1>Terrain: " + t.toString() + "</h1>";
-                                }
-                            }
-                        }
-                    }
-                }
-            } else { // First time clicking, show first layer
-                if (u != null) {
-                    // Unit is always on top, show this
-                    s = getUnitInfo(u);
-                } else {
-                    if (b != null) {
-                        // Building before resource
-                        s = "<h1>Building: " + b.toString() + "</h1>";
-                    } else {
+                        // Show everything else
+                        s += t.toString();
                         if (r != null) {
                             // Resource next
-                            s = "<h1>Resource: " + r.toString() + "</h1>";
-                        } else {
-                            if (t != null) { // Lastly just show terrain
-                                if (t == Types.TERRAIN.CITY) { // It's a city
-                                    s = getCityInfo();
-                                } else {
-                                    s = "<h1>Terrain: " + t.toString() + "</h1>";
-                                }
-                            }
+                            s += ", " + r.toString();
+                        }
+                        if (b != null) {
+                            // Buildings
+                            s += ", " + b.toString();
                         }
                     }
+                } else {
+                    // Show buildings and resources
+                    if (r != null) {
+                        // Resource next
+                        s += r.toString();
+                        if (b != null) {
+                            // Buildings
+                            s += ", " + b.toString();
+                        }
+                    } else if (b != null) {
+                        // Buildings
+                        s += b.toString();
+                    }
                 }
+                s += "</h1>";
+
+                updateButtons();
             }
 
             if (!textArea.getText().equals(s)) {
                 textArea.setText(s);
             }
-
-//            String[] splitLine = s.split("\n");
-//            for (int i = 0; i < splitLine.length; i++) {
-//                g.drawString(splitLine[i], 10, 10 + i * fontSize);
-//            }
         }
     }
 
@@ -167,7 +215,8 @@ public class InfoView extends JComponent {
     }
 
     private String getCityInfo() {
-        int cityID = board.getCityIdAt(highlightY0, highlightX0);
+        Board board = gs.getBoard();
+        int cityID = board.getCityIdAt(highlightY, highlightX);
         City c = (City) board.getActor(cityID);
 
         StringBuilder sb = new StringBuilder();
@@ -184,9 +233,159 @@ public class InfoView extends JComponent {
         return sb.toString();
     }
 
+    private void updateButtons() {
+        Board board = gs.getBoard();
+        int cityID = board.getCityIdAt(highlightY, highlightX);
+        Types.TERRAIN t = board.getTerrainAt(highlightY, highlightX);
+        Types.RESOURCE r = board.getResourceAt(highlightY, highlightX);
+        Types.BUILDING b = board.getBuildingAt(highlightY, highlightX);
+        Vector2d position = new Vector2d(highlightY, highlightX);
+        resetButtonVisibility();
+
+        if (cityID != -1) {
+            City c = (City) gs.getBoard().getActor(cityID);
+            if (c != null) {  // TODO: this should not be the case. Fix partial observability.
+                ArrayList<Action> acts = gs.getCityActions(c);
+
+                if (r != null) {
+                    boolean found = false;
+                    if (acts != null && acts.size() > 0) {
+                        for (Action a : acts) {
+                            if (a instanceof ResourceGathering) {
+                                if (((ResourceGathering) a).getResource().equals(r)
+                                        && ((ResourceGathering) a).getTargetPos().equals(position)) {
+                                    // Could try to collect this resource, set button value
+                                    listenerRG.update(cityID, position, ac, gs, "ResourceGathering");
+                                    listenerRG.setResource(r);
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    actionRG.setVisible(true);
+                    actionRG.setEnabled(found);
+                }
+                if (t != null) {
+                    // if forest: Burn & Clear
+                    // if plain: Grow forest
+                    if (t == Types.TERRAIN.FOREST) {
+                        boolean foundBF = false;
+                        boolean foundCF = false;
+                        if (acts != null && acts.size() > 0) {
+                            for (Action a : acts) {
+                                if (a instanceof BurnForest) {
+                                    if (((BurnForest) a).getTargetPos().equals(position)) {
+                                        listenerBF.update(cityID, position, ac, gs, "BurnForest");
+                                        foundBF = true;
+                                    }
+                                } else if (a instanceof ClearForest) {
+                                    if (((ClearForest) a).getTargetPos().equals(position)) {
+                                        listenerCF.update(cityID, position, ac, gs, "ClearForest");
+                                        foundCF = true;
+                                    }
+                                }
+                            }
+                        }
+                        actionBF.setVisible(true);
+                        actionCF.setVisible(true);
+                        actionBF.setEnabled(foundBF);
+                        actionCF.setEnabled(foundCF);
+
+                    } else if (t == Types.TERRAIN.PLAIN) {
+                        boolean foundGF = false;
+                        if (acts != null && acts.size() > 0) {
+                            for (Action a : acts) {
+                                if (a instanceof GrowForest) {
+                                    if (((GrowForest) a).getTargetPos().equals(position)) {
+                                        listenerGF.update(cityID, position, ac, gs, "GrowForest");
+                                        foundGF = true;
+                                    }
+                                }
+                            }
+                        }
+                        actionGF.setVisible(true);
+                        actionGF.setEnabled(foundGF);
+                    }
+                }
+                if (b != null) {
+                    boolean found = false;
+                    if (acts != null && acts.size() > 0) {
+                        for (Action a : acts) {
+                            if (a instanceof Destroy) {
+                                if (((Destroy) a).getTargetPos().equals(position)) {
+                                    listenerD.update(cityID, position, ac, gs, "Destroy");
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    actionD.setVisible(true);
+                    actionD.setEnabled(found);
+                }
+                if (c.getPosition().equals(position)) {
+                    // We've highlighted the city, all spawn actions show up
+                    for (JButton jb: actionS) {
+                        jb.setVisible(true);
+                        jb.setEnabled(false);
+                    }
+                    if (acts != null && acts.size() > 0) {
+                        for (Action a : acts) {
+                            if (a instanceof Spawn) {
+                                Types.UNIT unitType = ((Spawn) a).getUnitType();
+                                int idx = unitType.getKey();
+                                listenerS[idx].update(cityID, position, ac, gs, "Spawn");
+                                listenerS[idx].setUnitType(unitType);
+                                actionS[idx].setEnabled(true);
+                                break;
+                            }
+                        }
+                    }
+                } else if (t != null && b == null) {
+                    // We might be able to build here
+                    for (int i = 0; i < Types.BUILDING.values().length; i++) {
+                        if (Types.BUILDING.values()[i].getTerrainRequirements().contains(t)) {
+                            actionB[i].setVisible(true);
+                        }
+                        actionB[i].setEnabled(false);
+                    }
+                    if (acts != null && acts.size() > 0) {
+                        for (Action a : acts) {
+                            if (a instanceof Build) {
+                                Types.BUILDING buildingType = ((Build) a).getBuildingType();
+                                if (buildingType.getTerrainRequirements().contains(t)) {
+                                    int idx = buildingType.getKey();
+                                    listenerB[idx].update(cityID, position, ac, gs, "Build");
+                                    listenerB[idx].setBuildingType(buildingType);
+                                    actionB[idx].setEnabled(true);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void resetButtonVisibility(){
+        actionBF.setVisible(false);
+        actionCF.setVisible(false);
+        actionD.setVisible(false);
+        actionGF.setVisible(false);
+        actionRG.setVisible(false);
+        for (JButton jb: actionB) {
+            jb.setVisible(false);
+        }
+        for (JButton jb: actionS) {
+            jb.setVisible(false);
+        }
+    }
+
     void paint(GameState gs)
     {
-        this.board = gs.getBoard();
+        this.gs = gs;
         this.repaint();
     }
 
@@ -200,30 +399,108 @@ public class InfoView extends JComponent {
 
     public void setHighlight(int x, int y)
     {
-        highlightX2 = highlightX1;
-        highlightY2 = highlightY1;
-
-        highlightX1 = highlightX0;
-        highlightY1 = highlightY0;
-
-        highlightX0 = x;
-        highlightY0 = y;
+        highlightXprev = highlightX;
+        highlightYprev = highlightY;
+        highlightX = x;
+        highlightY = y;
     }
 
     public void resetHighlight() {
-        highlightX2 = -1;
-        highlightY2 = -1;
+        highlightX = -1;
+        highlightY = -1;
+        highlightXprev = -1;
+        highlightYprev = -1;
 
-        highlightX1 = -1;
-        highlightY1 = -1;
-
-        highlightX0 = -1;
-        highlightY0 = -1;
-
+        // Reset highlight info text
         textArea.setText("");
+
+        // Reset actions, none available yet for this player
+        resetButtonVisibility();
+
+        repaint();
     }
 
-    public int getHighlightX() {return highlightX0;}
-    public int getHighlightY() {return highlightY0;}
+    public int getHighlightX() {return highlightX;}
+    public int getHighlightY() {return highlightY;}
+    public boolean clickedTwice() {
+        return highlightX == highlightXprev && highlightY == highlightYprev;
+    }
+    public boolean highlightInGridBounds() {
+        return highlightX > -1 && highlightY > -1 && highlightX < gridSize && highlightY < gridSize;
+    }
 
+    class CityActionListener implements ActionListener {
+        int cityID;
+        Vector2d position;
+        ActionController ac;
+        GameState gs;
+        String actionType = "";
+
+        Types.RESOURCE resource;
+        Types.UNIT unitType;
+        Types.BUILDING buildingType;
+
+        CityActionListener() {}
+
+        public void update(int cityID, Vector2d position, ActionController ac, GameState gs, String type) {
+            this.cityID = cityID;
+            this.position = position;
+            this.ac = ac;
+            this.gs = gs;
+            this.actionType = type;
+        }
+
+        public void setResource(Types.RESOURCE resource) {
+            this.resource = resource;
+        }
+
+        public void setUnitType(Types.UNIT unitType) {
+            this.unitType = unitType;
+        }
+
+        public void setBuildingType(Types.BUILDING buildingType) {
+            this.buildingType = buildingType;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Action a = null;
+            switch (actionType) {
+                case "BurnForest":
+                    a = new BurnForest(cityID);
+                    ((BurnForest) a).setTargetPos(position);
+                    break;
+                case "ClearForest":
+                    a = new ClearForest(cityID);
+                    ((ClearForest) a).setTargetPos(position);
+                    break;
+                case "Destroy":
+                    a = new Destroy(cityID);
+                    ((Destroy) a).setTargetPos(position);
+                    break;
+                case "GrowForest":
+                    a = new GrowForest(cityID);
+                    ((GrowForest) a).setTargetPos(position);
+                    break;
+                case "ResourceGathering":
+                    a = new ResourceGathering(cityID);
+                    ((ResourceGathering) a).setTargetPos(position);
+                    ((ResourceGathering) a).setResource(resource);
+                    break;
+                case "Spawn":
+                    a = new Spawn(cityID);
+                    ((Spawn) a).setTargetPos(position);
+                    ((Spawn) a).setUnitType(unitType);
+                    break;
+                case "Build":
+                    a = new Build(cityID);
+                    ((Build) a).setTargetPos(position);
+                    ((Build) a).setBuildingType(buildingType);
+            }
+            if (a != null) {
+                ac.addAction(a, gs);
+                resetHighlight();
+            }
+        }
+    }
 }

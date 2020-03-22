@@ -9,6 +9,7 @@ import core.game.GameState;
 import core.actors.units.Unit;
 import utils.Vector2d;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Attack extends UnitAction
@@ -52,8 +53,25 @@ public class Attack extends UnitAction
             double accelerator = TribesConfig.ATTACK_MODIFIER;
             double totalDamage =attackForce+defenceForce;
 
+            //If target unit in city border increase defence force by 300% if city has walls or 50% if city does not have walls
+            if (gs != null){
+                int cityID = gs.getBoard().getCityIdAt(target.getPosition().x, target.getPosition().y);
+                if (cityID != -1){
+                    ArrayList<Integer> citesID = gs.getTribe(target.getTribeId()).getCitiesID();
+                    if (citesID.contains(cityID)){
+                        City c = gs.getBoard().getCityInBorders(target.getPosition().x, target.getPosition().y);
+                        if(c.hasWalls()) {
+                            defenceForce *= 4;
+                        }else {
+                            defenceForce *=1.5;
+                        }
+                    }
+                }
+            }
             int attackResult = (int) Math.round((attackForce/totalDamage)* attacker.ATK*accelerator);
             int defenceResult = (int) Math.round((defenceForce / totalDamage) * target.DEF *accelerator);
+
+
 
             if (target.getCurrentHP() <= attackResult) {
 

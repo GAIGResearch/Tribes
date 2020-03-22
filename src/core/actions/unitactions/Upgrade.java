@@ -22,7 +22,7 @@ public class Upgrade extends UnitAction
     @Override
     public boolean isFeasible(final GameState gs) {
         Unit unit = (Unit) gs.getActor(this.unitId);
-        Tribe tribe = (Tribe) gs.getActor(unit.getTribeId());
+        Tribe tribe = gs.getTribe(unit.getTribeId());
         TechnologyTree ttree = tribe.getTechTree();
 
         int stars = gs.getTribe(unit.getTribeId()).getStars();

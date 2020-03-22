@@ -35,7 +35,7 @@ public class TechnologyTree {
         Types.TECHNOLOGY requirement = target.getParentTech();
 
         //it will be not researchable if it's already researched or its requirement is not researched yet.
-        if(isResearched(target) || isResearched(requirement))
+        if(isResearched(target) || requirement != null && !isResearched(requirement))
             return false;
 
         return true;

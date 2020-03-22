@@ -16,16 +16,15 @@ public class EndTurn extends TribeAction {
 
     @Override
     public boolean isFeasible(final GameState gs) {
-        Tribe tribe = (Tribe) gs.getActor(tribeId);
+        Tribe tribe = gs.getTribe(tribeId);
         return gs.canEndTurn(tribe.getTribeId());
     }
 
     @Override
     public boolean execute(GameState gs) {
-        Tribe tribe = (Tribe) gs.getActor(tribeId);
         if(isFeasible(gs))
         {
-            gs.endTurn(tribe.getTribeId());
+            gs.endTurn(true);
         }
         return false;
     }

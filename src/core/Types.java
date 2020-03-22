@@ -7,9 +7,7 @@ import utils.ImageIO;
 import utils.Vector2d;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Random;
+import java.util.*;
 
 import static core.TribesConfig.*;
 import static core.Types.BUILDING.MONUMENT_STATUS.*;
@@ -172,25 +170,25 @@ Yellow_dark - 929000
      */
     public enum BUILDING
     {
-        PORT (0,"img/building/port.png", PORT_COST, PORT_BONUS, PORT_POINTS, SAILING, new TERRAIN[]{SHALLOW_WATER}),
-        MINE (1,"img/building/mine.png", MINE_COST, MINE_BONUS, MINE_POINTS, MINING, new TERRAIN[]{MOUNTAIN}),
-        FORGE (2,"img/building/forge.png", FORGE_COST, FORGE_BONUS, FORGE_POINTS, SMITHERY, new TERRAIN[]{PLAIN}),
-        FARM (3, "img/building/farm.png", FARM_COST, FARM_BONUS, FARM_POINTS, FARMING, new TERRAIN[]{PLAIN}),
-        WINDMILL (4,"img/building/windmill.png", WIND_MILL_COST, WIND_MILL_BONUS, WIND_MILL_POINTS, CONSTRUCTION, new TERRAIN[]{PLAIN}),
-        CUSTOM_HOUSE (5,"img/building/custom_house.png", CUSTOM_COST, CUSTOM_BONUS, CUSTOM_POINTS, TRADE, new TERRAIN[]{PLAIN}),
-        LUMBER_HUT(6,"img/building/lumner_hut.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, LUMBER_HUT_POINTS, MATHEMATICS, new TERRAIN[]{FOREST}),
-        SAWMILL (7,"img/building/sawmill.png", SAW_MILL_COST, SAW_MILL_BONUS, SAW_MILL_POINTS, MATHEMATICS, new TERRAIN[]{PLAIN}),
-        TEMPLE (8, "img/building/temple.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, FREE_SPIRIT, new TERRAIN[]{PLAIN}),
-        WATER_TEMPLE (9,"img/building/temple.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, AQUATISM, new TERRAIN[]{SHALLOW_WATER, DEEP_WATER}),
-        FOREST_TEMPLE (10,"img/building/temple.png", TEMPLE_FOREST_COST, TEMPLE_BONUS, TEMPLE_POINTS, SPIRITUALISM, new TERRAIN[]{FOREST}),
-        MOUNTAIN_TEMPLE (11,"img/building/temple.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, MEDITATION, new TERRAIN[]{MOUNTAIN}),
-        ALTAR_OF_PEACE (12,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new TERRAIN[]{SHALLOW_WATER,PLAIN}),
-        EMPERORS_TOMB (13,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, TRADE, new TERRAIN[]{SHALLOW_WATER,PLAIN}),
-        EYE_OF_GOD (14,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, NAVIGATION, new TERRAIN[]{SHALLOW_WATER,PLAIN}),
-        GATE_OF_POWER (15,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new TERRAIN[]{SHALLOW_WATER,PLAIN}),
-        GRAND_BAZAR (16,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, ROADS, new TERRAIN[]{SHALLOW_WATER,PLAIN}),
-        PARK_OF_FORTUNE (17,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new TERRAIN[]{SHALLOW_WATER,PLAIN}),
-        TOWER_OF_WISDOM (18, "img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, PHILOSOPHY, new TERRAIN[]{SHALLOW_WATER,PLAIN});
+        PORT (0,"img/building/port.png", PORT_COST, PORT_BONUS, PORT_POINTS, SAILING, new HashSet<>(Collections.singletonList(SHALLOW_WATER))),
+        MINE (1,"img/building/mine.png", MINE_COST, MINE_BONUS, MINE_POINTS, MINING, new HashSet<>(Collections.singletonList(MOUNTAIN))),
+        FORGE (2,"img/building/forge.png", FORGE_COST, FORGE_BONUS, FORGE_POINTS, SMITHERY, new HashSet<>(Collections.singletonList(PLAIN))),
+        FARM (3, "img/building/farm.png", FARM_COST, FARM_BONUS, FARM_POINTS, FARMING, new HashSet<>(Collections.singletonList(PLAIN))),
+        WINDMILL (4,"img/building/windmill.png", WIND_MILL_COST, WIND_MILL_BONUS, WIND_MILL_POINTS, CONSTRUCTION, new HashSet<>(Collections.singletonList(PLAIN))),
+        CUSTOM_HOUSE (5,"img/building/custom_house.png", CUSTOM_COST, CUSTOM_BONUS, CUSTOM_POINTS, TRADE, new HashSet<>(Collections.singletonList(PLAIN))),
+        LUMBER_HUT(6,"img/building/lumner_hut.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, LUMBER_HUT_POINTS, MATHEMATICS, new HashSet<>(Collections.singletonList(FOREST))),
+        SAWMILL (7,"img/building/sawmill.png", SAW_MILL_COST, SAW_MILL_BONUS, SAW_MILL_POINTS, MATHEMATICS, new HashSet<>(Collections.singletonList(PLAIN))),
+        TEMPLE (8, "img/building/temple.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, FREE_SPIRIT, new HashSet<>(Collections.singletonList(PLAIN))),
+        WATER_TEMPLE (9,"img/building/temple.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, AQUATISM, new HashSet<>(Arrays.asList(SHALLOW_WATER, DEEP_WATER))),
+        FOREST_TEMPLE (10,"img/building/temple.png", TEMPLE_FOREST_COST, TEMPLE_BONUS, TEMPLE_POINTS, SPIRITUALISM, new HashSet<>(Collections.singletonList(FOREST))),
+        MOUNTAIN_TEMPLE (11,"img/building/temple.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, MEDITATION, new HashSet<>(Collections.singletonList(MOUNTAIN))),
+        ALTAR_OF_PEACE (12,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        EMPERORS_TOMB (13,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, TRADE, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        EYE_OF_GOD (14,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, NAVIGATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        GATE_OF_POWER (15,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        GRAND_BAZAR (16,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, ROADS, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        PARK_OF_FORTUNE (17,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        TOWER_OF_WISDOM (18, "img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, PHILOSOPHY,new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN)));
 
         public enum MONUMENT_STATUS {
             UNAVAILABLE,
@@ -201,11 +199,11 @@ Yellow_dark - 929000
         private int key;
         private String imageFile;
         private TECHNOLOGY technologyRequirement;
-        private TERRAIN[] terrainRequirements;
+        private HashSet<TERRAIN> terrainRequirements;
         private int cost;
         private int bonus;
         private int points;
-        BUILDING(int numVal, String imageFile, int cost, int bonus, int points, TECHNOLOGY technologyRequirement, TERRAIN[] terrainRequirements)
+        BUILDING(int numVal, String imageFile, int cost, int bonus, int points, TECHNOLOGY technologyRequirement, HashSet<TERRAIN> terrainRequirements)
         {
             this.key = numVal;
             this.cost = cost;
@@ -216,7 +214,7 @@ Yellow_dark - 929000
             this.terrainRequirements = terrainRequirements;
         }
         public TECHNOLOGY getTechnologyRequirement() { return technologyRequirement; }
-        public TERRAIN[] getTerrainRequirements() { return terrainRequirements; }
+        public HashSet<TERRAIN> getTerrainRequirements() { return terrainRequirements; }
         public int getKey() {  return key; }
         public int getCost() {return cost; }
         public int getBonus() {return bonus; }

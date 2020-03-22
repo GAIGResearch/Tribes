@@ -110,9 +110,7 @@ public class Build extends CityAction
                 !techTree.isResearched(buildingType.getTechnologyRequirement())) { return false; }
 
         //Terrain constraint
-        for(Types.TERRAIN goodTerrain : buildingType.getTerrainRequirements()) {
-            if(board.getTerrainAt(targetPos.x, targetPos.y) != goodTerrain){ return false; }
-        }
+        if (!(buildingType.getTerrainRequirements().contains(board.getTerrainAt(targetPos.x, targetPos.y)))) return false;
 
         //Resource constraint
         Types.RESOURCE resNeeded = buildingType.getResourceConstraint();

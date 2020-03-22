@@ -210,8 +210,8 @@ public class TribesConfig
 
     /* ACTIONS */
     public static int CLEAR_FOREST_STAR = 2;
-    public static int FOREST_COST = 5;
+    public static int GROW_FOREST_COST = 5;
+    public static int BURN_FOREST_COST = 5;
     public static int CLEAR_VIEW_POINTS = 5;
-
-
+    
 }

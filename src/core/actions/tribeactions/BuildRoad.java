@@ -38,7 +38,7 @@ public class BuildRoad extends TribeAction {
         if(isFeasible(gs))
         {
             Tribe tribe = gs.getTribe(tribeId);
-            tribe.addStars(-TribesConfig.ROAD_COST);
+            tribe.subtractStars(TribesConfig.ROAD_COST);
             gs.getBoard().addRoad(position.x, position.y);
             return true;
         }

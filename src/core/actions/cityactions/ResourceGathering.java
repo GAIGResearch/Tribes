@@ -55,6 +55,8 @@ public class ResourceGathering extends CityAction
             City city = (City) gs.getActor(this.cityId);
             Vector2d position = super.getTargetPos();
             gs.getBoard().setResourceAt(position.x, position.y, null);
+            Tribe tribe = gs.getTribe(city.getTribeId());
+            tribe.subtractStars(this.resource.getCost());
             switch (this.resource){
                 case FISH:
                 case ANIMAL:

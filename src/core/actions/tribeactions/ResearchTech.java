@@ -37,7 +37,7 @@ public class ResearchTech extends TribeAction {
         {
             //Research tech
             int techCost = tech.getCost(tribe.getCitiesID().size());
-            tribe.addStars(-techCost);
+            tribe.subtractStars(techCost);
             tribe.getTechTree().doResearch(tech);
 
             //Flag if research tree is completed.

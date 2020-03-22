@@ -36,6 +36,9 @@ public class GameState {
     private HashMap<Integer, ArrayList<Action>> unitActions;
     private ArrayList<Action> tribeActions;
 
+    //Flags the state to indicate that the turn must end
+    private boolean turnMustEnd;
+
     /**
      * This variable indicates if the computed actions in this class are updated.
      * It will take the value of the tribeId for which the actions are computed, and -1 if they are
@@ -51,6 +54,7 @@ public class GameState {
         this.cityActions = new HashMap<>();
         this.unitActions = new HashMap<>();
         this.tribeActions = new ArrayList<>();
+        this.turnMustEnd = false;
     }
 
     /**
@@ -259,6 +263,7 @@ public class GameState {
         GameState copy = new GameState(new Random()); //copies of the game state can't have the same random generator.
         copy.board = board.copy(playerIdx!=-1, playerIdx);
         copy.tick = this.tick;
+        copy.turnMustEnd = turnMustEnd;
 
         int numTribes = getTribes().length;
         copy.canEndTurn = new boolean[numTribes];
@@ -303,14 +308,18 @@ public class GameState {
     }
 
     /**
-     * The player has decided to end the turn
-     * @param tribeId
+     * Sets the flag for turning ending to 'endTurn'
+     * @param endTurn true if the turn must end
      */
-    public void endTurn(int tribeId)
+    public void endTurn(boolean endTurn)
     {
-        //TODO: need to manage a turn ending here.
+        turnMustEnd = endTurn;
     }
 
+    public boolean isTurnEnding()
+    {
+        return turnMustEnd;
+    }
 
     /**
      * Gets the tribes playing this game.

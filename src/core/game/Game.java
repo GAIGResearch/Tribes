@@ -258,7 +258,7 @@ public class Game {
             ect.setMaxTimeMillis(remaining);
 
             //Continue this turn if there are still available actions. If the agent is human, let him play for now.
-            continueTurn = gs.existAvailableActions(tribe);
+            continueTurn = gs.existAvailableActions(tribe) && !gs.isTurnEnding();
             if(!(ag instanceof HumanAgent))
                 continueTurn &= !ect.exceededMaxTime();
         }
@@ -276,8 +276,7 @@ public class Game {
         //Get all cities of this tribe
         ArrayList<Integer> tribeCities = tribe.getCitiesID();
         ArrayList<Integer> allTribeUnits = new ArrayList<>();
-        GameState gs = gameStateObservations[tribe.getTribeId()];
-
+        gs.endTurn(false);
 
         //1. Compute stars and score per turn
         int acumProd = 0, turnScore = 0;

@@ -18,37 +18,39 @@ import static core.Types.UNIT.*;
 public class Types {
 
     public enum TECHNOLOGY {
-        CLIMBING(5),
-        FISHING(5),
-        HUNTING(5),
-        ORGANIZATION(5),
-        RIDING(5),
-        ARCHERY(6),
-        FARMING(6),
-        FORESTRY(6),
-        FREE_SPIRIT(6),
-        MEDITATION(6),
-        MINING(6),
-        ROADS(6),
-        SAILING(6),
-        SHIELDS(6),
-        WHALING(6),
-        AQUATISM(7),
-        CHIVALRY(7),
-        CONSTRUCTION(7),
-        MATHEMATICS(7),
-        NAVIGATION(7),
-        SMITHERY(7),
-        SPIRITUALISM(7),
-        TRADE(7),
-        PHILOSOPHY(7);
+        CLIMBING(5, null),
+        FISHING(5, null),
+        HUNTING(5, null),
+        ORGANIZATION(5, null),
+        RIDING(5, null),
+        ARCHERY(6, HUNTING),
+        FARMING(6, ORGANIZATION),
+        FORESTRY(6, HUNTING),
+        FREE_SPIRIT(6, RIDING),
+        MEDITATION(6, CLIMBING),
+        MINING(6, CLIMBING),
+        ROADS(6, RIDING),
+        SAILING(6, FISHING),
+        SHIELDS(6, ORGANIZATION),
+        WHALING(6, FISHING),
+        AQUATISM(7, WHALING),
+        CHIVALRY(7, FREE_SPIRIT),
+        CONSTRUCTION(7, FARMING),
+        MATHEMATICS(7, FORESTRY),
+        NAVIGATION(7, SAILING),
+        SMITHERY(7, MINING),
+        SPIRITUALISM(7, ARCHERY),
+        TRADE(7, ROADS),
+        PHILOSOPHY(7, MEDITATION);
 
         private int baseCost;
+        private TECHNOLOGY parent;
 
-        TECHNOLOGY(int baseCost) {
-            this.baseCost = baseCost;
+        TECHNOLOGY(int baseCost, TECHNOLOGY parent) {
+            this.baseCost = baseCost; this.parent = parent;
         }
 
+        public TECHNOLOGY getParentTech() {return this.parent;}
         public int getCost(int numOfCities) {
             return baseCost * numOfCities;
         }

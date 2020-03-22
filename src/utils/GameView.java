@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import core.Types;
+import core.actions.cityactions.CityAction;
+import core.actions.cityactions.ResourceGathering;
 import core.actors.Actor;
 import core.actors.City;
 import core.actors.Tribe;
@@ -24,7 +26,7 @@ public class GameView extends JComponent {
     private Board board; //This only counts terrains. Needs to be enhanced with actors, resources, etc.
     private GameState gameState;
 //    private Image backgroundImg;
-    private Image fogImg;
+    private Image fogImg, shineImg;
     private InfoView infoView;
     private Point2D panTranslate;  // Used to translate all coordinates for objects drawn on screen
 
@@ -33,6 +35,8 @@ public class GameView extends JComponent {
     private Color progressColor = new Color(53, 183, 255);
     private Color negativeColor = new Color(255, 63, 73);
     private Image starImg, starShadow, capitalImg, capitalShadow;
+
+    boolean[][] actionable;
 
     /**
      * Dimensions of the window.
@@ -53,6 +57,7 @@ public class GameView extends JComponent {
 
 //        backgroundImg = Types.TERRAIN.PLAIN.getImage(null);
         fogImg = ImageIO.GetInstance().getImage("img/fog.png");
+        shineImg = ImageIO.GetInstance().getImage("img/shine3.png");
         starImg = ImageIO.GetInstance().getImage("img/decorations/star.png");
         starShadow = ImageIO.GetInstance().getImage("img/decorations/starShadow.png");
         capitalImg = ImageIO.GetInstance().getImage("img/decorations/capital.png");
@@ -77,6 +82,20 @@ public class GameView extends JComponent {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, dimension.width, dimension.height);
 
+        // Update list of actionable tiles to be highlighted (collectible resources)
+        actionable = new boolean[gridSize][gridSize];
+        HashMap<Integer, ArrayList<Action>> actions = gameState.getCityActions();
+        for (Map.Entry<Integer, ArrayList<Action>> e: actions.entrySet()) {
+            for (Action a: e.getValue()) {
+                if (a instanceof CityAction) {
+                    Vector2d pos = ((CityAction) a).getTargetPos();
+                    if (pos != null) {
+                        actionable[pos.x][pos.y] = a instanceof ResourceGathering;
+                    }
+                }
+            }
+        }
+
         for(int i = 0; i < gridSize; ++i) {
             for(int j = 0; j < gridSize; ++j) {
                 // We paint all base terrains, resources and buildings first
@@ -90,11 +109,12 @@ public class GameView extends JComponent {
                 }
 
                 Types.RESOURCE r = board.getResourceAt(i,j);
+                if (actionable[i][j]) paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, shineImg, CELL_SIZE, panTranslate);
                 int imgSize = (int) (CELL_SIZE * 0.75);
-                paintImageRotated(g, j*CELL_SIZE, i*CELL_SIZE, (r == null) ? null : r.getImage(), imgSize, panTranslate);
+                paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, (r == null) ? null : r.getImage(t), imgSize, panTranslate);
 
                 Types.BUILDING b = board.getBuildingAt(i,j);
-                paintImageRotated(g, j*CELL_SIZE, i*CELL_SIZE, (b == null) ? null : b.getImage(), CELL_SIZE, panTranslate);
+                paintImageRotated(g, j*CELL_SIZE, i*CELL_SIZE, (b == null) ? null : b.getImage(), imgSize, panTranslate);
             }
         }
 

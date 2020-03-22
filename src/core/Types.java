@@ -109,29 +109,39 @@ public class Types {
      */
     public enum RESOURCE
     {
-        FISH(0, "img/resource/fish.png", 'h', TribesConfig.FISH_COST, FISH_POP),
-        FRUIT(1, "img/resource/fruit.png", 'f', FRUIT_COST, FRUIT_POP),
-        ANIMAL(2, "img/resource/animal.png", 'a', ANIMAL_COST, ANIMAL_POP),
-        WHALES(3, "img/resource/whale.png", 'w', WHALES_COST, WHALES_STARS),
-        ORE(5, "img/resource/ore.png", 'o', 0, 0),
-        CROPS(6, "img/resource/crops.png", 'c', 0, 0),
-        RUINS(7, "img/resource/ruins.png", 'r', 0, 0);
+        FISH(0, "img/resource/fish2.png", null,'h', FISH_COST, FISH_POP),
+        FRUIT(1, "img/resource/fruit2.png", null, 'f', FRUIT_COST, FRUIT_POP),
+        ANIMAL(2, "img/resource/animal2.png", null, 'a', ANIMAL_COST, ANIMAL_POP),
+        WHALES(3, "img/resource/whale2.png", "img/resource/whale3.png", 'w', WHALES_COST, WHALES_STARS),
+        ORE(5, "img/resource/ore2.png", null, 'o', 0, 0),
+        CROPS(6, "img/resource/crops2.png", null, 'c', 0, 0),
+        RUINS(7, "img/resource/ruins2.png", null, 'r', 0, 0);
 
         private int key;
-        private String imageFile;
+        private String imageFile, secondaryImageFile;
         private char mapChar;
         private int cost;
         private int bonus;
 
-        RESOURCE(int numVal, String imageFile, char mapChar, int cost, int bonus) {
+        RESOURCE(int numVal, String imageFile, String secondaryImageFile, char mapChar, int cost, int bonus) {
             this.key = numVal;
             this.imageFile = imageFile;
+            this.secondaryImageFile = secondaryImageFile;
             this.mapChar = mapChar;
             this.cost = cost;
             this.bonus = bonus;
         }
         public int getKey() {  return key; }
-        public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
+        public Image getImage(TERRAIN t) {
+            if (this == WHALES && t != null) {
+                if (t == DEEP_WATER) {
+                    return ImageIO.GetInstance().getImage(imageFile);
+                } else {
+                    return ImageIO.GetInstance().getImage(secondaryImageFile);
+                }
+            }
+            return ImageIO.GetInstance().getImage(imageFile);
+        }
         public int getCost() {return cost;}
         public int getBonus() {return bonus;}
 
@@ -149,25 +159,50 @@ public class Types {
      */
     public enum BUILDING
     {
-        PORT (0,"img/building/port.png", PORT_COST, PORT_BONUS, PORT_POINTS, SAILING, new HashSet<>(Collections.singletonList(SHALLOW_WATER))),
-        MINE (1,"img/building/mine.png", MINE_COST, MINE_BONUS, MINE_POINTS, MINING, new HashSet<>(Collections.singletonList(MOUNTAIN))),
-        FORGE (2,"img/building/forge.png", FORGE_COST, FORGE_BONUS, FORGE_POINTS, SMITHERY, new HashSet<>(Collections.singletonList(PLAIN))),
-        FARM (3, "img/building/farm.png", FARM_COST, FARM_BONUS, FARM_POINTS, FARMING, new HashSet<>(Collections.singletonList(PLAIN))),
-        WINDMILL (4,"img/building/windmill.png", WIND_MILL_COST, WIND_MILL_BONUS, WIND_MILL_POINTS, CONSTRUCTION, new HashSet<>(Collections.singletonList(PLAIN))),
-        CUSTOM_HOUSE (5,"img/building/custom_house.png", CUSTOM_COST, CUSTOM_BONUS, CUSTOM_POINTS, TRADE, new HashSet<>(Collections.singletonList(PLAIN))),
-        LUMBER_HUT(6,"img/building/lumner_hut.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, LUMBER_HUT_POINTS, MATHEMATICS, new HashSet<>(Collections.singletonList(FOREST))),
-        SAWMILL (7,"img/building/sawmill.png", SAW_MILL_COST, SAW_MILL_BONUS, SAW_MILL_POINTS, MATHEMATICS, new HashSet<>(Collections.singletonList(PLAIN))),
-        TEMPLE (8, "img/building/temple.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, FREE_SPIRIT, new HashSet<>(Collections.singletonList(PLAIN))),
-        WATER_TEMPLE (9,"img/building/temple.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, AQUATISM, new HashSet<>(Arrays.asList(SHALLOW_WATER, DEEP_WATER))),
-        FOREST_TEMPLE (10,"img/building/temple.png", TEMPLE_FOREST_COST, TEMPLE_BONUS, TEMPLE_POINTS, SPIRITUALISM, new HashSet<>(Collections.singletonList(FOREST))),
-        MOUNTAIN_TEMPLE (11,"img/building/temple.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, MEDITATION, new HashSet<>(Collections.singletonList(MOUNTAIN))),
-        ALTAR_OF_PEACE (12,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        EMPERORS_TOMB (13,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, TRADE, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        EYE_OF_GOD (14,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, NAVIGATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        GATE_OF_POWER (15,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        GRAND_BAZAR (16,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, ROADS, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        PARK_OF_FORTUNE (17,"img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        TOWER_OF_WISDOM (18, "img/building/monument.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, PHILOSOPHY,new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN)));
+        PORT (0,"img/building/port2.png", PORT_COST, PORT_BONUS, PORT_POINTS, SAILING, new HashSet<>(Collections.singletonList(SHALLOW_WATER))),
+        MINE (1,"img/building/mine2.png", MINE_COST, MINE_BONUS, MINE_POINTS, MINING, new HashSet<>(Collections.singletonList(MOUNTAIN))),
+        FORGE (2,"img/building/forge2.png", FORGE_COST, FORGE_BONUS, FORGE_POINTS, SMITHERY, new HashSet<>(Collections.singletonList(PLAIN))),
+        FARM (3, "img/building/farm2.png", FARM_COST, FARM_BONUS, FARM_POINTS, FARMING, new HashSet<>(Collections.singletonList(PLAIN))),
+        WINDMILL (4,"img/building/windmill2.png", WIND_MILL_COST, WIND_MILL_BONUS, WIND_MILL_POINTS, CONSTRUCTION, new HashSet<>(Collections.singletonList(PLAIN))),
+        CUSTOM_HOUSE (5,"img/building/custom_house2.png", CUSTOM_COST, CUSTOM_BONUS, CUSTOM_POINTS, TRADE, new HashSet<>(Collections.singletonList(PLAIN))),
+        LUMBER_HUT(6,"img/building/lumner_hut2.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, LUMBER_HUT_POINTS, MATHEMATICS, new HashSet<>(Collections.singletonList(FOREST))),
+        SAWMILL (7,"img/building/sawmill2.png", SAW_MILL_COST, SAW_MILL_BONUS, SAW_MILL_POINTS, MATHEMATICS, new HashSet<>(Collections.singletonList(PLAIN))),
+        TEMPLE (8, "img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, FREE_SPIRIT, new HashSet<>(Collections.singletonList(PLAIN))),
+        WATER_TEMPLE (9,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, AQUATISM, new HashSet<>(Arrays.asList(SHALLOW_WATER, DEEP_WATER))),
+        FOREST_TEMPLE (10,"img/building/temple2.png", TEMPLE_FOREST_COST, TEMPLE_BONUS, TEMPLE_POINTS, SPIRITUALISM, new HashSet<>(Collections.singletonList(FOREST))),
+        MOUNTAIN_TEMPLE (11,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, MEDITATION, new HashSet<>(Collections.singletonList(MOUNTAIN))),
+        ALTAR_OF_PEACE (12,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        EMPERORS_TOMB (13,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, TRADE, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        EYE_OF_GOD (14,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, NAVIGATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        GATE_OF_POWER (15,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        GRAND_BAZAR (16,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, ROADS, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        PARK_OF_FORTUNE (17,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        TOWER_OF_WISDOM (18, "img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, PHILOSOPHY,new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN)));
+
+        public static BUILDING stringToType(String type) {
+            switch (type) {
+                case "PORT": return PORT;
+                case "MINE": return MINE;
+                case "FORGE": return FORGE;
+                case "FARM": return FARM;
+                case "WINDMILL": return WINDMILL;
+                case "CUSTOM_HOUSE": return CUSTOM_HOUSE;
+                case "LUMBER_HUT": return LUMBER_HUT;
+                case "SAWMILL": return SAWMILL;
+                case "TEMPLE": return TEMPLE;
+                case "WATER_TEMPLE": return WATER_TEMPLE;
+                case "FOREST_TEMPLE": return FOREST_TEMPLE;
+                case "MOUNTAIN_TEMPLE": return MOUNTAIN_TEMPLE;
+                case "ALTAR_OF_PEACE": return ALTAR_OF_PEACE;
+                case "EMPERORS_TOMB": return EMPERORS_TOMB;
+                case "EYE_OF_GOD": return EYE_OF_GOD;
+                case "GATE_OF_POWER": return GATE_OF_POWER;
+                case "GRAND_BAZAR": return GRAND_BAZAR;
+                case "PARK_OF_FORTUNE": return PARK_OF_FORTUNE;
+                case "TOWER_OF_WISDOM": return TOWER_OF_WISDOM;
+            }
+            return null;
+        }
 
         public enum MONUMENT_STATUS {
             UNAVAILABLE,
@@ -374,6 +409,25 @@ public class Types {
             this.requirement = requirement;
             this.points = points;
         }
+
+        public static UNIT stringToType(String type) {
+            switch(type) {
+                case "WARRIOR": return WARRIOR;
+                case "RIDER": return RIDER;
+                case "DEFENDER": return DEFENDER;
+                case "SWORDMAN": return SWORDMAN;
+                case "ARCHER": return ARCHER;
+                case "CATAPULT": return CATAPULT;
+                case "KNIGHT": return KNIGHT;
+                case "MIND_BENDER": return MIND_BENDER;
+                case "BOAT": return BOAT;
+                case "SHIP": return SHIP;
+                case "BATTLESHIP": return BATTLESHIP;
+                case "SUPERUNIT": return SUPERUNIT;
+            }
+            return null;
+        }
+
         public int getKey() {  return key; }
         public Image getImage(int playerID) { return ImageIO.GetInstance().getImage(imageFile + playerID + ".png"); }
         public String getImageStr(int playerID) { return imageFile + playerID + ".png"; }
@@ -412,6 +466,16 @@ public class Types {
         public boolean spawnable()
         {
             return !(this == BOAT || this == SHIP || this == BATTLESHIP || this == SUPERUNIT);
+        }
+
+        public static ArrayList<UNIT> getSpawnableTypes() {
+            ArrayList<UNIT> units = new ArrayList<>();
+            for (UNIT u: UNIT.values()) {
+                if (u.spawnable()) {
+                    units.add(u);
+                }
+            }
+            return units;
         }
     }
 
@@ -479,7 +543,7 @@ public class Types {
         DEEP_WATER(2, "img/terrain/deepwater.png", 'd'),
         MOUNTAIN(3, "img/terrain/mountain3.png", 'm'),
         VILLAGE(4, "img/terrain/village2.png", 'v'),
-        CITY(5, "img/terrain/city.png", 'c'),
+        CITY(5, "img/terrain/city2.png", 'c'),
         FOREST(6, "img/terrain/forest2.png", 'f');
 
         private String imageFile;

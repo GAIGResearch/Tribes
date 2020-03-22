@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import static utils.GameView.gridSize;
 
@@ -31,7 +32,7 @@ public class InfoView extends JComponent {
     private JButton actionBF, actionCF, actionD, actionGF, actionRG;
     private JButton[] actionB, actionS;
     private CityActionListener listenerBF, listenerCF, listenerD, listenerGF, listenerRG;
-    private CityActionListener[] listenerB, listenerS;
+    private CityActionListener listenerS, listenerB;
     private ActionController ac;
 
     private int highlightX, highlightY;
@@ -63,23 +64,23 @@ public class InfoView extends JComponent {
 
         // Simple actions: BurnForest, ClearForest, Destroy, GrowForest, GatherResource
         actionBF = new JButton("Burn");  // If forest
-        listenerBF = new CityActionListener();
+        listenerBF = new CityActionListener("BurnForest");
         actionBF.addActionListener(listenerBF);
         actionBF.setVisible(false);
         actionCF = new JButton("Clear");  // If forest
-        listenerCF = new CityActionListener();
+        listenerCF = new CityActionListener("ClearForest");
         actionCF.addActionListener(listenerCF);
         actionCF.setVisible(false);
         actionD = new JButton("Destroy");  // If building
-        listenerD = new CityActionListener();
+        listenerD = new CityActionListener("Destroy");
         actionD.addActionListener(listenerD);
         actionD.setVisible(false);
         actionGF = new JButton("Grow");  // If plain
-        listenerGF = new CityActionListener();
+        listenerGF = new CityActionListener("Grow");
         actionGF.addActionListener(listenerGF);
         actionGF.setVisible(false);
         actionRG = new JButton("Gather");  // If resource
-        listenerRG = new CityActionListener();
+        listenerRG = new CityActionListener("ResourceGathering");
         actionRG.addActionListener(listenerRG);
         actionRG.setVisible(false);
         actionPanel.add(actionRG);
@@ -91,21 +92,20 @@ public class InfoView extends JComponent {
         // Complex actions: Build X, Spawn X
         int nBuildings = Types.BUILDING.values().length;
         actionB = new JButton[nBuildings];
-        listenerB = new CityActionListener[nBuildings];
+        listenerB = new CityActionListener("Build");
         for (int i = 0; i < nBuildings; i++) {
             actionB[i] = new JButton("Build " + Types.BUILDING.values()[i]);
-            listenerB[i] = new CityActionListener();
-            actionB[i].addActionListener(listenerB[i]);
+            actionB[i].addActionListener(listenerB);
             actionB[i].setVisible(false);
             actionPanel.add(actionB[i]);
         }
-        int nUnits = Types.UNIT.values().length;
+        ArrayList<Types.UNIT> spawnableUnits = Types.UNIT.getSpawnableTypes();
+        int nUnits = spawnableUnits.size();
         actionS = new JButton[nUnits];
-        listenerS = new CityActionListener[nUnits];
+        listenerS = new CityActionListener("Spawn");
         for (int i = 0; i < nUnits; i++) {
-            actionS[i] = new JButton("Spawn " + Types.UNIT.values()[i]);
-            listenerS[i] = new CityActionListener();
-            actionS[i].addActionListener(listenerS[i]);
+            actionS[i] = new JButton("Spawn " + spawnableUnits.get(i));
+            actionS[i].addActionListener(listenerS);
             actionS[i].setVisible(false);
             actionPanel.add(actionS[i]);
         }
@@ -255,7 +255,7 @@ public class InfoView extends JComponent {
                                 if (((ResourceGathering) a).getResource().equals(r)
                                         && ((ResourceGathering) a).getTargetPos().equals(position)) {
                                     // Could try to collect this resource, set button value
-                                    listenerRG.update(cityID, position, ac, gs, "ResourceGathering");
+                                    listenerRG.update(cityID, position, ac, gs);
                                     listenerRG.setResource(r);
                                     found = true;
                                     break;
@@ -276,12 +276,12 @@ public class InfoView extends JComponent {
                             for (Action a : acts) {
                                 if (a instanceof BurnForest) {
                                     if (((BurnForest) a).getTargetPos().equals(position)) {
-                                        listenerBF.update(cityID, position, ac, gs, "BurnForest");
+                                        listenerBF.update(cityID, position, ac, gs);
                                         foundBF = true;
                                     }
                                 } else if (a instanceof ClearForest) {
                                     if (((ClearForest) a).getTargetPos().equals(position)) {
-                                        listenerCF.update(cityID, position, ac, gs, "ClearForest");
+                                        listenerCF.update(cityID, position, ac, gs);
                                         foundCF = true;
                                     }
                                 }
@@ -298,7 +298,7 @@ public class InfoView extends JComponent {
                             for (Action a : acts) {
                                 if (a instanceof GrowForest) {
                                     if (((GrowForest) a).getTargetPos().equals(position)) {
-                                        listenerGF.update(cityID, position, ac, gs, "GrowForest");
+                                        listenerGF.update(cityID, position, ac, gs);
                                         foundGF = true;
                                     }
                                 }
@@ -314,7 +314,7 @@ public class InfoView extends JComponent {
                         for (Action a : acts) {
                             if (a instanceof Destroy) {
                                 if (((Destroy) a).getTargetPos().equals(position)) {
-                                    listenerD.update(cityID, position, ac, gs, "Destroy");
+                                    listenerD.update(cityID, position, ac, gs);
                                     found = true;
                                     break;
                                 }
@@ -326,42 +326,42 @@ public class InfoView extends JComponent {
                 }
                 if (c.getPosition().equals(position)) {
                     // We've highlighted the city, all spawn actions show up
-                    for (JButton jb: actionS) {
-                        jb.setVisible(true);
-                        jb.setEnabled(false);
-                    }
+                    boolean[] found = new boolean[actionS.length];
                     if (acts != null && acts.size() > 0) {
                         for (Action a : acts) {
                             if (a instanceof Spawn) {
                                 Types.UNIT unitType = ((Spawn) a).getUnitType();
-                                int idx = unitType.getKey();
-                                listenerS[idx].update(cityID, position, ac, gs, "Spawn");
-                                listenerS[idx].setUnitType(unitType);
-                                actionS[idx].setEnabled(true);
+                                int idx = Types.UNIT.getSpawnableTypes().indexOf(unitType);
+                                listenerS.update(cityID, position, ac, gs);
+                                found[idx] = true;
                                 break;
                             }
                         }
                     }
+                    for (int i = 0; i < actionS.length; i++) {
+                        actionS[i].setEnabled(found[i]);
+                        actionS[i].setVisible(true);
+                    }
                 } else if (t != null && b == null) {
                     // We might be able to build here
-                    for (int i = 0; i < Types.BUILDING.values().length; i++) {
-                        if (Types.BUILDING.values()[i].getTerrainRequirements().contains(t)) {
-                            actionB[i].setVisible(true);
-                        }
-                        actionB[i].setEnabled(false);
-                    }
+                    boolean[] found = new boolean[actionB.length];
                     if (acts != null && acts.size() > 0) {
                         for (Action a : acts) {
                             if (a instanceof Build) {
                                 Types.BUILDING buildingType = ((Build) a).getBuildingType();
                                 if (buildingType.getTerrainRequirements().contains(t)) {
                                     int idx = buildingType.getKey();
-                                    listenerB[idx].update(cityID, position, ac, gs, "Build");
-                                    listenerB[idx].setBuildingType(buildingType);
-                                    actionB[idx].setEnabled(true);
+                                    listenerB.update(cityID, position, ac, gs);
+                                    found[idx] = true;
                                     break;
                                 }
                             }
+                        }
+                    }
+                    for (int i = 0; i < actionB.length; i++) {
+                        if (Types.BUILDING.values()[i].getTerrainRequirements().contains(t)) {
+                            actionB[i].setVisible(true);
+                            actionB[i].setEnabled(found[i]);
                         }
                     }
                 }
@@ -435,31 +435,21 @@ public class InfoView extends JComponent {
         ActionController ac;
         GameState gs;
         String actionType = "";
-
         Types.RESOURCE resource;
-        Types.UNIT unitType;
-        Types.BUILDING buildingType;
 
-        CityActionListener() {}
+        CityActionListener(String type) {
+            this.actionType = type;
+        }
 
-        public void update(int cityID, Vector2d position, ActionController ac, GameState gs, String type) {
+        public void update(int cityID, Vector2d position, ActionController ac, GameState gs) {
             this.cityID = cityID;
             this.position = position;
             this.ac = ac;
             this.gs = gs;
-            this.actionType = type;
         }
 
         public void setResource(Types.RESOURCE resource) {
             this.resource = resource;
-        }
-
-        public void setUnitType(Types.UNIT unitType) {
-            this.unitType = unitType;
-        }
-
-        public void setBuildingType(Types.BUILDING buildingType) {
-            this.buildingType = buildingType;
         }
 
         @Override
@@ -488,14 +478,22 @@ public class InfoView extends JComponent {
                     ((ResourceGathering) a).setResource(resource);
                     break;
                 case "Spawn":
-                    a = new Spawn(cityID);
-                    ((Spawn) a).setTargetPos(position);
-                    ((Spawn) a).setUnitType(unitType);
+                    if( e.getSource() instanceof JButton) {
+                        String type = ((JButton)e.getSource()).getText().split(" ")[1];
+                        Types.UNIT uType = Types.UNIT.stringToType(type);
+                        a = new Spawn(cityID);
+                        ((Spawn) a).setTargetPos(position);
+                        ((Spawn) a).setUnitType(uType);
+                    }
                     break;
                 case "Build":
-                    a = new Build(cityID);
-                    ((Build) a).setTargetPos(position);
-                    ((Build) a).setBuildingType(buildingType);
+                    if( e.getSource() instanceof JButton) {
+                        String type = ((JButton)e.getSource()).getText().split(" ")[1];
+                        Types.BUILDING bType = Types.BUILDING.stringToType(type);
+                        a = new Build(cityID);
+                        ((Build) a).setTargetPos(position);
+                        ((Build) a).setBuildingType(bType);
+                    }
             }
             if (a != null) {
                 ac.addAction(a, gs);

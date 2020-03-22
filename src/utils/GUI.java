@@ -261,17 +261,19 @@ public class GUI extends JFrame implements Runnable {
      * unit at coordinates (unitX, unitY).
      */
     private Action getActionAt(int actionX, int actionY, int unitX, int unitY) {
-        HashMap<Integer, ArrayList<Action>> possibleActions = gs.getUnitActions();
-        for (Map.Entry<Integer, ArrayList<Action>> e: possibleActions.entrySet()) {
-            Unit u = (Unit) gs.getActor(e.getKey());
+        if (!infoView.clickedTwice()) { // Only return action if we're highlighting the unit and not underneath it
+            HashMap<Integer, ArrayList<Action>> possibleActions = gs.getUnitActions();
+            for (Map.Entry<Integer, ArrayList<Action>> e : possibleActions.entrySet()) {
+                Unit u = (Unit) gs.getActor(e.getKey());
 
-            // Only draw actions for highlighted unit
-            if (u.getPosition().x == unitY && u.getPosition().y == unitX) {
-                for (Action a: e.getValue()) {
-                    Vector2d pos = getActionPosition(gs, a);
-                    if (pos != null && pos.x == actionY && pos.y == actionX) return a;
+                // Only draw actions for highlighted unit
+                if (u.getPosition().x == unitY && u.getPosition().y == unitX) {
+                    for (Action a : e.getValue()) {
+                        Vector2d pos = getActionPosition(gs, a);
+                        if (pos != null && pos.x == actionY && pos.y == actionX) return a;
+                    }
+                    return null;
                 }
-                return null;
             }
         }
         return null;

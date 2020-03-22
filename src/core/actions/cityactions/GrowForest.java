@@ -28,7 +28,7 @@ public class GrowForest extends CityAction
         if(b.getCityIdAt(targetPos.x, targetPos.y) != city.getActorId()) return false;
 
         Tribe t = gs.getTribe(city.getTribeId());
-        if(t.getStars() < TribesConfig.FOREST_COST) return false;
+        if(t.getStars() < TribesConfig.GROW_FOREST_COST) return false;
         return t.getTechTree().isResearched(Types.TECHNOLOGY.SPIRITUALISM);
     }
 
@@ -36,7 +36,7 @@ public class GrowForest extends CityAction
     public boolean execute(GameState gs) {
         if (isFeasible(gs)){
             gs.getBoard().setTerrainAt(targetPos.x, targetPos.y, Types.TERRAIN.FOREST);
-            gs.getTribe(this.cityId).subtractStars(TribesConfig.FOREST_COST);
+            gs.getTribe(this.cityId).subtractStars(TribesConfig.GROW_FOREST_COST);
             return true;
         }
         return false;

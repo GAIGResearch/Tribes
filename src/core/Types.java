@@ -418,6 +418,11 @@ public class Types {
             }
             return null;
         }
+
+        public boolean spawnable()
+        {
+            return !(this == BOAT || this == SHIP || this == BATTLESHIP || this == SUPERUNIT);
+        }
     }
 
 

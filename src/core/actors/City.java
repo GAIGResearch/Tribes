@@ -173,7 +173,7 @@ public class City extends Actor{
     }
 
     public boolean canAddUnit(){
-        return unitsID.size() < level;
+        return unitsID.size() < (level+1);
     }
 
     public void removeUnit(int id){

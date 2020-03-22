@@ -17,27 +17,27 @@ public class ConvertFactory implements ActionFactory {
     public LinkedList<Action> computeActionVariants(final Actor actor, final GameState gs) {
         Unit unit = (Unit) actor;
         LinkedList<Action> converts = new LinkedList<>();
-        Board b = gs.getBoard();
-        Vector2d position = unit.getPosition();
 
-        for(int i = position.x- unit.RANGE; i <= position.x+ unit.RANGE; i++) {
-            for (int j = position.y - unit.RANGE; j <= position.y + unit.RANGE; j++) {
+        //Only if unit can attack.
+        if(unit.canAttack()) {
+            Board b = gs.getBoard();
+            Vector2d position = unit.getPosition();
 
-                //Not converting itself
-                if(i != position.x || j != position.y) {
-
-                    Unit target = b.getUnitAt(i,j);
-                    if(target != null)
-                    {
-                        Convert c = new Convert(unit.getActorId());
-                        c.setTargetId(target.getActorId());
-                        if(c.isFeasible(gs)){
-                            converts.add(c);
-                        }
+            LinkedList<Vector2d> potentialTiles = position.neighborhood(unit.RANGE, 0, b.getSize()); //use neighbourhood for board limits
+            for (Vector2d tile : potentialTiles) {
+                Unit target = b.getUnitAt(tile.x, tile.y);
+                if(target != null && target.getActorId() != unit.getActorId())
+                {
+                    // Check if there is actually a unit there (and it's not me)
+                    Convert c = new Convert(unit.getActorId());
+                    c.setTargetId(target.getActorId());
+                    if(c.isFeasible(gs)){
+                        converts.add(c);
                     }
                 }
             }
         }
+
         return converts;
     }
 

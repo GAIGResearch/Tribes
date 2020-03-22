@@ -1,18 +1,12 @@
 package core.actions.unitactions;
 
-import core.TechnologyTree;
 import core.Types;
 import core.actions.Action;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
 import utils.Vector2d;
-import utils.graph.NeighbourHelper;
-import utils.graph.PathNode;
 import utils.graph.Pathfinder;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class Move extends UnitAction
 {
@@ -33,7 +27,7 @@ public class Move extends UnitAction
         Pathfinder tp = new Pathfinder(unit.getPosition(), new StepMove(gs, unit));
 
         //If the unit can move and the destination is vacant, try to reach it.
-        if(unit.checkStatus(Types.TURN_STATUS.MOVED) && gs.getBoard().getUnitAt(destination.x, destination.y) == null) {
+        if(unit.canMove() && gs.getBoard().getUnitAt(destination.x, destination.y) == null) {
             return !tp.findPathTo(destination).isEmpty();
         }
         return false;
@@ -47,7 +41,6 @@ public class Move extends UnitAction
             Board board = gs.getBoard();
             Types.TERRAIN destinationTerrain = board.getTerrainAt(destination.x, destination.y);
 
-            unit.setStatus(Types.TURN_STATUS.MOVED);
             board.moveUnit(unit, unit.getPosition().x, unit.getPosition().y, destination.x, destination.y);
 
             if(unit.getType() == Types.UNIT.BOAT || unit.getType() == Types.UNIT.SHIP || unit.getType() == Types.UNIT.BATTLESHIP) {
@@ -59,6 +52,9 @@ public class Move extends UnitAction
                     board.embark(unit, destination.x, destination.y);
                 }
             }
+
+            unit.transitionToStatus(Types.TURN_STATUS.MOVED);
+
             return true;
         }
         return false;

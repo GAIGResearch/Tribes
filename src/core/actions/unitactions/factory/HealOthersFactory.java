@@ -19,10 +19,15 @@ public class HealOthersFactory implements ActionFactory {
         LinkedList<Action> actions = new LinkedList<>();
         Unit unit = (Unit) actor;
 
-        HealOthers action = new HealOthers(unit.getActorId());
-        if(action.isFeasible(gs)){
-            actions.add(action);
+        //Only if the unit can 'attack'
+        if(unit.canAttack())
+        {
+            HealOthers action = new HealOthers(unit.getActorId());
+            if(action.isFeasible(gs)){
+                actions.add(action);
+            }
         }
+
         return actions;
     }
 

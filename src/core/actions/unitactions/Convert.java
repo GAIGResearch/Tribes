@@ -1,5 +1,6 @@
 package core.actions.unitactions;
 
+import core.Types;
 import core.actions.Action;
 import core.game.GameState;
 import core.actors.units.Unit;
@@ -25,7 +26,7 @@ public class Convert extends UnitAction
         Unit unit = (Unit) gs.getActor(this.unitId);
 
         // Check if target is not null
-        if(target == null)
+        if(target == null || !unit.canAttack())
             return false;
 
         return unitInRange(unit, target, gs.getBoard());
@@ -42,6 +43,10 @@ public class Convert extends UnitAction
 
             //add tribe to converted units
             gs.getActiveTribe().addExtraUnit(target);
+
+            //manage status of the units after the action is executed
+            unit.transitionToStatus(Types.TURN_STATUS.ATTACKED);
+            target.setStatus(Types.TURN_STATUS.FINISHED);
             return true;
         }
         return false;

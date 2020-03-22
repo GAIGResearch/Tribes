@@ -23,7 +23,7 @@ public class Disband extends UnitAction
     {
         Unit unit = (Unit) gs.getActor(this.unitId);
         TechnologyTree tt = gs.getTribe(unit.getTribeId()).getTechTree();
-        return tt.isResearched(Types.TECHNOLOGY.FREE_SPIRIT);
+        return unit.isFresh() && tt.isResearched(Types.TECHNOLOGY.FREE_SPIRIT);
     }
 
     @Override

@@ -16,19 +16,21 @@ public class CaptureFactory implements ActionFactory {
     @Override
     public LinkedList<Action> computeActionVariants(final Actor actor, final GameState gs) {
         Unit unit = (Unit) actor;
-
-        // get city from board, check if action is feasible and add to list
-        Board b = gs.getBoard();
         LinkedList<Action> captures = new LinkedList<>();
-        City c = b.getCityInBorders(unit.getPosition().x, unit.getPosition().y);
-        if(c != null) {
-            Capture capture = new Capture(unit.getActorId());
-            capture.setTargetCity(c.getActorId());
-            if (capture.isFeasible(gs)) {
-                captures.add(capture);
+
+        if(unit.isFresh()) {
+            // get city from board, check if action is feasible and add to list
+            Board b = gs.getBoard();
+            City c = b.getCityInBorders(unit.getPosition().x, unit.getPosition().y);
+            if (c != null) {
+                Capture capture = new Capture(unit.getActorId());
+                capture.setTargetCity(c.getActorId());
+                if (capture.isFeasible(gs)) {
+                    captures.add(capture);
+                }
             }
         }
-
+        
         return captures;
     }
 

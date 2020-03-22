@@ -14,6 +14,9 @@ public class UnitActionBuilder
     {
         ArrayList<Action> allActions = new ArrayList<>();
 
+        if(unit.isFinished())
+            return allActions;
+
         //Attack
         allActions.addAll(new AttackFactory().computeActionVariants(unit, gs));
 

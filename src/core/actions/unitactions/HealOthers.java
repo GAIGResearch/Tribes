@@ -23,7 +23,9 @@ public class HealOthers extends UnitAction
         Board board = gs.getBoard();
         Unit unit = (Unit) gs.getActor(this.unitId);
 
-        if(unit.getType() != Types.UNIT.MIND_BENDER) return false;
+        //This needs to be a mind bender that can "attack"
+        if(unit.getType() != Types.UNIT.MIND_BENDER || !unit.canAttack())
+            return false;
 
         //Feasible if this unit can heal this turn and if there is at least one friendly unit adjacent.
         for(Vector2d tile : unit.getPosition().neighborhood(unit.RANGE, 0, board.getSize())){
@@ -50,7 +52,7 @@ public class HealOthers extends UnitAction
                 }
             }
 
-            unit.setStatus(Types.TURN_STATUS.ATTACKED);
+            unit.transitionToStatus(Types.TURN_STATUS.ATTACKED);
             return true;
         }
         return false;

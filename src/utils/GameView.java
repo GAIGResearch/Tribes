@@ -62,8 +62,6 @@ public class GameView extends JComponent {
         starShadow = ImageIO.GetInstance().getImage("img/decorations/starShadow.png");
         capitalImg = ImageIO.GetInstance().getImage("img/decorations/capital.png");
         capitalShadow = ImageIO.GetInstance().getImage("img/decorations/capitalShadow.png");
-
-        actionable = new boolean[gridSize][gridSize];
     }
 
 
@@ -85,12 +83,15 @@ public class GameView extends JComponent {
         g.fillRect(0, 0, dimension.width, dimension.height);
 
         // Update list of actionable tiles to be highlighted (collectible resources)
+        actionable = new boolean[gridSize][gridSize];
         HashMap<Integer, ArrayList<Action>> actions = gameState.getCityActions();
         for (Map.Entry<Integer, ArrayList<Action>> e: actions.entrySet()) {
             for (Action a: e.getValue()) {
                 if (a instanceof CityAction) {
                     Vector2d pos = ((CityAction) a).getTargetPos();
-                    actionable[pos.x][pos.y] = a instanceof ResourceGathering;
+                    if (pos != null) {
+                        actionable[pos.x][pos.y] = a instanceof ResourceGathering;
+                    }
                 }
             }
         }

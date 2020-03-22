@@ -200,8 +200,6 @@ public class GameState {
         TribeActionBuilder tab = new TribeActionBuilder();
         ArrayList<Action> actions = tab.getActions(this, tribe);
         tribeActions.addAll(actions);
-
-        int a = 0;
     }
 
     /**

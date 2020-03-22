@@ -8,6 +8,7 @@ import core.actors.City;
 import core.actors.Tribe;
 import core.actors.units.Unit;
 import players.Agent;
+import players.HumanAgent;
 import utils.ElapsedCpuTimer;
 import utils.GUI;
 import utils.Vector2d;
@@ -216,8 +217,10 @@ public class Game {
         //start the timer to the max duration
         ElapsedCpuTimer ect = new ElapsedCpuTimer();
         ect.setMaxTimeMillis(TURN_TIME_MILLIS);
+        boolean continueTurn = true;
 
         while(gs.existAvailableActions(tribe) && !ect.exceededMaxTime())
+        while(continueTurn)
         {
             //get one action from the player
             Action action = ag.act(gameStateObservations[playerID], ect);
@@ -254,6 +257,11 @@ public class Game {
 
             //the timer needs to be updated to the remaining time, not counting action computation.
             ect.setMaxTimeMillis(remaining);
+
+            //Continue this turn if there are still available actions. If the agent is human, let him play for now.
+            continueTurn = gs.existAvailableActions(tribe);
+            if(!(ag instanceof HumanAgent))
+                continueTurn &= !ect.exceededMaxTime();
         }
 
         //Ends the turn for this tribe (units that didn't move heal).

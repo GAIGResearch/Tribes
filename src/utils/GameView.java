@@ -57,7 +57,7 @@ public class GameView extends JComponent {
 
 //        backgroundImg = Types.TERRAIN.PLAIN.getImage(null);
         fogImg = ImageIO.GetInstance().getImage("img/fog.png");
-        shineImg = ImageIO.GetInstance().getImage("img/shine.png");
+        shineImg = ImageIO.GetInstance().getImage("img/shine3.png");
         starImg = ImageIO.GetInstance().getImage("img/decorations/star.png");
         starShadow = ImageIO.GetInstance().getImage("img/decorations/starShadow.png");
         capitalImg = ImageIO.GetInstance().getImage("img/decorations/capital.png");

@@ -203,6 +203,7 @@ public class TribesConfig
     public static int CITY_LEVEL_UP_POP_GROWTH = 3;
     public static int CITY_LEVEL_UP_PARK = 250;
     public static int CITY_BORDER_POINTS = 20;
+    public static int PROD_CAPITAL_BONUS = 1;
 
     /* TRIBES */
     public static int INITIAL_STARS = 5;

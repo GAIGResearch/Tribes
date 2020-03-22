@@ -57,6 +57,9 @@ public class Tribe extends Actor {
     //Kills by this tribe
     private int nKills;
 
+    //Total production for this turn.
+    private int totalProduction;
+
     public Tribe(Types.TRIBE tribe) {
         this.tribe = tribe;
         init();
@@ -75,11 +78,13 @@ public class Tribe extends Actor {
         techTree.doResearch(tribe.getInitialTech());
         citiesID = new ArrayList<>();
         stars = TribesConfig.INITIAL_STARS;
+        score = tribe.getInitialScore();
         tribesMet = new ArrayList<>();
         extraUnits = new ArrayList<>();
         connectedCities = new ArrayList<>();
         monuments = Types.BUILDING.initMonuments();
         nKills = 0;
+        totalProduction = 0;
     }
 
     public void initObsGrid(int size) {
@@ -96,6 +101,7 @@ public class Tribe extends Actor {
         tribeCopy.score = this.score;
         tribeCopy.capitalID = this.capitalID;
         tribeCopy.nKills = this.nKills;
+        tribeCopy.totalProduction = this.totalProduction;
 
         tribeCopy.techTree = this.techTree.copy();
 
@@ -219,6 +225,10 @@ public class Tribe extends Actor {
         return score;
     }
 
+    public void setScore(int score) {
+        this.score = score;
+    }
+
     public int getStars() {
         return stars;
     }
@@ -275,6 +285,14 @@ public class Tribe extends Actor {
 
     public int getnumKills() {
         return nKills;
+    }
+
+    public int getTotalProduction() {
+        return totalProduction;
+    }
+
+    public void setTotalProduction(int totalProduction) {
+        this.totalProduction = totalProduction;
     }
 
     public void addKill() {

@@ -1,5 +1,6 @@
 package core.game;
 
+import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actions.unitactions.Recover;
@@ -227,7 +228,7 @@ public class Game {
             //note down the remaining time to use it for the next iteration
             long remaining = ect.remainingTimeMillis();
 
-            //play the action in the game and update the avaliable actions list
+            //play the action in the game and update the available actions list
             gs.next(action);
             gs.computePlayerActions(tribe);
 
@@ -258,9 +259,9 @@ public class Game {
             ect.setMaxTimeMillis(remaining);
 
             //Continue this turn if there are still available actions. If the agent is human, let him play for now.
-            continueTurn = gs.existAvailableActions(tribe) && !gs.isTurnEnding();
+            continueTurn = !gs.isTurnEnding();
             if(!(ag instanceof HumanAgent))
-                continueTurn &= !ect.exceededMaxTime();
+                continueTurn &= gs.existAvailableActions(tribe) && !ect.exceededMaxTime();
         }
 
         //Ends the turn for this tribe (units that didn't move heal).
@@ -278,30 +279,36 @@ public class Game {
         ArrayList<Integer> allTribeUnits = new ArrayList<>();
         gs.endTurn(false);
 
-        //1. Compute stars and score per turn
+        //1. Compute stars and score per turn.
         int acumProd = 0, turnScore = 0;
-        for(int cityId : tribeCities)
-        {
+        for (int cityId : tribeCities) {
             City city = (City) gs.getActor(cityId);
 
             //Cities with an enemy unit in the city's tile don't generate production.
             boolean produces = true;
             Vector2d cityPos = city.getPosition();
             int unitIDAt = gs.getBoard().getUnitIDAt(cityPos.x, cityPos.y);
-            if(unitIDAt > 0)
-            {
+            if (unitIDAt > 0) {
                 Unit u = (Unit) gs.getActor(unitIDAt);
                 produces = (u.getTribeId() == tribe.getTribeId());
             }
 
-            if(produces)
+            if (produces)
                 acumProd += city.getProduction();
 
             turnScore += city.getPointsPerTurn();
             allTribeUnits.addAll(city.getUnitsID());
         }
-        tribe.addStars(acumProd);
-        tribe.addScore(turnScore);
+
+        if(gs.getTick() == 0)
+        {
+            tribe.setScore(tribe.getType().getInitialScore());
+            tribe.setStars(TribesConfig.INITIAL_STARS);
+        }else{
+            tribe.addStars(acumProd);
+            tribe.addScore(turnScore);
+        }
+        tribe.setTotalProduction(acumProd);
 
         //2. Units: all become available. This needs to be done here as some units may have become
         // pushed during other player's turn.

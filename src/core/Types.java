@@ -179,6 +179,31 @@ public class Types {
         PARK_OF_FORTUNE (17,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
         TOWER_OF_WISDOM (18, "img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, PHILOSOPHY,new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN)));
 
+        public static BUILDING stringToType(String type) {
+            switch (type) {
+                case "PORT": return PORT;
+                case "MINE": return MINE;
+                case "FORGE": return FORGE;
+                case "FARM": return FARM;
+                case "WINDMILL": return WINDMILL;
+                case "CUSTOM_HOUSE": return CUSTOM_HOUSE;
+                case "LUMBER_HUT": return LUMBER_HUT;
+                case "SAWMILL": return SAWMILL;
+                case "TEMPLE": return TEMPLE;
+                case "WATER_TEMPLE": return WATER_TEMPLE;
+                case "FOREST_TEMPLE": return FOREST_TEMPLE;
+                case "MOUNTAIN_TEMPLE": return MOUNTAIN_TEMPLE;
+                case "ALTAR_OF_PEACE": return ALTAR_OF_PEACE;
+                case "EMPERORS_TOMB": return EMPERORS_TOMB;
+                case "EYE_OF_GOD": return EYE_OF_GOD;
+                case "GATE_OF_POWER": return GATE_OF_POWER;
+                case "GRAND_BAZAR": return GRAND_BAZAR;
+                case "PARK_OF_FORTUNE": return PARK_OF_FORTUNE;
+                case "TOWER_OF_WISDOM": return TOWER_OF_WISDOM;
+            }
+            return null;
+        }
+
         public enum MONUMENT_STATUS {
             UNAVAILABLE,
             AVAILABLE,
@@ -384,6 +409,25 @@ public class Types {
             this.requirement = requirement;
             this.points = points;
         }
+
+        public static UNIT stringToType(String type) {
+            switch(type) {
+                case "WARRIOR": return WARRIOR;
+                case "RIDER": return RIDER;
+                case "DEFENDER": return DEFENDER;
+                case "SWORDMAN": return SWORDMAN;
+                case "ARCHER": return ARCHER;
+                case "CATAPULT": return CATAPULT;
+                case "KNIGHT": return KNIGHT;
+                case "MIND_BENDER": return MIND_BENDER;
+                case "BOAT": return BOAT;
+                case "SHIP": return SHIP;
+                case "BATTLESHIP": return BATTLESHIP;
+                case "SUPERUNIT": return SUPERUNIT;
+            }
+            return null;
+        }
+
         public int getKey() {  return key; }
         public Image getImage(int playerID) { return ImageIO.GetInstance().getImage(imageFile + playerID + ".png"); }
         public String getImageStr(int playerID) { return imageFile + playerID + ".png"; }
@@ -422,6 +466,16 @@ public class Types {
         public boolean spawnable()
         {
             return !(this == BOAT || this == SHIP || this == BATTLESHIP || this == SUPERUNIT);
+        }
+
+        public static ArrayList<UNIT> getSpawnableTypes() {
+            ArrayList<UNIT> units = new ArrayList<>();
+            for (UNIT u: UNIT.values()) {
+                if (u.spawnable()) {
+                    units.add(u);
+                }
+            }
+            return units;
         }
     }
 

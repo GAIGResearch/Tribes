@@ -44,11 +44,12 @@ public class TribeView extends JComponent {
         if (gs != null) {
             //For a better graphics, enable this: (be aware this could bring performance issues depending on your HW & OS).
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            Tribe[] tribes = gs.getTribes();
+            Tribe[] tribes = gs.getTribes().clone();
 
             Tribe t_this = tribes[gs.getActiveTribeID()];
             String s = "<p><b>" + t_this.getName() + "</b>  ...........  " + t_this.getScore() + " points. Stars: "
                     + t_this.getStars() + " (+" + t_this.getTotalProduction() + ")</p><br/><hr><h2>Rankings</h2>";
+
 
             Arrays.sort(tribes, Comparator.comparing(Tribe::getReverseScore));
             for (Tribe t : tribes) {

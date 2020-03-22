@@ -34,6 +34,8 @@ public class Capture extends UnitAction
         City targetCity = (City) gs.getActor(this.targetCityId);
         Unit unit = (Unit) gs.getActor(this.unitId);
 
+        if(!unit.isFresh()) return false;
+
         // If unit not in city, city belongs to the units tribe or if city is null then action is not feasible
         Board b = gs.getBoard();
         if(targetCity == null) return false;
@@ -42,7 +44,7 @@ public class Capture extends UnitAction
         if(b.getUnitAt(targetPos.x,targetPos.y) == null) return false;
 
         Vector2d unitPos = unit.getPosition();
-        if(targetPos.x != unitPos.x || targetPos.y != unitPos.y) return false;
+        if(!targetPos.equals(unitPos)) return false;
 
         return targetCity.getTribeId() != unit.getTribeId();
     }

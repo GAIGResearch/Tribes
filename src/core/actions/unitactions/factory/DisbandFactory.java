@@ -13,7 +13,7 @@ public class DisbandFactory implements ActionFactory {
 
     @Override
     public LinkedList<Action> computeActionVariants(final Actor actor, final GameState gs) {
-        LinkedList<Action> disbands = new LinkedList();
+        LinkedList<Action> disbands = new LinkedList<>();
         Unit unit = (Unit) actor;
 
         Disband disbandAction = new Disband(unit.getActorId());

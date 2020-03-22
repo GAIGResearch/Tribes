@@ -22,7 +22,7 @@ public class MoveFactory implements ActionFactory {
         Pathfinder tp = new Pathfinder(unit.getPosition(), new StepMove(gs, unit));
 
         //If a units turn is FINISHED don't do unnecessary calculations.
-        if(unit.checkStatus(Types.TURN_STATUS.MOVED)) {
+        if(unit.canMove()) {
             for(PathNode tile : tp.findPaths()) {
                 Move action = new Move(unit.getActorId());
                 action.setDestination(tile.getPosition());

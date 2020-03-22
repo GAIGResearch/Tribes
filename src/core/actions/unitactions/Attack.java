@@ -1,6 +1,7 @@
 package core.actions.unitactions;
 
 import core.TribesConfig;
+import core.Types;
 import core.actions.Action;
 import core.actors.City;
 import core.actors.Tribe;
@@ -32,8 +33,8 @@ public class Attack extends UnitAction
         Unit target = (Unit) gs.getActor(this.targetId);
         Unit attacker = (Unit) gs.getActor(this.unitId);
 
-        // Check if target is not null
-        if(target == null)
+        // Check if target is not null and that it can attack
+        if(target == null || !attacker.canAttack())
             return false;
 
         return unitInRange(attacker, target, gs.getBoard());
@@ -54,29 +55,25 @@ public class Attack extends UnitAction
             double totalDamage =attackForce+defenceForce;
 
             //If target unit in city border increase defence force by 300% if city has walls or 50% if city does not have walls
-            if (gs != null){
-                int cityID = gs.getBoard().getCityIdAt(target.getPosition().x, target.getPosition().y);
-                if (cityID != -1){
-                    ArrayList<Integer> citesID = gs.getTribe(target.getTribeId()).getCitiesID();
-                    if (citesID.contains(cityID)){
-                        City c = gs.getBoard().getCityInBorders(target.getPosition().x, target.getPosition().y);
-                        if(c.hasWalls()) {
-                            defenceForce *= 4;
-                        }else {
-                            defenceForce *=1.5;
-                        }
-                    }
+
+            int cityID = gs.getBoard().getCityIdAt(target.getPosition().x, target.getPosition().y);
+            if (cityID != -1){
+                ArrayList<Integer> citesID = gs.getTribe(target.getTribeId()).getCitiesID();
+                if (citesID.contains(cityID)){
+                    City c = gs.getBoard().getCityInBorders(target.getPosition().x, target.getPosition().y);
+                    defenceForce *= c.hasWalls() ? TribesConfig.DEFENCE_IN_WALLS : TribesConfig.DEFENCE;
                 }
             }
+
+            attacker.transitionToStatus(Types.TURN_STATUS.ATTACKED);
+
             int attackResult = (int) Math.round((attackForce/totalDamage)* attacker.ATK*accelerator);
             int defenceResult = (int) Math.round((defenceForce / totalDamage) * target.DEF *accelerator);
-
-
 
             if (target.getCurrentHP() <= attackResult) {
 
                 attacker.addKill();
-                gs.getTribe(attacker.getActorId()).addKill();
+                gs.getTribe(attacker.getTribeId()).addKill();
                 target.setIsKilled(true);
 
                 //Move unit to target position if unit is melee type
@@ -105,7 +102,7 @@ public class Attack extends UnitAction
                     //Check if attack kills this unit, if it does add a kill to the target
                     if(attacker.getCurrentHP() <=0 ) {
                         target.addKill();
-                        gs.getTribe(target.getActorId()).addKill();
+                        gs.getTribe(target.getTribeId()).addKill();
                         attacker.setIsKilled(true);
                     }
                 }

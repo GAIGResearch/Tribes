@@ -17,27 +17,27 @@ public class AttackFactory implements ActionFactory {
     public LinkedList<Action> computeActionVariants(final Actor actor, final GameState gs) {
         Unit unit = (Unit) actor;
         LinkedList<Action> attacks = new LinkedList<>();
-        Board b = gs.getBoard();
-        Vector2d position = unit.getPosition();
 
-        // Loop through unit range, check if tile observable and action feasible, if so add action
-        for(int i = position.x - unit.RANGE; i <= position.x + unit.RANGE; i++) {
-            for (int j = position.y - unit.RANGE; j <= position.y + unit.RANGE; j++) {
+        //Only if unit can attack.
+        if(unit.canAttack()) {
+            Board b = gs.getBoard();
+            Vector2d position = unit.getPosition();
 
-                //Not attacking itself
-                if(i != position.x || j != position.y) {
-
+            // Loop through unit range, check if tile observable and action feasible, if so add action
+            LinkedList<Vector2d> potentialTiles = position.neighborhood(unit.RANGE, 0, b.getSize()); //use neighbourhood for board limits
+            for (Vector2d tile : potentialTiles) {
+                Unit other = b.getUnitAt(tile.x, tile.y);
+                if (other != null && other.getActorId() != unit.getActorId()) {
+                    // Check if there is actually a unit there (and it's not me)
                     Attack a = new Attack(unit.getActorId());
-                    Unit other = b.getUnitAt(i, j);
-                    if (other != null) {  // Check if there is actually a unit there
-                        a.setTargetId(other.getActorId());
-                        if (a.isFeasible(gs)) {
-                            attacks.add(a);
-                        }
+                    a.setTargetId(other.getActorId());
+                    if (a.isFeasible(gs)) {
+                        attacks.add(a);
                     }
                 }
             }
         }
+
         return attacks;
     }
 

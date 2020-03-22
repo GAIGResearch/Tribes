@@ -4,6 +4,8 @@ import core.Types;
 import core.actors.Actor;
 import utils.Vector2d;
 
+import static core.Types.TURN_STATUS.*;
+
 public abstract class Unit extends Actor
 {
     public int ATK;
@@ -39,7 +41,7 @@ public abstract class Unit extends Actor
         this.cityID = cityID;
         this.tribeId = tribeID;
         this.isKilled = false;
-        this.status = Types.TURN_STATUS.FRESH;
+        this.status = FRESH;
     }
 
     public void setCurrentHP(int hp){
@@ -62,7 +64,7 @@ public abstract class Unit extends Actor
         this.kills++;
         //Persist skill
         if(getType() == Types.UNIT.KNIGHT) {
-            this.status = Types.TURN_STATUS.ATTACKED;
+            this.setStatus(ATTACKED);
         }
     }
 
@@ -82,20 +84,26 @@ public abstract class Unit extends Actor
 
     public Types.TURN_STATUS getStatus() { return status; }
 
+    public void setStatus(Types.TURN_STATUS status) { this.status = status;}
+
     /**
      * Checks if the unit can transition to the status indicated by @param transition.
      * @param transition the status to transition to.
      * @return if the unit can transition to @param transition or not.
     */
-    public boolean checkStatus(Types.TURN_STATUS transition) {
+    private boolean canTransitionTo(Types.TURN_STATUS transition) {
+
+        if(status == FINISHED)
+            return false;
+
         switch (getType()) {
             //Either move or attack
             case MIND_BENDER:
             case CATAPULT:
             case DEFENDER:
-                if(transition == Types.TURN_STATUS.MOVED && status == Types.TURN_STATUS.FRESH) { return true; }
-                if(transition == Types.TURN_STATUS.ATTACKED && status == Types.TURN_STATUS.FRESH) { return true; }
-                break;
+                if(transition == MOVED && status == FRESH) { return true; }
+                if(transition == ATTACKED && status == FRESH) { return true; }
+                return false;
             //Rules for Dash
             case ARCHER:
             case BATTLESHIP:
@@ -103,38 +111,38 @@ public abstract class Unit extends Actor
             case SHIP:
             case WARRIOR:
             case SWORDMAN:
-                if(transition == Types.TURN_STATUS.MOVED && status == Types.TURN_STATUS.FRESH) { return true; }
-                if(transition == Types.TURN_STATUS.ATTACKED && status == Types.TURN_STATUS.FRESH) { return true; }
-                if(transition == Types.TURN_STATUS.ATTACKED && status == Types.TURN_STATUS.MOVED) { return true; }
-                break;
+                if(transition == MOVED && status == FRESH) { return true; }
+                if(transition == ATTACKED && status == FRESH) { return true; }
+                if(transition == ATTACKED && status == MOVED) { return true; }
+                return false;
             //Rules for Escape
             case RIDER:
-                if(transition == Types.TURN_STATUS.MOVED && status == Types.TURN_STATUS.FRESH) { return true; }
-                if(transition == Types.TURN_STATUS.MOVED && status == Types.TURN_STATUS.ATTACKED) { return true; }
-                if(transition == Types.TURN_STATUS.MOVED && status == Types.TURN_STATUS.MOVED_AND_ATTACKED) { return true; }
-                if(transition == Types.TURN_STATUS.ATTACKED && status == Types.TURN_STATUS.FRESH) { return true; }
-                if(transition == Types.TURN_STATUS.ATTACKED && status == Types.TURN_STATUS.MOVED) { return true; }
+                if(transition == MOVED && status == FRESH) { return true; }
+                if(transition == MOVED && status == ATTACKED) { return true; }
+                if(transition == MOVED && status == MOVED_AND_ATTACKED) { return true; }
+                if(transition == ATTACKED && status == FRESH) { return true; }
+                if(transition == ATTACKED && status == MOVED) { return true; }
                 break;
             //Rules for Persist
             //Adding a kill for a knight resets its status to FRESH
             case KNIGHT:
-                if(transition == Types.TURN_STATUS.MOVED && status == Types.TURN_STATUS.FRESH) { return true; }
-                if(transition == Types.TURN_STATUS.ATTACKED && status == Types.TURN_STATUS.FRESH) { return true; }
-                if(transition == Types.TURN_STATUS.ATTACKED && status == Types.TURN_STATUS.MOVED) { return true; }
+                if(transition == MOVED && status == FRESH) { return true; }
+                if(transition == ATTACKED && status == FRESH) { return true; }
+                if(transition == ATTACKED && status == MOVED) { return true; }
                 //A Knight can only have its status set to ATTACKED by addKill(). This 'special' status allows
                 //a knight to attack again.
-                if(transition == Types.TURN_STATUS.ATTACKED && status == Types.TURN_STATUS.ATTACKED) { return true; }
+                if(transition == ATTACKED && status == ATTACKED) { return true; }
         }
         return false;
     }
 
-    public void setStatus(Types.TURN_STATUS newStatus) {
-        if(checkStatus(newStatus)) {
+    public void transitionToStatus(Types.TURN_STATUS newStatus) {
+        if(canTransitionTo(newStatus)) {
             switch (getType()) {
                 case MIND_BENDER:
                 case CATAPULT:
                 case DEFENDER:
-                    this.status = Types.TURN_STATUS.FINISHED;
+                    this.status = FINISHED;
                     break;
                 case ARCHER:
                 case BATTLESHIP:
@@ -142,37 +150,57 @@ public abstract class Unit extends Actor
                 case SHIP:
                 case WARRIOR:
                 case SWORDMAN:
-                    if(newStatus == Types.TURN_STATUS.MOVED && getStatus() == Types.TURN_STATUS.FRESH) { this.status = Types.TURN_STATUS.MOVED; }
-                    if(newStatus == Types.TURN_STATUS.ATTACKED && getStatus() == Types.TURN_STATUS.FRESH) { this.status = Types.TURN_STATUS.FINISHED; }
-                    if(newStatus == Types.TURN_STATUS.ATTACKED && getStatus() == Types.TURN_STATUS.MOVED) { this.status = Types.TURN_STATUS.FINISHED; }
+                    if(newStatus == MOVED && this.status == FRESH) { this.status = MOVED; }
+                    if(newStatus == ATTACKED && this.status == FRESH) { this.status = FINISHED; }
+                    if(newStatus == ATTACKED && this.status == MOVED) { this.status = FINISHED; }
                     break;
                 case RIDER:
-                    if(newStatus == Types.TURN_STATUS.MOVED && getStatus() == Types.TURN_STATUS.FRESH) { this.status = Types.TURN_STATUS.MOVED; }
-                    if(newStatus == Types.TURN_STATUS.MOVED && getStatus() == Types.TURN_STATUS.ATTACKED) { this.status = Types.TURN_STATUS.MOVED_AND_ATTACKED; }
-                    if(newStatus == Types.TURN_STATUS.MOVED && getStatus() == Types.TURN_STATUS.MOVED_AND_ATTACKED) { this.status = Types.TURN_STATUS.FINISHED; }
-                    if(newStatus == Types.TURN_STATUS.ATTACKED && getStatus() == Types.TURN_STATUS.FRESH) { this.status = Types.TURN_STATUS.ATTACKED; }
-                    if(newStatus == Types.TURN_STATUS.ATTACKED && getStatus() == Types.TURN_STATUS.MOVED) { this.status = Types.TURN_STATUS.MOVED_AND_ATTACKED; }
+                    if(newStatus == MOVED && this.status == FRESH) { this.status = MOVED; }
+                    if(newStatus == MOVED && this.status == ATTACKED) { this.status = MOVED_AND_ATTACKED; }
+                    if(newStatus == MOVED && this.status == MOVED_AND_ATTACKED) { this.status = FINISHED; }
+                    if(newStatus == ATTACKED && this.status == FRESH) { this.status = ATTACKED; }
+                    if(newStatus == ATTACKED && this.status == MOVED) { this.status = MOVED_AND_ATTACKED; }
                     break;
                 case KNIGHT:
-                    if(newStatus == Types.TURN_STATUS.MOVED && getStatus() == Types.TURN_STATUS.FRESH) { this.status = Types.TURN_STATUS.MOVED; }
-                    if(newStatus == Types.TURN_STATUS.ATTACKED && getStatus() == Types.TURN_STATUS.FRESH) { this.status = Types.TURN_STATUS.FINISHED; }
-                    if(newStatus == Types.TURN_STATUS.ATTACKED && getStatus() == Types.TURN_STATUS.MOVED) { this.status = Types.TURN_STATUS.FINISHED; }
+                    if(newStatus == MOVED && this.status == FRESH) { this.status = MOVED; }
+                    if(newStatus == ATTACKED && this.status == FRESH) { this.status = FINISHED; }
+                    if(newStatus == ATTACKED && this.status == MOVED) { this.status = FINISHED; }
                     //A Knight can only have its status set to ATTACKED by addKill(). This 'special' status allows
                     //a knight to attack again.
-                    if(newStatus == Types.TURN_STATUS.ATTACKED && getStatus() == Types.TURN_STATUS.ATTACKED) { this.status = Types.TURN_STATUS.FINISHED; }
+                    if(newStatus == ATTACKED && this.status == ATTACKED) { this.status = FINISHED; }
             }
         }
     }
+    
+    public boolean canAttack()
+    {
+        return this.canTransitionTo(ATTACKED);
+    }
+    
+    public boolean canMove()
+    {
+        return this.canTransitionTo(MOVED);
+    }
+
+    public boolean isFinished() {
+        return this.status == FINISHED;
+    }
+
+    public boolean isFresh() {
+        return this.status == FRESH;
+    }
+
 
     public abstract Unit copy();
 
     public void setIsKilled(boolean isKilled){
         this.isKilled = isKilled;
+        if(isKilled)
+            this.setStatus(FINISHED);
     }
 
     public boolean getIsKilled(){
         return isKilled;
     }
-
 
 }

@@ -467,7 +467,7 @@ public class Board {
                         t.addScore(TribesConfig.CITY_BORDER_POINTS);
                 }
             }
-            }
+    }
 
     // Method to expand city borders, take city as param
     public void expandBorder(City city){

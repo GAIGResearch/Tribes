@@ -2,6 +2,7 @@ package core.game;
 
 import core.actions.Action;
 import core.actions.cityactions.factory.CityActionBuilder;
+import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.TribeAction;
 import core.actions.tribeactions.factory.TribeActionBuilder;
 import core.actions.unitactions.factory.UnitActionBuilder;
@@ -214,8 +215,24 @@ public class GameState {
      */
     public boolean existAvailableActions(Tribe tribe)
     {
-        //TODO: Checks if there are available actions for this tribe.
-        return true;
+        int tribeId = tribe.getTribeId();
+        if(board.getActiveTribeID() != tribeId) //Not sure if this is needed, actually.
+            return false;
+
+        //Just one action for a city or a unit makes this question false.
+        int nActions = 0;
+        for(int cityId : cityActions.keySet())
+        {
+            nActions += cityActions.get(cityId).size();
+            if(nActions>0) return false;
+        }
+        for(int cityId : unitActions.keySet()) {
+            nActions += unitActions.get(cityId).size();
+            if(nActions>0) return false;
+        }
+
+        //No city or unit actions - if there's only one (EndTurn) tribe action, there are no actions available.
+        return tribeActions.size() != 1 || !(tribeActions.get(0) instanceof EndTurn);
     }
 
     /**

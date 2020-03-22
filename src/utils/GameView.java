@@ -266,7 +266,7 @@ public class GameView extends JComponent {
 
         int cityID = board.getCityIdAt(i,j);
         City c = (City) board.getActor(cityID);
-        int level = c.getLevel();
+        int cityCapacity = c.getLevel() + 1;
         int progress = c.getPopulation();
         int units = c.getUnitsID().size();
         int bound = c.getBound();
@@ -315,7 +315,7 @@ public class GameView extends JComponent {
 
         // Draw level
         int sectionWidth = CELL_SIZE/4;
-        int w = level * sectionWidth;
+        int w = cityCapacity * sectionWidth;
         Rectangle bgRect = new Rectangle(nameRect.x + nameRect.width/2 - w/2, nameRect.y + nameRect.height, w, (int)h);
         drawRoundRectShadowHighlight(g, bgRect);
         g.setColor(Color.WHITE);
@@ -343,10 +343,10 @@ public class GameView extends JComponent {
         }
 
         // Draw section separations
-        for (int l = 0; l < level - 1; l++) {
+        for (int l = 0; l < cityCapacity - 1; l++) {
             int lx = bgRect.x + sectionWidth * (l + 1);
             g.drawLine((int)(lx + panTranslate.getX()), (int)(bgRect.y + panTranslate.getY()),
-                    lx, bgRect.y + bgRect.height);
+                    (int)(lx + panTranslate.getX()), (int)(bgRect.y + bgRect.height + panTranslate.getY()));
         }
     }
 

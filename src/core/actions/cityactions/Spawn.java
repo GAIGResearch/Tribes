@@ -30,6 +30,9 @@ public class Spawn extends CityAction
         City city = (City) gs.getActor(this.cityId);
         Tribe t = gs.getTribe(city.getTribeId());
 
+        //It's a buildable type (no naval units, no giants)
+        if(!unit_type.spawnable()) return false;
+
         //I have enough money.
         if(t.getStars() < unit_type.getCost()) return false;
 
@@ -40,12 +43,9 @@ public class Spawn extends CityAction
         Vector2d cityPos = city.getPosition();
         if(gs.getBoard().getUnitAt(cityPos.x, cityPos.y) != null) return false;
 
-        //It's a buildable type (no naval units, no giants)
-        if(unit_type == BOAT || unit_type == SHIP || unit_type == BATTLESHIP || unit_type == SUPERUNIT) return false;
-
         //and I have the tech to build it...
         Types.TECHNOLOGY tech = unit_type.getRequirement();
-        return tech != null || t.getTechTree().isResearched(tech);
+        return tech == null || t.getTechTree().isResearched(tech);
 
     }
 
@@ -68,7 +68,6 @@ public class Spawn extends CityAction
     public Action copy() {
         Spawn spawn = new Spawn(this.cityId);
         spawn.setUnitType(this.unit_type);
-        spawn.setTargetPos(this.targetPos.copy());
         return spawn;
     }
 }

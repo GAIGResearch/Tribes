@@ -109,7 +109,7 @@ public class Types {
      */
     public enum RESOURCE
     {
-        FISH(0, "img/resource/fish.png", 'h', FISH_COST, FISH_POP),
+        FISH(0, "img/resource/fish.png", 'h', TribesConfig.FISH_COST, FISH_POP),
         FRUIT(1, "img/resource/fruit.png", 'f', FRUIT_COST, FRUIT_POP),
         ANIMAL(2, "img/resource/animal.png", 'a', ANIMAL_COST, ANIMAL_POP),
         WHALES(3, "img/resource/whale.png", 'w', WHALES_COST, WHALES_STARS),
@@ -407,6 +407,11 @@ public class Types {
                     System.out.println("WARNING: TypescreateUnit(), type creation not implemented.");
             }
             return null;
+        }
+
+        public boolean spawnable()
+        {
+            return !(this == BOAT || this == SHIP || this == BATTLESHIP || this == SUPERUNIT);
         }
     }
 

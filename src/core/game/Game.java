@@ -227,7 +227,7 @@ public class Game {
             //note down the remaining time to use it for the next iteration
             long remaining = ect.remainingTimeMillis();
 
-            //play the action in the game and update the avaliable actions list
+            //play the action in the game and update the available actions list
             gs.next(action);
             gs.computePlayerActions(tribe);
 
@@ -258,9 +258,9 @@ public class Game {
             ect.setMaxTimeMillis(remaining);
 
             //Continue this turn if there are still available actions. If the agent is human, let him play for now.
-            continueTurn = gs.existAvailableActions(tribe) && !gs.isTurnEnding();
+            continueTurn = !gs.isTurnEnding();
             if(!(ag instanceof HumanAgent))
-                continueTurn &= !ect.exceededMaxTime();
+                continueTurn &= gs.existAvailableActions(tribe) && !ect.exceededMaxTime();
         }
 
         //Ends the turn for this tribe (units that didn't move heal).

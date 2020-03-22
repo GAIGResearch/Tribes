@@ -219,7 +219,6 @@ public class Game {
         ect.setMaxTimeMillis(TURN_TIME_MILLIS);
         boolean continueTurn = true;
 
-        while(gs.existAvailableActions(tribe) && !ect.exceededMaxTime())
         while(continueTurn)
         {
             //get one action from the player

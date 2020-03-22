@@ -50,7 +50,7 @@ public class TribeView extends JComponent {
             String s = "<p><b>" + t_this.getName() + "</b>  ...........  " + t_this.getScore() + " points. Stars: "
                     + t_this.getStars() + " (+" + t_this.getTotalProduction() + ")</p><br/><hr><h2>Rankings</h2>";
 
-
+            // TODO: make sure this doesn't mess up assumptions of tribe order, it shouldn't since array cloned
             Arrays.sort(tribes, Comparator.comparing(Tribe::getReverseScore));
             for (Tribe t : tribes) {
                 s += "<p><b>" + t.getName() + "</b>  ...........  " + t.getScore() + " points</p>";

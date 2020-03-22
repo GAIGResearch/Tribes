@@ -114,8 +114,8 @@ public class Types {
         ANIMAL(2, "img/resource/animal2.png", null, 'a', ANIMAL_COST, ANIMAL_POP),
         WHALES(3, "img/resource/whale2.png", "img/resource/whale3.png", 'w', WHALES_COST, WHALES_STARS),
         ORE(5, "img/resource/ore2.png", null, 'o', 0, 0),
-        CROPS(6, "img/resource/crops.png", null, 'c', 0, 0),
-        RUINS(7, "img/resource/ruins.png", null, 'r', 0, 0);
+        CROPS(6, "img/resource/crops2.png", null, 'c', 0, 0),
+        RUINS(7, "img/resource/ruins2.png", null, 'r', 0, 0);
 
         private int key;
         private String imageFile, secondaryImageFile;

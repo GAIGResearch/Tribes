@@ -79,6 +79,7 @@ public class Examine extends UnitAction
             }
             Vector2d unitPos = unit.getPosition();
             gs.getBoard().setResourceAt(unitPos.x, unitPos.y, null);
+            unit.setStatus(Types.TURN_STATUS.FINISHED);
             return true;
         }
         return false;

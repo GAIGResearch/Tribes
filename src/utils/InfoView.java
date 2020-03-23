@@ -42,6 +42,7 @@ public class InfoView extends JComponent {
     {
         this.size = new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_INFO_PANEL_HEIGHT);
         this.ac = ac;
+        int scrollBarSize = (Integer) UIManager.get("ScrollBar.width");
 
         highlightX = -1;
         highlightY = -1;
@@ -49,7 +50,7 @@ public class InfoView extends JComponent {
         highlightYprev = -1;
 
         textArea = new JEditorPane("text/html", "");
-        textArea.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_INFO_PANEL_HEIGHT - GUI_ACTION_PANEL_HEIGHT));
+        textArea.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_ACTION_PANEL_FULL_SIZE));
         Font textFont = new Font(textArea.getFont().getName(), Font.PLAIN, 12);
         textArea.setFont(textFont);
         textArea.setEditable(false);
@@ -58,7 +59,7 @@ public class InfoView extends JComponent {
         caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 
         JPanel actionPanel = new JPanel();
-        actionPanel.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_ACTION_PANEL_FULL_SIZE));
+        actionPanel.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH - scrollBarSize*2, GUI_ACTION_PANEL_FULL_SIZE));
 
         // Simple actions: BurnForest, ClearForest, Destroy, GrowForest, GatherResource
         actionBF = new JButton("Burn");  // If forest
@@ -111,6 +112,7 @@ public class InfoView extends JComponent {
         this.setLayout(new FlowLayout());
         JScrollPane scrollPane1 = new JScrollPane(textArea);
         JScrollPane scrollPane2 = new JScrollPane(actionPanel);
+        scrollPane1.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_INFO_PANEL_HEIGHT - GUI_ACTION_PANEL_HEIGHT));
         scrollPane2.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_ACTION_PANEL_HEIGHT));
         this.add(scrollPane1);
         this.add(scrollPane2);

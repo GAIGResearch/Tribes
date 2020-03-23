@@ -10,6 +10,8 @@ import players.ActionController;
 import javax.swing.*;
 import java.awt.*;
 
+import static core.Constants.*;
+
 public class TechView extends JComponent {
 
     private Dimension size;
@@ -22,7 +24,9 @@ public class TechView extends JComponent {
         this.setLayout(new FlowLayout());  // TODO: organize these based on tech tree structure (place underneath parents)
 
         this.ac = ac;
-        this.size = new Dimension(400, 500);
+        this.size = new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_TECH_PANEL_HEIGHT);
+        JPanel buttons = new JPanel();
+        buttons.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_TECH_PANEL_FULL_SIZE));
         techs = new JButton[Types.TECHNOLOGY.values().length];
         for (int i = 0; i < Types.TECHNOLOGY.values().length; i++) {
             Types.TECHNOLOGY t = Types.TECHNOLOGY.values()[i];
@@ -34,8 +38,11 @@ public class TechView extends JComponent {
                 ac.addAction(a, gs);
             });
             techs[i] = button;
-            this.add(techs[i]);
+            buttons.add(techs[i]);
         }
+        JScrollPane scrollPane = new JScrollPane(buttons);
+        scrollPane.setPreferredSize(size);
+        this.add(scrollPane);
     }
 
 

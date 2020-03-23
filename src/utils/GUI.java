@@ -27,7 +27,7 @@ public class GUI extends JFrame implements Runnable {
 
     private Game game;
     private GameState gs;
-    private KeyController ki;
+//    private KeyController ki;
     private ActionController ac;
 
     private GameView view;
@@ -40,19 +40,36 @@ public class GUI extends JFrame implements Runnable {
     // Zoomed screen dragging vars
     private Point2D startDrag, endDrag, panTranslate;
 
+    public static double screenDiagonal;
+    double scale = 1;
+
     /**
      * Constructor
      * @param title Title of the window.
      */
     public GUI(Game game, String title, KeyController ki, ActionController ac, boolean closeAppOnClosingWindow) {
         super(title);
-        this.ki = ki;
+
+        Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        screenDiagonal = Math.sqrt(rect.width*rect.width + rect.height* rect.height);
+
+        CELL_SIZE = (int)(0.038*screenDiagonal*scale);
+        GUI_GAME_VIEW_SIZE = (int)(0.36*screenDiagonal*scale);
+        GUI_MIN_PAN = (int)(0.015*screenDiagonal*scale);
+        GUI_COMP_SPACING = (int)(0.0045*screenDiagonal*scale);
+        GUI_CITY_TAG_WIDTH = (int)(0.009*screenDiagonal*scale);
+        GUI_SIDE_PANEL_WIDTH = (int)(0.25*screenDiagonal*scale);
+        GUI_INFO_PANEL_HEIGHT = (int)(0.18*screenDiagonal*scale);
+        GUI_ACTION_PANEL_HEIGHT = (int)(0.045*screenDiagonal*scale);
+        GUI_TECH_PANEL_HEIGHT = (int)(0.136*screenDiagonal*scale);
+        GUI_TECH_PANEL_FULL_SIZE = (int)(GUI_TECH_PANEL_FULL_SIZE*(1/scale));
+
+//        this.ki = ki;
         this.ac = ac;
         this.game = game;
 
         infoView = new InfoView(ac);
         panTranslate = new Point2D.Double(0,0);
-//        tribeView = new TribeView();
         view = new GameView(game.getBoard(), infoView, panTranslate);
 
         // Create frame layout
@@ -68,19 +85,19 @@ public class GUI extends JFrame implements Runnable {
         JPanel sidePanel = createSidePanel();
 
         gbc.gridx = 0;
-        getContentPane().add(Box.createRigidArea(new Dimension(10, 0)), gbc);
+        getContentPane().add(Box.createRigidArea(new Dimension(GUI_COMP_SPACING, 0)), gbc);
 
         gbc.gridx++;
         getContentPane().add(mainPanel, gbc);
 
         gbc.gridx++;
-        getContentPane().add(Box.createRigidArea(new Dimension(10, 0)), gbc);
+        getContentPane().add(Box.createRigidArea(new Dimension(GUI_COMP_SPACING, 0)), gbc);
 
         gbc.gridx++;
         getContentPane().add(sidePanel, gbc);
 
         gbc.gridx++;
-        getContentPane().add(Box.createRigidArea(new Dimension(10, 0)), gbc);
+        getContentPane().add(Box.createRigidArea(new Dimension(GUI_COMP_SPACING, 0)), gbc);
 
         // Frame properties
         pack();
@@ -166,13 +183,13 @@ public class GUI extends JFrame implements Runnable {
         c.weighty = 0;
 
         c.gridy = 0;
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
 
         c.gridy++;
         mainPanel.add(view, c);
 
         c.gridy++;
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
 
         return mainPanel;
     }
@@ -197,39 +214,39 @@ public class GUI extends JFrame implements Runnable {
         JTabbedPane tribeResearchInfo = new JTabbedPane();
         tribeView = new TribeView();
         techView = new TechView(ac);
-        tribeResearchInfo.setPreferredSize(new Dimension(400, 300));
+        tribeResearchInfo.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_TECH_PANEL_HEIGHT));
         tribeResearchInfo.add("Tribe Info", tribeView);
-        tribeResearchInfo.add("Tech Tree", new JScrollPane(techView));
+        tribeResearchInfo.add("Tech Tree", techView);
 
         c.gridy = 0;
         sidePanel.add(appTitle, c);
 
         c.gridy++;
-        sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+        sidePanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
 
         c.gridy++;
         sidePanel.add(appTurn, c);
 
         c.gridy++;
-        sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+        sidePanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
 
         c.gridy++;
         sidePanel.add(activeTribe, c);
 
         c.gridy++;
-        sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+        sidePanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
 
         c.gridy++;
         sidePanel.add(infoView, c);
 
         c.gridy++;
-        sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+        sidePanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
 
         c.gridy++;
         sidePanel.add(tribeResearchInfo, c);
 
         c.gridy++;
-        sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+        sidePanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
 
         c.gridy++;
         JButton endTurn = new JButton("End Turn");
@@ -237,7 +254,7 @@ public class GUI extends JFrame implements Runnable {
         sidePanel.add(endTurn, c);
 
         c.gridy++;
-        sidePanel.add(Box.createRigidArea(new Dimension(0, 5)), c);
+        sidePanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
 
         return sidePanel;
     }

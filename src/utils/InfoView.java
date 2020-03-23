@@ -15,8 +15,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashSet;
 
+import static core.Constants.*;
+import static core.TribesConfig.VETERAN_KILLS;
 import static utils.GameView.gridSize;
 
 @SuppressWarnings({"SuspiciousNameCombination", "StringConcatenationInsideStringBufferAppend"})
@@ -26,9 +27,6 @@ public class InfoView extends JComponent {
     private Dimension size;
     private JEditorPane textArea;
 
-    int actionPanelHeight = 100;
-    int sidePanelWidth = 400;
-    int sidePanelHeight = 400;
     private JButton actionBF, actionCF, actionD, actionGF, actionRG;
     private JButton[] actionB, actionS;
     private CityActionListener listenerBF, listenerCF, listenerD, listenerGF, listenerRG;
@@ -42,8 +40,9 @@ public class InfoView extends JComponent {
 
     InfoView(ActionController ac)
     {
-        this.size = new Dimension(sidePanelWidth, sidePanelHeight);
+        this.size = new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_INFO_PANEL_HEIGHT);
         this.ac = ac;
+        int scrollBarSize = (Integer) UIManager.get("ScrollBar.width");
 
         highlightX = -1;
         highlightY = -1;
@@ -51,7 +50,7 @@ public class InfoView extends JComponent {
         highlightYprev = -1;
 
         textArea = new JEditorPane("text/html", "");
-        textArea.setPreferredSize(new Dimension(sidePanelWidth, sidePanelHeight - actionPanelHeight));
+        textArea.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_ACTION_PANEL_FULL_SIZE));
         Font textFont = new Font(textArea.getFont().getName(), Font.PLAIN, 12);
         textArea.setFont(textFont);
         textArea.setEditable(false);
@@ -60,7 +59,7 @@ public class InfoView extends JComponent {
         caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 
         JPanel actionPanel = new JPanel();
-        actionPanel.setPreferredSize(new Dimension(sidePanelWidth, 220));
+        actionPanel.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH - scrollBarSize*2, GUI_ACTION_PANEL_FULL_SIZE));
 
         // Simple actions: BurnForest, ClearForest, Destroy, GrowForest, GatherResource
         actionBF = new JButton("Burn");  // If forest
@@ -113,7 +112,8 @@ public class InfoView extends JComponent {
         this.setLayout(new FlowLayout());
         JScrollPane scrollPane1 = new JScrollPane(textArea);
         JScrollPane scrollPane2 = new JScrollPane(actionPanel);
-        scrollPane2.setPreferredSize(new Dimension(sidePanelWidth, actionPanelHeight));
+        scrollPane1.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_INFO_PANEL_HEIGHT - GUI_ACTION_PANEL_HEIGHT));
+        scrollPane2.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_ACTION_PANEL_HEIGHT));
         this.add(scrollPane1);
         this.add(scrollPane2);
     }
@@ -199,8 +199,8 @@ public class InfoView extends JComponent {
         if (u.isVeteran()) {
             sb.append("<b>Veteran unit.</b>");
         } else {
-            int kills = Math.min(u.getKills(), 3);
-            sb.append("" + kills + "/3 kills to become a veteran.");
+            int kills = Math.min(u.getKills(), VETERAN_KILLS);
+            sb.append("" + kills + "/" + VETERAN_KILLS + " kills to become a veteran.");
         }
 //        sb.append("</td></tr></table>");
         sb.append("<ul>");

@@ -30,8 +30,6 @@ public class GameView extends JComponent {
     private InfoView infoView;
     private Point2D panTranslate;  // Used to translate all coordinates for objects drawn on screen
 
-    private int shadowOffset = 1;
-    private int roundRectArc = 5;
     private Color progressColor = new Color(53, 183, 255);
     private Color negativeColor = new Color(255, 63, 73);
     private Image starImg, starShadow, capitalImg, capitalShadow;
@@ -53,7 +51,7 @@ public class GameView extends JComponent {
         gridSize = board.getSize();
 //        int size = gridSize * CELL_SIZE;
 //        int d = (int) Math.sqrt(size * size * 2);
-        dimension = new Dimension(VIEW_SIZE, VIEW_SIZE);
+        dimension = new Dimension(GUI_GAME_VIEW_SIZE, GUI_GAME_VIEW_SIZE);
 
 //        backgroundImg = Types.TERRAIN.PLAIN.getImage(null);
         fogImg = ImageIO.GetInstance().getImage("img/fog.png");
@@ -151,19 +149,19 @@ public class GameView extends JComponent {
                     if (exhausted) {
                         String exhaustedStr = imgFile + imgFile.split("/")[2] + "Exhausted.png";
                         Image exhaustedImg = ImageIO.GetInstance().getImage(exhaustedStr);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - shadowOffset,
-                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - shadowOffset,
+                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - SHADOW_OFFSET,
+                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - SHADOW_OFFSET,
                                 exhaustedImg, imgSize, panTranslate);
                     } else {
                         String highlightStr = imgFile + imgFile.split("/")[2] + "Highlight.png";
                         String shadowStr = imgFile + imgFile.split("/")[2] + "Shadow.png";
                         Image highlight = ImageIO.GetInstance().getImage(highlightStr);
                         Image shadow = ImageIO.GetInstance().getImage(shadowStr);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - shadowOffset,
-                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - shadowOffset,
+                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - SHADOW_OFFSET,
+                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - SHADOW_OFFSET,
                                 highlight, imgSize, panTranslate);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 + shadowOffset,
-                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 + shadowOffset,
+                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 + SHADOW_OFFSET,
+                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 + SHADOW_OFFSET,
                                 shadow, imgSize, panTranslate);
                         paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2,
                                 i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2,
@@ -305,7 +303,7 @@ public class GameView extends JComponent {
         String production = "" + c.getProduction();
 
         double h = d/4.0;
-        double nameWidth = 20 + 3*h;
+        double nameWidth = GUI_CITY_TAG_WIDTH + 3*h;
         Point2D namePos = rotatePoint(j,i);
         Rectangle nameRect = new Rectangle((int)(namePos.getX() + d/2.0 - nameWidth*2/3.0),
                 (int)(namePos.getY() + d/2.0 - h), (int)nameWidth, (int)h);
@@ -318,8 +316,8 @@ public class GameView extends JComponent {
                 (int)(nameRect.y + h*1.1 - fontSize/4.0 + panTranslate.getY()));
 
         // Draw number of stars
-        paintImage(g, (int)(nameRect.x + nameRect.width*0.55 + shadowOffset),
-                nameRect.y + shadowOffset, starShadow, (int)h, panTranslate);
+        paintImage(g, (int)(nameRect.x + nameRect.width*0.55 + SHADOW_OFFSET),
+                nameRect.y + SHADOW_OFFSET, starShadow, (int)h, panTranslate);
         paintImage(g, (int)(nameRect.x + nameRect.width*0.55), nameRect.y, starImg, (int)h, panTranslate);
         drawStringShadow(g, production, (int)(nameRect.x + nameRect.width - fontSize*0.75),
                 (int)(nameRect.y + h*1.1 - fontSize/4.0));
@@ -329,7 +327,7 @@ public class GameView extends JComponent {
 
         // Draw capital sign
         if (c.isCapital()) {
-            paintImage(g, nameRect.x + shadowOffset, nameRect.y + shadowOffset, capitalShadow, (int)h, panTranslate);
+            paintImage(g, nameRect.x + SHADOW_OFFSET, nameRect.y + SHADOW_OFFSET, capitalShadow, (int)h, panTranslate);
             paintImage(g, nameRect.x, nameRect.y, capitalImg, (int)h, panTranslate);
         }
 
@@ -340,7 +338,7 @@ public class GameView extends JComponent {
         drawRoundRectShadowHighlight(g, bgRect);
         g.setColor(Color.WHITE);
         g.fillRoundRect((int)(bgRect.x + panTranslate.getX()), (int)(bgRect.y + panTranslate.getY()),
-                bgRect.width, bgRect.height, roundRectArc, roundRectArc);
+                bgRect.width, bgRect.height, ROUND_RECT_ARC, ROUND_RECT_ARC);
 
         // Draw population/progress
         if (progress >= 0) {
@@ -351,7 +349,7 @@ public class GameView extends JComponent {
         int pw = Math.abs(progress) * sectionWidth;
         Rectangle pgRect = new Rectangle(bgRect.x, bgRect.y, pw, bgRect.height);
         g.fillRoundRect((int)(pgRect.x + panTranslate.getX()), (int)(pgRect.y +  + panTranslate.getY()),
-                pgRect.width, pgRect.height, roundRectArc, roundRectArc);
+                pgRect.width, pgRect.height, ROUND_RECT_ARC, ROUND_RECT_ARC);
 
         // Draw unit counts
         g.setColor(Color.black);
@@ -372,27 +370,27 @@ public class GameView extends JComponent {
 
     private void drawRoundRectShadowHighlight(Graphics2D g, Rectangle rect) {
         g.setColor(new Color(0, 0, 0, 122));
-        g.fillRoundRect((int)(rect.x + shadowOffset + panTranslate.getX()),
-                (int)(rect.y + shadowOffset + panTranslate.getY()), rect.width, rect.height,
-                roundRectArc, roundRectArc);
+        g.fillRoundRect((int)(rect.x + SHADOW_OFFSET + panTranslate.getX()),
+                (int)(rect.y + SHADOW_OFFSET + panTranslate.getY()), rect.width, rect.height,
+                ROUND_RECT_ARC, ROUND_RECT_ARC);
         g.setColor(new Color(255, 255, 255, 122));
-        g.fillRoundRect((int)(rect.x - shadowOffset + panTranslate.getX()),
-                (int)(rect.y - shadowOffset + panTranslate.getY()), rect.width, rect.height,
-                roundRectArc, roundRectArc);
+        g.fillRoundRect((int)(rect.x - SHADOW_OFFSET + panTranslate.getX()),
+                (int)(rect.y - SHADOW_OFFSET + panTranslate.getY()), rect.width, rect.height,
+                ROUND_RECT_ARC, ROUND_RECT_ARC);
     }
 
     private void drawRectShadowHighlight(Graphics2D g, Rectangle rect) {
         g.setColor(new Color(0, 0, 0, 122));
-        g.fillRect((int)(rect.x + shadowOffset + panTranslate.getX()),
-                (int)(rect.y + shadowOffset + panTranslate.getY()), rect.width, rect.height);
+        g.fillRect((int)(rect.x + SHADOW_OFFSET + panTranslate.getX()),
+                (int)(rect.y + SHADOW_OFFSET + panTranslate.getY()), rect.width, rect.height);
         g.setColor(new Color(255, 255, 255, 122));
-        g.fillRect((int)(rect.x - shadowOffset + panTranslate.getX()),
-                (int)(rect.y - shadowOffset + panTranslate.getY()), rect.width, rect.height);
+        g.fillRect((int)(rect.x - SHADOW_OFFSET + panTranslate.getX()),
+                (int)(rect.y - SHADOW_OFFSET + panTranslate.getY()), rect.width, rect.height);
     }
 
     private void drawStringShadow (Graphics2D g, String s, int x, int y) {
         g.setColor(new Color(0, 0, 0, 122));
-        g.drawString(s, (int)(x+shadowOffset + panTranslate.getX()), (int)(y+shadowOffset + panTranslate.getY()));
+        g.drawString(s, (int)(x+SHADOW_OFFSET + panTranslate.getX()), (int)(y+SHADOW_OFFSET + panTranslate.getY()));
     }
 
 

@@ -357,10 +357,10 @@ public class GUI extends JFrame implements Runnable {
         } else if (a instanceof Attack) {
             Unit target = (Unit) gs.getActor(((Attack) a).getTargetId());
             pos = target.getPosition();
-        } else if ( a instanceof Recover) {
+        } else if (a instanceof Recover || a instanceof HealOthers || a instanceof Disband) {
             Unit u = (Unit) gs.getActor(((UnitAction) a).getUnitId());
             pos = u.getPosition();
-        } else if (a instanceof Capture || a instanceof Convert || a instanceof Disband || a instanceof Examine) {
+        } else if (a instanceof Capture || a instanceof Convert || a instanceof Examine) {
             Unit u = (Unit) gs.getActor(((UnitAction) a).getUnitId());
             pos = new Vector2d(u.getPosition().x-1, u.getPosition().y);
         }

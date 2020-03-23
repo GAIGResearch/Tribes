@@ -417,6 +417,9 @@ public class Game {
         return gs.getBoard();
     }
 
+    public Agent[] getPlayers() {
+        return players;
+    }
 
     /**
      * Method to identify the end of the game.

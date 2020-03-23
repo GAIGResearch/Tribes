@@ -7,6 +7,7 @@ import core.game.Game;
 import core.game.GameState;
 import core.actions.Action;
 import players.ActionController;
+import players.HumanAgent;
 import players.KeyController;
 
 import javax.swing.*;
@@ -24,6 +25,7 @@ public class GUI extends JFrame implements Runnable {
     private JLabel appTurn;
     private JLabel activeTribe;
 
+    private Game game;
     private GameState gs;
     private KeyController ki;
     private ActionController ac;
@@ -46,6 +48,7 @@ public class GUI extends JFrame implements Runnable {
         super(title);
         this.ki = ki;
         this.ac = ac;
+        this.game = game;
 
         infoView = new InfoView(ac);
         panTranslate = new Point2D.Double(0,0);
@@ -249,6 +252,33 @@ public class GUI extends JFrame implements Runnable {
             view.setPanToTribe(gs);  // Pan camera to tribe capital on turn change
             ac.reset();  // Clear action queue on turn change
         }
+
+        // Check if city is levelling up, pop up dialogue to choose options if human agent
+        if (gs.isLevelingUp() && game.getPlayers()[gs.getActiveTribeID()] instanceof HumanAgent) {
+            view.paint(gs);
+            int n = -1;
+            Object[] options = new String[2];
+            Action[] optionsA = new Action[2];
+            HashMap<Integer, ArrayList<Action>> actions = gs.getCityActions();
+            for (Map.Entry<Integer, ArrayList<Action>> e : actions.entrySet()) {
+                for (int i = 0; i < e.getValue().size(); i++) {
+                    options[i] = e.getValue().get(i).toString();
+                    optionsA[i] = e.getValue().get(i);
+                }
+            }
+            while (n == -1) {
+                n = JOptionPane.showOptionDialog(this, //parent container of JOptionPane
+                        "City is levelling up!",
+                        "Level Up",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,  //do not use a custom Icon
+                        options,  //the titles of buttons
+                        options[0]);  //default button title
+            }
+            ac.addAction(optionsA[n], gs);
+        }
+
         this.gs = gs;
     }
 
@@ -282,6 +312,7 @@ public class GUI extends JFrame implements Runnable {
     @Override
     public void run() {
         finishedUpdate = false;
+
         view.paint(gs);
         tribeView.paint(gs);
         techView.paint(gs);
@@ -296,6 +327,7 @@ public class GUI extends JFrame implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         finishedUpdate = true;
     }
 

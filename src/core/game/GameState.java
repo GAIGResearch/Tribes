@@ -3,7 +3,6 @@ package core.game;
 import core.actions.Action;
 import core.actions.cityactions.factory.CityActionBuilder;
 import core.actions.tribeactions.EndTurn;
-import core.actions.tribeactions.TribeAction;
 import core.actions.tribeactions.factory.TribeActionBuilder;
 import core.actions.unitactions.factory.UnitActionBuilder;
 import core.actors.Actor;
@@ -15,7 +14,6 @@ import utils.Vector2d;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Random;
 
 public class GameState {
@@ -47,6 +45,7 @@ public class GameState {
      */
     private int computedActionTribeIdFlag;
 
+    private boolean levelingUp;  // Indicates if a city is leveling up, which reduces action list to only 2 options
 
     //Constructor.
     public GameState(Random rnd) {
@@ -155,10 +154,10 @@ public class GameState {
         CityActionBuilder cab = new CityActionBuilder();
 
         int numCities = cities.size();
-        boolean done = false;
         int i = 0;
+        levelingUp = false;
 
-        while (!done && i < numCities)
+        while (!levelingUp && i < numCities)
         {
             int cityId = cities.get(i);
             City c = (City) board.getActor(cityId);
@@ -169,8 +168,8 @@ public class GameState {
                 cityActions.put(cityId, actions);
             }
 
-            done = cab.cityLevelsUp();
-            if(!done)
+            levelingUp = cab.cityLevelsUp();
+            if(!levelingUp)
             {
                 ArrayList<Integer> unitIds = c.getUnitsID();
                 allUnits.addAll(unitIds);
@@ -182,7 +181,7 @@ public class GameState {
         allUnits.addAll(tribe.getExtraUnits());
 
         int activeTribeID = board.getActiveTribeID();
-        if(done)
+        if(levelingUp)
         {
             //A city is levelling up. We're done with this city.
             canEndTurn[activeTribeID] = false;
@@ -285,6 +284,7 @@ public class GameState {
         int numTribes = getTribes().length;
         copy.canEndTurn = new boolean[numTribes];
         System.arraycopy(canEndTurn, 0, copy.canEndTurn, 0, numTribes);
+        copy.levelingUp = levelingUp;
 
         copy.tribeActions = new ArrayList<>();
         for(Action ta : tribeActions)
@@ -394,4 +394,7 @@ public class GameState {
         return unitActions.get(u.getActorId());
     }
 
+    public boolean isLevelingUp() {
+        return levelingUp;
+    }
 }

@@ -92,4 +92,9 @@ public class LevelUp extends CityAction {
         lUp.setBonus(this.bonus);
         return lUp;
     }
+
+    @Override
+    public String toString() {
+        return bonus.toString();
+    }
 }

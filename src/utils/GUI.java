@@ -40,7 +40,6 @@ public class GUI extends JFrame implements Runnable {
     // Zoomed screen dragging vars
     private Point2D startDrag, endDrag, panTranslate;
 
-    public static Dimension screenSize;
     public static double screenDiagonal;
 
     /**
@@ -50,8 +49,9 @@ public class GUI extends JFrame implements Runnable {
     public GUI(Game game, String title, KeyController ki, ActionController ac, boolean closeAppOnClosingWindow) {
         super(title);
 
-        screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        screenDiagonal = Math.sqrt(screenSize.width*screenSize.width + screenSize.height* screenSize.height);
+        Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        screenDiagonal = Math.sqrt(rect.width*rect.width + rect.height* rect.height);
+
         CELL_SIZE = (int)(0.038*screenDiagonal);
         GUI_GAME_VIEW_SIZE = (int)(0.36*screenDiagonal);
         GUI_MIN_PAN = (int)(0.015*screenDiagonal);

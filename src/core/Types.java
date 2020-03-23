@@ -597,6 +597,7 @@ public class Types {
         MOVE("img/actions/move.png"),
         ATTACK("img/actions/attack.png"),
         CAPTURE("img/actions/capture.png"),
+        EXAMINE("img/actions/examine.png"),
         DISBAND("img/actions/disband.png"),
         HEAL("img/actions/heal.png"),
         UPGRADE("img/actions/upgrade.png");
@@ -614,9 +615,11 @@ public class Types {
                 return ImageIO.GetInstance().getImage(ATTACK.imgPath);
             } else if (a instanceof Capture || a instanceof Convert) {
                 return ImageIO.GetInstance().getImage(CAPTURE.imgPath);
+            } else if (a instanceof Examine) {
+                return ImageIO.GetInstance().getImage(EXAMINE.imgPath);
             } else if (a instanceof Disband) {
                 return ImageIO.GetInstance().getImage(DISBAND.imgPath);
-            } else if (a instanceof Recover) {
+            } else if (a instanceof Recover || a instanceof HealOthers) {
                 return ImageIO.GetInstance().getImage(HEAL.imgPath);
             } else if (a instanceof Upgrade) {
                 return ImageIO.GetInstance().getImage(UPGRADE.imgPath);

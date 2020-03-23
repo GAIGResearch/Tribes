@@ -313,13 +313,14 @@ public class GUI extends JFrame implements Runnable {
             for (Map.Entry<Integer, ArrayList<Action>> e : possibleActions.entrySet()) {
                 Unit u = (Unit) gs.getActor(e.getKey());
 
-                // Only draw actions for highlighted unit
-                if (u.getPosition().x == unitY && u.getPosition().y == unitX) {
-                    for (Action a : e.getValue()) {
-                        Vector2d pos = getActionPosition(gs, a);
-                        if (pos != null && pos.x == actionY && pos.y == actionX) return a;
+                for (Action a : e.getValue()) {
+                    Vector2d pos = getActionPosition(gs, a);
+                    if (pos != null && pos.x == actionY && pos.y == actionX) {
+                        if ((a instanceof Capture || a instanceof Examine) ||  // These actions don't need the unit highlighted
+                                u.getPosition().x == unitY && u.getPosition().y == unitX) {
+                            return a;
+                        }
                     }
-                    return null;
                 }
             }
         }
@@ -356,10 +357,12 @@ public class GUI extends JFrame implements Runnable {
         } else if (a instanceof Attack) {
             Unit target = (Unit) gs.getActor(((Attack) a).getTargetId());
             pos = target.getPosition();
-        } else if (a instanceof Capture || a instanceof Convert || a instanceof Disband || a instanceof Recover ||
-                a instanceof Upgrade) {
+        } else if (a instanceof Recover || a instanceof HealOthers || a instanceof Disband) {
             Unit u = (Unit) gs.getActor(((UnitAction) a).getUnitId());
             pos = u.getPosition();
+        } else if (a instanceof Capture || a instanceof Convert || a instanceof Examine) {
+            Unit u = (Unit) gs.getActor(((UnitAction) a).getUnitId());
+            pos = new Vector2d(u.getPosition().x-1, u.getPosition().y);
         }
         return pos;
     }

@@ -27,7 +27,7 @@ public class AttackFactory implements ActionFactory {
             LinkedList<Vector2d> potentialTiles = position.neighborhood(unit.RANGE, 0, b.getSize()); //use neighbourhood for board limits
             for (Vector2d tile : potentialTiles) {
                 Unit other = b.getUnitAt(tile.x, tile.y);
-                if (other != null && other.getActorId() != unit.getActorId()) {
+                if (other != null && other.getTribeId() != unit.getTribeId()) {
                     // Check if there is actually a unit there (and it's not me)
                     Attack a = new Attack(unit.getActorId());
                     a.setTargetId(other.getActorId());

@@ -65,7 +65,7 @@ public class HealOthers extends UnitAction
 
     private boolean canBeHealed(Unit healer, Unit target)
     {
-        if(target != null && target.getActorId() != healer.getActorId()){
+        if(target != null && target.getTribeId() != healer.getTribeId()){
             return (target.getCurrentHP() < target.getMaxHP()) && (target.getTribeId() == healer.getTribeId());
         }
         return false;

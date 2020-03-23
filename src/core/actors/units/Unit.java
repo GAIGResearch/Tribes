@@ -41,7 +41,7 @@ public abstract class Unit extends Actor
         this.cityID = cityID;
         this.tribeId = tribeID;
         this.isKilled = false;
-        this.status = FRESH;
+        this.status = FINISHED;
     }
 
     public void setCurrentHP(int hp){

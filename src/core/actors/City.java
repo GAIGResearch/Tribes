@@ -165,7 +165,7 @@ public class City extends Actor{
     }
 
     public boolean addUnit(int id){
-        if (unitsID.size() < level){
+        if (unitsID.size() < (level+1)){
             unitsID.add(id);
             return true;
         }

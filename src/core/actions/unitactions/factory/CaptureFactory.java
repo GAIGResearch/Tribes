@@ -1,5 +1,6 @@
 package core.actions.unitactions.factory;
 
+import core.Types;
 import core.actions.Action;
 import core.actions.ActionFactory;
 import core.actions.unitactions.Capture;
@@ -18,7 +19,9 @@ public class CaptureFactory implements ActionFactory {
         Unit unit = (Unit) actor;
         LinkedList<Action> captures = new LinkedList<>();
 
-        if(unit.isFresh()) {
+        Types.TERRAIN t = gs.getBoard().getTerrainAt(unit.getPosition().x, unit.getPosition().y);
+        if(unit.isFresh() && t == Types.TERRAIN.VILLAGE || t == Types.TERRAIN.CITY) {
+            // TODO: this will not see villages as valid captures
             // get city from board, check if action is feasible and add to list
             Board b = gs.getBoard();
             City c = b.getCityInBorders(unit.getPosition().x, unit.getPosition().y);

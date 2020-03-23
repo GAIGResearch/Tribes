@@ -77,6 +77,8 @@ public class Examine extends UnitAction
                     gs.getTribe(unit.getTribeId()).addStars(bonus.getBonus());
                     break;
             }
+            Vector2d unitPos = unit.getPosition();
+            gs.getBoard().setResourceAt(unitPos.x, unitPos.y, null);
             return true;
         }
         return false;

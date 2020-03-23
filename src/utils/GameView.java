@@ -10,6 +10,8 @@ import java.util.Map;
 import core.Types;
 import core.actions.cityactions.CityAction;
 import core.actions.cityactions.ResourceGathering;
+import core.actions.unitactions.Capture;
+import core.actions.unitactions.Examine;
 import core.actors.Actor;
 import core.actors.City;
 import core.actors.Tribe;
@@ -178,14 +180,32 @@ public class GameView extends JComponent {
                 ArrayList<Action> possibleActions = gameState.getUnitActions(u);
                 if (possibleActions != null && possibleActions.size() > 0) {
                     for (Action a : possibleActions) {
-                        Image actionImg = Types.ACTION.getImage(a);
+                        if (!(a instanceof Examine || a instanceof Capture)) {
+                            Image actionImg = Types.ACTION.getImage(a);
 
-                        if (actionImg != null) {
-                            Vector2d pos = GUI.getActionPosition(gameState, a);
+                            if (actionImg != null) {
+                                Vector2d pos = GUI.getActionPosition(gameState, a);
 
-                            if (pos != null) {
-                                paintImageRotated(g, pos.y * CELL_SIZE, pos.x * CELL_SIZE, actionImg, CELL_SIZE, panTranslate);
+                                if (pos != null) {
+                                    paintImageRotated(g, pos.y * CELL_SIZE, pos.x * CELL_SIZE, actionImg, CELL_SIZE, panTranslate);
+                                }
                             }
+                        }
+                    }
+                }
+            }
+        }
+        // Draw actions that don't need highlight separately
+        actions = gameState.getUnitActions();
+        for (Map.Entry<Integer, ArrayList<Action>> e: actions.entrySet()) {
+            for (Action a : e.getValue()) {
+                if (a instanceof Examine || a instanceof Capture) {
+                    Image actionImg = Types.ACTION.getImage(a);
+                    if (actionImg != null) {
+                        Vector2d pos = GUI.getActionPosition(gameState, a);
+
+                        if (pos != null) {
+                            paintImageRotated(g, pos.y * CELL_SIZE, pos.x * CELL_SIZE, actionImg, CELL_SIZE, panTranslate);
                         }
                     }
                 }
@@ -284,87 +304,90 @@ public class GameView extends JComponent {
 
         int cityID = board.getCityIdAt(i,j);
         City c = (City) board.getActor(cityID);
-        int cityCapacity = c.getLevel() + 1;
-        int progress = c.getPopulation();
-        int units = c.getUnitsID().size();
-        int bound = c.getBound();
-        Color col = Types.TRIBE.values()[c.getTribeId()].getColorDark();
 
-        // Draw city border
-        Point2D p = rotatePoint(j-bound, i-bound);
-        g.setColor(col);
-        Stroke oldStroke = g.getStroke();
-        g.setStroke(new BasicStroke(5, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0));
-        drawRotatedRect(g, (int)p.getX(), (int)p.getY(), CELL_SIZE*(2*bound + 1), CELL_SIZE*(2*bound+1), panTranslate);
-        g.setStroke(oldStroke);
+        if (c != null) {  // TODO: this shouldn't happen, there's a city here
+            int cityCapacity = c.getLevel() + 1;
+            int progress = c.getPopulation();
+            int units = c.getUnitsID().size();
+            int bound = c.getBound();
+            Color col = Types.TRIBE.values()[c.getTribeId()].getColorDark();
 
-        // Draw capital img + city name/ID + number of stars
-        String cityName = ""+cityID;
-        String production = "" + c.getProduction();
+            // Draw city border
+            Point2D p = rotatePoint(j - bound, i - bound);
+            g.setColor(col);
+            Stroke oldStroke = g.getStroke();
+            g.setStroke(new BasicStroke(5, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0));
+            drawRotatedRect(g, (int) p.getX(), (int) p.getY(), CELL_SIZE * (2 * bound + 1), CELL_SIZE * (2 * bound + 1), panTranslate);
+            g.setStroke(oldStroke);
 
-        double h = d/4.0;
-        double nameWidth = GUI_CITY_TAG_WIDTH + 3*h;
-        Point2D namePos = rotatePoint(j,i);
-        Rectangle nameRect = new Rectangle((int)(namePos.getX() + d/2.0 - nameWidth*2/3.0),
-                (int)(namePos.getY() + d/2.0 - h), (int)nameWidth, (int)h);
-        drawRectShadowHighlight(g, nameRect);
-        g.setColor(col);
-        g.fillRect((int)(nameRect.x + panTranslate.getX()), (int)(nameRect.y + panTranslate.getY()), nameRect.width, nameRect.height);
-        g.setColor(Color.WHITE);
+            // Draw capital img + city name/ID + number of stars
+            String cityName = "" + cityID;
+            String production = "" + c.getProduction();
 
-        g.drawString(cityName, (int)(nameRect.x + h + fontSize/4.0 + panTranslate.getX()),
-                (int)(nameRect.y + h*1.1 - fontSize/4.0 + panTranslate.getY()));
+            double h = d / 4.0;
+            double nameWidth = GUI_CITY_TAG_WIDTH + 3 * h;
+            Point2D namePos = rotatePoint(j, i);
+            Rectangle nameRect = new Rectangle((int) (namePos.getX() + d / 2.0 - nameWidth * 2 / 3.0),
+                    (int) (namePos.getY() + d / 2.0 - h), (int) nameWidth, (int) h);
+            drawRectShadowHighlight(g, nameRect);
+            g.setColor(col);
+            g.fillRect((int) (nameRect.x + panTranslate.getX()), (int) (nameRect.y + panTranslate.getY()), nameRect.width, nameRect.height);
+            g.setColor(Color.WHITE);
 
-        // Draw number of stars
-        paintImage(g, (int)(nameRect.x + nameRect.width*0.55 + SHADOW_OFFSET),
-                nameRect.y + SHADOW_OFFSET, starShadow, (int)h, panTranslate);
-        paintImage(g, (int)(nameRect.x + nameRect.width*0.55), nameRect.y, starImg, (int)h, panTranslate);
-        drawStringShadow(g, production, (int)(nameRect.x + nameRect.width - fontSize*0.75),
-                (int)(nameRect.y + h*1.1 - fontSize/4.0));
-        g.setColor(Color.WHITE);
-        g.drawString(production, (int)(nameRect.x + nameRect.width - fontSize*0.75 + panTranslate.getX()),
-                (int)(nameRect.y + h*1.1 - fontSize/4.0 + panTranslate.getY()));
+            g.drawString(cityName, (int) (nameRect.x + h + fontSize / 4.0 + panTranslate.getX()),
+                    (int) (nameRect.y + h * 1.1 - fontSize / 4.0 + panTranslate.getY()));
 
-        // Draw capital sign
-        if (c.isCapital()) {
-            paintImage(g, nameRect.x + SHADOW_OFFSET, nameRect.y + SHADOW_OFFSET, capitalShadow, (int)h, panTranslate);
-            paintImage(g, nameRect.x, nameRect.y, capitalImg, (int)h, panTranslate);
-        }
+            // Draw number of stars
+            paintImage(g, (int) (nameRect.x + nameRect.width * 0.55 + SHADOW_OFFSET),
+                    nameRect.y + SHADOW_OFFSET, starShadow, (int) h, panTranslate);
+            paintImage(g, (int) (nameRect.x + nameRect.width * 0.55), nameRect.y, starImg, (int) h, panTranslate);
+            drawStringShadow(g, production, (int) (nameRect.x + nameRect.width - fontSize * 0.75),
+                    (int) (nameRect.y + h * 1.1 - fontSize / 4.0));
+            g.setColor(Color.WHITE);
+            g.drawString(production, (int) (nameRect.x + nameRect.width - fontSize * 0.75 + panTranslate.getX()),
+                    (int) (nameRect.y + h * 1.1 - fontSize / 4.0 + panTranslate.getY()));
 
-        // Draw level
-        int sectionWidth = CELL_SIZE/4;
-        int w = cityCapacity * sectionWidth;
-        Rectangle bgRect = new Rectangle(nameRect.x + nameRect.width/2 - w/2, nameRect.y + nameRect.height, w, (int)h);
-        drawRoundRectShadowHighlight(g, bgRect);
-        g.setColor(Color.WHITE);
-        g.fillRoundRect((int)(bgRect.x + panTranslate.getX()), (int)(bgRect.y + panTranslate.getY()),
-                bgRect.width, bgRect.height, ROUND_RECT_ARC, ROUND_RECT_ARC);
+            // Draw capital sign
+            if (c.isCapital()) {
+                paintImage(g, nameRect.x + SHADOW_OFFSET, nameRect.y + SHADOW_OFFSET, capitalShadow, (int) h, panTranslate);
+                paintImage(g, nameRect.x, nameRect.y, capitalImg, (int) h, panTranslate);
+            }
 
-        // Draw population/progress
-        if (progress >= 0) {
-            g.setColor(progressColor);
-        } else {
-            g.setColor(negativeColor);
-        }
-        int pw = Math.abs(progress) * sectionWidth;
-        Rectangle pgRect = new Rectangle(bgRect.x, bgRect.y, pw, bgRect.height);
-        g.fillRoundRect((int)(pgRect.x + panTranslate.getX()), (int)(pgRect.y +  + panTranslate.getY()),
-                pgRect.width, pgRect.height, ROUND_RECT_ARC, ROUND_RECT_ARC);
+            // Draw level
+            int sectionWidth = CELL_SIZE / 4;
+            int w = cityCapacity * sectionWidth;
+            Rectangle bgRect = new Rectangle(nameRect.x + nameRect.width / 2 - w / 2, nameRect.y + nameRect.height, w, (int) h);
+            drawRoundRectShadowHighlight(g, bgRect);
+            g.setColor(Color.WHITE);
+            g.fillRoundRect((int) (bgRect.x + panTranslate.getX()), (int) (bgRect.y + panTranslate.getY()),
+                    bgRect.width, bgRect.height, ROUND_RECT_ARC, ROUND_RECT_ARC);
 
-        // Draw unit counts
-        g.setColor(Color.black);
-        double radius = h/2.0;
-        double unitHeight = bgRect.y + h/2 - radius/2;
-        for (int u = 0; u < units; u++) {
-            g.fillOval((int)(bgRect.x + sectionWidth * u + sectionWidth/2.0 - radius/2.0 + panTranslate.getX()),
-                    (int)(unitHeight  + panTranslate.getY()), (int)radius, (int)radius);
-        }
+            // Draw population/progress
+            if (progress >= 0) {
+                g.setColor(progressColor);
+            } else {
+                g.setColor(negativeColor);
+            }
+            int pw = Math.abs(progress) * sectionWidth;
+            Rectangle pgRect = new Rectangle(bgRect.x, bgRect.y, pw, bgRect.height);
+            g.fillRoundRect((int) (pgRect.x + panTranslate.getX()), (int) (pgRect.y + +panTranslate.getY()),
+                    pgRect.width, pgRect.height, ROUND_RECT_ARC, ROUND_RECT_ARC);
 
-        // Draw section separations
-        for (int l = 0; l < cityCapacity - 1; l++) {
-            int lx = bgRect.x + sectionWidth * (l + 1);
-            g.drawLine((int)(lx + panTranslate.getX()), (int)(bgRect.y + panTranslate.getY()),
-                    (int)(lx + panTranslate.getX()), (int)(bgRect.y + bgRect.height + panTranslate.getY()));
+            // Draw unit counts
+            g.setColor(Color.black);
+            double radius = h / 2.0;
+            double unitHeight = bgRect.y + h / 2 - radius / 2;
+            for (int u = 0; u < units; u++) {
+                g.fillOval((int) (bgRect.x + sectionWidth * u + sectionWidth / 2.0 - radius / 2.0 + panTranslate.getX()),
+                        (int) (unitHeight + panTranslate.getY()), (int) radius, (int) radius);
+            }
+
+            // Draw section separations
+            for (int l = 0; l < cityCapacity - 1; l++) {
+                int lx = bgRect.x + sectionWidth * (l + 1);
+                g.drawLine((int) (lx + panTranslate.getX()), (int) (bgRect.y + panTranslate.getY()),
+                        (int) (lx + panTranslate.getX()), (int) (bgRect.y + bgRect.height + panTranslate.getY()));
+            }
         }
     }
 

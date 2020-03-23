@@ -612,7 +612,7 @@ public class Types {
                 return ImageIO.GetInstance().getImage(MOVE.imgPath);
             } else if (a instanceof Attack) {
                 return ImageIO.GetInstance().getImage(ATTACK.imgPath);
-            } else if (a instanceof Capture || a instanceof Convert) {
+            } else if (a instanceof Capture || a instanceof Convert || a instanceof Examine) {
                 return ImageIO.GetInstance().getImage(CAPTURE.imgPath);
             } else if (a instanceof Disband) {
                 return ImageIO.GetInstance().getImage(DISBAND.imgPath);

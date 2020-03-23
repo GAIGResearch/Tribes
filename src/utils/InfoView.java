@@ -423,7 +423,7 @@ public class InfoView extends JComponent {
     public int getHighlightX() {return highlightX;}
     public int getHighlightY() {return highlightY;}
     public boolean clickedTwice() {
-        return highlightX == highlightXprev && highlightY == highlightYprev;
+        return highlightX != -1 && highlightX == highlightXprev && highlightY == highlightYprev;
     }
     public boolean highlightInGridBounds() {
         return highlightX > -1 && highlightY > -1 && highlightX < gridSize && highlightY < gridSize;

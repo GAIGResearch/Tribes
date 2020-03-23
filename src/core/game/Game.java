@@ -23,6 +23,8 @@ import static core.Constants.*;
 
 public class Game {
 
+    private boolean FORCE_FULL_OBSERVABILITY = false;
+
     // State of the game (objects, ticks, etc).
     private GameState gs;
 
@@ -249,8 +251,10 @@ public class Game {
                     }
                 }
 
-//                frame.update(getGameState(-1));
-                frame.update(getGameState(gs.getActiveTribeID()));        //Partial Obs
+                if(FORCE_FULL_OBSERVABILITY)
+                    frame.update(getGameState(-1));
+                else
+                    frame.update(getGameState(gs.getActiveTribeID()));        //Partial Obs
                 Thread gui = new Thread(frame);
                 gui.start();
             }

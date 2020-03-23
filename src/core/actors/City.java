@@ -161,7 +161,7 @@ public class City extends Actor{
     public void levelUp(){
         level++;
         population = population - population_need;
-        population_need = level;
+        population_need = (level+1);
     }
 
     public boolean addUnit(int id){

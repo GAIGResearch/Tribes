@@ -41,7 +41,7 @@ public class GUI extends JFrame implements Runnable {
     private Point2D startDrag, endDrag, panTranslate;
 
     public static double screenDiagonal;
-    private double scale = 1;
+    double scale = 1;
 
     /**
      * Constructor
@@ -58,7 +58,7 @@ public class GUI extends JFrame implements Runnable {
         GUI_MIN_PAN = (int)(0.015*screenDiagonal*scale);
         GUI_COMP_SPACING = (int)(0.0045*screenDiagonal*scale);
         GUI_CITY_TAG_WIDTH = (int)(0.009*screenDiagonal*scale);
-        GUI_SIDE_PANEL_WIDTH = (int)(0.18*screenDiagonal*scale);
+        GUI_SIDE_PANEL_WIDTH = (int)(0.25*screenDiagonal*scale);
         GUI_INFO_PANEL_HEIGHT = (int)(0.18*screenDiagonal*scale);
         GUI_ACTION_PANEL_HEIGHT = (int)(0.045*screenDiagonal*scale);
         GUI_TECH_PANEL_HEIGHT = (int)(0.136*screenDiagonal*scale);

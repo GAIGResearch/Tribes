@@ -34,7 +34,7 @@ public class Destroy extends CityAction
             Board b = gs.getBoard();
             b.setBuildingAt(targetPos.x, targetPos.y, null);
 
-            tribe.addScore(buildingToRemove.getPoints());
+            tribe.subtractScore(buildingToRemove.getPoints());
 
             if(buildingToRemove.type == Types.BUILDING.PORT)
             {

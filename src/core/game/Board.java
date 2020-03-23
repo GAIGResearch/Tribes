@@ -165,9 +165,13 @@ public class Board {
     }
 
     public boolean tryPush(int tribeId, Unit toPush, int startX, int startY, int x, int y) {
-        //there's no unit?
-        if (units[x][y] > 0)
+        //there's no unit? (or killed)
+        Unit u = getUnitAt(x, y);
+        if (u != null && !u.getIsKilled())
+        {
             return false;
+        }
+
 
         //climbable mountain?
         Types.TERRAIN terrain = terrains[x][y];

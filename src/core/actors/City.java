@@ -103,7 +103,7 @@ public class City extends Actor{
         boolean isBase = building.type.isBase();
         City cityToAddTo = this;
         Board board = gameState.getBoard();
-        Tribe tribe = (Tribe) gameState.getActor(this.tribeId);
+        Tribe tribe = gameState.getTribe(this.tribeId);
 
         //Population added by the base building.
         if(isBase && isPopulation && !onlyMatching) addPopulation(building.getBonus());

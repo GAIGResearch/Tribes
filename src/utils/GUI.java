@@ -23,7 +23,7 @@ import static core.Constants.*;
 
 public class GUI extends JFrame implements Runnable {
     private JLabel appTurn;
-    private JLabel activeTribe;
+    private JLabel activeTribe, activeTribeInfo;
 
     private Game game;
     private GameState gs;
@@ -211,6 +211,9 @@ public class GUI extends JFrame implements Runnable {
         activeTribe = new JLabel("Tribe acting: ");
         activeTribe.setFont(textFont);
 
+        activeTribeInfo = new JLabel("[stars: 0 (+0)]");
+        activeTribeInfo.setFont(textFont);
+
         JTabbedPane tribeResearchInfo = new JTabbedPane();
         tribeView = new TribeView();
         techView = new TechView(ac);
@@ -232,6 +235,8 @@ public class GUI extends JFrame implements Runnable {
 
         c.gridy++;
         sidePanel.add(activeTribe, c);
+        c.gridy++;
+        sidePanel.add(activeTribeInfo, c);
 
         c.gridy++;
         sidePanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
@@ -338,6 +343,7 @@ public class GUI extends JFrame implements Runnable {
         appTurn.setText("Turn: " + gs.getTick());
         if (gs.getActiveTribe() != null) {
             activeTribe.setText("Tribe acting: " + gs.getActiveTribe().getName());
+            activeTribeInfo.setText("stars: " + gs.getActiveTribe().getStars() + " (+" + gs.getActiveTribe().getTotalProduction() + ")");
         }
         try {
             Thread.sleep(1);

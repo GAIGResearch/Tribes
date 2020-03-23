@@ -7,9 +7,20 @@ public class Constants {
     public static long TURN_TIME_MILLIS = 10000000; //10000; //10 seconds.
 
     // Display settings
-    public static int CELL_SIZE = 80;
-    public static int VIEW_SIZE = 800;
-    public static int GUI_MIN_PAN = 35;
-    public static int GUI_ZOOM_FACTOR = 5;
+    public static int GUI_GAME_VIEW_SIZE;
+    public static int CELL_SIZE;
+    public static int GUI_MIN_PAN;
+    public static int GUI_COMP_SPACING;
+    public static int GUI_CITY_TAG_WIDTH;
 
+    public static int GUI_SIDE_PANEL_WIDTH;
+    public static int GUI_INFO_PANEL_HEIGHT;
+    public static int GUI_ACTION_PANEL_HEIGHT;
+    public static int GUI_TECH_PANEL_HEIGHT;
+    public static int GUI_ACTION_PANEL_FULL_SIZE = 220;
+    public static int GUI_TECH_PANEL_FULL_SIZE = 500;
+
+    public static int SHADOW_OFFSET = 1;
+    public static int ROUND_RECT_ARC = 5;
+    public static int GUI_ZOOM_FACTOR = 5;
 }

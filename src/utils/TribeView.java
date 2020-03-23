@@ -9,6 +9,9 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import static core.Constants.GUI_SIDE_PANEL_WIDTH;
+import static core.Constants.GUI_TECH_PANEL_HEIGHT;
+
 
 public class TribeView extends JComponent {
 
@@ -18,7 +21,7 @@ public class TribeView extends JComponent {
 
     TribeView()
     {
-        this.size = new Dimension(400, 300);
+        this.size = new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_TECH_PANEL_HEIGHT);
 
         textArea = new JEditorPane("text/html", "");
         textArea.setPreferredSize(this.size);

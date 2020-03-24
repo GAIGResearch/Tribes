@@ -261,7 +261,7 @@ public class Board {
         if (getTerrainAt(xF, yF) == Types.TERRAIN.MOUNTAIN) {
             partialObsRangeClear += 1;
         }
-        t.clearView(xF, yF, partialObsRangeClear);
+        t.clearView(xF, yF, partialObsRangeClear, this);
     }
 
     public void launchExplorer(int x0, int y0, int tribeId, Random rnd) {
@@ -285,7 +285,7 @@ public class Board {
                     moved = true;
                     curX = x;
                     curY = y;
-                    tribes[tribeId].clearView(x, y);
+                    tribes[tribeId].clearView(x, y, this);
                 }
 
                 j++;
@@ -714,7 +714,7 @@ public class Board {
         tribes[c.getTribeId()].addCity(c.getActorId());
 
         //cities provide visibility, which needs updating
-        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, 2);
+        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, 2, this);
 
         //By default, cities are considered to be roads for trade network purposes.
         networkTiles[c.getPosition().x][c.getPosition().y] = true;

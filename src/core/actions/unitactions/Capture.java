@@ -56,8 +56,11 @@ public class Capture extends UnitAction
             Unit unit = (Unit) gs.getActor(this.unitId);
             City targetCity = (City) gs.getActor(this.targetCityId);
             Board b = gs.getBoard();
-            Tribe t = b.getTribe(unit.getTribeId());
-            return b.capture(gs, t, targetCity.getPosition().x, targetCity.getPosition().y);
+            Tribe thisTribe = b.getTribe(unit.getTribeId());
+            Tribe targetTribe = b.getTribe(targetCity.getTribeId());
+            //TODO: Substract score
+            //targetTribe.subtractScore(targetCity.);
+            return b.capture(gs, thisTribe, targetCity.getPosition().x, targetCity.getPosition().y);
         }
         return false;
     }

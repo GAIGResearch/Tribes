@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 import java.util.LinkedList;
 import java.util.HashMap;
+import java.util.Random;
+
 import static core.Types.BUILDING.*;
 
 
@@ -131,8 +133,8 @@ public class Tribe extends Actor {
     }
 
 
-    public void clearView(int x, int y) {
-        clearView(x, y, 1);
+    public void clearView(int x, int y, Board b) {
+        clearView(x, y, 1, b);
 
         //We may be clearing the last tiles of the board, which grants a monument
         if(monuments.get(EYE_OF_GOD) == MONUMENT_STATUS.UNAVAILABLE)
@@ -148,7 +150,7 @@ public class Tribe extends Actor {
         }
     }
 
-    public void clearView(int x, int y, int range) {
+    public void clearView(int x, int y, int range, Board b) {
         int size = obsGrid.length;
         for (int i = x - range; i <= x + range; ++i)
             for (int j = y - range; j <= y + range; ++j) {
@@ -157,6 +159,13 @@ public class Tribe extends Actor {
                     if (!obsGrid[i][j]) {
                         obsGrid[i][j] = true;
                         this.score += TribesConfig.CLEAR_VIEW_POINTS;
+                        Unit u = b.getUnitAt(i,j);
+                        City c = b.getCityInBorders(i,j);
+                        if( u !=null){
+                            meetTribe(b,u.getTribeId());
+                        }else if(c !=null){
+                            meetTribe(b,c.getTribeId());
+                        }
                     }
                 }
             }
@@ -311,9 +320,9 @@ public class Tribe extends Actor {
         return tribesMet;
     }
 
-    public void meetTribe(GameState gs, int tribeID) {
+    public void meetTribe(Board b, int tribeID) {
 
-        Tribe[] t = gs.getTribes(); // get tribes from boards
+        Tribe[] t = b.getTribes(); // get tribes from boards
 
         boolean[] inMetTribes = new boolean[t.length];
         //loop through all tribes
@@ -357,10 +366,11 @@ public class Tribe extends Actor {
                 if (potentialTechForThisTribe.size() == 0 || potentialTechForMetTribe.size() == 0)
                     continue;
 
-                Types.TECHNOLOGY techToGet = potentialTechForThisTribe.get(gs.getRandomGenerator().nextInt(potentialTechForThisTribe.size()));
+                Random r = new Random(); //TODO: get rid of this random, need to find out how to get random obj from gamestate
+                Types.TECHNOLOGY techToGet = potentialTechForThisTribe.get(r.nextInt(potentialTechForThisTribe.size()));
                 thisTribeTree.doResearch(techToGet);
 
-                techToGet = potentialTechForMetTribe.get(gs.getRandomGenerator().nextInt(potentialTechForMetTribe.size()));
+                techToGet = potentialTechForMetTribe.get(r.nextInt(potentialTechForMetTribe.size()));
                 metTribeTree.doResearch(techToGet);
             }
         }

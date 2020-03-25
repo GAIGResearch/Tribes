@@ -24,7 +24,8 @@ public class ClearForest extends CityAction
 
         if(b.getTerrainAt(targetPos.x, targetPos.y) != Types.TERRAIN.FOREST) return false;
         if(b.getCityIdAt(targetPos.x, targetPos.y) != cityId) return false;
-        return gs.getTribe(cityId).getTechTree().isResearched(Types.TECHNOLOGY.FORESTRY);
+        City city = (City) gs.getActor(this.cityId);
+        return gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.FORESTRY);
     }
 
     @Override

@@ -384,13 +384,12 @@ public class Tribe extends Actor {
             for (int cityId : citiesID) {
                 if (cityId != capitalID) {
 
-                    //Check if the city is conected to the capital
+                    //Check if the city is connected to the capital
                     City nonCapitalCity = (City) b.getActor(cityId);
                     Vector2d nonCapitalPos = nonCapitalCity.getPosition();
                     ArrayList<PathNode> pathToCity = tp.findPathTo(nonCapitalPos);
 
-
-                    boolean connectedNow = pathToCity.size() > 0;
+                    boolean connectedNow = (pathToCity != null) && (pathToCity.size() > 0);
 
                     //This was previously connected
                     if (connectedCities.contains(cityId)) {

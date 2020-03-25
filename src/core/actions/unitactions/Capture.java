@@ -1,7 +1,9 @@
 package core.actions.unitactions;
 
+import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
+import core.actors.Building;
 import core.actors.Tribe;
 import core.game.Board;
 import core.game.GameState;
@@ -58,8 +60,12 @@ public class Capture extends UnitAction
             Board b = gs.getBoard();
             Tribe thisTribe = b.getTribe(unit.getTribeId());
             Tribe targetTribe = b.getTribe(targetCity.getTribeId());
-            //TODO: Substract score
-            //targetTribe.subtractScore(targetCity.);
+            //Subtract score  from target tribe based on the number of tiles and add score to this tribe
+            LinkedList<Vector2d> tiles = gs.getBoard().getCityTiles(targetCityId);
+            //LinkedList<Building> buildings = targetCity.getBuildings();
+            targetTribe.subtractScore(tiles.size() * TribesConfig.CITY_BORDER_POINTS);
+            thisTribe.addScore(tiles.size() * TribesConfig.CITY_BORDER_POINTS);
+
             return b.capture(gs, thisTribe, targetCity.getPosition().x, targetCity.getPosition().y);
         }
         return false;

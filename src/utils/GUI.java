@@ -23,12 +23,14 @@ import static core.Constants.*;
 
 public class GUI extends JFrame implements Runnable {
     private JLabel appTurn;
-    private JLabel activeTribe, activeTribeInfo;
+    private JLabel activeTribe, activeTribeInfo, otherInfo;
+    private int otherInfoDelay = GUI_INFO_DELAY;
 
     private Game game;
     private GameState gs;
 //    private KeyController ki;
     private ActionController ac;
+    private Examine lastExamineAction;
 
     private GameView view;
     private TribeView tribeView;
@@ -214,6 +216,9 @@ public class GUI extends JFrame implements Runnable {
         activeTribeInfo = new JLabel("[stars: 0 (+0)]");
         activeTribeInfo.setFont(textFont);
 
+        otherInfo = new JLabel(".");
+        otherInfo.setFont(textFont);
+
         JTabbedPane tribeResearchInfo = new JTabbedPane();
         tribeView = new TribeView();
         techView = new TechView(ac);
@@ -237,6 +242,8 @@ public class GUI extends JFrame implements Runnable {
         sidePanel.add(activeTribe, c);
         c.gridy++;
         sidePanel.add(activeTribeInfo, c);
+        c.gridy++;
+        sidePanel.add(otherInfo, c);
 
         c.gridy++;
         sidePanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
@@ -301,6 +308,13 @@ public class GUI extends JFrame implements Runnable {
             ac.addAction(optionsA[n], gs);
         }
 
+        // Display result of Examine action
+        Action a = ac.getLastActionPlayed();
+        if (a instanceof Examine) {
+            lastExamineAction = (Examine)a;
+            ac.setLastActionPlayed(null);
+        }
+
         this.gs = gs;
     }
 
@@ -344,6 +358,15 @@ public class GUI extends JFrame implements Runnable {
         if (gs.getActiveTribe() != null) {
             activeTribe.setText("Tribe acting: " + gs.getActiveTribe().getName());
             activeTribeInfo.setText("stars: " + gs.getActiveTribe().getStars() + " (+" + gs.getActiveTribe().getTotalProduction() + ")");
+            if (lastExamineAction != null) {
+                otherInfo.setText("Ruins: " + lastExamineAction.getBonus().toString());
+                otherInfoDelay--;
+                if (otherInfoDelay == 0) {
+                    lastExamineAction = null;
+                    otherInfo.setText(".");
+                    otherInfoDelay = GUI_INFO_DELAY;
+                }
+            }
         }
         try {
             Thread.sleep(1);

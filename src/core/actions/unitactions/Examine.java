@@ -16,6 +16,7 @@ import static core.Types.EXAMINE_BONUS.*;
 
 public class Examine extends UnitAction
 {
+    Types.EXAMINE_BONUS bonus;
 
     public Examine(int unitId)
     {
@@ -40,7 +41,7 @@ public class Examine extends UnitAction
             int capital = t.getCapitalID();
 
             boolean allTech = technologyTree.isEverythingResearched();
-            Types.EXAMINE_BONUS bonus = Types.EXAMINE_BONUS.random(rnd);
+            bonus = Types.EXAMINE_BONUS.random(rnd);
             while (allTech && bonus == RESEARCH) {
                 bonus = Types.EXAMINE_BONUS.random(rnd);
             }
@@ -85,8 +86,14 @@ public class Examine extends UnitAction
         return false;
     }
 
+    public Types.EXAMINE_BONUS getBonus() {
+        return bonus;
+    }
+
     @Override
     public Action copy() {
-        return new Examine(this.unitId);
+        Examine copy = new Examine(this.unitId);
+        copy.bonus = bonus;
+        return copy;
     }
 }

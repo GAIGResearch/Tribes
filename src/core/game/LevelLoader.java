@@ -25,7 +25,7 @@ public class LevelLoader
      * @param tribes tribes to play in this game
      * @param lines lines containing the level
      */
-    public Board buildLevel(Tribe[] tribes, String[] lines, Random rnd) {
+    public Board buildLevel(Tribe[] tribes, String[] lines, Random rnd, GameState gameState) {
 
         Board board = new Board();
 
@@ -62,7 +62,7 @@ public class LevelLoader
                         //A city to create. Add it and assign it to the next tribe.
                         City c = new City(i, j, tribeID);
                         c.setCapital(true);
-                        board.addCityToTribe(c);
+                        board.addCityToTribe(c,gameState);
 
                         //Also, each tribe starts with a unit in the same location where the city is
                         Types.UNIT unitType = tribes[tribeID].getType().getStartingUnit();

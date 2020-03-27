@@ -41,7 +41,7 @@ public class Move extends UnitAction
             Board board = gs.getBoard();
             Types.TERRAIN destinationTerrain = board.getTerrainAt(destination.x, destination.y);
 
-            board.moveUnit(unit, unit.getPosition().x, unit.getPosition().y, destination.x, destination.y);
+            board.moveUnit(unit, unit.getPosition().x, unit.getPosition().y, destination.x, destination.y, gs);
 
             if(unit.getType() == Types.UNIT.BOAT || unit.getType() == Types.UNIT.SHIP || unit.getType() == Types.UNIT.BATTLESHIP) {
                 if(destinationTerrain != Types.TERRAIN.SHALLOW_WATER && destinationTerrain != Types.TERRAIN.DEEP_WATER && destinationTerrain != Types.TERRAIN.CITY){

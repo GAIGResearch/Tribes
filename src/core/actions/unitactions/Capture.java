@@ -63,8 +63,8 @@ public class Capture extends UnitAction
             //Subtract score  from target tribe based on the number of tiles and add score to this tribe
             LinkedList<Vector2d> tiles = gs.getBoard().getCityTiles(targetCityId);
             //LinkedList<Building> buildings = targetCity.getBuildings();
-            targetTribe.subtractScore(tiles.size() * TribesConfig.CITY_BORDER_POINTS);
-            thisTribe.addScore(tiles.size() * TribesConfig.CITY_BORDER_POINTS);
+            targetTribe.subtractScore(targetCity.getPointsWorth());
+            thisTribe.addScore(targetCity.getPointsWorth());
 
             return b.capture(gs, thisTribe, targetCity.getPosition().x, targetCity.getPosition().y);
         }

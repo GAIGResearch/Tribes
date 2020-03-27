@@ -456,6 +456,7 @@ public class Board {
                 if(tileCityId[i][j] == -1){
                     tileCityId[i][j] = c.getActorId();
                     t.addScore(TribesConfig.CITY_BORDER_POINTS); // Add score to tribe on border creation
+                    c.addPointsWorth(TribesConfig.CITY_BORDER_POINTS);
                 }
             }
         }
@@ -469,6 +470,7 @@ public class Board {
                 for(int j = cityPos.y-1; j <= cityPos.y+1; j++) {
                     if(tileCityId[i][j] == c.getActorId())
                         t.addScore(TribesConfig.CITY_BORDER_POINTS);
+                        c.addPointsWorth(TribesConfig.CITY_BORDER_POINTS);
                 }
             }
     }

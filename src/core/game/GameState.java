@@ -65,14 +65,14 @@ public class GameState {
 
         String[] lines = new IO().readFile(filename);
         LevelLoader ll = new LevelLoader();
-        board = ll.buildLevel(tribes, lines, rnd,this.copy());
+        board = ll.buildLevel(tribes, lines, rnd);
 
         for(Tribe tribe : tribes)
         {
             int startingCityId = tribe.getCitiesID().get(0);
             City c = (City) board.getActor(startingCityId);
             Vector2d cityPos = c.getPosition();
-            tribe.clearView(cityPos.x, cityPos.y,this.copy());
+            tribe.clearView(cityPos.x, cityPos.y,rnd, board.copy());
         }
 
         canEndTurn = new boolean[tribes.length];

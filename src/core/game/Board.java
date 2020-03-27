@@ -177,7 +177,7 @@ public class Board {
         Types.TERRAIN terrain = terrains[x][y];
         if (terrain == Types.TERRAIN.MOUNTAIN) {
             if (tribes[tribeId].getTechTree().isResearched(Types.TECHNOLOGY.CLIMBING)) {
-                moveUnit(toPush, startX, startY, x, y, gs);
+                moveUnit(toPush, startX, startY, x, y, r);
                 return true;
             } else return false; //Can't be pushed if it's a mountain and climbing is not researched.
         }
@@ -203,7 +203,7 @@ public class Board {
         }
 
         //Otherwise, no problem
-        moveUnit(toPush, startX, startY, x, y, r);
+        moveUnit  (toPush, startX, startY, x, y, r);
         return true;
     }
 
@@ -264,7 +264,7 @@ public class Board {
         t.clearView(xF, yF, partialObsRangeClear, r, this.copy());
     }
 
-    public void launchExplorer(int x0, int y0, int tribeId, Random rnd, GameState gs) {
+    public void launchExplorer(int x0, int y0, int tribeId, Random rnd, Random r) {
         int xMove[] = {0, -1, 0, 1, -1, -1, 1, 1};
         int yMove[] = {1, 0, -1, 0, 1, -1, -1, 1};
 
@@ -285,7 +285,7 @@ public class Board {
                     moved = true;
                     curX = x;
                     curY = y;
-                    tribes[tribeId].clearView(x, y,gs);
+                    tribes[tribeId].clearView(x, y,r, this.copy());
                 }
 
                 j++;
@@ -530,7 +530,7 @@ public class Board {
             moveOneToNewCity(newCity, capturingTribe, rnd);
 
             //Add city to board and set its borders
-            addCityToTribe(newCity,gameState);
+            addCityToTribe(newCity,gameState.getRandomGenerator());
             setBorderHelper(newCity, newCity.getBound());
 
         }else if(ter == Types.TERRAIN.CITY)
@@ -707,7 +707,7 @@ public class Board {
      * Adds a city to a tribe
      * @param c city to add
      */
-    public void addCityToTribe(City c, GameState gameState)
+    public void addCityToTribe(City c, Random r)
     {
         addActor(c);
         if (c.isCapital()){
@@ -716,7 +716,7 @@ public class Board {
         tribes[c.getTribeId()].addCity(c.getActorId());
 
         //cities provide visibility, which needs updating
-        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, 2, gameState);
+        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, 2, r, this.copy());
 
         //By default, cities are considered to be roads for trade network purposes.
         networkTiles[c.getPosition().x][c.getPosition().y] = true;

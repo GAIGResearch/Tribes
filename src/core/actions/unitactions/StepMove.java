@@ -2,6 +2,7 @@ package core.actions.unitactions;
 
 import core.TechnologyTree;
 import core.Types;
+import core.actors.City;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
@@ -50,6 +51,13 @@ public class StepMove implements NeighbourHelper
 
             //Check if current research allows movement to this tile.
             if(!board.traversable(tile.x, tile.y, unit.getTribeId())) { continue; }
+
+            //Mind benders cannot move into an enemy city tile.
+            if(unit.getType() == Types.UNIT.MIND_BENDER && board.getTerrainAt(tile.x, tile.y) == Types.TERRAIN.CITY) {
+                City targetCity = (City) board.getActor(board.getCityIdAt(tile.x, tile.y));
+                //The city belongs to the enemy.
+                if(targetCity.getTribeId() != unit.getTribeId()) { continue; }
+            }
 
             //Unit is a water unit
             if(unit.getType() == Types.UNIT.BOAT || unit.getType() == Types.UNIT.SHIP || unit.getType() == Types.UNIT.BATTLESHIP) {

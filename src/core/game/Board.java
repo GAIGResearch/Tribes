@@ -99,7 +99,7 @@ public class Board {
                 {
                     copyBoard.setUnitIdAt(x, y, units[x][y]);
                     copyBoard.setTerrainAt(x, y, terrains[x][y]);
-                    copyBoard.setResourceAt(x, y, resources[x][y]);
+                    copyBoard.setResourceAt(x, y, maskResource(playerId, x, y));
                     copyBoard.setBuildingAt(x, y, buildings[x][y]);
                     copyBoard.tileCityId[x][y] = tileCityId[x][y];
                     copyBoard.networkTiles[x][y] = networkTiles[x][y];
@@ -125,6 +125,28 @@ public class Board {
         }
 
         return copyBoard;
+    }
+
+    /**
+     * Masks a resource that can only be revealed after researching a specific technology.
+     * @param playerID
+     * @param x x coordinate of the resource
+     * @param y y coordinate of the resource
+     * @return Returns the resource at x,y or null if there is no resource, or the resource is hidden.
+     */
+    private Types.RESOURCE maskResource(int playerID, int x, int y) {
+        TechnologyTree techTree = tribes[playerID].getTechTree();
+
+        switch (resources[x][y]) {
+            case CROPS:
+                if(!techTree.isResearched(Types.TECHNOLOGY.ORGANIZATION)) { return null; }
+            case ORE:
+                if(!techTree.isResearched(Types.TECHNOLOGY.CLIMBING)) { return null; }
+            case WHALES:
+                if(!techTree.isResearched(Types.TECHNOLOGY.FISHING)) { return null; }
+        }
+
+        return resources[x][y];
     }
 
     /**

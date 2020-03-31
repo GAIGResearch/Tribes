@@ -50,7 +50,7 @@ public class LevelUp extends CityAction {
                 city.addProduction(TribesConfig.CITY_LEVEL_UP_WORKSHOP_PROD);
                 break;
             case EXPLORER:
-                gs.getBoard().launchExplorer(cityPos.x, cityPos.y, city.getTribeId(), gs.getRandomGenerator(), gs.getRandomGenerator());
+                gs.getBoard().launchExplorer(cityPos.x, cityPos.y, city.getTribeId(), gs.getRandomGenerator());
                 break;
             case CITY_WALL:
                 city.setWalls(true);

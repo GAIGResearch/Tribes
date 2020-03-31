@@ -72,7 +72,7 @@ public class GameState {
             int startingCityId = tribe.getCitiesID().get(0);
             City c = (City) board.getActor(startingCityId);
             Vector2d cityPos = c.getPosition();
-            tribe.clearView(cityPos.x, cityPos.y,rnd, board.copy());
+            tribe.clearView(cityPos.x, cityPos.y,rnd, board);
         }
 
         canEndTurn = new boolean[tribes.length];

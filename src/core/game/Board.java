@@ -264,7 +264,7 @@ public class Board {
         t.clearView(xF, yF, partialObsRangeClear, r, this.copy());
     }
 
-    public void launchExplorer(int x0, int y0, int tribeId, Random rnd, Random r) {
+    public void launchExplorer(int x0, int y0, int tribeId, Random rnd) {
         int xMove[] = {0, -1, 0, 1, -1, -1, 1, 1};
         int yMove[] = {1, 0, -1, 0, 1, -1, -1, 1};
 
@@ -285,7 +285,7 @@ public class Board {
                     moved = true;
                     curX = x;
                     curY = y;
-                    tribes[tribeId].clearView(x, y,r, this.copy());
+                    tribes[tribeId].clearView(x, y,rnd, this.copy());
                 }
 
                 j++;

@@ -129,24 +129,36 @@ public class Board {
 
     /**
      * Masks a resource that can only be revealed after researching a specific technology.
-     * @param playerID
-     * @param x x coordinate of the resource
-     * @param y y coordinate of the resource
+     * @param playerID if -1 we don not mask any resources.
+     * @param x x coordinate of the resource.
+     * @param y y coordinate of the resource.
      * @return Returns the resource at x,y or null if there is no resource, or the resource is hidden.
      */
     private Types.RESOURCE maskResource(int playerID, int x, int y) {
-        TechnologyTree techTree = tribes[playerID].getTechTree();
+        if(playerID == -1) { return resources[x][y]; }
+        else {
+            TechnologyTree t = tribes[playerID].getTechTree();
 
-        switch (resources[x][y]) {
-            case CROPS:
-                if(!techTree.isResearched(Types.TECHNOLOGY.ORGANIZATION)) { return null; }
-            case ORE:
-                if(!techTree.isResearched(Types.TECHNOLOGY.CLIMBING)) { return null; }
-            case WHALES:
-                if(!techTree.isResearched(Types.TECHNOLOGY.FISHING)) { return null; }
+            try {
+                switch (resources[x][y]) {
+                    case CROPS:
+                        if (!t.isResearched(Types.TECHNOLOGY.ORGANIZATION)) {
+                            return null;
+                        }
+                    case ORE:
+                        if (!t.isResearched(Types.TECHNOLOGY.CLIMBING)) {
+                            return null;
+                        }
+                    case WHALES:
+                        if (!t.isResearched(Types.TECHNOLOGY.FISHING)) {
+                            return null;
+                        }
+                }
+                return resources[x][y];
+            } catch (Exception e) {
+                return null;
+            }
         }
-
-        return resources[x][y];
     }
 
     /**

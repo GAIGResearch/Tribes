@@ -159,7 +159,7 @@ public class Types {
      */
     public enum BUILDING
     {
-        PORT (0,"img/building/port2.png", PORT_COST, PORT_BONUS, PORT_POINTS, SAILING, new HashSet<>(Collections.singletonList(SHALLOW_WATER))),
+        PORT (0,"img/building/dock2.png", PORT_COST, PORT_BONUS, PORT_POINTS, SAILING, new HashSet<>(Collections.singletonList(SHALLOW_WATER))),
         MINE (1,"img/building/mine2.png", MINE_COST, MINE_BONUS, MINE_POINTS, MINING, new HashSet<>(Collections.singletonList(MOUNTAIN))),
         FORGE (2,"img/building/forge2.png", FORGE_COST, FORGE_BONUS, FORGE_POINTS, SMITHERY, new HashSet<>(Collections.singletonList(PLAIN))),
         FARM (3, "img/building/farm2.png", FARM_COST, FARM_BONUS, FARM_POINTS, FARMING, new HashSet<>(Collections.singletonList(PLAIN))),

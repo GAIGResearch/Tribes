@@ -295,7 +295,7 @@ public class Board {
         if (getTerrainAt(xF, yF) == Types.TERRAIN.MOUNTAIN) {
             partialObsRangeClear += 1;
         }
-        t.clearView(xF, yF, partialObsRangeClear, r, this.copy());
+        t.clearView(xF, yF, partialObsRangeClear, r, this);
     }
 
     public void launchExplorer(int x0, int y0, int tribeId, Random rnd) {

@@ -19,6 +19,7 @@ public class City extends Actor{
     private int pointsPerTurn = 0;
     private boolean hasWalls = false;
     private int bound;
+    private int pointsWorth;
 
     private ArrayList<Integer> unitsID = new ArrayList<>();
     private LinkedList<Building> buildings = new LinkedList<>();
@@ -308,5 +309,16 @@ public class City extends Actor{
 
     public LinkedList<Building> getBuildings() {
         return buildings;
+    }
+
+    public void addPointsWorth(int points){
+        pointsWorth +=points;
+    }
+
+    public void subtractPointsWorth(int points){
+        pointsWorth -=points;
+    }
+    public int getPointsWorth(){
+        return pointsWorth;
     }
 }

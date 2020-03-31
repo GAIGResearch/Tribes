@@ -74,6 +74,7 @@ public class Build extends CityAction
 
             tribe.subtractStars(buildingType.getCost());
             tribe.addScore(buildingType.getPoints());
+            city.addPointsWorth(buildingType.getPoints());
             board.setBuildingAt(targetPos.x, targetPos.y, buildingType);
 
             city.addBuilding(gs, new Building(targetPos.x, targetPos.y, buildingType));

@@ -56,7 +56,7 @@ public class Examine extends UnitAction
                     board.addUnit((City)gs.getActor(capital), superUnit);
 
                     if(unitInCity != null)
-                        board.pushUnit(unitInCity.getTribeId(), unitInCity, cityPos.x, cityPos.y);
+                        board.pushUnit(unitInCity.getTribeId(), unitInCity, cityPos.x, cityPos.y, gs.getRandomGenerator());
 
                     break;
 
@@ -71,7 +71,7 @@ public class Examine extends UnitAction
 
                 case EXPLORER:
                     cityPos = gs.getActor(capital).getPosition();
-                    gs.getBoard().launchExplorer(cityPos.x, cityPos.y, unit.getTribeId(), rnd);
+                    gs.getBoard().launchExplorer(cityPos.x, cityPos.y, unit.getTribeId(), rnd,gs);
                     break;
 
                 case RESOURCES:

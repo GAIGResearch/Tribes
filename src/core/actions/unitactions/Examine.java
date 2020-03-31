@@ -71,7 +71,7 @@ public class Examine extends UnitAction
 
                 case EXPLORER:
                     cityPos = gs.getActor(capital).getPosition();
-                    gs.getBoard().launchExplorer(cityPos.x, cityPos.y, unit.getTribeId(), rnd,gs);
+                    gs.getBoard().launchExplorer(cityPos.x, cityPos.y, unit.getTribeId(), rnd);
                     break;
 
                 case RESOURCES:

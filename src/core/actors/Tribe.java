@@ -162,9 +162,9 @@ public class Tribe extends Actor {
                         Unit u = b.getUnitAt(i,j);
                         City c = b.getCityInBorders(i,j);
                         if( u !=null){
-                            meetTribe(r,b,u.getTribeId());
+                            meetTribe(r,b.getTribes(),u.getTribeId());
                         }else if(c !=null){
-                            meetTribe(r,b,c.getTribeId());
+                            meetTribe(r,b.getTribes(),c.getTribeId());
                         }
                     }
                 }
@@ -320,24 +320,24 @@ public class Tribe extends Actor {
         return tribesMet;
     }
 
-    public void meetTribe(Random r, Board b, int tribeID) {
+    public void meetTribe(Random r, Tribe[] tribes, int tribeID) {
 
-        Tribe[] t = gs.getBoard().getTribes(); // get tribes from boards
+//        Tribe[] t = gs.getBoard().getTribes(); // get tribes from boards
 
-        boolean[] inMetTribes = new boolean[t.length];
+        boolean[] inMetTribes = new boolean[tribes.length];
         //loop through all tribes
-        for (int i = 0; i < t.length; i++) {
+        for (int i = 0; i < tribes.length; i++) {
             // if tribes not in tribes met or tribe is itself then do nothing else add to tribesmet arraylist
-            if (t[i].tribe == this.tribesMet.get(i) || t[i].tribeId == tribeID) {
+            if (tribes[i].tribe == this.tribesMet.get(i) || tribes[i].tribeId == tribeID) {
                 inMetTribes[i] = true;
             }
             if (!inMetTribes[i]) {
-                tribesMet.add(t[i].tribe); // add to this tribe
-                t[i].tribesMet.add(this.tribe); // add to met tribe as well
+                tribesMet.add(tribes[i].tribe); // add to this tribe
+                tribes[i].tribesMet.add(this.tribe); // add to met tribe as well
 
                 //Pick a technology at random from the tribe to learn
                 TechnologyTree thisTribeTree = getTechTree();
-                TechnologyTree metTribeTree = t[i].getTechTree();
+                TechnologyTree metTribeTree = tribes[i].getTechTree();
                 ArrayList<Types.TECHNOLOGY> techInThisTribe = new ArrayList<>(); //Check which tech in this tribe
                 ArrayList<Types.TECHNOLOGY> techInMetTribe = new ArrayList<>(); // Check which tech in met tribe
                 //Check which technologies both research trees contain
@@ -366,7 +366,6 @@ public class Tribe extends Actor {
                 if (potentialTechForThisTribe.size() == 0 || potentialTechForMetTribe.size() == 0)
                     continue;
 
-                Random r = gs.getRandomGenerator();
                 Types.TECHNOLOGY techToGet = potentialTechForThisTribe.get(r.nextInt(potentialTechForThisTribe.size()));
                 thisTribeTree.doResearch(techToGet);
 

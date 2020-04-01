@@ -202,6 +202,10 @@ public class TribesConfig
     public static final int CITY_LEVEL_UP_PARK = 250;
     public static final int CITY_BORDER_POINTS = 20;
     public static final int PROD_CAPITAL_BONUS = 1;
+    public static final int EXPLORER_CLEAR_RANGE = 1;
+    public static final int FIRST_CITY_CLEAR_RANGE = 2;
+    public static final int NEW_CITY_CLEAR_RANGE = 1;
+    public static final int CITY_EXPANSION_TILES = 1;
 
     /* TRIBES */
     public static final int INITIAL_STARS = 5;

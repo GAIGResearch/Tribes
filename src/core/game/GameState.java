@@ -1,5 +1,6 @@
 package core.game;
 
+import core.TribesConfig;
 import core.actions.Action;
 import core.actions.cityactions.factory.CityActionBuilder;
 import core.actions.tribeactions.EndTurn;
@@ -72,7 +73,7 @@ public class GameState {
             int startingCityId = tribe.getCitiesID().get(0);
             City c = (City) board.getActor(startingCityId);
             Vector2d cityPos = c.getPosition();
-            tribe.clearView(cityPos.x, cityPos.y,rnd, board);
+            tribe.clearView(cityPos.x, cityPos.y, TribesConfig.FIRST_CITY_CLEAR_RANGE, rnd, board);
         }
 
         canEndTurn = new boolean[tribes.length];
@@ -162,13 +163,18 @@ public class GameState {
             int cityId = cities.get(i);
             City c = (City) board.getActor(cityId);
             ArrayList<Action> actions = cab.getActions(this, c);
+            levelingUp = cab.cityLevelsUp();
 
             if(actions.size() > 0)
             {
+                if(levelingUp)
+                {
+                    //We may have already processed other cities. Actions for those should be eliminated.
+                    cityActions.clear();
+                }
                 cityActions.put(cityId, actions);
             }
 
-            levelingUp = cab.cityLevelsUp();
             if(!levelingUp)
             {
                 ArrayList<Integer> unitIds = c.getUnitsID();
@@ -176,9 +182,6 @@ public class GameState {
                 i++;
             }
         }
-
-        //Add the extra units that don't belong to any city.
-        allUnits.addAll(tribe.getExtraUnits());
 
         int activeTribeID = board.getActiveTribeID();
         if(levelingUp)
@@ -189,6 +192,9 @@ public class GameState {
         }else{
             canEndTurn[activeTribeID] = true;
         }
+
+        //Add the extra units that don't belong to any city.
+        allUnits.addAll(tribe.getExtraUnits());
 
         //Units!
         UnitActionBuilder uab = new UnitActionBuilder();

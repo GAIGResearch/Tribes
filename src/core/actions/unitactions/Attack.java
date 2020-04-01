@@ -70,11 +70,14 @@ public class Attack extends UnitAction
             int attackResult = (int) Math.round((attackForce/totalDamage)* attacker.ATK*accelerator);
             int defenceResult = (int) Math.round((defenceForce / totalDamage) * target.DEF *accelerator);
 
+            Tribe attackerTribe = gs.getTribe(attacker.getTribeId());
+            attackerTribe.resetPacifistCount();
+
             if (target.getCurrentHP() <= attackResult) {
 
                 attacker.addKill();
-                gs.getTribe(attacker.getTribeId()).addKill();
-                gs.getTribe(target.getTribeId()).subtractScore(target.getType().getPoints());
+                attackerTribe.addKill();
+                attackerTribe.subtractScore(target.getType().getPoints());
                 target.setIsKilled(true);
 
                 //Move unit to target position if unit is melee type
@@ -105,7 +108,7 @@ public class Attack extends UnitAction
                         target.addKill();
                         gs.getTribe(target.getTribeId()).addKill();
                         attacker.setIsKilled(true);
-                        gs.getTribe(attacker.getTribeId()).subtractScore(attacker.getType().getPoints());
+                        attackerTribe.subtractScore(attacker.getType().getPoints());
                     }
                 }
 

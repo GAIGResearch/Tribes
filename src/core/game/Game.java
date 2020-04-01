@@ -327,7 +327,10 @@ public class Game {
                 unit.setStatus(Types.TURN_STATUS.FRESH);
         }
 
-        //3. Compute the actions available for this player.
+        //3. Update tribe pacifist counter
+        tribe.addPacifistCount();
+
+        //4. Compute the actions available for this player.
         gs.computePlayerActions(tribe);
     }
 

@@ -62,6 +62,9 @@ public class Tribe extends Actor {
     //Total production for this turn.
     private int totalProduction;
 
+    //Turns since the last attack of this tribe if Meditation is reseached.
+    private int nPacifistCount;
+
     public Tribe(Types.TRIBE tribe) {
         this.tribe = tribe;
         init();
@@ -87,6 +90,7 @@ public class Tribe extends Actor {
         monuments = Types.BUILDING.initMonuments();
         nKills = 0;
         totalProduction = 0;
+        nPacifistCount = 0;
     }
 
     public void initObsGrid(int size) {
@@ -104,6 +108,7 @@ public class Tribe extends Actor {
         tribeCopy.capitalID = this.capitalID;
         tribeCopy.nKills = this.nKills;
         tribeCopy.totalProduction = this.totalProduction;
+        tribeCopy.nPacifistCount = this.nPacifistCount;
 
         tribeCopy.techTree = this.techTree.copy();
 
@@ -498,4 +503,17 @@ public class Tribe extends Actor {
     public ArrayList<Integer> getExtraUnits() {
         return extraUnits;
     }
+
+    public void addPacifistCount() {
+        if(techTree.isResearched(Types.TECHNOLOGY.MEDITATION))
+        {
+            nPacifistCount++;
+            if(nPacifistCount == TribesConfig.ALTAR_OF_PEACE_TURNS)
+            {
+                monuments.put(ALTAR_OF_PEACE, MONUMENT_STATUS.AVAILABLE);
+            }
+        }
+    }
+
+    public void resetPacifistCount() {nPacifistCount = 0;}
 }

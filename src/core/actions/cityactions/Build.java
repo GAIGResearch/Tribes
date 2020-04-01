@@ -78,6 +78,7 @@ public class Build extends CityAction
             tribe.addScore(buildingType.getPoints());
             city.addPointsWorth(buildingType.getPoints());
             board.setBuildingAt(targetPos.x, targetPos.y, buildingType);
+            board.setResourceAt(targetPos.x, targetPos.y, null);
 
             city.addBuilding(gs, new Building(targetPos.x, targetPos.y, buildingType));
             if(buildingType == Types.BUILDING.PORT)

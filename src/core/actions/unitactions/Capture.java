@@ -73,7 +73,7 @@ public class Capture extends UnitAction
             Unit unit = (Unit) gs.getActor(this.unitId);
             Board b = gs.getBoard();
             Tribe thisTribe = b.getTribe(unit.getTribeId());
-            
+
             if(captureType == Types.TERRAIN.CITY)
             {
                 City targetCity = (City) gs.getActor(this.targetCityId);

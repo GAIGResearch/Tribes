@@ -132,9 +132,24 @@ public class Tribe extends Actor {
         return tribeCopy;
     }
 
+    public void clearView(int x, int y, int range, Random r, Board b) {
+        int size = obsGrid.length;
+        Vector2d center = new Vector2d(x, y);
 
-    public void clearView(int x, int y, Random r, Board b) {
-        clearView(x, y, 1, r,b);
+        for(Vector2d tile : center.neighborhood(range, 0, size))
+        {
+            if (!obsGrid[tile.x][tile.y]) {
+                obsGrid[tile.x][tile.y] = true;
+                this.score += TribesConfig.CLEAR_VIEW_POINTS;
+                Unit u = b.getUnitAt(tile.x,tile.y);
+                City c = b.getCityInBorders(tile.x,tile.y);
+                if( u !=null){
+                    meetTribe(r,b.getTribes(),u.getTribeId());
+                }else if(c !=null){
+                    meetTribe(r,b.getTribes(),c.getTribeId());
+                }
+            }
+        }
 
         //We may be clearing the last tiles of the board, which grants a monument
         if(monuments.get(EYE_OF_GOD) == MONUMENT_STATUS.UNAVAILABLE)
@@ -148,27 +163,6 @@ public class Tribe extends Actor {
             //All clear and we couldn't buy monument before. Now we can.
             monuments.put(EYE_OF_GOD, MONUMENT_STATUS.AVAILABLE);
         }
-    }
-
-    public void clearView(int x, int y, int range, Random r, Board b) {
-        int size = obsGrid.length;
-        for (int i = x - range; i <= x + range; ++i)
-            for (int j = y - range; j <= y + range; ++j) {
-                //All these positions should be within my view.
-                if (i >= 0 && j >= 0 && i < size && j < size) {
-                    if (!obsGrid[i][j]) {
-                        obsGrid[i][j] = true;
-                        this.score += TribesConfig.CLEAR_VIEW_POINTS;
-                        Unit u = b.getUnitAt(i,j);
-                        City c = b.getCityInBorders(i,j);
-                        if( u !=null){
-                            meetTribe(r,b.getTribes(),u.getTribeId());
-                        }else if(c !=null){
-                            meetTribe(r,b.getTribes(),c.getTribeId());
-                        }
-                    }
-                }
-            }
     }
 
 

@@ -55,10 +55,12 @@ public class Build extends CityAction
             case PARK_OF_FORTUNE:
             case TOWER_OF_WISDOM:
                 boolean buildingConstraintsOk = isBuildable(gs, buildingType.getCost(), false);
-                City city = (City) gs.getActor(this.cityId);
-                Tribe tribe = gs.getTribe(city.getTribeId());
                 if(buildingConstraintsOk)
+                {
+                    City city = (City) gs.getActor(this.cityId);
+                    Tribe tribe = gs.getTribe(city.getTribeId());
                     return tribe.isMonumentBuildable(buildingType);
+                }
                 else return false;
         }
         return false;

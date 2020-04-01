@@ -171,7 +171,7 @@ public class Types {
         WATER_TEMPLE (9,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, AQUATISM, new HashSet<>(Arrays.asList(SHALLOW_WATER, DEEP_WATER))),
         FOREST_TEMPLE (10,"img/building/temple2.png", TEMPLE_FOREST_COST, TEMPLE_BONUS, TEMPLE_POINTS, SPIRITUALISM, new HashSet<>(Collections.singletonList(FOREST))),
         MOUNTAIN_TEMPLE (11,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, MEDITATION, new HashSet<>(Collections.singletonList(MOUNTAIN))),
-        ALTAR_OF_PEACE (12,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        ALTAR_OF_PEACE (12,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, MEDITATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
         EMPERORS_TOMB (13,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, TRADE, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
         EYE_OF_GOD (14,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, NAVIGATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
         GATE_OF_POWER (15,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),

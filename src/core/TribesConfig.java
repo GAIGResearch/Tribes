@@ -173,6 +173,8 @@ public class TribesConfig
     public static final int EMPERORS_TOMB_STARS = 100;
     public static final int GATE_OF_POWER_KILLS = 10;
     public static final int GRAND_BAZAR_CITIES = 5;
+    public static final int ALTAR_OF_PEACE_TURNS = 5;
+
 
     // Temple
     public static final int TEMPLE_COST = 20;

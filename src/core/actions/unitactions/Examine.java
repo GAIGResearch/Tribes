@@ -51,12 +51,11 @@ public class Examine extends UnitAction
                     Board board = gs.getBoard();
                     Vector2d cityPos = gs.getActor(capital).getPosition();
                     Unit unitInCity = board.getUnitAt(cityPos.x, cityPos.y);
+                    if(unitInCity != null)
+                        board.pushUnit(unitInCity.getTribeId(), unitInCity, cityPos.x, cityPos.y, gs.getRandomGenerator());
 
                     Unit superUnit = Types.UNIT.createUnit(cityPos, 0, false, capital, unit.getTribeId(), Types.UNIT.SUPERUNIT);
                     board.addUnit((City)gs.getActor(capital), superUnit);
-
-                    if(unitInCity != null)
-                        board.pushUnit(unitInCity.getTribeId(), unitInCity, cityPos.x, cityPos.y, gs.getRandomGenerator());
 
                     break;
 

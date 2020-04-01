@@ -84,7 +84,11 @@ public class City extends Actor{
             case WATER_TEMPLE:
             case MOUNTAIN_TEMPLE:
             case FOREST_TEMPLE:
-                if(!onlyMatching) changePointsPerTurn(building.getPoints(), multiplier);
+                if(!onlyMatching)
+                {
+                    changePointsPerTurn(building.getPoints(), multiplier);
+                    addPopulation(building.type.getBonus() * multiplier);
+                }
                 break;
             case ALTAR_OF_PEACE:
             case EMPERORS_TOMB:

@@ -254,7 +254,7 @@ public class Game {
                 if(FORCE_FULL_OBSERVABILITY)
                     frame.update(getGameState(-1));
                 else
-                    frame.update(getGameState(gs.getActiveTribeID()));        //Partial Obs
+                    frame.update(gameStateObservations[gs.getActiveTribeID()]);        //Partial Obs
                 Thread gui = new Thread(frame);
                 gui.start();
             }

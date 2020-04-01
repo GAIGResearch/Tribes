@@ -13,7 +13,7 @@ public class SuperUnit extends Unit
 
     @Override
     public Types.UNIT getType() {
-        return Types.UNIT.RIDER;
+        return Types.UNIT.SUPERUNIT;
     }
 
     @Override

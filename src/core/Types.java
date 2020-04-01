@@ -165,7 +165,7 @@ public class Types {
         FARM (3, "img/building/farm2.png", FARM_COST, FARM_BONUS, FARM_POINTS, FARMING, new HashSet<>(Collections.singletonList(PLAIN))),
         WINDMILL (4,"img/building/windmill2.png", WIND_MILL_COST, WIND_MILL_BONUS, WIND_MILL_POINTS, CONSTRUCTION, new HashSet<>(Collections.singletonList(PLAIN))),
         CUSTOM_HOUSE (5,"img/building/custom_house2.png", CUSTOM_COST, CUSTOM_BONUS, CUSTOM_POINTS, TRADE, new HashSet<>(Collections.singletonList(PLAIN))),
-        LUMBER_HUT(6,"img/building/lumner_hut2.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, LUMBER_HUT_POINTS, MATHEMATICS, new HashSet<>(Collections.singletonList(FOREST))),
+        LUMBER_HUT(6,"img/building/lumber_hut2.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, LUMBER_HUT_POINTS, FORESTRY, new HashSet<>(Collections.singletonList(FOREST))),
         SAWMILL (7,"img/building/sawmill2.png", SAW_MILL_COST, SAW_MILL_BONUS, SAW_MILL_POINTS, MATHEMATICS, new HashSet<>(Collections.singletonList(PLAIN))),
         TEMPLE (8, "img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, FREE_SPIRIT, new HashSet<>(Collections.singletonList(PLAIN))),
         WATER_TEMPLE (9,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, AQUATISM, new HashSet<>(Arrays.asList(SHALLOW_WATER, DEEP_WATER))),

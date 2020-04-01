@@ -145,14 +145,17 @@ public class Board {
                         if (!t.isResearched(Types.TECHNOLOGY.ORGANIZATION)) {
                             return null;
                         }
+                        break;
                     case ORE:
                         if (!t.isResearched(Types.TECHNOLOGY.CLIMBING)) {
                             return null;
                         }
+                        break;
                     case WHALES:
                         if (!t.isResearched(Types.TECHNOLOGY.FISHING)) {
                             return null;
                         }
+                        break;
                 }
                 return resources[x][y];
             } catch (Exception e) {

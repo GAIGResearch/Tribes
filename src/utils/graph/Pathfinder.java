@@ -76,7 +76,7 @@ public class Pathfinder
                 destinationsFromStart.add(node);
             }
 
-            ArrayList<PathNode> neighbours = provider.getNeighbours(root.getPosition(), root.getTotalCost());
+            ArrayList<PathNode> neighbours = provider.getNeighbours(node.getPosition(), node.getTotalCost());
             for (PathNode neighbour : neighbours) {
                 double curDistance = neighbour.getTotalCost();
                 if (!visited.contains(neighbour)) {

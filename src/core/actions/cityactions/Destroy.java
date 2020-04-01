@@ -35,7 +35,7 @@ public class Destroy extends CityAction
             b.setBuildingAt(targetPos.x, targetPos.y, null);
 
             tribe.subtractScore(buildingToRemove.getPoints());
-
+            city.subtractPointsWorth(buildingToRemove.getPoints());
             if(buildingToRemove.type == Types.BUILDING.PORT)
             {
                 //If a port is removed, then the tile stops belonging to the trade network

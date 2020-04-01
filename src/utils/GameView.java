@@ -21,6 +21,7 @@ import core.game.GameState;
 import core.actions.Action;
 
 import static core.Constants.*;
+import static core.Types.TERRAIN.*;
 
 public class GameView extends JComponent {
 
@@ -55,7 +56,7 @@ public class GameView extends JComponent {
 //        int d = (int) Math.sqrt(size * size * 2);
         dimension = new Dimension(GUI_GAME_VIEW_SIZE, GUI_GAME_VIEW_SIZE);
 
-//        backgroundImg = Types.TERRAIN.PLAIN.getImage(null);
+//        backgroundImg = PLAIN.getImage(null);
         fogImg = ImageIO.GetInstance().getImage("img/fog.png");
         shineImg = ImageIO.GetInstance().getImage("img/shine3.png");
         starImg = ImageIO.GetInstance().getImage("img/decorations/star.png");
@@ -114,7 +115,7 @@ public class GameView extends JComponent {
                 paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, (r == null) ? null : r.getImage(t), imgSize, panTranslate);
 
                 Types.BUILDING b = board.getBuildingAt(i,j);
-                paintImageRotated(g, j*CELL_SIZE, i*CELL_SIZE, (b == null) ? null : b.getImage(), imgSize, panTranslate);
+                paintImageRotated(g, j*CELL_SIZE, i*CELL_SIZE, (b == null) ? null : b.getImage(), CELL_SIZE, panTranslate);
             }
         }
 
@@ -137,7 +138,7 @@ public class GameView extends JComponent {
             for(int j = 0; j < gridSize; ++j) {
                 // We then paint cities and units.
                 Types.TERRAIN t = board.getTerrainAt(i,j);
-                if (t == Types.TERRAIN.CITY) {
+                if (t == CITY) {
                     drawCityDecorations(g, i, j);
                 }
 
@@ -471,15 +472,15 @@ public class GameView extends JComponent {
         Types.TERRAIN diagUR = null;
         if (i > 0 && j < gridSize - 1) diagUR = board.getTerrainAt(i - 1, j + 1);
 
-        if (t == Types.TERRAIN.DEEP_WATER || t == Types.TERRAIN.SHALLOW_WATER) {
+        if (t == DEEP_WATER || t == SHALLOW_WATER) {
             // If this is the last tile on the row
             boolean down = (i == gridSize - 1);
             // If the tile above is not water
-            boolean top = (i > 0 && board.getTerrainAt(i - 1, j) != Types.TERRAIN.SHALLOW_WATER && board.getTerrainAt(i - 1, j) != Types.TERRAIN.DEEP_WATER);
+            boolean top = (i > 0 && board.getTerrainAt(i - 1, j) != SHALLOW_WATER && board.getTerrainAt(i - 1, j) != DEEP_WATER);
             // If first tile on column
             boolean left = (j == 0);
             // If the tile to the right is not water
-            boolean right = (j < gridSize - 1 && board.getTerrainAt(i, j + 1) != Types.TERRAIN.SHALLOW_WATER && board.getTerrainAt(i, j + 1) != Types.TERRAIN.DEEP_WATER);
+            boolean right = (j < gridSize - 1 && board.getTerrainAt(i, j + 1) != SHALLOW_WATER && board.getTerrainAt(i, j + 1) != DEEP_WATER);
             if (down) {
                 if (left) {
                     toPaint = t.getImage("down-left");
@@ -487,14 +488,14 @@ public class GameView extends JComponent {
                     if (top) {
                         toPaint = t.getImage("top-down-right");
                     } else {
-                        if (diagUR == Types.TERRAIN.SHALLOW_WATER || diagUR == Types.TERRAIN.DEEP_WATER) {
+                        if (t == SHALLOW_WATER && (diagUR == SHALLOW_WATER || diagUR == DEEP_WATER)) {
                             toPaint = t.getImage("down-right-ur");
                         } else {
                             toPaint = t.getImage("down-right");
                         }
                     }
                 } else if (top) {
-                    if (diagUR == Types.TERRAIN.SHALLOW_WATER || diagUR == Types.TERRAIN.DEEP_WATER) {
+                    if (t == SHALLOW_WATER && (diagUR == SHALLOW_WATER || diagUR == DEEP_WATER)) {
                         toPaint = t.getImage("top-down-ur");
                     } else {
                         toPaint = t.getImage("top-down");
@@ -503,7 +504,7 @@ public class GameView extends JComponent {
                     toPaint = t.getImage("down");
                 }
             } else if (top) {
-                if (j == gridSize-1 || diagUR == Types.TERRAIN.SHALLOW_WATER || diagUR == Types.TERRAIN.DEEP_WATER) {
+                if (t == SHALLOW_WATER && (j == gridSize-1 || diagUR == SHALLOW_WATER || diagUR == DEEP_WATER)) {
                     if (left) {
                         toPaint = t.getImage("top-left-ur");
                     } else {
@@ -523,7 +524,7 @@ public class GameView extends JComponent {
                     }
                 }
             } else if (right) {
-                if (i == 0 || j < gridSize - 1 && (diagUR == Types.TERRAIN.SHALLOW_WATER || diagUR == Types.TERRAIN.DEEP_WATER)) {
+                if (i == 0 || j < gridSize - 1 && t == SHALLOW_WATER && (diagUR == SHALLOW_WATER || diagUR == DEEP_WATER)) {
                     toPaint = t.getImage("right-ur");
                 } else {
                     toPaint = t.getImage("right");
@@ -535,9 +536,9 @@ public class GameView extends JComponent {
             }
         } else {
             // If this is the last tile on the row, or the tile underneath is water, get the '-down' img
-            boolean down = (i == gridSize - 1 || board.getTerrainAt(i+1, j) == Types.TERRAIN.SHALLOW_WATER);
+            boolean down = (i == gridSize - 1 || board.getTerrainAt(i+1, j) == SHALLOW_WATER);
             // If the same is true for the column instead, this is a '-left' img
-            boolean left = (j == 0 || board.getTerrainAt(i, j-1) == Types.TERRAIN.SHALLOW_WATER);
+            boolean left = (j == 0 || board.getTerrainAt(i, j-1) == SHALLOW_WATER);
 
             if (down) {
                 if (j == gridSize - 1) {
@@ -549,15 +550,15 @@ public class GameView extends JComponent {
                 } else {
                     if (left) {
                         if (j == 0) {
-                            if (i < gridSize - 1 && (board.getTerrainAt(i, j + 1) == Types.TERRAIN.SHALLOW_WATER ||
-                                            board.getTerrainAt(i, j + 1) == Types.TERRAIN.DEEP_WATER)) {
+                            if (i < gridSize - 1 && (board.getTerrainAt(i, j + 1) == SHALLOW_WATER ||
+                                            board.getTerrainAt(i, j + 1) == DEEP_WATER)) {
                                 toPaint = t.getImage("down-left-el-dr");
                             } else {
                                 toPaint = t.getImage("down-left-el");
                             }
                         } else if (i == gridSize - 1) {
-                            if (board.getTerrainAt(i - 1, j) == Types.TERRAIN.SHALLOW_WATER
-                                    || board.getTerrainAt(i - 1, j) == Types.TERRAIN.DEEP_WATER) {
+                            if (board.getTerrainAt(i - 1, j) == SHALLOW_WATER
+                                    || board.getTerrainAt(i - 1, j) == DEEP_WATER) {
                                 toPaint = t.getImage("down-left-ed-ul");
                             } else {
                                 toPaint = t.getImage("down-left-ed");
@@ -567,8 +568,8 @@ public class GameView extends JComponent {
                         }
                     } else {
                         if (j < gridSize - 1 && i < gridSize - 1 &&
-                                (board.getTerrainAt(i, j + 1) == Types.TERRAIN.SHALLOW_WATER ||
-                                board.getTerrainAt(i, j + 1) == Types.TERRAIN.DEEP_WATER)) {
+                                (board.getTerrainAt(i, j + 1) == SHALLOW_WATER ||
+                                board.getTerrainAt(i, j + 1) == DEEP_WATER)) {
                             toPaint = t.getImage("down-dr");
                         } else {
                             toPaint = t.getImage("down");
@@ -576,8 +577,8 @@ public class GameView extends JComponent {
                     }
                 }
             } else if (left) {
-                if (i == 0 || board.getTerrainAt(i - 1, j) == Types.TERRAIN.SHALLOW_WATER ||
-                        board.getTerrainAt(i - 1, j) == Types.TERRAIN.DEEP_WATER) {
+                if (i == 0 || board.getTerrainAt(i - 1, j) == SHALLOW_WATER ||
+                        board.getTerrainAt(i - 1, j) == DEEP_WATER) {
                     if (cornerUL) {
                         toPaint = t.getImage("corner-ul");
                     } else {
@@ -594,9 +595,9 @@ public class GameView extends JComponent {
                 Types.TERRAIN tl = board.getTerrainAt(i, j - 1);
                 Types.TERRAIN td = board.getTerrainAt(i + 1, j);
                 Types.TERRAIN tld = board.getTerrainAt(i + 1, j - 1);
-                if (i < gridSize-1 && j > 0 && (tld == Types.TERRAIN.SHALLOW_WATER || tld == Types.TERRAIN.DEEP_WATER) &&
-                        (tl != Types.TERRAIN.SHALLOW_WATER && tl != Types.TERRAIN.DEEP_WATER) &&
-                        (td != Types.TERRAIN.SHALLOW_WATER && td != Types.TERRAIN.DEEP_WATER)) {
+                if (i < gridSize-1 && j > 0 && (tld == SHALLOW_WATER || tld == DEEP_WATER) &&
+                        (tl != SHALLOW_WATER && tl != DEEP_WATER) &&
+                        (td != SHALLOW_WATER && td != DEEP_WATER)) {
                     toPaint = t.getImage("dl");
                 } else {
                     toPaint = t.getImage(null);

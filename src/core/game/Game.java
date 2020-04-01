@@ -245,7 +245,7 @@ public class Game {
                 // while the next action is being computed
                 while (!frame.nextMove()) {
                     try {
-                        Thread.sleep(1);
+                        Thread.sleep(FRAME_DELAY);
                     } catch (Exception e) {
                         System.out.println("EXCEPTION " + e);
                     }

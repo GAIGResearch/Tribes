@@ -99,7 +99,7 @@ public class Board {
                 {
                     copyBoard.setUnitIdAt(x, y, units[x][y]);
                     copyBoard.setTerrainAt(x, y, terrains[x][y]);
-                    copyBoard.setResourceAt(x, y, resources[x][y]);
+                    copyBoard.setResourceAt(x, y, maskResource(playerId, x, y));
                     copyBoard.setBuildingAt(x, y, buildings[x][y]);
                     copyBoard.tileCityId[x][y] = tileCityId[x][y];
                     copyBoard.networkTiles[x][y] = networkTiles[x][y];
@@ -128,6 +128,40 @@ public class Board {
     }
 
     /**
+     * Masks a resource that can only be revealed after researching a specific technology.
+     * @param playerID if -1 we don not mask any resources.
+     * @param x x coordinate of the resource.
+     * @param y y coordinate of the resource.
+     * @return Returns the resource at x,y or null if there is no resource, or the resource is hidden.
+     */
+    private Types.RESOURCE maskResource(int playerID, int x, int y) {
+        if(playerID == -1) { return resources[x][y]; }
+        else {
+            TechnologyTree t = tribes[playerID].getTechTree();
+
+            try {
+                switch (resources[x][y]) {
+                    case CROPS:
+                        if (!t.isResearched(Types.TECHNOLOGY.ORGANIZATION)) {
+                            return null;
+                        }
+                    case ORE:
+                        if (!t.isResearched(Types.TECHNOLOGY.CLIMBING)) {
+                            return null;
+                        }
+                    case WHALES:
+                        if (!t.isResearched(Types.TECHNOLOGY.FISHING)) {
+                            return null;
+                        }
+                }
+                return resources[x][y];
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
+
+    /**
      * Pushes a unit out of a city (x,y). The order in which tiles are tried for the new
      * destination are: S, W, N, E, SW, NW, NE, NW. If none of those positions are available, the
      * unit disappears.
@@ -139,7 +173,7 @@ public class Board {
      * @param startY   y coordinate of the starting position of the unit to push
      */
 
-    public void pushUnit(int tribeId, Unit toPush, int startX, int startY) {
+    public void pushUnit(int tribeId, Unit toPush, int startX, int startY, Random r) {
         int xPush[] = {0, -1, 0, 1, -1, -1, 1, 1};
         int yPush[] = {1, 0, -1, 0, 1, -1, -1, 1};
         int idx = 0;
@@ -150,7 +184,7 @@ public class Board {
             int y = startY + yPush[idx];
 
             if (x >= 0 && y >= 0 && x < size && y < size) {
-                pushed = tryPush(tribeId, toPush, startX, startY, x, y);
+                pushed = tryPush(tribeId, toPush, startX, startY, x, y, r);
             }
             idx++;
         }
@@ -164,7 +198,7 @@ public class Board {
 
     }
 
-    public boolean tryPush(int tribeId, Unit toPush, int startX, int startY, int x, int y) {
+    public boolean tryPush(int tribeId, Unit toPush, int startX, int startY, int x, int y, Random r) {
         //there's no unit? (or killed)
         Unit u = getUnitAt(x, y);
         if (u != null && !u.getIsKilled())
@@ -177,7 +211,7 @@ public class Board {
         Types.TERRAIN terrain = terrains[x][y];
         if (terrain == Types.TERRAIN.MOUNTAIN) {
             if (tribes[tribeId].getTechTree().isResearched(Types.TECHNOLOGY.CLIMBING)) {
-                moveUnit(toPush, startX, startY, x, y);
+                moveUnit(toPush, startX, startY, x, y, r);
                 return true;
             } else return false; //Can't be pushed if it's a mountain and climbing is not researched.
         }
@@ -203,7 +237,7 @@ public class Board {
         }
 
         //Otherwise, no problem
-        moveUnit(toPush, startX, startY, x, y);
+        moveUnit  (toPush, startX, startY, x, y, r);
         return true;
     }
 
@@ -251,7 +285,7 @@ public class Board {
         addUnit(city, newUnit);
     }
 
-    public void moveUnit(Unit unit, int x0, int y0, int xF, int yF) {
+    public void moveUnit(Unit unit, int x0, int y0, int xF, int yF, Random r) {
         units[x0][y0] = 0;
         units[xF][yF] = unit.getActorId();
         unit.setPosition(xF, yF);
@@ -261,7 +295,7 @@ public class Board {
         if (getTerrainAt(xF, yF) == Types.TERRAIN.MOUNTAIN) {
             partialObsRangeClear += 1;
         }
-        t.clearView(xF, yF, partialObsRangeClear);
+        t.clearView(xF, yF, partialObsRangeClear, r, this);
     }
 
     public void launchExplorer(int x0, int y0, int tribeId, Random rnd) {
@@ -285,7 +319,7 @@ public class Board {
                     moved = true;
                     curX = x;
                     curY = y;
-                    tribes[tribeId].clearView(x, y);
+                    tribes[tribeId].clearView(x, y,rnd, this.copy());
                 }
 
                 j++;
@@ -456,6 +490,7 @@ public class Board {
                 if(tileCityId[i][j] == -1){
                     tileCityId[i][j] = c.getActorId();
                     t.addScore(TribesConfig.CITY_BORDER_POINTS); // Add score to tribe on border creation
+                    c.addPointsWorth(TribesConfig.CITY_BORDER_POINTS);
                 }
             }
         }
@@ -469,6 +504,7 @@ public class Board {
                 for(int j = cityPos.y-1; j <= cityPos.y+1; j++) {
                     if(tileCityId[i][j] == c.getActorId())
                         t.addScore(TribesConfig.CITY_BORDER_POINTS);
+                        c.addPointsWorth(TribesConfig.CITY_BORDER_POINTS);
                 }
             }
     }
@@ -528,7 +564,7 @@ public class Board {
             moveOneToNewCity(newCity, capturingTribe, rnd);
 
             //Add city to board and set its borders
-            addCityToTribe(newCity);
+            addCityToTribe(newCity,gameState.getRandomGenerator());
             setBorderHelper(newCity, newCity.getBound());
 
         }else if(ter == Types.TERRAIN.CITY)
@@ -705,7 +741,7 @@ public class Board {
      * Adds a city to a tribe
      * @param c city to add
      */
-    public void addCityToTribe(City c)
+    public void addCityToTribe(City c, Random r)
     {
         addActor(c);
         if (c.isCapital()){
@@ -714,7 +750,7 @@ public class Board {
         tribes[c.getTribeId()].addCity(c.getActorId());
 
         //cities provide visibility, which needs updating
-        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, 2);
+        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, 2, r, this.copy());
 
         //By default, cities are considered to be roads for trade network purposes.
         networkTiles[c.getPosition().x][c.getPosition().y] = true;

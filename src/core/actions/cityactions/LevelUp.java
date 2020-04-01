@@ -66,6 +66,7 @@ public class LevelUp extends CityAction {
                 break;
             case PARK:
                 tribe.addScore(TribesConfig.CITY_LEVEL_UP_PARK);
+                city.addPointsWorth(TribesConfig.CITY_LEVEL_UP_PARK);
                 tribe.cityMaxedUp();
                 break;
             case SUPERUNIT:
@@ -75,12 +76,13 @@ public class LevelUp extends CityAction {
                 tribe.cityMaxedUp();
 
                 if(unitInCity != null)
-                    gs.getBoard().pushUnit(unitInCity.getTribeId(), unitInCity, cityPos.x, cityPos.y);
+                    gs.getBoard().pushUnit(unitInCity.getTribeId(), unitInCity, cityPos.x, cityPos.y, gs.getRandomGenerator());
 
                 break;
         }
 
         tribe.addScore(bonus.getLevelUpPoints());
+        city.addPointsWorth(bonus.getLevelUpPoints());
         city.levelUp();
 
         return true;

@@ -10,7 +10,7 @@ import java.util.Queue;
 public class ActionController {
 
     private Queue<Action> actionsQueue;
-
+    private Action lastActionPlayed;
 
     public ActionController()
     {
@@ -28,7 +28,8 @@ public class ActionController {
     }
 
     public Action getAction() {
-        return actionsQueue.poll();
+        lastActionPlayed = actionsQueue.poll();
+        return lastActionPlayed;
     }
 
     private ActionController(Queue<Action> otherQueue) {
@@ -41,5 +42,13 @@ public class ActionController {
 
     public void reset() {
         actionsQueue.clear();
+    }
+
+    public Action getLastActionPlayed() {
+        return lastActionPlayed;
+    }
+
+    public void setLastActionPlayed(Action a) {
+        lastActionPlayed = a;
     }
 }

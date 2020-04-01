@@ -132,6 +132,7 @@ public class GUI extends JFrame implements Runnable {
                 } else {
                     // Otherwise highlight new cell
                     infoView.setHighlight((int)p.getX(), (int)p.getY());
+//                    System.out.println("Highlighting: " + (int)p.getX() + " " + (int)p.getY());
                 }
             }
 

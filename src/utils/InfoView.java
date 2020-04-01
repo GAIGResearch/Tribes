@@ -263,8 +263,7 @@ public class InfoView extends JComponent {
                             }
                         }
                     }
-                    actionRG.setVisible(true);
-                    actionRG.setEnabled(found);
+                    actionRG.setVisible(found);
                 }
                 if (t != null) {
                     // if forest: Burn & Clear
@@ -287,10 +286,8 @@ public class InfoView extends JComponent {
                                 }
                             }
                         }
-                        actionBF.setVisible(true);
-                        actionCF.setVisible(true);
-                        actionBF.setEnabled(foundBF);
-                        actionCF.setEnabled(foundCF);
+                        actionBF.setVisible(foundBF);
+                        actionCF.setVisible(foundCF);
 
                     } else if (t == Types.TERRAIN.PLAIN) {
                         boolean foundGF = false;
@@ -304,8 +301,7 @@ public class InfoView extends JComponent {
                                 }
                             }
                         }
-                        actionGF.setVisible(true);
-                        actionGF.setEnabled(foundGF);
+                        actionGF.setVisible(foundGF);
                     }
                 }
                 if (b != null) {
@@ -321,8 +317,7 @@ public class InfoView extends JComponent {
                             }
                         }
                     }
-                    actionD.setVisible(true);
-                    actionD.setEnabled(found);
+                    actionD.setVisible(found);
                 }
                 if (c.getPosition().equals(position)) {
                     // We've highlighted the city, all spawn actions show up
@@ -334,13 +329,11 @@ public class InfoView extends JComponent {
                                 int idx = Types.UNIT.getSpawnableTypes().indexOf(unitType);
                                 listenerS.update(cityID, position, ac, gs);
                                 found[idx] = true;
-                                break;
                             }
                         }
                     }
                     for (int i = 0; i < actionS.length; i++) {
-                        actionS[i].setEnabled(found[i]);
-                        actionS[i].setVisible(true);
+                        actionS[i].setVisible(found[i]);
                     }
                 } else if (t != null && b == null) {
                     // We might be able to build here
@@ -349,20 +342,22 @@ public class InfoView extends JComponent {
                         for (Action a : acts) {
                             if (a instanceof Build) {
                                 Types.BUILDING buildingType = ((Build) a).getBuildingType();
-                                if (buildingType.getTerrainRequirements().contains(t)) {
+//                                if (buildingType.getTerrainRequirements().contains(t) &&
+//                                if (a.isFeasible(gs) &&
+                                if (((Build) a).getTargetPos().equals(position))
+                                {
                                     int idx = buildingType.getKey();
                                     listenerB.update(cityID, position, ac, gs);
                                     found[idx] = true;
-                                    break;
                                 }
                             }
                         }
                     }
                     for (int i = 0; i < actionB.length; i++) {
-                        if (Types.BUILDING.values()[i].getTerrainRequirements().contains(t)) {
-                            actionB[i].setVisible(true);
-                            actionB[i].setEnabled(found[i]);
-                        }
+//                        if (Types.BUILDING.values()[i].getTerrainRequirements().contains(t)) {
+//                        if()
+                            actionB[i].setVisible(found[i]);
+//                        }
                     }
                 }
             }

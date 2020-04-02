@@ -15,6 +15,7 @@ import core.actions.unitactions.Examine;
 import core.actors.Actor;
 import core.actors.City;
 import core.actors.Tribe;
+import core.actors.units.SuperUnit;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
@@ -135,40 +136,37 @@ public class GameView extends JComponent {
         }
 
         for(int i = 0; i < gridSize; ++i) {
-            for(int j = 0; j < gridSize; ++j) {
-                // We then paint cities and units.
-                Types.TERRAIN t = board.getTerrainAt(i,j);
+            for (int j = 0; j < gridSize; ++j) {
+                // We then paint cities decorations
+                Types.TERRAIN t = board.getTerrainAt(i, j);
                 if (t == CITY) {
                     drawCityDecorations(g, i, j);
                 }
+            }
+        }
 
+        for(int i = 0; i < gridSize; ++i) {
+            for(int j = 0; j < gridSize; ++j) {
                 Unit u = board.getUnitAt(i,j);
                 if (u != null) {
 
                     int imgSize = (int) (CELL_SIZE * 0.75);
+                    if (u instanceof SuperUnit) imgSize = CELL_SIZE;
                     String imgFile = u.getType().getImageFile();
-                    boolean exhausted = false; //u.isExhausted(); // TODO: does unit have available actions?
+
+                    Point2D rotated = rotatePoint(j, i);
+                    int x = (int)(rotated.getX() + CELL_SIZE*CELL_SIZE/4/imgSize);
+                    int y = (int)(rotated.getY() - imgSize/1.5);
+
+                    ArrayList<Action> possibleActions = gameState.getUnitActions(u);
+                    boolean exhausted = (possibleActions == null || possibleActions.size() == 0);
 
                     if (exhausted) {
-                        String exhaustedStr = imgFile + imgFile.split("/")[2] + "Exhausted.png";
+                        String exhaustedStr = imgFile + u.getTribeId() + "Exhausted.png";
                         Image exhaustedImg = ImageIO.GetInstance().getImage(exhaustedStr);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - SHADOW_OFFSET,
-                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - SHADOW_OFFSET,
-                                exhaustedImg, imgSize, panTranslate);
+                        paintImage(g, x, y, exhaustedImg, imgSize, panTranslate);
                     } else {
-                        String highlightStr = imgFile + imgFile.split("/")[2] + "Highlight.png";
-                        String shadowStr = imgFile + imgFile.split("/")[2] + "Shadow.png";
-                        Image highlight = ImageIO.GetInstance().getImage(highlightStr);
-                        Image shadow = ImageIO.GetInstance().getImage(shadowStr);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - SHADOW_OFFSET,
-                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - SHADOW_OFFSET,
-                                highlight, imgSize, panTranslate);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 + SHADOW_OFFSET,
-                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 + SHADOW_OFFSET,
-                                shadow, imgSize, panTranslate);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2,
-                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2,
-                                u.getType().getImage(u.getTribeId()), imgSize, panTranslate);
+                        paintImage(g, x, y, u.getType().getImage(u.getTribeId()), imgSize, panTranslate);
                     }
                 }
             }

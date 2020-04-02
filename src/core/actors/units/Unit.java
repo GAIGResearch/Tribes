@@ -111,6 +111,7 @@ public abstract class Unit extends Actor
             case SHIP:
             case WARRIOR:
             case SWORDMAN:
+            case SUPERUNIT:
                 if(transition == MOVED && status == FRESH) { return true; }
                 if(transition == ATTACKED && status == FRESH) { return true; }
                 if(transition == ATTACKED && status == MOVED) { return true; }
@@ -150,6 +151,7 @@ public abstract class Unit extends Actor
                 case SHIP:
                 case WARRIOR:
                 case SWORDMAN:
+                case SUPERUNIT:
                     if(newStatus == MOVED && this.status == FRESH) { this.status = MOVED; }
                     if(newStatus == ATTACKED && this.status == FRESH) { this.status = FINISHED; }
                     if(newStatus == ATTACKED && this.status == MOVED) { this.status = FINISHED; }

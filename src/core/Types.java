@@ -407,9 +407,9 @@ public class Types {
         WARRIOR (0,"img/unit/warrior/", WARRIOR_COST, null, WARRIOR_POINTS), //+10
         RIDER (1,"img/unit/rider/", RIDER_COST, RIDING, RIDER_POINTS), //+15
         DEFENDER (2,"img/unit/defender/", DEFENDER_COST, SHIELDS, DEFENDER_POINTS), // +15
-        SWORDMAN (3,"img/unit/swordman/", SWORDMAN_COST, SMITHERY, SWORDMAN_POINTS), //+25
+        SWORDMAN (3,"img/unit/swordsman/", SWORDMAN_COST, SMITHERY, SWORDMAN_POINTS), //+25
         ARCHER (4,"img/unit/archer/", ARCHER_COST, ARCHERY, ARCHER_POINTS),//+15
-        CATAPULT (5,"img/unit/", CATAPULT_COST, MATHEMATICS, CATAPULT_POINTS), //+40
+        CATAPULT (5,"img/unit/catapult/", CATAPULT_COST, MATHEMATICS, CATAPULT_POINTS), //+40
         KNIGHT (6,"img/unit/knight/", KNIGHT_COST, CHIVALRY, KNIGHT_POINTS), //+40
         MIND_BENDER(7,"img/unit/mind_bender/", MINDBENDER_COST, PHILOSOPHY, MINDBENDER_POINTS), //+25
         BOAT(8,"img/unit/boat/", BOAT_COST, SAILING, BOAT_POINTS), //+0

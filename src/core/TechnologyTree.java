@@ -1,6 +1,7 @@
 package core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import static core.Types.TECHNOLOGY.*;
@@ -12,6 +13,7 @@ public class TechnologyTree {
 
     public TechnologyTree(){
         researched = new boolean[Types.TECHNOLOGY.values().length];
+        //Arrays.fill(researched, true);
     }
 
     public TechnologyTree(boolean[] researched){

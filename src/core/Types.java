@@ -45,12 +45,26 @@ public class Types {
 
         private int baseCost;
         private TECHNOLOGY parent;
+        private ArrayList<TECHNOLOGY> children;
 
         TECHNOLOGY(int baseCost, TECHNOLOGY parent) {
             this.baseCost = baseCost; this.parent = parent;
         }
 
         public TECHNOLOGY getParentTech() {return this.parent;}
+        public ArrayList<TECHNOLOGY> getChildTech() {
+            if (children == null) {
+                ArrayList<TECHNOLOGY> c = new ArrayList<>();
+                for (TECHNOLOGY t : TECHNOLOGY.values()) {
+                    if (t.getParentTech() == this) {
+                        c.add(t);
+                    }
+                }
+                children = c;
+            }
+            return children;
+        }
+
         public int getCost(int numOfCities) {
             return baseCost * numOfCities;
         }
@@ -109,27 +123,29 @@ public class Types {
      */
     public enum RESOURCE
     {
-        FISH(0, "img/resource/fish2.png", null,'h', FISH_COST, FISH_POP),
-        FRUIT(1, "img/resource/fruit2.png", null, 'f', FRUIT_COST, FRUIT_POP),
-        ANIMAL(2, "img/resource/animal2.png", null, 'a', ANIMAL_COST, ANIMAL_POP),
-        WHALES(3, "img/resource/whale2.png", "img/resource/whale3.png", 'w', WHALES_COST, WHALES_STARS),
-        ORE(5, "img/resource/ore2.png", null, 'o', 0, 0),
-        CROPS(6, "img/resource/crops2.png", null, 'c', 0, 0),
-        RUINS(7, "img/resource/ruins2.png", null, 'r', 0, 0);
+        FISH(0, "img/resource/fish2.png", null,'h', FISH_COST, FISH_POP, FISHING),
+        FRUIT(1, "img/resource/fruit2.png", null, 'f', FRUIT_COST, FRUIT_POP, ORGANIZATION),
+        ANIMAL(2, "img/resource/animal2.png", null, 'a', ANIMAL_COST, ANIMAL_POP, HUNTING),
+        WHALES(3, "img/resource/whale2.png", "img/resource/whale3.png", 'w', WHALES_COST, WHALES_STARS, WHALING),
+        ORE(5, "img/resource/ore2.png", null, 'o', 0, 0, MINING),
+        CROPS(6, "img/resource/crops2.png", null, 'c', 0, 0, FARMING),
+        RUINS(7, "img/resource/ruins2.png", null, 'r', 0, 0, null);
 
         private int key;
         private String imageFile, secondaryImageFile;
         private char mapChar;
         private int cost;
         private int bonus;
+        private TECHNOLOGY tech;
 
-        RESOURCE(int numVal, String imageFile, String secondaryImageFile, char mapChar, int cost, int bonus) {
+        RESOURCE(int numVal, String imageFile, String secondaryImageFile, char mapChar, int cost, int bonus, TECHNOLOGY t) {
             this.key = numVal;
             this.imageFile = imageFile;
             this.secondaryImageFile = secondaryImageFile;
             this.mapChar = mapChar;
             this.cost = cost;
             this.bonus = bonus;
+            this.tech = t;
         }
         public int getKey() {  return key; }
         public Image getImage(TERRAIN t) {
@@ -151,6 +167,10 @@ public class Types {
                     return r;
             }
             return null;
+        }
+
+        public TECHNOLOGY getTechnologyRequirement() {
+            return tech;
         }
     }
 
@@ -435,7 +455,7 @@ public class Types {
         public int getCost() {
             return cost;
         }
-        public TECHNOLOGY getRequirement() {
+        public TECHNOLOGY getTechnologyRequirement() {
             return requirement;
         }
         public int getPoints() { return points; }
@@ -594,18 +614,30 @@ public class Types {
     }
 
     public enum ACTION {
-        MOVE("img/actions/move.png"),
-        ATTACK("img/actions/attack.png"),
-        CAPTURE("img/actions/capture.png"),
-        EXAMINE("img/actions/examine.png"),
-        DISBAND("img/actions/disband.png"),
-        HEAL("img/actions/heal.png"),
-        UPGRADE("img/actions/upgrade.png");
+        MOVE("img/actions/move.png", null),
+        CLIMB_MOUNTAIN(null, CLIMBING),
+        ATTACK("img/actions/attack.png", null),
+        CAPTURE("img/actions/capture.png", null),
+        EXAMINE("img/actions/examine.png", null),
+        DISBAND("img/actions/disband.png", FREE_SPIRIT),
+        HEAL("img/actions/heal.png", null),
+        UPGRADE_BOAT("img/actions/upgrade.png", SAILING),
+        UPGRADE_SHIP("img/actions/upgrade.png", NAVIGATION),
+        BURN_FOREST(null, CHIVALRY),
+        CLEAR_FOREST(null, FORESTRY),
+        DESTROY(null, CONSTRUCTION),
+        GROW_FOREST(null, SPIRITUALISM),
+        BUILD_ROAD(null, ROADS);
 
         private String imgPath;
+        private TECHNOLOGY tech;  // Requires this technology to perform action
 
-        ACTION(String imgPath) {
-            this.imgPath = imgPath;
+        ACTION(String imgPath, TECHNOLOGY t) {
+            this.imgPath = imgPath; this.tech = t;
+        }
+
+        public TECHNOLOGY getTechnologyRequirement() {
+            return tech;
         }
 
         public static Image getImage(Action a) {
@@ -622,7 +654,7 @@ public class Types {
             } else if (a instanceof Recover || a instanceof HealOthers) {
                 return ImageIO.GetInstance().getImage(HEAL.imgPath);
             } else if (a instanceof Upgrade) {
-                return ImageIO.GetInstance().getImage(UPGRADE.imgPath);
+                return ImageIO.GetInstance().getImage(UPGRADE_BOAT.imgPath);
             }
             return null;
         }

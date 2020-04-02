@@ -8,9 +8,6 @@ import core.game.GameState;
 import core.actors.City;
 import utils.Vector2d;
 
-
-import static core.Types.UNIT.*;
-
 public class Spawn extends CityAction
 {
     private Types.UNIT unit_type;
@@ -44,7 +41,7 @@ public class Spawn extends CityAction
         if(gs.getBoard().getUnitAt(cityPos.x, cityPos.y) != null) return false;
 
         //and I have the tech to build it...
-        Types.TECHNOLOGY tech = unit_type.getRequirement();
+        Types.TECHNOLOGY tech = unit_type.getTechnologyRequirement();
         return tech == null || t.getTechTree().isResearched(tech);
 
     }

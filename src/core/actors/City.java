@@ -16,7 +16,6 @@ public class City extends Actor{
     private int population_need;
     private boolean isCapital;
     private int production = 0;
-    private int pointsPerTurn = 0;
     private boolean hasWalls = false;
     private int bound;
     private int pointsWorth;
@@ -38,12 +37,7 @@ public class City extends Actor{
     public void addPopulation(int number){
         population += number;
     }
-    private void changePointsPerTurn(int points){
-        changePointsPerTurn(points, 1);
-    }
-    private void changePointsPerTurn(int points, int multiplier){
-        this.pointsPerTurn = points*multiplier;
-    }
+
     public void addProduction(int prod) {
         production += prod;
         if(production < 0) production = 0;
@@ -86,7 +80,6 @@ public class City extends Actor{
             case FOREST_TEMPLE:
                 if(!onlyMatching)
                 {
-                    changePointsPerTurn(building.getPoints(), multiplier);
                     addPopulation(building.type.getBonus() * multiplier);
                 }
                 break;
@@ -223,13 +216,6 @@ public class City extends Actor{
         return population_need;
     }
 
-
-    // Get the point for each turn
-    public int getPointsPerTurn() {
-        return pointsPerTurn;
-    }
-
-
     public void setUnitsID(ArrayList<Integer> unitsID) {
         this.unitsID = unitsID;
     }
@@ -254,7 +240,6 @@ public class City extends Actor{
         c.population_need = population_need;
         c.isCapital = isCapital;
         c.production = production;
-        c.pointsPerTurn = pointsPerTurn;
         c.hasWalls = hasWalls;
         c.bound = bound;
         c.actorId = actorId;
@@ -291,13 +276,6 @@ public class City extends Actor{
             }
         }
         return null;
-    }
-
-    public void subtractLongTermPoints(int points){
-        if (pointsPerTurn < points){
-            System.out.println("Error in subtract Long Term Points!!! -> Destroy Temple");
-        }
-        pointsPerTurn -= points;
     }
 
     public void subtractProduction(int production){

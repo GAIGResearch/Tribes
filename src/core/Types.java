@@ -187,10 +187,10 @@ public class Types {
         CUSTOM_HOUSE (5,"img/building/custom_house2.png", CUSTOM_COST, CUSTOM_BONUS, CUSTOM_POINTS, TRADE, new HashSet<>(Collections.singletonList(PLAIN))),
         LUMBER_HUT(6,"img/building/lumber_hut2.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, LUMBER_HUT_POINTS, FORESTRY, new HashSet<>(Collections.singletonList(FOREST))),
         SAWMILL (7,"img/building/sawmill2.png", SAW_MILL_COST, SAW_MILL_BONUS, SAW_MILL_POINTS, MATHEMATICS, new HashSet<>(Collections.singletonList(PLAIN))),
-        TEMPLE (8, "img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, FREE_SPIRIT, new HashSet<>(Collections.singletonList(PLAIN))),
-        WATER_TEMPLE (9,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, AQUATISM, new HashSet<>(Arrays.asList(SHALLOW_WATER, DEEP_WATER))),
-        FOREST_TEMPLE (10,"img/building/temple2.png", TEMPLE_FOREST_COST, TEMPLE_BONUS, TEMPLE_POINTS, SPIRITUALISM, new HashSet<>(Collections.singletonList(FOREST))),
-        MOUNTAIN_TEMPLE (11,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, MEDITATION, new HashSet<>(Collections.singletonList(MOUNTAIN))),
+        TEMPLE (8, "img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS[0], FREE_SPIRIT, new HashSet<>(Collections.singletonList(PLAIN))),
+        WATER_TEMPLE (9,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS[0], AQUATISM, new HashSet<>(Arrays.asList(SHALLOW_WATER, DEEP_WATER))),
+        FOREST_TEMPLE (10,"img/building/temple2.png", TEMPLE_FOREST_COST, TEMPLE_BONUS, TEMPLE_POINTS[0], SPIRITUALISM, new HashSet<>(Collections.singletonList(FOREST))),
+        MOUNTAIN_TEMPLE (11,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS[0], MEDITATION, new HashSet<>(Collections.singletonList(MOUNTAIN))),
         ALTAR_OF_PEACE (12,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, MEDITATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
         EMPERORS_TOMB (13,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, TRADE, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
         EYE_OF_GOD (14,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, NAVIGATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
@@ -296,6 +296,12 @@ public class Types {
             return this == ALTAR_OF_PEACE || this == EMPERORS_TOMB || this == EYE_OF_GOD ||
                     this == GATE_OF_POWER || this == PARK_OF_FORTUNE || this == TOWER_OF_WISDOM;
         }
+
+        public boolean isTemple()
+        {
+            return this == TEMPLE || this == WATER_TEMPLE  || this == MOUNTAIN_TEMPLE  || this == FOREST_TEMPLE;
+        }
+
 
         public static HashMap<BUILDING, MONUMENT_STATUS> initMonuments()
         {

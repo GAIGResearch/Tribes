@@ -1,5 +1,6 @@
 package core.game;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
@@ -15,6 +16,8 @@ import utils.GUI;
 import utils.Vector2d;
 import utils.WindowInput;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
@@ -192,6 +195,9 @@ public class Game {
             //play the full turn for this player
             processTurn(i, tribe, frame);
 
+            // Save Game
+            saveGame();
+
             //it may be that this player won the game, no more playing.
             if(isEnded())
             {
@@ -201,6 +207,26 @@ public class Game {
 
         //All turns passed, time to increase the tick.
         gs.incTick();
+    }
+
+    public void saveGame(){
+        ObjectMapper mapper = new ObjectMapper();
+        try{
+            String fileName = gs.getTick() + "_" + gs.getBoard().getActiveTribeID();
+
+            //Create dictionary
+            File rootFileLoc = new File("save");
+            rootFileLoc.mkdir();
+
+            File fileLoc = new File("save/" + this.seed);
+            fileLoc.mkdir();
+
+            // Save GameState Information
+            mapper.writeValue(new File("save/" + this.seed + "/" + fileName + ".json"), this.gs.getBoard());
+
+        } catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     /**

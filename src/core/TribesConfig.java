@@ -180,8 +180,8 @@ public class TribesConfig
     public static final int TEMPLE_COST = 20;
     public static final int TEMPLE_FOREST_COST = 15;
     public static final int TEMPLE_BONUS = 1;
-    public static final int TEMPLE_POINTS = 100;
-
+    public static final int TEMPLE_TURNS_TO_SCORE = 3;
+    public static final int[] TEMPLE_POINTS = new int[]{100, 50, 50, 50, 150};
 
     //Resources
     public static final int ANIMAL_COST = 2;

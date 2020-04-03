@@ -15,6 +15,7 @@ import core.actions.unitactions.Examine;
 import core.actors.Actor;
 import core.actors.City;
 import core.actors.Tribe;
+import core.actors.units.Catapult;
 import core.actors.units.SuperUnit;
 import core.actors.units.Unit;
 import core.game.Board;
@@ -151,7 +152,7 @@ public class GameView extends JComponent {
                 if (u != null) {
 
                     int imgSize = (int) (CELL_SIZE * 0.75);
-                    if (u instanceof SuperUnit) imgSize = CELL_SIZE;
+                    if (u instanceof SuperUnit || u instanceof Catapult) imgSize = CELL_SIZE;
                     String imgFile = u.getType().getImageFile();
 
                     Point2D rotated = rotatePoint(j, i);

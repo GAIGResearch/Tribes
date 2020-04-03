@@ -82,7 +82,7 @@ public class InfoView extends JComponent {
         actionD.addActionListener(listenerD);
         actionD.setVisible(false);
         actionGF = new JButton("Grow");  // If plain
-        listenerGF = new CityActionListener("Grow");
+        listenerGF = new CityActionListener("GrowForest");
         actionGF.addActionListener(listenerGF);
         actionGF.setVisible(false);
         actionRG = new JButton("Gather");  // If resource

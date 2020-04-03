@@ -178,9 +178,10 @@ public class Board {
      * @param toPush   Unit to be pushed
      * @param startX   x coordinate of the starting position of the unit to push
      * @param startY   y coordinate of the starting position of the unit to push
+     * @return true if the unit could be pushed.
      */
 
-    public void pushUnit(int tribeId, Unit toPush, int startX, int startY, Random r) {
+    public boolean pushUnit(int tribeId, Unit toPush, int startX, int startY, Random r) {
         int xPush[] = {0, -1, 0, 1, -1, -1, 1, 1};
         int yPush[] = {1, 0, -1, 0, 1, -1, -1, 1};
         int idx = 0;
@@ -199,10 +200,7 @@ public class Board {
         //A pushed unit moves to PUSHED status - essentially its turn is over.
         toPush.setStatus(Types.TURN_STATUS.PUSHED);
 
-        if (!pushed) {
-            //TODO: if a unit can't be pushed, unit must disappear
-        }
-
+        return pushed;
     }
 
     public boolean tryPush(int tribeId, Unit toPush, int startX, int startY, int x, int y, Random r) {

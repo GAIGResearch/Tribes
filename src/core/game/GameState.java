@@ -312,6 +312,25 @@ public class GameState {
         return copy;
     }
 
+    /**
+     * Pushes a unit following the game rules. If the unit can't be pushed, destroys it.
+     * @param toPush unit to push
+     * @param startX initial x position
+     * @param startY initial y position.
+     */
+    public void pushUnit(Unit toPush, int startX, int startY)
+    {
+        boolean pushed = board.pushUnit(toPush.getTribeId(), toPush, startX, startY, rnd);
+        if(!pushed)
+        {
+            board.removeUnitFromBoard(toPush);
+            City c = (City) getActor(toPush.getCityID());
+            board.removeUnitFromCity(toPush, c);
+            Tribe t = getTribe(toPush.getTribeId());
+            t.subtractScore(toPush.getType().getPoints());
+        }
+    }
+
     public boolean canEndTurn(int tribeId)
     {
         return canEndTurn[tribeId];

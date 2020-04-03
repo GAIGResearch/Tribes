@@ -13,7 +13,7 @@ public class TechnologyTree {
 
     public TechnologyTree(){
         researched = new boolean[Types.TECHNOLOGY.values().length];
-        //Arrays.fill(researched, true);
+        Arrays.fill(researched, true);
     }
 
     public TechnologyTree(boolean[] researched){

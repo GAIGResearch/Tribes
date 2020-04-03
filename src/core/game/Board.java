@@ -206,7 +206,7 @@ public class Board {
     public boolean tryPush(int tribeId, Unit toPush, int startX, int startY, int x, int y, Random r) {
         //there's no unit? (or killed)
         Unit u = getUnitAt(x, y);
-        if (u != null && !u.getIsKilled())
+        if (u != null && !u.isKilled())
         {
             return false;
         }

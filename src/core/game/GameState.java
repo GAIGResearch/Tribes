@@ -5,6 +5,7 @@ import core.actions.Action;
 import core.actions.cityactions.factory.CityActionBuilder;
 import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.factory.TribeActionBuilder;
+import core.actions.unitactions.UnitAction;
 import core.actions.unitactions.factory.UnitActionBuilder;
 import core.actors.Actor;
 import core.actors.City;
@@ -240,9 +241,42 @@ public class GameState {
         if(action != null)
         {
             action.execute(this);
+
+            //Post-action execution matters:
+
+            //new actions may have become available, update the 'dirty' flag
             computedActionTribeIdFlag = -1;
         }
     }
+
+    /**
+     * Pushes a unit following the game rules. If the unit can't be pushed, destroys it.
+     * @param toPush unit to push
+     * @param startX initial x position
+     * @param startY initial y position.
+     */
+    public void pushUnit(Unit toPush, int startX, int startY)
+    {
+        boolean pushed = board.pushUnit(toPush.getTribeId(), toPush, startX, startY, rnd);
+        if(!pushed)
+        {
+            killUnit(toPush);
+        }
+    }
+
+    /**
+     * Kills a unit from the game, removing it from the board, its original city and substracting game score.
+     * @param toKill unit to Kill
+     */
+    public void killUnit(Unit toKill)
+    {
+        board.removeUnitFromBoard(toKill);
+        City c = (City) getActor(toKill.getCityID());
+        board.removeUnitFromCity(toKill, c);
+        Tribe t = getTribe(toKill.getTribeId());
+        t.subtractScore(toKill.getType().getPoints());
+    }
+
 
     /**
      * Public accessor to the copy() functionality of this state.
@@ -250,15 +284,6 @@ public class GameState {
      */
     public GameState copy() {
         return copy(-1);  // No reduction happening if no index specified
-    }
-
-    /**
-     * Returns the game board.
-     * @return the game board.
-     */
-    public Board getBoard()
-    {
-        return board;
     }
 
     /**
@@ -312,25 +337,6 @@ public class GameState {
         return copy;
     }
 
-    /**
-     * Pushes a unit following the game rules. If the unit can't be pushed, destroys it.
-     * @param toPush unit to push
-     * @param startX initial x position
-     * @param startY initial y position.
-     */
-    public void pushUnit(Unit toPush, int startX, int startY)
-    {
-        boolean pushed = board.pushUnit(toPush.getTribeId(), toPush, startX, startY, rnd);
-        if(!pushed)
-        {
-            board.removeUnitFromBoard(toPush);
-            City c = (City) getActor(toPush.getCityID());
-            board.removeUnitFromCity(toPush, c);
-            Tribe t = getTribe(toPush.getTribeId());
-            t.subtractScore(toPush.getType().getPoints());
-        }
-    }
-
     public boolean canEndTurn(int tribeId)
     {
         return canEndTurn[tribeId];
@@ -357,6 +363,16 @@ public class GameState {
     public Tribe[] getTribes()
     {
         return board.getTribes();
+    }
+
+
+    /**
+     * Returns the game board.
+     * @return the game board.
+     */
+    public Board getBoard()
+    {
+        return board;
     }
 
 

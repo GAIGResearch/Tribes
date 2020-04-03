@@ -111,7 +111,7 @@ public class City extends Actor{
         Tribe tribe = gameState.getTribe(this.tribeId);
 
         //Population added by the base building.
-        if(isBase && isPopulation && !onlyMatching) addPopulation(building.getBonus());
+        if(isBase && isPopulation && !onlyMatching) addPopulation(multiplier * building.getBonus());
 
         //Check all buildings next to the new building position.
         for(Vector2d adjPosition : building.position.neighborhood(1, 0, board.getSize()))
@@ -126,11 +126,11 @@ public class City extends Actor{
                 if(cityId == actorId)
                 {
                     //the matching building belongs to this city
-                    existingBuilding = this.getBuilding(building.position.x, building.position.y);
+                    existingBuilding = this.getBuilding(adjPosition.x, adjPosition.y);
                 }else if(tribe.getCitiesID().contains(cityId)) {
                     //the matching building belongs to a city from a different tribe
                     City city = (City) gameState.getActor(cityId);
-                    existingBuilding = city.getBuilding(building.position.x, building.position.y);
+                    existingBuilding = city.getBuilding(adjPosition.x, adjPosition.y);
                     cityToAddTo = city;
 
                 }else return; //This may happen if the building belongs to a city from another tribe.

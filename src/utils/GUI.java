@@ -133,7 +133,17 @@ public class GUI extends JFrame implements Runnable {
                 // If unit highlighted and action at new click valid for unit, execute action
                 Action candidate = getActionAt((int)p.getX(), (int)p.getY(), infoView.getHighlightX(), infoView.getHighlightY());
                 if (candidate != null) {
-                    ac.addAction(candidate, gs);
+                    int n = 0;
+                    if (candidate instanceof Disband) {  // These actions needs confirmation before executing
+                        n = JOptionPane.showConfirmDialog(mainPanel,
+                                "Confirm action " + candidate.toString(),
+                                "Are you sure?",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE);
+                    }
+                    if (n == 0) {
+                        ac.addAction(candidate, gs);
+                    }
                     infoView.resetHighlight();
                 } else {
                     // Otherwise highlight new cell

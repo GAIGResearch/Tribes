@@ -574,11 +574,13 @@ public class InfoView extends JComponent {
                         ((Build) a).setTargetPos(position);
                         ((Build) a).setBuildingType(bType);
                     }
+                    break;
                 case "Research":
                     if (e.getSource() instanceof JButton) {
                         a = new ResearchTech(gs.getActiveTribeID());
                         ((ResearchTech)a).setTech(tech);  // TODO: confirmation
                     }
+                    break;
             }
             if (a != null) {
                 ac.addAction(a, gs);

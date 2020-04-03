@@ -334,7 +334,7 @@ public class InfoView extends JComponent {
                                 int idx = Types.UNIT.getSpawnableTypes().indexOf(unitType);
                                 listenerS.update(cityID, position, ac, gs);
                                 found[idx] = true;
-                                break;
+                                //break;
                             }
                         }
                     }

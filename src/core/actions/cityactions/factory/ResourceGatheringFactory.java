@@ -23,7 +23,6 @@ public class ResourceGatheringFactory implements ActionFactory {
         int cityId = city.getActorId();
 
         // loop through bounds of city and add resource actions if they are feasible
-        // TODO: Find more efficient method other than asking board for city tiles
         for(Vector2d pos : b.getCityTiles(cityId)) {
 
             Types.RESOURCE r = b.getResourceAt(pos.x, pos.y);

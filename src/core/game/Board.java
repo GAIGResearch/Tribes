@@ -44,6 +44,9 @@ public class Board {
     // Player currently making a move.
     private int activeTribeID = -1;
 
+    //Actor ID counter
+    private int actorIDcounter;
+
     // Constructor for board
     public Board() {
         this.gameActors = new HashMap<>();
@@ -90,6 +93,7 @@ public class Board {
         copyBoard.tileCityId = new int[size][size];
         copyBoard.networkTiles = new boolean[size][size];
         copyBoard.activeTribeID = activeTribeID;
+        copyBoard.actorIDcounter = actorIDcounter;
 
         // Copy board objects (they are all ids)
         for (int x = 0; x < this.size; x++) {
@@ -802,14 +806,12 @@ public class Board {
     /**
      * Adds a new actor to the list of game actors
      * @param actor the actor to add
-     * @return the unique identifier of this actor for the rest of the game.
      */
-    public int addActor(core.actors.Actor actor)
+    void addActor(core.actors.Actor actor)
     {
-        int nActors = gameActors.size() + 1;
-        gameActors.put(nActors, actor);
-        actor.setActorId(nActors);
-        return nActors;
+        actorIDcounter++;
+        gameActors.put(actorIDcounter, actor);
+        actor.setActorId(actorIDcounter);
     }
 
     /**

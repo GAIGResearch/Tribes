@@ -307,8 +307,11 @@ public class Game {
             //All temples grow;
             for(Building b : city.getBuildings())
             {
-                if(b.type.isTemple())
-                    ((Temple)b).score();
+                if(b.type.isTemple()) {
+                    int templePoints = ((Temple) b).score();
+                    tribe.addScore(templePoints);
+                    city.addPointsWorth(templePoints);
+                }
             }
         }
 

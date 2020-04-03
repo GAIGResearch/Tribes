@@ -210,7 +210,7 @@ public class TribesConfig
     public static final int CITY_EXPANSION_TILES = 1;
 
     /* TRIBES */
-    public static final int INITIAL_STARS = 500;
+    public static final int INITIAL_STARS = 5;
 
     /* ACTIONS */
     public static final int CLEAR_FOREST_STAR = 2;

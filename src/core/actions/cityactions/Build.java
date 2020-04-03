@@ -4,6 +4,7 @@ import core.TechnologyTree;
 import core.Types;
 import core.actions.Action;
 import core.actors.Building;
+import core.actors.Temple;
 import core.actors.Tribe;
 import core.game.Board;
 import core.game.GameState;
@@ -80,7 +81,13 @@ public class Build extends CityAction
             board.setBuildingAt(targetPos.x, targetPos.y, buildingType);
             board.setResourceAt(targetPos.x, targetPos.y, null);
 
-            city.addBuilding(gs, new Building(targetPos.x, targetPos.y, buildingType));
+            if(buildingType.isTemple())
+                city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, buildingType));
+            else
+                city.addBuilding(gs, new Building(targetPos.x, targetPos.y, buildingType));
+
+
+
             if(buildingType == Types.BUILDING.PORT)
                 board.setTradeNetwork(targetPos.x, targetPos.y, true);
             if(buildingType.isMonument())

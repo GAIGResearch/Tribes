@@ -81,16 +81,6 @@ public class GameState {
     }
 
     /**
-     * Adds a new actor to the list of game actors
-     * @param actor the actor to add
-     * @return the unique identifier of this actor for the rest of the game.
-     */
-    public int addActor(Actor actor)
-    {
-        return board.addActor(actor);
-    }
-
-    /**
      * Gets a game actor from its id.
      * @param actorId the id of the actor to retrieve
      * @return the actor, null if the id doesn't correspond to an actor (note that it may have
@@ -246,9 +236,6 @@ public class GameState {
      */
     public void next(Action action)
     {
-        //TODO: MAIN function of this class.
-        // Takes the action passed as parameter and runs it in the game.
-
         //At least it'll have these two things:
         if(action != null)
         {

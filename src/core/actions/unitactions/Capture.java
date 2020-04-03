@@ -83,9 +83,15 @@ public class Capture extends UnitAction
                 targetTribe.subtractScore(targetCity.getPointsWorth());
                 thisTribe.addScore(targetCity.getPointsWorth());
 
+                //the unit that captures exhausts their turn
+                unit.setStatus(Types.TURN_STATUS.FINISHED);
+
                 return b.capture(gs, thisTribe, targetCity.getPosition().x, targetCity.getPosition().y);
             }else if(captureType == Types.TERRAIN.VILLAGE)
             {
+                //the unit that captures exhausts their turn
+                unit.setStatus(Types.TURN_STATUS.FINISHED);
+
                 Vector2d unitPos = unit.getPosition();
                 return b.capture(gs, thisTribe, unitPos.x, unitPos.y);
             }

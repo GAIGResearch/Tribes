@@ -204,7 +204,7 @@ public class TribesConfig
     public static final int PROD_CAPITAL_BONUS = 1;
 
     /* TRIBES */
-    public static final int INITIAL_STARS = 5;
+    public static final int INITIAL_STARS = 1000;
 
     /* ACTIONS */
     public static final int CLEAR_FOREST_STAR = 2;

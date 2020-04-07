@@ -85,7 +85,8 @@ public class City extends Actor{
                 {
                     addPopulation(tribe, building.type.getBonus() * multiplier);
                 }
-                tribe.addStars(TribesConfig.TEMPLE_POINTS[0]);
+                int scoreDiff = negative ? ((Temple)building).getPoints() : TribesConfig.TEMPLE_POINTS[0];
+                tribe.addScore(scoreDiff);
                 break;
             case ALTAR_OF_PEACE:
             case EMPERORS_TOMB:
@@ -94,7 +95,7 @@ public class City extends Actor{
             case PARK_OF_FORTUNE:
             case TOWER_OF_WISDOM:
                 if(!onlyMatching) addPopulation(tribe,building.type.getBonus() * multiplier);
-                tribe.addScore(TribesConfig.MONUMENT_POINTS);
+                tribe.addScore(TribesConfig.MONUMENT_POINTS * multiplier);
                 break;
         }
     }

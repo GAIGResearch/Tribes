@@ -6,7 +6,9 @@ import core.Types;
 import core.actions.Action;
 import core.actions.unitactions.Recover;
 import core.actions.unitactions.factory.RecoverFactory;
+import core.actors.Building;
 import core.actors.City;
+import core.actors.Temple;
 import core.actors.Tribe;
 import core.actors.units.Unit;
 import players.Agent;
@@ -326,8 +328,17 @@ public class Game {
             if (produces)
                 acumProd += city.getProduction();
 
-            turnScore += city.getPointsPerTurn();
             allTribeUnits.addAll(city.getUnitsID());
+
+            //All temples grow;
+            for(Building b : city.getBuildings())
+            {
+                if(b.type.isTemple()) {
+                    int templePoints = ((Temple) b).score();
+                    tribe.addScore(templePoints);
+                    city.addPointsWorth(templePoints);
+                }
+            }
         }
 
         if(gs.getTick() == 0)

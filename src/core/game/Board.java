@@ -44,6 +44,9 @@ public class Board {
     // Player currently making a move.
     private int activeTribeID = -1;
 
+    //Actor ID counter
+    private int actorIDcounter;
+
     // Constructor for board
     public Board() {
         this.gameActors = new HashMap<>();
@@ -90,6 +93,7 @@ public class Board {
         copyBoard.tileCityId = new int[size][size];
         copyBoard.networkTiles = new boolean[size][size];
         copyBoard.activeTribeID = activeTribeID;
+        copyBoard.actorIDcounter = actorIDcounter;
 
         // Copy board objects (they are all ids)
         for (int x = 0; x < this.size; x++) {
@@ -174,9 +178,10 @@ public class Board {
      * @param toPush   Unit to be pushed
      * @param startX   x coordinate of the starting position of the unit to push
      * @param startY   y coordinate of the starting position of the unit to push
+     * @return true if the unit could be pushed.
      */
 
-    public void pushUnit(int tribeId, Unit toPush, int startX, int startY, Random r) {
+    public boolean pushUnit(int tribeId, Unit toPush, int startX, int startY, Random r) {
         int xPush[] = {0, -1, 0, 1, -1, -1, 1, 1};
         int yPush[] = {1, 0, -1, 0, 1, -1, -1, 1};
         int idx = 0;
@@ -195,16 +200,13 @@ public class Board {
         //A pushed unit moves to PUSHED status - essentially its turn is over.
         toPush.setStatus(Types.TURN_STATUS.PUSHED);
 
-        if (!pushed) {
-            //TODO: if a unit can't be pushed, unit must disappear
-        }
-
+        return pushed;
     }
 
     public boolean tryPush(int tribeId, Unit toPush, int startX, int startY, int x, int y, Random r) {
         //there's no unit? (or killed)
         Unit u = getUnitAt(x, y);
-        if (u != null && !u.getIsKilled())
+        if (u != null && !u.isKilled())
         {
             return false;
         }
@@ -802,14 +804,12 @@ public class Board {
     /**
      * Adds a new actor to the list of game actors
      * @param actor the actor to add
-     * @return the unique identifier of this actor for the rest of the game.
      */
-    public int addActor(core.actors.Actor actor)
+    void addActor(core.actors.Actor actor)
     {
-        int nActors = gameActors.size() + 1;
-        gameActors.put(nActors, actor);
-        actor.setActorId(nActors);
-        return nActors;
+        actorIDcounter++;
+        gameActors.put(actorIDcounter, actor);
+        actor.setActorId(actorIDcounter);
     }
 
     /**

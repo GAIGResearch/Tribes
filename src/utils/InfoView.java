@@ -82,7 +82,7 @@ public class InfoView extends JComponent {
         actionD.addActionListener(listenerD);
         actionD.setVisible(false);
         actionGF = new JButton("Grow");  // If plain
-        listenerGF = new CityActionListener("Grow");
+        listenerGF = new CityActionListener("GrowForest");
         actionGF.addActionListener(listenerGF);
         actionGF.setVisible(false);
         actionRG = new JButton("Gather");  // If resource
@@ -241,7 +241,7 @@ public class InfoView extends JComponent {
 //            sb.append("<table border=\"0\"><tr><td><img width=\"" + CELL_SIZE + "\" src=\"file:" + Types.TERRAIN.CITY.getImageStr() + "\"/></p></td><td>");
             sb.append("<ul>");
             sb.append("<li><b>Is Capital:</b> " + c.isCapital() + "</li>");
-            sb.append("<li><b>Points:</b> " + c.getPointsPerTurn() + "</li>");
+            sb.append("<li><b>Points:</b> " + c.getPointsWorth() + "</li>");
             sb.append("<li><b>Production:</b> " + c.getProduction() + "</li>");
             sb.append("</ul>");
 //            sb.append("</td></tr></table>");
@@ -574,11 +574,13 @@ public class InfoView extends JComponent {
                         ((Build) a).setTargetPos(position);
                         ((Build) a).setBuildingType(bType);
                     }
+                    break;
                 case "Research":
                     if (e.getSource() instanceof JButton) {
                         a = new ResearchTech(gs.getActiveTribeID());
                         ((ResearchTech)a).setTech(tech);  // TODO: confirmation
                     }
+                    break;
             }
             if (a != null) {
                 ac.addAction(a, gs);

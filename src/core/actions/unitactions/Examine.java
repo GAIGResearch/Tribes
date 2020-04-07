@@ -52,11 +52,10 @@ public class Examine extends UnitAction
                     Vector2d cityPos = gs.getActor(capital).getPosition();
                     Unit unitInCity = board.getUnitAt(cityPos.x, cityPos.y);
                     if(unitInCity != null)
-                        board.pushUnit(unitInCity.getTribeId(), unitInCity, cityPos.x, cityPos.y, gs.getRandomGenerator());
+                        gs.pushUnit(unitInCity, cityPos.x, cityPos.y);
 
                     Unit superUnit = Types.UNIT.createUnit(cityPos, 0, false, capital, unit.getTribeId(), Types.UNIT.SUPERUNIT);
                     board.addUnit((City)gs.getActor(capital), superUnit);
-
                     break;
 
                 case RESEARCH:
@@ -65,7 +64,7 @@ public class Examine extends UnitAction
 
                 case POP_GROWTH:
                     City c = (City) gs.getActor(capital);
-                    c.addPopulation(bonus.getBonus());
+                    c.addPopulation(t, bonus.getBonus());
                     break;
 
                 case EXPLORER:

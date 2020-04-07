@@ -374,7 +374,7 @@ public class GUI extends JFrame implements Runnable {
         appTurn.setText("Turn: " + gs.getTick());
         if (gs.getActiveTribe() != null) {
             activeTribe.setText("Tribe acting: " + gs.getActiveTribe().getName());
-            activeTribeInfo.setText("stars: " + gs.getActiveTribe().getStars() + " (+" + gs.getActiveTribe().getTotalProduction() + ")");
+            activeTribeInfo.setText("stars: " + gs.getActiveTribe().getStars() + " (+" + gs.getActiveTribe().getMaxProduction(gs) + ")");
             if (lastExamineAction != null) {
                 otherInfo.setText("Ruins: " + lastExamineAction.getBonus().toString());
                 otherInfoDelay--;

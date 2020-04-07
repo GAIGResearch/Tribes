@@ -179,25 +179,25 @@ public class Types {
      */
     public enum BUILDING
     {
-        PORT (0,"img/building/dock2.png", PORT_COST, PORT_BONUS, PORT_POINTS, SAILING, new HashSet<>(Collections.singletonList(SHALLOW_WATER))),
-        MINE (1,"img/building/mine2.png", MINE_COST, MINE_BONUS, MINE_POINTS, MINING, new HashSet<>(Collections.singletonList(MOUNTAIN))),
-        FORGE (2,"img/building/forge2.png", FORGE_COST, FORGE_BONUS, FORGE_POINTS, SMITHERY, new HashSet<>(Collections.singletonList(PLAIN))),
-        FARM (3, "img/building/farm2.png", FARM_COST, FARM_BONUS, FARM_POINTS, FARMING, new HashSet<>(Collections.singletonList(PLAIN))),
-        WINDMILL (4,"img/building/windmill2.png", WIND_MILL_COST, WIND_MILL_BONUS, WIND_MILL_POINTS, CONSTRUCTION, new HashSet<>(Collections.singletonList(PLAIN))),
-        CUSTOM_HOUSE (5,"img/building/custom_house2.png", CUSTOM_COST, CUSTOM_BONUS, CUSTOM_POINTS, TRADE, new HashSet<>(Collections.singletonList(PLAIN))),
-        LUMBER_HUT(6,"img/building/lumber_hut2.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, LUMBER_HUT_POINTS, FORESTRY, new HashSet<>(Collections.singletonList(FOREST))),
-        SAWMILL (7,"img/building/sawmill2.png", SAW_MILL_COST, SAW_MILL_BONUS, SAW_MILL_POINTS, MATHEMATICS, new HashSet<>(Collections.singletonList(PLAIN))),
-        TEMPLE (8, "img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, FREE_SPIRIT, new HashSet<>(Collections.singletonList(PLAIN))),
-        WATER_TEMPLE (9,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, AQUATISM, new HashSet<>(Arrays.asList(SHALLOW_WATER, DEEP_WATER))),
-        FOREST_TEMPLE (10,"img/building/temple2.png", TEMPLE_FOREST_COST, TEMPLE_BONUS, TEMPLE_POINTS, SPIRITUALISM, new HashSet<>(Collections.singletonList(FOREST))),
-        MOUNTAIN_TEMPLE (11,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, MEDITATION, new HashSet<>(Collections.singletonList(MOUNTAIN))),
-        ALTAR_OF_PEACE (12,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, MEDITATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        EMPERORS_TOMB (13,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, TRADE, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        EYE_OF_GOD (14,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, NAVIGATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        GATE_OF_POWER (15,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        GRAND_BAZAR (16,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, ROADS, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        PARK_OF_FORTUNE (17,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        TOWER_OF_WISDOM (18, "img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, PHILOSOPHY,new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN)));
+        PORT (0,"img/building/dock2.png", PORT_COST, PORT_BONUS, SAILING, new HashSet<>(Collections.singletonList(SHALLOW_WATER))),
+        MINE (1,"img/building/mine2.png", MINE_COST, MINE_BONUS, MINING, new HashSet<>(Collections.singletonList(MOUNTAIN))),
+        FORGE (2,"img/building/forge2.png", FORGE_COST, FORGE_BONUS, SMITHERY, new HashSet<>(Collections.singletonList(PLAIN))),
+        FARM (3, "img/building/farm2.png", FARM_COST, FARM_BONUS, FARMING, new HashSet<>(Collections.singletonList(PLAIN))),
+        WINDMILL (4,"img/building/windmill2.png", WIND_MILL_COST, WIND_MILL_BONUS, CONSTRUCTION, new HashSet<>(Collections.singletonList(PLAIN))),
+        CUSTOM_HOUSE (5,"img/building/custom_house2.png", CUSTOM_COST, CUSTOM_BONUS, TRADE, new HashSet<>(Collections.singletonList(PLAIN))),
+        LUMBER_HUT(6,"img/building/lumber_hut2.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, FORESTRY, new HashSet<>(Collections.singletonList(FOREST))),
+        SAWMILL (7,"img/building/sawmill2.png", SAW_MILL_COST, SAW_MILL_BONUS, MATHEMATICS, new HashSet<>(Collections.singletonList(PLAIN))),
+        TEMPLE (8, "img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, FREE_SPIRIT, new HashSet<>(Collections.singletonList(PLAIN))),
+        WATER_TEMPLE (9,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, AQUATISM, new HashSet<>(Arrays.asList(SHALLOW_WATER, DEEP_WATER))),
+        FOREST_TEMPLE (10,"img/building/temple2.png", TEMPLE_FOREST_COST, TEMPLE_BONUS, SPIRITUALISM, new HashSet<>(Collections.singletonList(FOREST))),
+        MOUNTAIN_TEMPLE (11,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, MEDITATION, new HashSet<>(Collections.singletonList(MOUNTAIN))),
+        ALTAR_OF_PEACE (12,"img/building/monument2.png", 0, MONUMENT_BONUS, MEDITATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        EMPERORS_TOMB (13,"img/building/monument2.png", 0, MONUMENT_BONUS, TRADE, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        EYE_OF_GOD (14,"img/building/monument2.png", 0, MONUMENT_BONUS, NAVIGATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        GATE_OF_POWER (15,"img/building/monument2.png", 0, MONUMENT_BONUS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        GRAND_BAZAR (16,"img/building/monument2.png", 0, MONUMENT_BONUS, ROADS, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        PARK_OF_FORTUNE (17,"img/building/monument2.png", 0, MONUMENT_BONUS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        TOWER_OF_WISDOM (18, "img/building/monument2.png", 0, MONUMENT_BONUS, PHILOSOPHY,new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN)));
 
         public static BUILDING stringToType(String type) {
             switch (type) {
@@ -236,13 +236,11 @@ public class Types {
         private HashSet<TERRAIN> terrainRequirements;
         private int cost;
         private int bonus;
-        private int points;
-        BUILDING(int numVal, String imageFile, int cost, int bonus, int points, TECHNOLOGY technologyRequirement, HashSet<TERRAIN> terrainRequirements)
+        BUILDING(int numVal, String imageFile, int cost, int bonus, TECHNOLOGY technologyRequirement, HashSet<TERRAIN> terrainRequirements)
         {
             this.key = numVal;
             this.cost = cost;
             this.bonus = bonus;
-            this.points = points;
             this.imageFile = imageFile;
             this.technologyRequirement = technologyRequirement;
             this.terrainRequirements = terrainRequirements;
@@ -252,7 +250,6 @@ public class Types {
         public int getKey() {  return key; }
         public int getCost() {return cost; }
         public int getBonus() {return bonus; }
-        public int getPoints() {return points; }
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
 
         public Types.RESOURCE getResourceConstraint()
@@ -296,6 +293,12 @@ public class Types {
             return this == ALTAR_OF_PEACE || this == EMPERORS_TOMB || this == EYE_OF_GOD ||
                     this == GATE_OF_POWER || this == PARK_OF_FORTUNE || this == TOWER_OF_WISDOM;
         }
+
+        public boolean isTemple()
+        {
+            return this == TEMPLE || this == WATER_TEMPLE  || this == MOUNTAIN_TEMPLE  || this == FOREST_TEMPLE;
+        }
+
 
         public static HashMap<BUILDING, MONUMENT_STATUS> initMonuments()
         {

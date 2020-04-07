@@ -5,6 +5,7 @@ import core.actions.Action;
 import core.actions.cityactions.factory.CityActionBuilder;
 import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.factory.TribeActionBuilder;
+import core.actions.unitactions.UnitAction;
 import core.actions.unitactions.factory.UnitActionBuilder;
 import core.actors.Actor;
 import core.actors.City;
@@ -78,16 +79,6 @@ public class GameState {
 
         canEndTurn = new boolean[tribes.length];
 
-    }
-
-    /**
-     * Adds a new actor to the list of game actors
-     * @param actor the actor to add
-     * @return the unique identifier of this actor for the rest of the game.
-     */
-    public int addActor(Actor actor)
-    {
-        return board.addActor(actor);
     }
 
     /**
@@ -229,11 +220,11 @@ public class GameState {
         for(int cityId : cityActions.keySet())
         {
             nActions += cityActions.get(cityId).size();
-            if(nActions>0) return false;
+            if(nActions>0) return true;
         }
         for(int cityId : unitActions.keySet()) {
             nActions += unitActions.get(cityId).size();
-            if(nActions>0) return false;
+            if(nActions>0) return true;
         }
 
         //No city or unit actions - if there's only one (EndTurn) tribe action, there are no actions available.
@@ -246,16 +237,46 @@ public class GameState {
      */
     public void next(Action action)
     {
-        //TODO: MAIN function of this class.
-        // Takes the action passed as parameter and runs it in the game.
-
         //At least it'll have these two things:
         if(action != null)
         {
             action.execute(this);
+
+            //Post-action execution matters:
+
+            //new actions may have become available, update the 'dirty' flag
             computedActionTribeIdFlag = -1;
         }
     }
+
+    /**
+     * Pushes a unit following the game rules. If the unit can't be pushed, destroys it.
+     * @param toPush unit to push
+     * @param startX initial x position
+     * @param startY initial y position.
+     */
+    public void pushUnit(Unit toPush, int startX, int startY)
+    {
+        boolean pushed = board.pushUnit(toPush.getTribeId(), toPush, startX, startY, rnd);
+        if(!pushed)
+        {
+            killUnit(toPush);
+        }
+    }
+
+    /**
+     * Kills a unit from the game, removing it from the board, its original city and substracting game score.
+     * @param toKill unit to Kill
+     */
+    public void killUnit(Unit toKill)
+    {
+        board.removeUnitFromBoard(toKill);
+        City c = (City) getActor(toKill.getCityID());
+        board.removeUnitFromCity(toKill, c);
+        Tribe t = getTribe(toKill.getTribeId());
+        t.subtractScore(toKill.getType().getPoints());
+    }
+
 
     /**
      * Public accessor to the copy() functionality of this state.
@@ -263,15 +284,6 @@ public class GameState {
      */
     public GameState copy() {
         return copy(-1);  // No reduction happening if no index specified
-    }
-
-    /**
-     * Returns the game board.
-     * @return the game board.
-     */
-    public Board getBoard()
-    {
-        return board;
     }
 
     /**
@@ -355,6 +367,16 @@ public class GameState {
 
 
     /**
+     * Returns the game board.
+     * @return the game board.
+     */
+    public Board getBoard()
+    {
+        return board;
+    }
+
+
+    /**
      * Gets the tribe tribeId playing this game.
      * @param tribeID ID of the tribe to pick
      * @return the tribe with the ID requested
@@ -399,6 +421,16 @@ public class GameState {
     public ArrayList<Action> getUnitActions(Unit u) {
         return unitActions.get(u.getActorId());
     }
+
+
+    public ArrayList<Action> getCityActions(int cityId) {
+        return cityActions.get(cityId);
+    }
+
+    public ArrayList<Action> getUnitActions(int unitId) {
+        return unitActions.get(unitId);
+    }
+
 
     public boolean isLevelingUp() {
         return levelingUp;

@@ -3,6 +3,7 @@ package utils;
 import core.TechnologyTree;
 import core.Types;
 import core.actions.cityactions.*;
+import core.actions.tribeactions.BuildRoad;
 import core.actions.tribeactions.ResearchTech;
 import core.actors.City;
 import core.actors.Tribe;
@@ -23,7 +24,7 @@ import static core.Constants.*;
 import static core.TribesConfig.VETERAN_KILLS;
 import static utils.GameView.gridSize;
 
-@SuppressWarnings({"SuspiciousNameCombination", "StringConcatenationInsideStringBufferAppend"})
+@SuppressWarnings({"StringConcatenationInsideStringBufferAppend", "SuspiciousNameCombination"})
 public class InfoView extends JComponent {
 
     // Dimensions of the window.
@@ -32,10 +33,12 @@ public class InfoView extends JComponent {
 
     private JButton actionBF, actionCF, actionD, actionGF, actionRG;
     private JButton[] actionB, actionS;
+    private JButton actionRoad;
     private JButton actionResearch;
-    private CityActionListener listenerBF, listenerCF, listenerD, listenerGF, listenerRG;
-    private CityActionListener listenerS, listenerB;
-    private CityActionListener listenerResearch;
+    private TribesActionListener listenerBF, listenerCF, listenerD, listenerGF, listenerRG;
+    private TribesActionListener listenerS, listenerB;
+    private TribesActionListener listenerResearch;
+    private TribesActionListener listenerRoad;
     private ActionController ac;
 
     private int highlightX, highlightY;
@@ -70,23 +73,23 @@ public class InfoView extends JComponent {
 
         // Simple actions: BurnForest, ClearForest, Destroy, GrowForest, GatherResource
         actionBF = new JButton("Burn");  // If forest
-        listenerBF = new CityActionListener("BurnForest");
+        listenerBF = new TribesActionListener("BurnForest");
         actionBF.addActionListener(listenerBF);
         actionBF.setVisible(false);
         actionCF = new JButton("Clear");  // If forest
-        listenerCF = new CityActionListener("ClearForest");
+        listenerCF = new TribesActionListener("ClearForest");
         actionCF.addActionListener(listenerCF);
         actionCF.setVisible(false);
         actionD = new JButton("Destroy");  // If building
-        listenerD = new CityActionListener("Destroy");
+        listenerD = new TribesActionListener("Destroy");
         actionD.addActionListener(listenerD);
         actionD.setVisible(false);
         actionGF = new JButton("Grow");  // If plain
-        listenerGF = new CityActionListener("GrowForest");
+        listenerGF = new TribesActionListener("GrowForest");
         actionGF.addActionListener(listenerGF);
         actionGF.setVisible(false);
         actionRG = new JButton("Gather");  // If resource
-        listenerRG = new CityActionListener("ResourceGathering");
+        listenerRG = new TribesActionListener("ResourceGathering");
         actionRG.addActionListener(listenerRG);
         actionRG.setVisible(false);
         actionPanel.add(actionRG);
@@ -98,7 +101,7 @@ public class InfoView extends JComponent {
         // Complex actions: Build X, Spawn X
         int nBuildings = Types.BUILDING.values().length;
         actionB = new JButton[nBuildings];
-        listenerB = new CityActionListener("Build");
+        listenerB = new TribesActionListener("Build");
         for (int i = 0; i < nBuildings; i++) {
             actionB[i] = new JButton("Build " + Types.BUILDING.values()[i]);
             actionB[i].addActionListener(listenerB);
@@ -108,7 +111,7 @@ public class InfoView extends JComponent {
         ArrayList<Types.UNIT> spawnableUnits = Types.UNIT.getSpawnableTypes();
         int nUnits = spawnableUnits.size();
         actionS = new JButton[nUnits];
-        listenerS = new CityActionListener("Spawn");
+        listenerS = new TribesActionListener("Spawn");
         for (int i = 0; i < nUnits; i++) {
             actionS[i] = new JButton("Spawn " + spawnableUnits.get(i));
             actionS[i].addActionListener(listenerS);
@@ -118,9 +121,15 @@ public class InfoView extends JComponent {
 
         actionResearch = new JButton("Research");
         actionResearch.setVisible(false);
-        listenerResearch = new CityActionListener("Research");
+        listenerResearch = new TribesActionListener("Research");
         actionResearch.addActionListener(listenerResearch);
         actionPanel.add(actionResearch);
+
+        actionRoad = new JButton("Build Road");
+        actionRoad.setVisible(false);
+        listenerRoad = new TribesActionListener("BuildRoad");
+        actionRoad.addActionListener(listenerRoad);
+        actionPanel.add(actionRoad);
 
         this.setLayout(new FlowLayout());
         JScrollPane scrollPane1 = new JScrollPane(textArea);
@@ -257,6 +266,11 @@ public class InfoView extends JComponent {
         Types.BUILDING b = board.getBuildingAt(highlightY, highlightX);
         Vector2d position = new Vector2d(highlightY, highlightX);
         resetButtonVisibility();
+
+        if (board.getTribe(board.getActiveTribeID()).getTechTree().isResearched(Types.TECHNOLOGY.ROADS)) {
+            actionRoad.setVisible(true);
+            listenerRoad.update(board.getActiveTribeID(), position, ac, gs);
+        }
 
         if (cityID != -1) {
             City c = (City) gs.getBoard().getActor(cityID);
@@ -432,6 +446,7 @@ public class InfoView extends JComponent {
         actionGF.setVisible(false);
         actionRG.setVisible(false);
         actionResearch.setVisible(false);
+        actionRoad.setVisible(false);
         for (JButton jb: actionB) {
             jb.setVisible(false);
         }
@@ -502,16 +517,16 @@ public class InfoView extends JComponent {
         techHighlight = t;
     }
 
-    class CityActionListener implements ActionListener {
+    class TribesActionListener implements ActionListener {
         int cityID;
         Vector2d position;
         ActionController ac;
         GameState gs;
-        String actionType = "";
+        String actionType;
         Types.RESOURCE resource;
         Types.TECHNOLOGY tech;
 
-        CityActionListener(String type) {
+        TribesActionListener(String type) {
             this.actionType = type;
         }
 
@@ -536,6 +551,10 @@ public class InfoView extends JComponent {
         public void actionPerformed(ActionEvent e) {
             Action a = null;
             switch (actionType) {
+                case "BuildRoad":
+                    a = new BuildRoad(cityID);
+                    ((BuildRoad) a).setPosition(position);
+                    break;
                 case "BurnForest":
                     a = new BurnForest(cityID);
                     ((BurnForest) a).setTargetPos(position);
@@ -578,7 +597,7 @@ public class InfoView extends JComponent {
                 case "Research":
                     if (e.getSource() instanceof JButton) {
                         a = new ResearchTech(gs.getActiveTribeID());
-                        ((ResearchTech)a).setTech(tech);  // TODO: confirmation
+                        ((ResearchTech)a).setTech(tech);
                     }
                     break;
             }

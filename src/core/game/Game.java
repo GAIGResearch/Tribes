@@ -322,7 +322,6 @@ public class Game {
         }else{
             tribe.addStars(acumProd);
         }
-        tribe.setTotalProduction(acumProd);
 
         //2. Units: all become available. This needs to be done here as some units may have become
         // pushed during other player's turn.

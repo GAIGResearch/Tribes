@@ -80,9 +80,9 @@ public class Build extends CityAction
             board.setResourceAt(targetPos.x, targetPos.y, null);
 
             if(buildingType.isTemple())
-                city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, buildingType));
+                city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, buildingType, this.cityId));
             else
-                city.addBuilding(gs, new Building(targetPos.x, targetPos.y, buildingType));
+                city.addBuilding(gs, new Building(targetPos.x, targetPos.y, buildingType, this.cityId));
 
 
 

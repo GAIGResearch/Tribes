@@ -201,14 +201,13 @@ public class InfoView extends JComponent {
                     }
                 }
                 s += "</h1>";
-
-                updateButtons();
             }
 
             if (!textArea.getText().equals(s) && updateHighlight) {
                 textArea.setText(s);
                 techHighlight = null;
                 updateHighlight = false;
+                updateButtons();
             }
         }
         updateTechButton();
@@ -261,9 +260,7 @@ public class InfoView extends JComponent {
     private void updateButtons() {
         Board board = gs.getBoard();
         int cityID = board.getCityIdAt(highlightY, highlightX);
-        Types.TERRAIN t = board.getTerrainAt(highlightY, highlightX);
         Types.RESOURCE r = board.getResourceAt(highlightY, highlightX);
-        Types.BUILDING b = board.getBuildingAt(highlightY, highlightX);
         Vector2d position = new Vector2d(highlightY, highlightX);
         resetButtonVisibility();
 
@@ -277,118 +274,69 @@ public class InfoView extends JComponent {
             if (c != null) {  // TODO: this should not be the case. Fix partial observability.
                 ArrayList<Action> acts = gs.getCityActions(c);
 
-                if (r != null) {
-                    boolean found = false;
-                    if (acts != null && acts.size() > 0) {
-                        for (Action a : acts) {
-                            if (a instanceof ResourceGathering) {
-                                if (((ResourceGathering) a).getResource().equals(r)
-                                        && ((ResourceGathering) a).getTargetPos().equals(position)) {
-                                    // Could try to collect this resource, set button value
-                                    listenerRG.update(cityID, position, ac, gs);
-                                    listenerRG.setResource(r);
-                                    found = true;
-                                    break;
-                                }
+                boolean foundRG = false;
+                boolean foundBF = false;
+                boolean foundCF = false;
+                boolean foundGF = false;
+                boolean foundD = false;
+                boolean[] foundS = new boolean[actionS.length];
+                boolean[] foundB = new boolean[actionB.length];
+                if (acts != null && acts.size() > 0) {
+                    for (Action a : acts) {
+                        if (a instanceof ResourceGathering) {
+                            if (((ResourceGathering) a).getResource().equals(r)
+                                    && ((ResourceGathering) a).getTargetPos().equals(position)) {
+                                listenerRG.update(cityID, position, ac, gs);
+                                listenerRG.setResource(r);
+                                foundRG = true;
+                            }
+                        } else if (a instanceof BurnForest) {
+                            if (((BurnForest) a).getTargetPos().equals(position)) {
+                                listenerBF.update(cityID, position, ac, gs);
+                                foundBF = true;
+                            }
+                        } else if (a instanceof ClearForest) {
+                            if (((ClearForest) a).getTargetPos().equals(position)) {
+                                listenerCF.update(cityID, position, ac, gs);
+                                foundCF = true;
+                            }
+                        } else if (a instanceof GrowForest) {
+                            if (((GrowForest) a).getTargetPos().equals(position)) {
+                                listenerGF.update(cityID, position, ac, gs);
+                                foundGF = true;
+                            }
+                        } else if (a instanceof Destroy) {
+                            if (((Destroy) a).getTargetPos().equals(position)) {
+                                listenerD.update(cityID, position, ac, gs);
+                                foundD = true;
+                                break;
+                            }
+                        } else if (a instanceof Spawn) {
+                            Types.UNIT unitType = ((Spawn) a).getUnitType();
+                            int idx = Types.UNIT.getSpawnableTypes().indexOf(unitType);
+                            listenerS.update(cityID, position, ac, gs);
+                            foundS[idx] = true;
+                        } else if (a instanceof Build) {
+                            Types.BUILDING buildingType = ((Build) a).getBuildingType();
+                            if (((Build) a).getTargetPos().equals(position))
+                            {
+                                int idx = buildingType.getKey();
+                                listenerB.update(cityID, position, ac, gs);
+                                foundB[idx] = true;
                             }
                         }
-                    }
-                    actionRG.setVisible(found);
-                }
-                if (t != null) {
-                    // if forest: Burn & Clear
-                    // if plain: Grow forest
-                    if (t == Types.TERRAIN.FOREST) {
-                        boolean foundBF = false;
-                        boolean foundCF = false;
-                        if (acts != null && acts.size() > 0) {
-                            for (Action a : acts) {
-                                if (a instanceof BurnForest) {
-                                    if (((BurnForest) a).getTargetPos().equals(position)) {
-                                        listenerBF.update(cityID, position, ac, gs);
-                                        foundBF = true;
-                                    }
-                                } else if (a instanceof ClearForest) {
-                                    if (((ClearForest) a).getTargetPos().equals(position)) {
-                                        listenerCF.update(cityID, position, ac, gs);
-                                        foundCF = true;
-                                    }
-                                }
-                            }
-                        }
-                        actionBF.setVisible(foundBF);
-                        actionCF.setVisible(foundCF);
-
-                    } else if (t == Types.TERRAIN.PLAIN) {
-                        boolean foundGF = false;
-                        if (acts != null && acts.size() > 0) {
-                            for (Action a : acts) {
-                                if (a instanceof GrowForest) {
-                                    if (((GrowForest) a).getTargetPos().equals(position)) {
-                                        listenerGF.update(cityID, position, ac, gs);
-                                        foundGF = true;
-                                    }
-                                }
-                            }
-                        }
-                        actionGF.setVisible(foundGF);
                     }
                 }
-                if (b != null) {
-                    boolean found = false;
-                    if (acts != null && acts.size() > 0) {
-                        for (Action a : acts) {
-                            if (a instanceof Destroy) {
-                                if (((Destroy) a).getTargetPos().equals(position)) {
-                                    listenerD.update(cityID, position, ac, gs);
-                                    found = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    actionD.setVisible(found);
+                actionRG.setVisible(foundRG);
+                actionBF.setVisible(foundBF);
+                actionCF.setVisible(foundCF);
+                actionGF.setVisible(foundGF);
+                actionD.setVisible(foundD);
+                for (int i = 0; i < actionS.length; i++) {
+                    actionS[i].setVisible(foundS[i]);
                 }
-                if (c.getPosition().equals(position)) {
-                    // We've highlighted the city, all spawn actions show up
-                    boolean[] found = new boolean[actionS.length];
-                    if (acts != null && acts.size() > 0) {
-                        for (Action a : acts) {
-                            if (a instanceof Spawn) {
-                                Types.UNIT unitType = ((Spawn) a).getUnitType();
-                                int idx = Types.UNIT.getSpawnableTypes().indexOf(unitType);
-                                listenerS.update(cityID, position, ac, gs);
-                                found[idx] = true;
-                            }
-                        }
-                    }
-                    for (int i = 0; i < actionS.length; i++) {
-                        actionS[i].setVisible(found[i]);
-                    }
-                } else if (t != null && b == null) {
-                    // We might be able to build here
-                    boolean[] found = new boolean[actionB.length];
-                    if (acts != null && acts.size() > 0) {
-                        for (Action a : acts) {
-                            if (a instanceof Build) {
-                                Types.BUILDING buildingType = ((Build) a).getBuildingType();
-//                                if (buildingType.getTerrainRequirements().contains(t) &&
-//                                if (a.isFeasible(gs) &&
-                                if (((Build) a).getTargetPos().equals(position))
-                                {
-                                    int idx = buildingType.getKey();
-                                    listenerB.update(cityID, position, ac, gs);
-                                    found[idx] = true;
-                                }
-                            }
-                        }
-                    }
-                    for (int i = 0; i < actionB.length; i++) {
-//                        if (Types.BUILDING.values()[i].getTerrainRequirements().contains(t)) {
-//                        if()
-                            actionB[i].setVisible(found[i]);
-//                        }
-                    }
+                for (int i = 0; i < actionB.length; i++) {
+                    actionB[i].setVisible(foundB[i]);
                 }
             }
         }
@@ -396,6 +344,8 @@ public class InfoView extends JComponent {
 
     private void updateTechButton() {
         if (techHighlight != null && updateTechHighlight) {
+            resetButtonVisibility();
+            updateHighlight = false;
             actionResearch.setVisible(true);
             listenerResearch.update(techHighlight, ac, gs);
 
@@ -445,8 +395,8 @@ public class InfoView extends JComponent {
         actionD.setVisible(false);
         actionGF.setVisible(false);
         actionRG.setVisible(false);
-        actionResearch.setVisible(false);
         actionRoad.setVisible(false);
+        actionResearch.setVisible(false);
         for (JButton jb: actionB) {
             jb.setVisible(false);
         }

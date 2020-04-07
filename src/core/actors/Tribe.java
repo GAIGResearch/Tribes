@@ -5,6 +5,7 @@ import core.TribesConfig;
 import core.Types;
 import core.actors.units.Unit;
 import core.game.Board;
+import core.game.Game;
 import core.game.GameState;
 import utils.Vector2d;
 import utils.graph.PathNode;
@@ -59,9 +60,6 @@ public class Tribe extends Actor {
     //Kills by this tribe
     private int nKills;
 
-    //Total production for this turn.
-    private int totalProduction;
-
     //Turns since the last attack of this tribe if Meditation is reseached.
     private int nPacifistCount;
 
@@ -89,7 +87,6 @@ public class Tribe extends Actor {
         connectedCities = new ArrayList<>();
         monuments = Types.BUILDING.initMonuments();
         nKills = 0;
-        totalProduction = 0;
         nPacifistCount = 0;
     }
 
@@ -107,7 +104,6 @@ public class Tribe extends Actor {
         tribeCopy.score = this.score;
         tribeCopy.capitalID = this.capitalID;
         tribeCopy.nKills = this.nKills;
-        tribeCopy.totalProduction = this.totalProduction;
         tribeCopy.nPacifistCount = this.nPacifistCount;
 
         tribeCopy.techTree = this.techTree.copy();
@@ -299,14 +295,6 @@ public class Tribe extends Actor {
         return nKills;
     }
 
-    public int getTotalProduction() {
-        return totalProduction;
-    }
-
-    public void setTotalProduction(int totalProduction) {
-        this.totalProduction = totalProduction;
-    }
-
     public void addKill() {
         this.nKills++;
 
@@ -448,6 +436,17 @@ public class Tribe extends Actor {
             }
         }
     }
+
+    public int getMaxProduction(GameState gs)
+    {
+        int acumProd = 0;
+        for (int cityId : citiesID) {
+            City city = (City) gs.getActor(cityId);
+            acumProd += city.getProduction();
+        }
+        return acumProd;
+    }
+
 
     public boolean controlsCapital() {
         return citiesID.contains(capitalID);

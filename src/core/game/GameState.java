@@ -220,11 +220,11 @@ public class GameState {
         for(int cityId : cityActions.keySet())
         {
             nActions += cityActions.get(cityId).size();
-            if(nActions>0) return false;
+            if(nActions>0) return true;
         }
         for(int cityId : unitActions.keySet()) {
             nActions += unitActions.get(cityId).size();
-            if(nActions>0) return false;
+            if(nActions>0) return true;
         }
 
         //No city or unit actions - if there's only one (EndTurn) tribe action, there are no actions available.
@@ -421,6 +421,16 @@ public class GameState {
     public ArrayList<Action> getUnitActions(Unit u) {
         return unitActions.get(u.getActorId());
     }
+
+
+    public ArrayList<Action> getCityActions(int cityId) {
+        return cityActions.get(cityId);
+    }
+
+    public ArrayList<Action> getUnitActions(int unitId) {
+        return unitActions.get(unitId);
+    }
+
 
     public boolean isLevelingUp() {
         return levelingUp;

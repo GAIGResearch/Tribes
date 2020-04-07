@@ -25,7 +25,7 @@ import static core.Constants.*;
 
 public class Game {
 
-    private boolean FORCE_FULL_OBSERVABILITY = false;
+    private boolean FORCE_FULL_OBSERVABILITY = true;
 
     // State of the game (objects, ticks, etc).
     private GameState gs;
@@ -339,8 +339,9 @@ public class Game {
         //3. Update tribe pacifist counter
         tribe.addPacifistCount();
 
-        //4. Compute the actions available for this player.
+        //4. Compute the actions available for this player and copy observations.
         gs.computePlayerActions(tribe);
+        updateAssignedGameStates();
     }
 
 

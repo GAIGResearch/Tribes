@@ -473,10 +473,10 @@ public class Board {
 
 
     // Method to determine city borders, take city and x and y pos of city as params
-    public void setCityBorders(){
+    void setCityBorders(){
 
-        for(int i = 0; i<tribes.length; i++) {
-            ArrayList<Integer> tribe1Cities = tribes[i].getCitiesID();
+        for (Tribe tribe : tribes) {
+            ArrayList<Integer> tribe1Cities = tribe.getCitiesID();
 
             for (int cityId : tribe1Cities) {
                 City c = (City) gameActors.get(cityId);
@@ -500,25 +500,25 @@ public class Board {
         }
     }
 
-    //Set extra points for tribe on border expansion
-    private void setPointsForBorderExpansion(City c){
-        Tribe t = getTribe(c.getTribeId());
-        Vector2d cityPos = c.getPosition();
-        for(Vector2d tile : cityPos.neighborhood(TribesConfig.CITY_EXPANSION_TILES, 0, size))
-        {
-            if(tileCityId[tile.x][tile.y] == c.getActorId())
-            {
-                t.addScore(TribesConfig.CITY_BORDER_POINTS);
-                c.addPointsWorth(TribesConfig.CITY_BORDER_POINTS);
-            }
-        }
-    }
+//    //Set extra points for tribe on border expansion
+//    private void setPointsForBorderExpansion(City c){
+//        Tribe t = getTribe(c.getTribeId());
+//        Vector2d cityPos = c.getPosition();
+//        for(Vector2d tile : cityPos.neighborhood(TribesConfig.CITY_EXPANSION_TILES, 0, size))
+//        {
+//            if(tileCityId[tile.x][tile.y] == c.getActorId())
+//            {
+//                t.addScore(TribesConfig.CITY_BORDER_POINTS);
+//                c.addPointsWorth(TribesConfig.CITY_BORDER_POINTS);
+//            }
+//        }
+//    }
 
     // Method to expand city borders, take city as param
     public void expandBorder(City city){
         city.setBound(city.getBound()+TribesConfig.CITY_EXPANSION_TILES);
         setBorderHelper(city,city.getBound());
-        setPointsForBorderExpansion(city);
+//        setPointsForBorderExpansion(city);
     }
 
     public int getCityIdAt(int x, int y)

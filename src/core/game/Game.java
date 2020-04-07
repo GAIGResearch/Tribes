@@ -285,8 +285,8 @@ public class Game {
         ArrayList<Integer> allTribeUnits = new ArrayList<>();
         gs.endTurn(false);
 
-        //1. Compute stars and score per turn.
-        int acumProd = 0, turnScore = 0;
+        //1. Compute stars per turn.
+        int acumProd = 0;
         for (int cityId : tribeCities) {
             City city = (City) gs.getActor(cityId);
 
@@ -321,7 +321,6 @@ public class Game {
             tribe.setStars(TribesConfig.INITIAL_STARS);
         }else{
             tribe.addStars(acumProd);
-            tribe.addScore(turnScore);
         }
         tribe.setTotalProduction(acumProd);
 

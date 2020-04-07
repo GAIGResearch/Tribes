@@ -31,12 +31,6 @@ public class RandomAgent extends Agent {
         }
 
         int nActions = allActions.size();
-
-        if(nActions == 2)
-        {
-            int a = 0;
-        }
-
         Action toExecute = allActions.get(rnd.nextInt(nActions));
         System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + nActions + ". Executing " + toExecute);
         return toExecute;

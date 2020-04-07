@@ -25,7 +25,7 @@ import static core.Constants.*;
 
 public class Game {
 
-    private boolean FORCE_FULL_OBSERVABILITY = true;
+    private boolean FORCE_FULL_OBSERVABILITY = false;
 
     // State of the game (objects, ticks, etc).
     private GameState gs;

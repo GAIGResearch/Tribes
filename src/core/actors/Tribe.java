@@ -417,7 +417,7 @@ public class Tribe extends Actor {
 
             //The capital gains 1 population for each city connected, -1 for each city disconnected
             int capitalGain = addedCities.size() - lostCities.size();
-            capital.addPopulation(capitalGain);
+            capital.addPopulation(this, capitalGain);
 
             //We may be adding a new monument to the pool!
             if(connectedCities.size() >= TribesConfig.GRAND_BAZAR_CITIES && monuments.get(GRAND_BAZAR) == MONUMENT_STATUS.UNAVAILABLE)
@@ -431,13 +431,13 @@ public class Tribe extends Actor {
             //All cities that lost connection with the capital lose 1 population
             for (int cityId : lostCities) {
                 City nonCapitalCity = (City) b.getActor(cityId);
-                nonCapitalCity.addPopulation(-1);
+                nonCapitalCity.addPopulation(this, -1);
             }
 
             //All cities that gained connection with the capital gain 1 population.
             for (int cityId : addedCities) {
                 City nonCapitalCity = (City) b.getActor(cityId);
-                nonCapitalCity.addPopulation(1);
+                nonCapitalCity.addPopulation(this, 1);
             }
         }
     }

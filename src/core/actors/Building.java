@@ -21,6 +21,4 @@ public class Building {
     public int getBonus(){
         return type.getBonus();
     }
-    public int getPoints() {return type.getPoints();}
-
 }

@@ -33,6 +33,15 @@ public class Temple extends Building
         return 0;
     }
 
+
+    public int getPoints()
+    {
+        int totPoints = 0;
+        for(int i = 0; i < level; ++i)
+            totPoints += TribesConfig.TEMPLE_POINTS[i];
+        return totPoints;
+    }
+
     public Building copy()
     {
         Temple t = new Temple(position.x, position.y, type);

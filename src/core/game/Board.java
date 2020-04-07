@@ -490,7 +490,9 @@ public class Board {
     private void setBorderHelper(City c, int bound){
         Vector2d cityPos = c.getPosition();
         Tribe t = getTribe(c.getTribeId());
-        for(Vector2d tile : cityPos.neighborhood(bound, 0, size))
+        LinkedList<Vector2d> tiles = cityPos.neighborhood(bound, 0, size);
+        tiles.add(new Vector2d(cityPos));
+        for(Vector2d tile : tiles)
         {
             if(tileCityId[tile.x][tile.y] == -1){
                 tileCityId[tile.x][tile.y] = c.getActorId();

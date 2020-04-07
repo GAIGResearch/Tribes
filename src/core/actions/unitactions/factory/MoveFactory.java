@@ -11,6 +11,7 @@ import core.game.GameState;
 import utils.graph.PathNode;
 import utils.graph.Pathfinder;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class MoveFactory implements ActionFactory {
@@ -23,7 +24,8 @@ public class MoveFactory implements ActionFactory {
 
         //If a units turn is FINISHED don't do unnecessary calculations.
         if(unit.canMove()) {
-            for(PathNode tile : tp.findPaths()) {
+            ArrayList<PathNode> paths = tp.findPaths();
+            for(PathNode tile : paths) {
                 Move action = new Move(unit.getActorId());
                 action.setDestination(tile.getPosition());
                 moves.add(action);

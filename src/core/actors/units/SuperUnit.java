@@ -13,7 +13,7 @@ public class SuperUnit extends Unit
 
     @Override
     public Types.UNIT getType() {
-        return Types.UNIT.RIDER;
+        return Types.UNIT.SUPERUNIT;
     }
 
     @Override
@@ -22,7 +22,7 @@ public class SuperUnit extends Unit
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
-        c.setIsKilled(getIsKilled());
+        c.setKilled(isKilled());
         return c;
     }
 }

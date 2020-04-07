@@ -52,6 +52,12 @@ public class GUI extends JFrame implements Runnable {
     public GUI(Game game, String title, KeyController ki, ActionController ac, boolean closeAppOnClosingWindow) {
         super(title);
 
+        try {
+            UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName() );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
         screenDiagonal = Math.sqrt(rect.width*rect.width + rect.height* rect.height);
 
@@ -63,7 +69,7 @@ public class GUI extends JFrame implements Runnable {
         GUI_SIDE_PANEL_WIDTH = (int)(0.25*screenDiagonal*scale);
         GUI_INFO_PANEL_HEIGHT = (int)(0.18*screenDiagonal*scale);
         GUI_ACTION_PANEL_HEIGHT = (int)(0.045*screenDiagonal*scale);
-        GUI_TECH_PANEL_HEIGHT = (int)(0.136*screenDiagonal*scale);
+        GUI_TECH_PANEL_HEIGHT = (int)(0.16*screenDiagonal*scale);
         GUI_TECH_PANEL_FULL_SIZE = (int)(GUI_TECH_PANEL_FULL_SIZE*(1/scale));
 
 //        this.ki = ki;
@@ -132,6 +138,7 @@ public class GUI extends JFrame implements Runnable {
                 } else {
                     // Otherwise highlight new cell
                     infoView.setHighlight((int)p.getX(), (int)p.getY());
+//                    System.out.println("Highlighting: " + (int)p.getX() + " " + (int)p.getY());
                 }
             }
 
@@ -221,7 +228,7 @@ public class GUI extends JFrame implements Runnable {
 
         JTabbedPane tribeResearchInfo = new JTabbedPane();
         tribeView = new TribeView();
-        techView = new TechView(ac);
+        techView = new TechView(ac, infoView);
         tribeResearchInfo.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_TECH_PANEL_HEIGHT));
         tribeResearchInfo.add("Tribe Info", tribeView);
         tribeResearchInfo.add("Tech Tree", techView);

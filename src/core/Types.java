@@ -45,12 +45,26 @@ public class Types {
 
         private int baseCost;
         private TECHNOLOGY parent;
+        private ArrayList<TECHNOLOGY> children;
 
         TECHNOLOGY(int baseCost, TECHNOLOGY parent) {
             this.baseCost = baseCost; this.parent = parent;
         }
 
         public TECHNOLOGY getParentTech() {return this.parent;}
+        public ArrayList<TECHNOLOGY> getChildTech() {
+            if (children == null) {
+                ArrayList<TECHNOLOGY> c = new ArrayList<>();
+                for (TECHNOLOGY t : TECHNOLOGY.values()) {
+                    if (t.getParentTech() == this) {
+                        c.add(t);
+                    }
+                }
+                children = c;
+            }
+            return children;
+        }
+
         public int getCost(int numOfCities) {
             return baseCost * numOfCities;
         }
@@ -109,27 +123,29 @@ public class Types {
      */
     public enum RESOURCE
     {
-        FISH(0, "img/resource/fish2.png", null,'h', FISH_COST, FISH_POP),
-        FRUIT(1, "img/resource/fruit2.png", null, 'f', FRUIT_COST, FRUIT_POP),
-        ANIMAL(2, "img/resource/animal2.png", null, 'a', ANIMAL_COST, ANIMAL_POP),
-        WHALES(3, "img/resource/whale2.png", "img/resource/whale3.png", 'w', WHALES_COST, WHALES_STARS),
-        ORE(5, "img/resource/ore2.png", null, 'o', 0, 0),
-        CROPS(6, "img/resource/crops2.png", null, 'c', 0, 0),
-        RUINS(7, "img/resource/ruins2.png", null, 'r', 0, 0);
+        FISH(0, "img/resource/fish2.png", null,'h', FISH_COST, FISH_POP, FISHING),
+        FRUIT(1, "img/resource/fruit2.png", null, 'f', FRUIT_COST, FRUIT_POP, ORGANIZATION),
+        ANIMAL(2, "img/resource/animal2.png", null, 'a', ANIMAL_COST, ANIMAL_POP, HUNTING),
+        WHALES(3, "img/resource/whale2.png", "img/resource/whale3.png", 'w', WHALES_COST, WHALES_STARS, WHALING),
+        ORE(5, "img/resource/ore2.png", null, 'o', 0, 0, MINING),
+        CROPS(6, "img/resource/crops2.png", null, 'c', 0, 0, FARMING),
+        RUINS(7, "img/resource/ruins2.png", null, 'r', 0, 0, null);
 
         private int key;
         private String imageFile, secondaryImageFile;
         private char mapChar;
         private int cost;
         private int bonus;
+        private TECHNOLOGY tech;
 
-        RESOURCE(int numVal, String imageFile, String secondaryImageFile, char mapChar, int cost, int bonus) {
+        RESOURCE(int numVal, String imageFile, String secondaryImageFile, char mapChar, int cost, int bonus, TECHNOLOGY t) {
             this.key = numVal;
             this.imageFile = imageFile;
             this.secondaryImageFile = secondaryImageFile;
             this.mapChar = mapChar;
             this.cost = cost;
             this.bonus = bonus;
+            this.tech = t;
         }
         public int getKey() {  return key; }
         public Image getImage(TERRAIN t) {
@@ -152,6 +168,10 @@ public class Types {
             }
             return null;
         }
+
+        public TECHNOLOGY getTechnologyRequirement() {
+            return tech;
+        }
     }
 
     /**
@@ -165,13 +185,13 @@ public class Types {
         FARM (3, "img/building/farm2.png", FARM_COST, FARM_BONUS, FARM_POINTS, FARMING, new HashSet<>(Collections.singletonList(PLAIN))),
         WINDMILL (4,"img/building/windmill2.png", WIND_MILL_COST, WIND_MILL_BONUS, WIND_MILL_POINTS, CONSTRUCTION, new HashSet<>(Collections.singletonList(PLAIN))),
         CUSTOM_HOUSE (5,"img/building/custom_house2.png", CUSTOM_COST, CUSTOM_BONUS, CUSTOM_POINTS, TRADE, new HashSet<>(Collections.singletonList(PLAIN))),
-        LUMBER_HUT(6,"img/building/lumner_hut2.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, LUMBER_HUT_POINTS, MATHEMATICS, new HashSet<>(Collections.singletonList(FOREST))),
+        LUMBER_HUT(6,"img/building/lumber_hut2.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, LUMBER_HUT_POINTS, FORESTRY, new HashSet<>(Collections.singletonList(FOREST))),
         SAWMILL (7,"img/building/sawmill2.png", SAW_MILL_COST, SAW_MILL_BONUS, SAW_MILL_POINTS, MATHEMATICS, new HashSet<>(Collections.singletonList(PLAIN))),
-        TEMPLE (8, "img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, FREE_SPIRIT, new HashSet<>(Collections.singletonList(PLAIN))),
-        WATER_TEMPLE (9,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, AQUATISM, new HashSet<>(Arrays.asList(SHALLOW_WATER, DEEP_WATER))),
-        FOREST_TEMPLE (10,"img/building/temple2.png", TEMPLE_FOREST_COST, TEMPLE_BONUS, TEMPLE_POINTS, SPIRITUALISM, new HashSet<>(Collections.singletonList(FOREST))),
-        MOUNTAIN_TEMPLE (11,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS, MEDITATION, new HashSet<>(Collections.singletonList(MOUNTAIN))),
-        ALTAR_OF_PEACE (12,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        TEMPLE (8, "img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS[0], FREE_SPIRIT, new HashSet<>(Collections.singletonList(PLAIN))),
+        WATER_TEMPLE (9,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS[0], AQUATISM, new HashSet<>(Arrays.asList(SHALLOW_WATER, DEEP_WATER))),
+        FOREST_TEMPLE (10,"img/building/temple2.png", TEMPLE_FOREST_COST, TEMPLE_BONUS, TEMPLE_POINTS[0], SPIRITUALISM, new HashSet<>(Collections.singletonList(FOREST))),
+        MOUNTAIN_TEMPLE (11,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, TEMPLE_POINTS[0], MEDITATION, new HashSet<>(Collections.singletonList(MOUNTAIN))),
+        ALTAR_OF_PEACE (12,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, MEDITATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
         EMPERORS_TOMB (13,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, TRADE, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
         EYE_OF_GOD (14,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, NAVIGATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
         GATE_OF_POWER (15,"img/building/monument2.png", 0, MONUMENT_BONUS, MONUMENT_POINTS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
@@ -276,6 +296,12 @@ public class Types {
             return this == ALTAR_OF_PEACE || this == EMPERORS_TOMB || this == EYE_OF_GOD ||
                     this == GATE_OF_POWER || this == PARK_OF_FORTUNE || this == TOWER_OF_WISDOM;
         }
+
+        public boolean isTemple()
+        {
+            return this == TEMPLE || this == WATER_TEMPLE  || this == MOUNTAIN_TEMPLE  || this == FOREST_TEMPLE;
+        }
+
 
         public static HashMap<BUILDING, MONUMENT_STATUS> initMonuments()
         {
@@ -387,9 +413,9 @@ public class Types {
         WARRIOR (0,"img/unit/warrior/", WARRIOR_COST, null, WARRIOR_POINTS), //+10
         RIDER (1,"img/unit/rider/", RIDER_COST, RIDING, RIDER_POINTS), //+15
         DEFENDER (2,"img/unit/defender/", DEFENDER_COST, SHIELDS, DEFENDER_POINTS), // +15
-        SWORDMAN (3,"img/unit/swordman/", SWORDMAN_COST, SMITHERY, SWORDMAN_POINTS), //+25
+        SWORDMAN (3,"img/unit/swordsman/", SWORDMAN_COST, SMITHERY, SWORDMAN_POINTS), //+25
         ARCHER (4,"img/unit/archer/", ARCHER_COST, ARCHERY, ARCHER_POINTS),//+15
-        CATAPULT (5,"img/unit/", CATAPULT_COST, MATHEMATICS, CATAPULT_POINTS), //+40
+        CATAPULT (5,"img/unit/catapult/", CATAPULT_COST, MATHEMATICS, CATAPULT_POINTS), //+40
         KNIGHT (6,"img/unit/knight/", KNIGHT_COST, CHIVALRY, KNIGHT_POINTS), //+40
         MIND_BENDER(7,"img/unit/mind_bender/", MINDBENDER_COST, PHILOSOPHY, MINDBENDER_POINTS), //+25
         BOAT(8,"img/unit/boat/", BOAT_COST, SAILING, BOAT_POINTS), //+0
@@ -435,7 +461,7 @@ public class Types {
         public int getCost() {
             return cost;
         }
-        public TECHNOLOGY getRequirement() {
+        public TECHNOLOGY getTechnologyRequirement() {
             return requirement;
         }
         public int getPoints() { return points; }
@@ -594,18 +620,30 @@ public class Types {
     }
 
     public enum ACTION {
-        MOVE("img/actions/move.png"),
-        ATTACK("img/actions/attack.png"),
-        CAPTURE("img/actions/capture.png"),
-        EXAMINE("img/actions/examine.png"),
-        DISBAND("img/actions/disband.png"),
-        HEAL("img/actions/heal.png"),
-        UPGRADE("img/actions/upgrade.png");
+        MOVE("img/actions/move.png", null),
+        CLIMB_MOUNTAIN(null, CLIMBING),
+        ATTACK("img/actions/attack.png", null),
+        CAPTURE("img/actions/capture.png", null),
+        EXAMINE("img/actions/examine.png", null),
+        DISBAND("img/actions/disband.png", FREE_SPIRIT),
+        HEAL("img/actions/heal.png", null),
+        UPGRADE_BOAT("img/actions/upgrade.png", SAILING),
+        UPGRADE_SHIP("img/actions/upgrade.png", NAVIGATION),
+        BURN_FOREST(null, CHIVALRY),
+        CLEAR_FOREST(null, FORESTRY),
+        DESTROY(null, CONSTRUCTION),
+        GROW_FOREST(null, SPIRITUALISM),
+        BUILD_ROAD(null, ROADS);
 
         private String imgPath;
+        private TECHNOLOGY tech;  // Requires this technology to perform action
 
-        ACTION(String imgPath) {
-            this.imgPath = imgPath;
+        ACTION(String imgPath, TECHNOLOGY t) {
+            this.imgPath = imgPath; this.tech = t;
+        }
+
+        public TECHNOLOGY getTechnologyRequirement() {
+            return tech;
         }
 
         public static Image getImage(Action a) {
@@ -622,7 +660,7 @@ public class Types {
             } else if (a instanceof Recover || a instanceof HealOthers) {
                 return ImageIO.GetInstance().getImage(HEAL.imgPath);
             } else if (a instanceof Upgrade) {
-                return ImageIO.GetInstance().getImage(UPGRADE.imgPath);
+                return ImageIO.GetInstance().getImage(UPGRADE_BOAT.imgPath);
             }
             return null;
         }

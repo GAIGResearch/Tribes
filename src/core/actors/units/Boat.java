@@ -33,7 +33,7 @@ public class Boat extends Unit
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         c.setBaseLandUnit(getBaseLandUnit());
-        c.setIsKilled(getIsKilled());
+        c.setKilled(isKilled());
         return c;
     }
 }

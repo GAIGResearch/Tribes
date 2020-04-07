@@ -16,7 +16,6 @@ public class City extends Actor{
     private int population_need;
     private boolean isCapital;
     private int production = 0;
-    private int pointsPerTurn = 0;
     private boolean hasWalls = false;
     private int bound;
     private int pointsWorth;
@@ -38,12 +37,7 @@ public class City extends Actor{
     public void addPopulation(int number){
         population += number;
     }
-    private void changePointsPerTurn(int points){
-        changePointsPerTurn(points, 1);
-    }
-    private void changePointsPerTurn(int points, int multiplier){
-        this.pointsPerTurn = points*multiplier;
-    }
+
     public void addProduction(int prod) {
         production += prod;
         if(production < 0) production = 0;
@@ -84,7 +78,10 @@ public class City extends Actor{
             case WATER_TEMPLE:
             case MOUNTAIN_TEMPLE:
             case FOREST_TEMPLE:
-                if(!onlyMatching) changePointsPerTurn(building.getPoints(), multiplier);
+                if(!onlyMatching)
+                {
+                    addPopulation(building.type.getBonus() * multiplier);
+                }
                 break;
             case ALTAR_OF_PEACE:
             case EMPERORS_TOMB:
@@ -107,7 +104,7 @@ public class City extends Actor{
         Tribe tribe = gameState.getTribe(this.tribeId);
 
         //Population added by the base building.
-        if(isBase && isPopulation && !onlyMatching) addPopulation(building.getBonus());
+        if(isBase && isPopulation && !onlyMatching) addPopulation(multiplier * building.getBonus());
 
         //Check all buildings next to the new building position.
         for(Vector2d adjPosition : building.position.neighborhood(1, 0, board.getSize()))
@@ -122,11 +119,11 @@ public class City extends Actor{
                 if(cityId == actorId)
                 {
                     //the matching building belongs to this city
-                    existingBuilding = this.getBuilding(building.position.x, building.position.y);
+                    existingBuilding = this.getBuilding(adjPosition.x, adjPosition.y);
                 }else if(tribe.getCitiesID().contains(cityId)) {
                     //the matching building belongs to a city from a different tribe
                     City city = (City) gameState.getActor(cityId);
-                    existingBuilding = city.getBuilding(building.position.x, building.position.y);
+                    existingBuilding = city.getBuilding(adjPosition.x, adjPosition.y);
                     cityToAddTo = city;
 
                 }else return; //This may happen if the building belongs to a city from another tribe.
@@ -219,13 +216,6 @@ public class City extends Actor{
         return population_need;
     }
 
-
-    // Get the point for each turn
-    public int getPointsPerTurn() {
-        return pointsPerTurn;
-    }
-
-
     public void setUnitsID(ArrayList<Integer> unitsID) {
         this.unitsID = unitsID;
     }
@@ -250,7 +240,6 @@ public class City extends Actor{
         c.population_need = population_need;
         c.isCapital = isCapital;
         c.production = production;
-        c.pointsPerTurn = pointsPerTurn;
         c.hasWalls = hasWalls;
         c.bound = bound;
         c.actorId = actorId;
@@ -287,13 +276,6 @@ public class City extends Actor{
             }
         }
         return null;
-    }
-
-    public void subtractLongTermPoints(int points){
-        if (pointsPerTurn < points){
-            System.out.println("Error in subtract Long Term Points!!! -> Destroy Temple");
-        }
-        pointsPerTurn -= points;
     }
 
     public void subtractProduction(int production){

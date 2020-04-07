@@ -173,13 +173,15 @@ public class TribesConfig
     public static final int EMPERORS_TOMB_STARS = 100;
     public static final int GATE_OF_POWER_KILLS = 10;
     public static final int GRAND_BAZAR_CITIES = 5;
+    public static final int ALTAR_OF_PEACE_TURNS = 5;
+
 
     // Temple
     public static final int TEMPLE_COST = 20;
     public static final int TEMPLE_FOREST_COST = 15;
     public static final int TEMPLE_BONUS = 1;
-    public static final int TEMPLE_POINTS = 100;
-
+    public static final int TEMPLE_TURNS_TO_SCORE = 3;
+    public static final int[] TEMPLE_POINTS = new int[]{100, 50, 50, 50, 150};
 
     //Resources
     public static final int ANIMAL_COST = 2;
@@ -202,6 +204,10 @@ public class TribesConfig
     public static final int CITY_LEVEL_UP_PARK = 250;
     public static final int CITY_BORDER_POINTS = 20;
     public static final int PROD_CAPITAL_BONUS = 1;
+    public static final int EXPLORER_CLEAR_RANGE = 1;
+    public static final int FIRST_CITY_CLEAR_RANGE = 2;
+    public static final int NEW_CITY_CLEAR_RANGE = 1;
+    public static final int CITY_EXPANSION_TILES = 1;
 
     /* TRIBES */
     public static final int INITIAL_STARS = 1000;

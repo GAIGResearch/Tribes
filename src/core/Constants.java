@@ -18,7 +18,7 @@ public class Constants {
     public static int GUI_INFO_PANEL_HEIGHT;
     public static int GUI_ACTION_PANEL_HEIGHT;
     public static int GUI_TECH_PANEL_HEIGHT;
-    public static int GUI_ACTION_PANEL_FULL_SIZE = 220;
+    public static int GUI_ACTION_PANEL_FULL_SIZE = 350;
     public static int GUI_TECH_PANEL_FULL_SIZE = 300;
 
     public static int SHADOW_OFFSET = 1;

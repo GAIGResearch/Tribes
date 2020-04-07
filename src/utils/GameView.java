@@ -3,9 +3,7 @@ package utils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import core.Types;
 import core.actions.cityactions.CityAction;
@@ -15,10 +13,13 @@ import core.actions.unitactions.Examine;
 import core.actors.Actor;
 import core.actors.City;
 import core.actors.Tribe;
+import core.actors.units.Catapult;
+import core.actors.units.SuperUnit;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
 import core.actions.Action;
+import javafx.util.Pair;
 
 import static core.Constants.*;
 import static core.Types.TERRAIN.*;
@@ -135,40 +136,37 @@ public class GameView extends JComponent {
         }
 
         for(int i = 0; i < gridSize; ++i) {
-            for(int j = 0; j < gridSize; ++j) {
-                // We then paint cities and units.
-                Types.TERRAIN t = board.getTerrainAt(i,j);
+            for (int j = 0; j < gridSize; ++j) {
+                // We then paint cities decorations
+                Types.TERRAIN t = board.getTerrainAt(i, j);
                 if (t == CITY) {
                     drawCityDecorations(g, i, j);
                 }
+            }
+        }
 
+        for(int i = 0; i < gridSize; ++i) {
+            for(int j = 0; j < gridSize; ++j) {
                 Unit u = board.getUnitAt(i,j);
                 if (u != null) {
 
                     int imgSize = (int) (CELL_SIZE * 0.75);
+                    if (u instanceof SuperUnit || u instanceof Catapult) imgSize = CELL_SIZE;
                     String imgFile = u.getType().getImageFile();
-                    boolean exhausted = false; //u.isExhausted(); // TODO: does unit have available actions?
+
+                    Point2D rotated = rotatePoint(j, i);
+                    int x = (int)(rotated.getX() + CELL_SIZE*CELL_SIZE/4/imgSize);
+                    int y = (int)(rotated.getY() - imgSize/1.5);
+
+                    ArrayList<Action> possibleActions = gameState.getUnitActions(u);
+                    boolean exhausted = (possibleActions == null || possibleActions.size() == 0);
 
                     if (exhausted) {
-                        String exhaustedStr = imgFile + imgFile.split("/")[2] + "Exhausted.png";
+                        String exhaustedStr = imgFile + u.getTribeId() + "Exhausted.png";
                         Image exhaustedImg = ImageIO.GetInstance().getImage(exhaustedStr);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - SHADOW_OFFSET,
-                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - SHADOW_OFFSET,
-                                exhaustedImg, imgSize, panTranslate);
+                        paintImage(g, x, y, exhaustedImg, imgSize, panTranslate);
                     } else {
-                        String highlightStr = imgFile + imgFile.split("/")[2] + "Highlight.png";
-                        String shadowStr = imgFile + imgFile.split("/")[2] + "Shadow.png";
-                        Image highlight = ImageIO.GetInstance().getImage(highlightStr);
-                        Image shadow = ImageIO.GetInstance().getImage(shadowStr);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - SHADOW_OFFSET,
-                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 - SHADOW_OFFSET,
-                                highlight, imgSize, panTranslate);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 + SHADOW_OFFSET,
-                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2 + SHADOW_OFFSET,
-                                shadow, imgSize, panTranslate);
-                        paintImageRotated(g, j * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2,
-                                i * CELL_SIZE + CELL_SIZE / 2 - imgSize / 2,
-                                u.getType().getImage(u.getTribeId()), imgSize, panTranslate);
+                        paintImage(g, x, y, u.getType().getImage(u.getTribeId()), imgSize, panTranslate);
                     }
                 }
             }
@@ -278,7 +276,7 @@ public class GameView extends JComponent {
     /**
      * Expects coordinates in grid, translates to screen coordinates.
      */
-    public static Point2D rotatePoint(int x, int y) {
+    public static Point2D rotatePoint(double x, double y) {
         double d = Math.sqrt(2*CELL_SIZE*CELL_SIZE);
         double x2 = x * CELL_SIZE + y * d/2 - x * d/5;
         double y2 = y * CELL_SIZE - y * d/5 - x * d/2;
@@ -298,9 +296,6 @@ public class GameView extends JComponent {
     }
 
     private void drawCityDecorations(Graphics2D g, int i, int j) {
-        // TODO: if city not capital, remove from city tag the capital sign and shorten tag background
-        // TODO: transparency name tag
-
         int d = (int)Math.sqrt(CELL_SIZE*CELL_SIZE*2);
         int fontSize = CELL_SIZE/3;
         Font textFont = new Font(getFont().getName(), Font.PLAIN, fontSize);
@@ -313,38 +308,80 @@ public class GameView extends JComponent {
             int cityCapacity = c.getLevel() + 1;
             int progress = c.getPopulation();
             int units = c.getUnitsID().size();
-            int bound = c.getBound();
             Color col = Types.TRIBE.values()[c.getTribeId()].getColorDark();
+            Color colTransparent = new Color(col.getRed(), col.getGreen(), col.getBlue(), 170);
 
             // Draw city border
-            Point2D p = rotatePoint(j - bound, i - bound);
+            LinkedList<Vector2d> tiles = board.getCityTiles(cityID);
+            int nCityTiles = tiles.size();
+            int nNeighbours = 4;
+            boolean[][] tileNeighbours = new boolean[nCityTiles][nNeighbours];  // order: left, right, up, down
+            Pair<Vector2d, Vector2d>[] lines = new Pair[]{new Pair(new Vector2d(0, 0), new Vector2d(0, 1)),
+                                                        new Pair(new Vector2d(1, 0), new Vector2d(1, 1)),
+                                                        new Pair(new Vector2d(0, 0), new Vector2d(1, 0)),
+                                                        new Pair(new Vector2d(0, 1), new Vector2d(1, 1))};
+            for (int k = 0; k < nCityTiles-1; k++) {
+                Vector2d t1 = tiles.get(k);
+                for (int p = k+1; p < nCityTiles; p++) {
+                    Vector2d t2 = tiles.get(p);
+                    if (t1.equals(t2)) continue;
+                    if (t1.x - t2.x == 1 && t1.y == t2.y) {  // t1 to the right of t2
+                        tileNeighbours[k][0] = true;
+                        tileNeighbours[p][1] = true;
+                    } else if (t1.x - t2.x == -1 && t1.y == t2.y) { // t1 to the left of t2
+                        tileNeighbours[k][1] = true;
+                        tileNeighbours[p][0] = true;
+                    } else if (t1.x == t2.x && t1.y - t2.y == 1) {  // t1 underneath t2
+                        tileNeighbours[k][2] = true;
+                        tileNeighbours[p][3] = true;
+                    } else if (t1.x == t2.x && t1.y - t2.y == -1) {  // t1 above t2
+                        tileNeighbours[k][3] = true;
+                        tileNeighbours[p][2] = true;
+                    }
+                }
+            }
             g.setColor(col);
             Stroke oldStroke = g.getStroke();
             g.setStroke(new BasicStroke(5, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0));
-            drawRotatedRect(g, (int) p.getX(), (int) p.getY(), CELL_SIZE * (2 * bound + 1), CELL_SIZE * (2 * bound + 1), panTranslate);
+            // Draw lines for tiles that don't have a neighbour on a side
+            for (int t = 0; t < nCityTiles; t++) {
+                Vector2d tile = tiles.get(t);
+                for (int n = 0; n < nNeighbours; n++) {
+                    if (!tileNeighbours[t][n]) {
+                        // draw line on this side
+                        Point2D from = rotatePoint(lines[n].getKey().y + tile.y, lines[n].getKey().x + tile.x);
+                        Point2D to = rotatePoint(lines[n].getValue().y + tile.y, lines[n].getValue().x + tile.x);
+                        g.drawLine((int)from.getX() + (int)panTranslate.getX(), (int)from.getY() + (int)panTranslate.getY(),
+                                (int)to.getX() + (int)panTranslate.getX(), (int)to.getY() + (int)panTranslate.getY());
+                    }
+                }
+            }
             g.setStroke(oldStroke);
 
             // Draw capital img + city name/ID + number of stars
             String cityName = "" + cityID;
             String production = "" + c.getProduction();
 
+            int sections = 2;
+            if (c.isCapital()) {
+                sections = 3;
+            }
             double h = d / 4.0;
-            double nameWidth = GUI_CITY_TAG_WIDTH + 3 * h;
+            double nameWidth = GUI_CITY_TAG_WIDTH + sections * h;
             Point2D namePos = rotatePoint(j, i);
             Rectangle nameRect = new Rectangle((int) (namePos.getX() + d / 2.0 - nameWidth * 2 / 3.0),
                     (int) (namePos.getY() + d / 2.0 - h), (int) nameWidth, (int) h);
-            drawRectShadowHighlight(g, nameRect);
-            g.setColor(col);
+            g.setColor(colTransparent);
             g.fillRect((int) (nameRect.x + panTranslate.getX()), (int) (nameRect.y + panTranslate.getY()), nameRect.width, nameRect.height);
             g.setColor(Color.WHITE);
 
-            g.drawString(cityName, (int) (nameRect.x + h + fontSize / 4.0 + panTranslate.getX()),
+            g.drawString(cityName, (int) (nameRect.x + (sections-2) * h + fontSize / 4.0 + panTranslate.getX()),
                     (int) (nameRect.y + h * 1.1 - fontSize / 4.0 + panTranslate.getY()));
 
             // Draw number of stars
-            paintImage(g, (int) (nameRect.x + nameRect.width * 0.55 + SHADOW_OFFSET),
+            paintImage(g, (int) (nameRect.x + nameRect.width * (0.35 + (sections-2)*0.2) + SHADOW_OFFSET),
                     nameRect.y + SHADOW_OFFSET, starShadow, (int) h, panTranslate);
-            paintImage(g, (int) (nameRect.x + nameRect.width * 0.55), nameRect.y, starImg, (int) h, panTranslate);
+            paintImage(g, (int) (nameRect.x + nameRect.width * (0.35 + (sections-2)*0.2)), nameRect.y, starImg, (int) h, panTranslate);
             drawStringShadow(g, production, (int) (nameRect.x + nameRect.width - fontSize * 0.75),
                     (int) (nameRect.y + h * 1.1 - fontSize / 4.0));
             g.setColor(Color.WHITE);
@@ -358,7 +395,8 @@ public class GameView extends JComponent {
             }
 
             // Draw level
-            int sectionWidth = CELL_SIZE / 4;
+            h /= 2;
+            int sectionWidth = (int)h;
             int w = cityCapacity * sectionWidth;
             Rectangle bgRect = new Rectangle(nameRect.x + nameRect.width / 2 - w / 2, nameRect.y + nameRect.height, w, (int) h);
             drawRoundRectShadowHighlight(g, bgRect);
@@ -404,15 +442,6 @@ public class GameView extends JComponent {
         g.fillRoundRect((int)(rect.x - SHADOW_OFFSET + panTranslate.getX()),
                 (int)(rect.y - SHADOW_OFFSET + panTranslate.getY()), rect.width, rect.height,
                 ROUND_RECT_ARC, ROUND_RECT_ARC);
-    }
-
-    private void drawRectShadowHighlight(Graphics2D g, Rectangle rect) {
-        g.setColor(new Color(0, 0, 0, 122));
-        g.fillRect((int)(rect.x + SHADOW_OFFSET + panTranslate.getX()),
-                (int)(rect.y + SHADOW_OFFSET + panTranslate.getY()), rect.width, rect.height);
-        g.setColor(new Color(255, 255, 255, 122));
-        g.fillRect((int)(rect.x - SHADOW_OFFSET + panTranslate.getX()),
-                (int)(rect.y - SHADOW_OFFSET + panTranslate.getY()), rect.width, rect.height);
     }
 
     private void drawStringShadow (Graphics2D g, String s, int x, int y) {

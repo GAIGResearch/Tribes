@@ -1,9 +1,11 @@
 package core.game;
 
+import core.TribesConfig;
 import core.actions.Action;
 import core.actions.cityactions.factory.CityActionBuilder;
 import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.factory.TribeActionBuilder;
+import core.actions.unitactions.UnitAction;
 import core.actions.unitactions.factory.UnitActionBuilder;
 import core.actors.Actor;
 import core.actors.City;
@@ -72,21 +74,11 @@ public class GameState {
             int startingCityId = tribe.getCitiesID().get(0);
             City c = (City) board.getActor(startingCityId);
             Vector2d cityPos = c.getPosition();
-            tribe.clearView(cityPos.x, cityPos.y,rnd, board);
+            tribe.clearView(cityPos.x, cityPos.y, TribesConfig.FIRST_CITY_CLEAR_RANGE, rnd, board);
         }
 
         canEndTurn = new boolean[tribes.length];
 
-    }
-
-    /**
-     * Adds a new actor to the list of game actors
-     * @param actor the actor to add
-     * @return the unique identifier of this actor for the rest of the game.
-     */
-    public int addActor(Actor actor)
-    {
-        return board.addActor(actor);
     }
 
     /**
@@ -162,13 +154,18 @@ public class GameState {
             int cityId = cities.get(i);
             City c = (City) board.getActor(cityId);
             ArrayList<Action> actions = cab.getActions(this, c);
+            levelingUp = cab.cityLevelsUp();
 
             if(actions.size() > 0)
             {
+                if(levelingUp)
+                {
+                    //We may have already processed other cities. Actions for those should be eliminated.
+                    cityActions.clear();
+                }
                 cityActions.put(cityId, actions);
             }
 
-            levelingUp = cab.cityLevelsUp();
             if(!levelingUp)
             {
                 ArrayList<Integer> unitIds = c.getUnitsID();
@@ -176,9 +173,6 @@ public class GameState {
                 i++;
             }
         }
-
-        //Add the extra units that don't belong to any city.
-        allUnits.addAll(tribe.getExtraUnits());
 
         int activeTribeID = board.getActiveTribeID();
         if(levelingUp)
@@ -189,6 +183,9 @@ public class GameState {
         }else{
             canEndTurn[activeTribeID] = true;
         }
+
+        //Add the extra units that don't belong to any city.
+        allUnits.addAll(tribe.getExtraUnits());
 
         //Units!
         UnitActionBuilder uab = new UnitActionBuilder();
@@ -240,16 +237,46 @@ public class GameState {
      */
     public void next(Action action)
     {
-        //TODO: MAIN function of this class.
-        // Takes the action passed as parameter and runs it in the game.
-
         //At least it'll have these two things:
         if(action != null)
         {
             action.execute(this);
+
+            //Post-action execution matters:
+
+            //new actions may have become available, update the 'dirty' flag
             computedActionTribeIdFlag = -1;
         }
     }
+
+    /**
+     * Pushes a unit following the game rules. If the unit can't be pushed, destroys it.
+     * @param toPush unit to push
+     * @param startX initial x position
+     * @param startY initial y position.
+     */
+    public void pushUnit(Unit toPush, int startX, int startY)
+    {
+        boolean pushed = board.pushUnit(toPush.getTribeId(), toPush, startX, startY, rnd);
+        if(!pushed)
+        {
+            killUnit(toPush);
+        }
+    }
+
+    /**
+     * Kills a unit from the game, removing it from the board, its original city and substracting game score.
+     * @param toKill unit to Kill
+     */
+    public void killUnit(Unit toKill)
+    {
+        board.removeUnitFromBoard(toKill);
+        City c = (City) getActor(toKill.getCityID());
+        board.removeUnitFromCity(toKill, c);
+        Tribe t = getTribe(toKill.getTribeId());
+        t.subtractScore(toKill.getType().getPoints());
+    }
+
 
     /**
      * Public accessor to the copy() functionality of this state.
@@ -257,15 +284,6 @@ public class GameState {
      */
     public GameState copy() {
         return copy(-1);  // No reduction happening if no index specified
-    }
-
-    /**
-     * Returns the game board.
-     * @return the game board.
-     */
-    public Board getBoard()
-    {
-        return board;
     }
 
     /**
@@ -345,6 +363,16 @@ public class GameState {
     public Tribe[] getTribes()
     {
         return board.getTribes();
+    }
+
+
+    /**
+     * Returns the game board.
+     * @return the game board.
+     */
+    public Board getBoard()
+    {
+        return board;
     }
 
 

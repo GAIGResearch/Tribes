@@ -44,6 +44,9 @@ public class Board {
     // Player currently making a move.
     private int activeTribeID = -1;
 
+    //Actor ID counter
+    private int actorIDcounter;
+
     // Constructor for board
     public Board() {
         this.gameActors = new HashMap<>();
@@ -90,6 +93,7 @@ public class Board {
         copyBoard.tileCityId = new int[size][size];
         copyBoard.networkTiles = new boolean[size][size];
         copyBoard.activeTribeID = activeTribeID;
+        copyBoard.actorIDcounter = actorIDcounter;
 
         // Copy board objects (they are all ids)
         for (int x = 0; x < this.size; x++) {
@@ -145,14 +149,17 @@ public class Board {
                         if (!t.isResearched(Types.TECHNOLOGY.ORGANIZATION)) {
                             return null;
                         }
+                        break;
                     case ORE:
                         if (!t.isResearched(Types.TECHNOLOGY.CLIMBING)) {
                             return null;
                         }
+                        break;
                     case WHALES:
                         if (!t.isResearched(Types.TECHNOLOGY.FISHING)) {
                             return null;
                         }
+                        break;
                 }
                 return resources[x][y];
             } catch (Exception e) {
@@ -171,9 +178,10 @@ public class Board {
      * @param toPush   Unit to be pushed
      * @param startX   x coordinate of the starting position of the unit to push
      * @param startY   y coordinate of the starting position of the unit to push
+     * @return true if the unit could be pushed.
      */
 
-    public void pushUnit(int tribeId, Unit toPush, int startX, int startY, Random r) {
+    public boolean pushUnit(int tribeId, Unit toPush, int startX, int startY, Random r) {
         int xPush[] = {0, -1, 0, 1, -1, -1, 1, 1};
         int yPush[] = {1, 0, -1, 0, 1, -1, -1, 1};
         int idx = 0;
@@ -192,16 +200,13 @@ public class Board {
         //A pushed unit moves to PUSHED status - essentially its turn is over.
         toPush.setStatus(Types.TURN_STATUS.PUSHED);
 
-        if (!pushed) {
-            //TODO: if a unit can't be pushed, unit must disappear
-        }
-
+        return pushed;
     }
 
     public boolean tryPush(int tribeId, Unit toPush, int startX, int startY, int x, int y, Random r) {
         //there's no unit? (or killed)
         Unit u = getUnitAt(x, y);
-        if (u != null && !u.getIsKilled())
+        if (u != null && !u.isKilled())
         {
             return false;
         }
@@ -319,7 +324,7 @@ public class Board {
                     moved = true;
                     curX = x;
                     curY = y;
-                    tribes[tribeId].clearView(x, y,rnd, this.copy());
+                    tribes[tribeId].clearView(x, y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this.copy());
                 }
 
                 j++;
@@ -482,36 +487,36 @@ public class Board {
     }
 
     // Set border helper method to set city bounds
-    public void setBorderHelper(City c, int bound){
+    private void setBorderHelper(City c, int bound){
         Vector2d cityPos = c.getPosition();
         Tribe t = getTribe(c.getTribeId());
-        for (int i = cityPos.x-bound; i <= cityPos.x+bound; i++){
-            for(int j = cityPos.y-bound; j <= cityPos.y+bound; j++) {
-                if(tileCityId[i][j] == -1){
-                    tileCityId[i][j] = c.getActorId();
-                    t.addScore(TribesConfig.CITY_BORDER_POINTS); // Add score to tribe on border creation
-                    c.addPointsWorth(TribesConfig.CITY_BORDER_POINTS);
-                }
+        for(Vector2d tile : cityPos.neighborhood(bound, 0, size))
+        {
+            if(tileCityId[tile.x][tile.y] == -1){
+                tileCityId[tile.x][tile.y] = c.getActorId();
+                t.addScore(TribesConfig.CITY_BORDER_POINTS); // Add score to tribe on border creation
+                c.addPointsWorth(TribesConfig.CITY_BORDER_POINTS);
             }
         }
     }
 
     //Set extra points for tribe on border expansion
-    public void setPointsForBorderExpansion(City c ){
+    private void setPointsForBorderExpansion(City c){
         Tribe t = getTribe(c.getTribeId());
         Vector2d cityPos = c.getPosition();
-            for (int i = cityPos.x-1; i <= cityPos.x+1; i++){
-                for(int j = cityPos.y-1; j <= cityPos.y+1; j++) {
-                    if(tileCityId[i][j] == c.getActorId())
-                        t.addScore(TribesConfig.CITY_BORDER_POINTS);
-                        c.addPointsWorth(TribesConfig.CITY_BORDER_POINTS);
-                }
+        for(Vector2d tile : cityPos.neighborhood(TribesConfig.CITY_EXPANSION_TILES, 0, size))
+        {
+            if(tileCityId[tile.x][tile.y] == c.getActorId())
+            {
+                t.addScore(TribesConfig.CITY_BORDER_POINTS);
+                c.addPointsWorth(TribesConfig.CITY_BORDER_POINTS);
             }
+        }
     }
 
     // Method to expand city borders, take city as param
     public void expandBorder(City city){
-        city.setBound(city.getBound()+1);
+        city.setBound(city.getBound()+TribesConfig.CITY_EXPANSION_TILES);
         setBorderHelper(city,city.getBound());
         setPointsForBorderExpansion(city);
     }
@@ -566,6 +571,9 @@ public class Board {
             //Add city to board and set its borders
             addCityToTribe(newCity,gameState.getRandomGenerator());
             setBorderHelper(newCity, newCity.getBound());
+
+            //This becomes a city.
+            setTerrainAt(x, y, Types.TERRAIN.CITY);
 
         }else if(ter == Types.TERRAIN.CITY)
         {
@@ -750,7 +758,7 @@ public class Board {
         tribes[c.getTribeId()].addCity(c.getActorId());
 
         //cities provide visibility, which needs updating
-        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, 2, r, this.copy());
+        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, TribesConfig.NEW_CITY_CLEAR_RANGE, r, this.copy());
 
         //By default, cities are considered to be roads for trade network purposes.
         networkTiles[c.getPosition().x][c.getPosition().y] = true;
@@ -796,14 +804,12 @@ public class Board {
     /**
      * Adds a new actor to the list of game actors
      * @param actor the actor to add
-     * @return the unique identifier of this actor for the rest of the game.
      */
-    public int addActor(core.actors.Actor actor)
+    void addActor(core.actors.Actor actor)
     {
-        int nActors = gameActors.size() + 1;
-        gameActors.put(nActors, actor);
-        actor.setActorId(nActors);
-        return nActors;
+        actorIDcounter++;
+        gameActors.put(actorIDcounter, actor);
+        actor.setActorId(actorIDcounter);
     }
 
     /**

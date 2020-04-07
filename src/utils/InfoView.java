@@ -1,8 +1,11 @@
 package utils;
 
+import core.TechnologyTree;
 import core.Types;
 import core.actions.cityactions.*;
+import core.actions.tribeactions.ResearchTech;
 import core.actors.City;
+import core.actors.Tribe;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
@@ -29,12 +32,16 @@ public class InfoView extends JComponent {
 
     private JButton actionBF, actionCF, actionD, actionGF, actionRG;
     private JButton[] actionB, actionS;
+    private JButton actionResearch;
     private CityActionListener listenerBF, listenerCF, listenerD, listenerGF, listenerRG;
     private CityActionListener listenerS, listenerB;
+    private CityActionListener listenerResearch;
     private ActionController ac;
 
     private int highlightX, highlightY;
     private int highlightXprev, highlightYprev;
+    private boolean updateHighlight, updateTechHighlight;
+    Types.TECHNOLOGY techHighlight;
 
     private GameState gs;
 
@@ -75,7 +82,7 @@ public class InfoView extends JComponent {
         actionD.addActionListener(listenerD);
         actionD.setVisible(false);
         actionGF = new JButton("Grow");  // If plain
-        listenerGF = new CityActionListener("Grow");
+        listenerGF = new CityActionListener("GrowForest");
         actionGF.addActionListener(listenerGF);
         actionGF.setVisible(false);
         actionRG = new JButton("Gather");  // If resource
@@ -108,6 +115,12 @@ public class InfoView extends JComponent {
             actionS[i].setVisible(false);
             actionPanel.add(actionS[i]);
         }
+
+        actionResearch = new JButton("Research");
+        actionResearch.setVisible(false);
+        listenerResearch = new CityActionListener("Research");
+        actionResearch.addActionListener(listenerResearch);
+        actionPanel.add(actionResearch);
 
         this.setLayout(new FlowLayout());
         JScrollPane scrollPane1 = new JScrollPane(textArea);
@@ -183,10 +196,13 @@ public class InfoView extends JComponent {
                 updateButtons();
             }
 
-            if (!textArea.getText().equals(s)) {
+            if (!textArea.getText().equals(s) && updateHighlight) {
                 textArea.setText(s);
+                techHighlight = null;
+                updateHighlight = false;
             }
         }
+        updateTechButton();
     }
 
     private String getUnitInfo(Unit u) {
@@ -225,7 +241,7 @@ public class InfoView extends JComponent {
 //            sb.append("<table border=\"0\"><tr><td><img width=\"" + CELL_SIZE + "\" src=\"file:" + Types.TERRAIN.CITY.getImageStr() + "\"/></p></td><td>");
             sb.append("<ul>");
             sb.append("<li><b>Is Capital:</b> " + c.isCapital() + "</li>");
-            sb.append("<li><b>Points:</b> " + c.getPointsPerTurn() + "</li>");
+            sb.append("<li><b>Points:</b> " + c.getPointsWorth() + "</li>");
             sb.append("<li><b>Production:</b> " + c.getProduction() + "</li>");
             sb.append("</ul>");
 //            sb.append("</td></tr></table>");
@@ -263,8 +279,7 @@ public class InfoView extends JComponent {
                             }
                         }
                     }
-                    actionRG.setVisible(true);
-                    actionRG.setEnabled(found);
+                    actionRG.setVisible(found);
                 }
                 if (t != null) {
                     // if forest: Burn & Clear
@@ -287,10 +302,8 @@ public class InfoView extends JComponent {
                                 }
                             }
                         }
-                        actionBF.setVisible(true);
-                        actionCF.setVisible(true);
-                        actionBF.setEnabled(foundBF);
-                        actionCF.setEnabled(foundCF);
+                        actionBF.setVisible(foundBF);
+                        actionCF.setVisible(foundCF);
 
                     } else if (t == Types.TERRAIN.PLAIN) {
                         boolean foundGF = false;
@@ -304,8 +317,7 @@ public class InfoView extends JComponent {
                                 }
                             }
                         }
-                        actionGF.setVisible(true);
-                        actionGF.setEnabled(foundGF);
+                        actionGF.setVisible(foundGF);
                     }
                 }
                 if (b != null) {
@@ -321,8 +333,7 @@ public class InfoView extends JComponent {
                             }
                         }
                     }
-                    actionD.setVisible(true);
-                    actionD.setEnabled(found);
+                    actionD.setVisible(found);
                 }
                 if (c.getPosition().equals(position)) {
                     // We've highlighted the city, all spawn actions show up
@@ -334,13 +345,11 @@ public class InfoView extends JComponent {
                                 int idx = Types.UNIT.getSpawnableTypes().indexOf(unitType);
                                 listenerS.update(cityID, position, ac, gs);
                                 found[idx] = true;
-                                //break;
                             }
                         }
                     }
                     for (int i = 0; i < actionS.length; i++) {
-                        actionS[i].setEnabled(found[i]);
-                        actionS[i].setVisible(true);
+                        actionS[i].setVisible(found[i]);
                     }
                 } else if (t != null && b == null) {
                     // We might be able to build here
@@ -349,23 +358,70 @@ public class InfoView extends JComponent {
                         for (Action a : acts) {
                             if (a instanceof Build) {
                                 Types.BUILDING buildingType = ((Build) a).getBuildingType();
-                                if (buildingType.getTerrainRequirements().contains(t)) {
+//                                if (buildingType.getTerrainRequirements().contains(t) &&
+//                                if (a.isFeasible(gs) &&
+                                if (((Build) a).getTargetPos().equals(position))
+                                {
                                     int idx = buildingType.getKey();
                                     listenerB.update(cityID, position, ac, gs);
                                     found[idx] = true;
-                                    break;
                                 }
                             }
                         }
                     }
                     for (int i = 0; i < actionB.length; i++) {
-                        if (Types.BUILDING.values()[i].getTerrainRequirements().contains(t)) {
-                            actionB[i].setVisible(true);
-                            actionB[i].setEnabled(found[i]);
-                        }
+//                        if (Types.BUILDING.values()[i].getTerrainRequirements().contains(t)) {
+//                        if()
+                            actionB[i].setVisible(found[i]);
+//                        }
                     }
                 }
             }
+        }
+    }
+
+    private void updateTechButton() {
+        if (techHighlight != null && updateTechHighlight) {
+            actionResearch.setVisible(true);
+            listenerResearch.update(techHighlight, ac, gs);
+
+            Tribe t = gs.getActiveTribe();
+            if (t != null) {
+                TechnologyTree tt = t.getTechTree();
+                if (tt != null) {
+                    boolean researched = tt.isResearched(techHighlight);
+                    boolean techRequirement = tt.isResearchable(techHighlight);
+                    int starCost = techHighlight.getCost(t.getCitiesID().size());
+                    boolean starRequirement = t.getStars() >= starCost;
+                    boolean researchable = techRequirement && starRequirement;
+
+                    String txt = "";
+                    if (!(researchable || researched)) {
+                        actionResearch.setEnabled(false);
+                        actionResearch.setText("Unavailable");
+                        if (!techRequirement) txt += "Requires " + techHighlight.getParentTech().toString();
+                        if (!starRequirement) {
+                            if (!techRequirement) txt += "<br/>";
+                            txt += "Not enough stars, " + t.getStars() + " of " + starCost + " required";
+                        }
+                        actionResearch.setToolTipText("<html>" + txt + "</html>");
+                    } else {
+                        if (researched) {
+                            actionResearch.setEnabled(false);
+                            txt = "Researched.";
+                            actionResearch.setText("Researched");
+                        } else {
+                            actionResearch.setEnabled(true);
+                            txt = "Researchable.";
+                            actionResearch.setText("Research");
+                        }
+                    }
+
+                    String fullTxt = textArea.getText().replaceAll("</*html>|</*head>|</*body>|\n|\r", "") + "<hr>" + txt;
+                    textArea.setText(fullTxt);
+                }
+            }
+            updateTechHighlight = false;
         }
     }
 
@@ -375,6 +431,7 @@ public class InfoView extends JComponent {
         actionD.setVisible(false);
         actionGF.setVisible(false);
         actionRG.setVisible(false);
+        actionResearch.setVisible(false);
         for (JButton jb: actionB) {
             jb.setVisible(false);
         }
@@ -403,6 +460,7 @@ public class InfoView extends JComponent {
         highlightYprev = highlightY;
         highlightX = x;
         highlightY = y;
+        updateHighlight = true;
     }
 
     public void resetHighlight() {
@@ -410,6 +468,10 @@ public class InfoView extends JComponent {
         highlightY = -1;
         highlightXprev = -1;
         highlightYprev = -1;
+        techHighlight = null;
+
+        updateHighlight = false;
+        updateTechHighlight = false;
 
         // Reset highlight info text
         textArea.setText("");
@@ -429,6 +491,17 @@ public class InfoView extends JComponent {
         return highlightX > -1 && highlightY > -1 && highlightX < gridSize && highlightY < gridSize;
     }
 
+    public void setTechHighlightText(String s) {
+        if (!textArea.getText().equals(s)) {
+            textArea.setText(s);
+            updateTechHighlight = true;
+        }
+    }
+
+    public void setTechHighlight(Types.TECHNOLOGY t) {
+        techHighlight = t;
+    }
+
     class CityActionListener implements ActionListener {
         int cityID;
         Vector2d position;
@@ -436,6 +509,7 @@ public class InfoView extends JComponent {
         GameState gs;
         String actionType = "";
         Types.RESOURCE resource;
+        Types.TECHNOLOGY tech;
 
         CityActionListener(String type) {
             this.actionType = type;
@@ -444,6 +518,12 @@ public class InfoView extends JComponent {
         public void update(int cityID, Vector2d position, ActionController ac, GameState gs) {
             this.cityID = cityID;
             this.position = position;
+            this.ac = ac;
+            this.gs = gs;
+        }
+
+        public void update(Types.TECHNOLOGY t, ActionController ac, GameState gs) {
+            this.tech = t;
             this.ac = ac;
             this.gs = gs;
         }
@@ -494,6 +574,13 @@ public class InfoView extends JComponent {
                         ((Build) a).setTargetPos(position);
                         ((Build) a).setBuildingType(bType);
                     }
+                    break;
+                case "Research":
+                    if (e.getSource() instanceof JButton) {
+                        a = new ResearchTech(gs.getActiveTribeID());
+                        ((ResearchTech)a).setTech(tech);  // TODO: confirmation
+                    }
+                    break;
             }
             if (a != null) {
                 ac.addAction(a, gs);

@@ -62,6 +62,9 @@ public class Tribe extends Actor {
     //Total production for this turn.
     private int totalProduction;
 
+    //Turns since the last attack of this tribe if Meditation is reseached.
+    private int nPacifistCount;
+
     public Tribe(Types.TRIBE tribe) {
         this.tribe = tribe;
         init();
@@ -87,6 +90,7 @@ public class Tribe extends Actor {
         monuments = Types.BUILDING.initMonuments();
         nKills = 0;
         totalProduction = 0;
+        nPacifistCount = 0;
     }
 
     public void initObsGrid(int size) {
@@ -104,6 +108,7 @@ public class Tribe extends Actor {
         tribeCopy.capitalID = this.capitalID;
         tribeCopy.nKills = this.nKills;
         tribeCopy.totalProduction = this.totalProduction;
+        tribeCopy.nPacifistCount = this.nPacifistCount;
 
         tribeCopy.techTree = this.techTree.copy();
 
@@ -132,9 +137,24 @@ public class Tribe extends Actor {
         return tribeCopy;
     }
 
+    public void clearView(int x, int y, int range, Random r, Board b) {
+        int size = obsGrid.length;
+        Vector2d center = new Vector2d(x, y);
 
-    public void clearView(int x, int y, Random r, Board b) {
-        clearView(x, y, 1, r,b);
+        for(Vector2d tile : center.neighborhood(range, 0, size))
+        {
+            if (!obsGrid[tile.x][tile.y]) {
+                obsGrid[tile.x][tile.y] = true;
+                this.score += TribesConfig.CLEAR_VIEW_POINTS;
+                Unit u = b.getUnitAt(tile.x,tile.y);
+                City c = b.getCityInBorders(tile.x,tile.y);
+                if( u !=null){
+                    meetTribe(r,b.getTribes(),u.getTribeId());
+                }else if(c !=null){
+                    meetTribe(r,b.getTribes(),c.getTribeId());
+                }
+            }
+        }
 
         //We may be clearing the last tiles of the board, which grants a monument
         if(monuments.get(EYE_OF_GOD) == MONUMENT_STATUS.UNAVAILABLE)
@@ -148,27 +168,6 @@ public class Tribe extends Actor {
             //All clear and we couldn't buy monument before. Now we can.
             monuments.put(EYE_OF_GOD, MONUMENT_STATUS.AVAILABLE);
         }
-    }
-
-    public void clearView(int x, int y, int range, Random r, Board b) {
-        int size = obsGrid.length;
-        for (int i = x - range; i <= x + range; ++i)
-            for (int j = y - range; j <= y + range; ++j) {
-                //All these positions should be within my view.
-                if (i >= 0 && j >= 0 && i < size && j < size) {
-                    if (!obsGrid[i][j]) {
-                        obsGrid[i][j] = true;
-                        this.score += TribesConfig.CLEAR_VIEW_POINTS;
-                        Unit u = b.getUnitAt(i,j);
-                        City c = b.getCityInBorders(i,j);
-                        if( u !=null){
-                            meetTribe(r,b.getTribes(),u.getTribeId());
-                        }else if(c !=null){
-                            meetTribe(r,b.getTribes(),c.getTribeId());
-                        }
-                    }
-                }
-            }
     }
 
 
@@ -400,13 +399,12 @@ public class Tribe extends Actor {
             for (int cityId : citiesID) {
                 if (cityId != capitalID) {
 
-                    //Check if the city is conected to the capital
+                    //Check if the city is connected to the capital
                     City nonCapitalCity = (City) b.getActor(cityId);
                     Vector2d nonCapitalPos = nonCapitalCity.getPosition();
                     ArrayList<PathNode> pathToCity = tp.findPathTo(nonCapitalPos);
 
-
-                    boolean connectedNow = pathToCity.size() > 0;
+                    boolean connectedNow = (pathToCity != null) && (pathToCity.size() > 0);
 
                     //This was previously connected
                     if (connectedCities.contains(cityId)) {
@@ -512,4 +510,17 @@ public class Tribe extends Actor {
     public ArrayList<Integer> getExtraUnits() {
         return extraUnits;
     }
+
+    public void addPacifistCount() {
+        if(techTree.isResearched(Types.TECHNOLOGY.MEDITATION))
+        {
+            nPacifistCount++;
+            if(nPacifistCount == TribesConfig.ALTAR_OF_PEACE_TURNS)
+            {
+                monuments.put(ALTAR_OF_PEACE, MONUMENT_STATUS.AVAILABLE);
+            }
+        }
+    }
+
+    public void resetPacifistCount() {nPacifistCount = 0;}
 }

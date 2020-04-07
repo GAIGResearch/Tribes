@@ -5,13 +5,11 @@ import core.Types;
 import core.actions.Action;
 import core.actors.City;
 import core.actors.Tribe;
-import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
 import utils.Vector2d;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class Attack extends UnitAction
 {
@@ -70,14 +68,18 @@ public class Attack extends UnitAction
             int attackResult = (int) Math.round((attackForce/totalDamage)* attacker.ATK*accelerator);
             int defenceResult = (int) Math.round((defenceForce / totalDamage) * target.DEF *accelerator);
 
+            Tribe attackerTribe = gs.getTribe(attacker.getTribeId());
+            attackerTribe.resetPacifistCount();
+
             if (target.getCurrentHP() <= attackResult) {
 
                 attacker.addKill();
-                gs.getTribe(attacker.getTribeId()).addKill();
-                gs.getTribe(target.getTribeId()).subtractScore(target.getType().getPoints());
-                target.setIsKilled(true);
+                attackerTribe.addKill();
 
-                //Move unit to target position if unit is melee type
+                //Actually kill the unit
+                gs.killUnit(target);
+
+                //After killing the unit, move to target position if unit is melee type
                 switch (attacker.getType()) {
                     case DEFENDER:
                     case SWORDMAN:
@@ -87,6 +89,7 @@ public class Attack extends UnitAction
                     case SUPERUNIT:
                     gs.getBoard().tryPush(attacker.getTribeId(), attacker, attacker.getPosition().x, attacker.getPosition().y, target.getPosition().x, target.getPosition().y, gs.getRandomGenerator());
                 }
+
 
             } else {
 
@@ -104,8 +107,9 @@ public class Attack extends UnitAction
                     if(attacker.getCurrentHP() <=0 ) {
                         target.addKill();
                         gs.getTribe(target.getTribeId()).addKill();
-                        attacker.setIsKilled(true);
-                        gs.getTribe(attacker.getTribeId()).subtractScore(attacker.getType().getPoints());
+
+                        //Actually kill the unit
+                        gs.killUnit(attacker);
                     }
                 }
 

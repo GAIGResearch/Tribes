@@ -19,21 +19,31 @@ public class CaptureFactory implements ActionFactory {
         Unit unit = (Unit) actor;
         LinkedList<Action> captures = new LinkedList<>();
 
+        if(!unit.isFresh())
+            return captures;
+
         Types.TERRAIN t = gs.getBoard().getTerrainAt(unit.getPosition().x, unit.getPosition().y);
-        if(unit.isFresh() && t == Types.TERRAIN.VILLAGE || t == Types.TERRAIN.CITY) {
-            // TODO: this will not see villages as valid captures
+        Capture capture;
+
+        if(t == Types.TERRAIN.VILLAGE)
+        {
+            capture = new Capture(unit.getActorId());
+            capture.setTargetCity(-1);
+        }else if(t == Types.TERRAIN.CITY) {
             // get city from board, check if action is feasible and add to list
             Board b = gs.getBoard();
             City c = b.getCityInBorders(unit.getPosition().x, unit.getPosition().y);
             if (c != null) {
-                Capture capture = new Capture(unit.getActorId());
+                capture = new Capture(unit.getActorId());
                 capture.setTargetCity(c.getActorId());
-                if (capture.isFeasible(gs)) {
-                    captures.add(capture);
-                }
-            }
+            }else return captures;
+        }else return captures;
+
+        capture.setCaptureType(t);
+        if (capture.isFeasible(gs)) {
+            captures.add(capture);
         }
-        
+
         return captures;
     }
 

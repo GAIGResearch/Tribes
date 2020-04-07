@@ -36,9 +36,10 @@ public class GrowForest extends CityAction
     public boolean execute(GameState gs) {
         if (isFeasible(gs)){
             Board b = gs.getBoard();
+            City city = (City) gs.getActor(this.cityId);
             b.setTerrainAt(targetPos.x, targetPos.y, Types.TERRAIN.FOREST);
             b.setResourceAt(targetPos.x, targetPos.y, null);
-            gs.getTribe(this.cityId).subtractStars(TribesConfig.GROW_FOREST_COST);
+            gs.getTribe(city.getTribeId()).subtractStars(TribesConfig.GROW_FOREST_COST);
             return true;
         }
         return false;

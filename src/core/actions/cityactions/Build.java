@@ -76,15 +76,13 @@ public class Build extends CityAction
         if(isFeasible(gs)) {
 
             tribe.subtractStars(buildingType.getCost());
-            tribe.addScore(buildingType.getPoints());
-            city.addPointsWorth(buildingType.getPoints());
             board.setBuildingAt(targetPos.x, targetPos.y, buildingType);
             board.setResourceAt(targetPos.x, targetPos.y, null);
 
             if(buildingType.isTemple())
-                city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, buildingType));
+                city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, buildingType, this.cityId));
             else
-                city.addBuilding(gs, new Building(targetPos.x, targetPos.y, buildingType));
+                city.addBuilding(gs, new Building(targetPos.x, targetPos.y, buildingType, this.cityId));
 
 
 

@@ -65,7 +65,8 @@ public class PathNode implements Comparable<PathNode>
 
     @Override
     public int compareTo(PathNode o) {
-        return Double.compare(totalCost, o.totalCost);
+//        return Double.compare(estimatedCost, o.estimatedCost);
+        return Double.compare(totalCost + estimatedCost, o.totalCost + o.estimatedCost);
     }
 
     @Override

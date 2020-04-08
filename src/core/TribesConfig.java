@@ -127,45 +127,37 @@ public class TribesConfig
     // Farm
     public static final int FARM_COST = 5;
     public static final int FARM_BONUS = 2;
-    public static final int FARM_POINTS = 10;
     public static final Types.RESOURCE FARM_RES_CONSTRAINT = Types.RESOURCE.CROPS;
 
     //WindMill
     public static final int WIND_MILL_COST = 5;
     public static final int WIND_MILL_BONUS = 1;
-    public static final int WIND_MILL_POINTS = 5;
 
     // LumberHut
     public static final int LUMBER_HUT_COST = 2;
     public static final int LUMBER_HUT_BONUS = 1;
-    public static final int LUMBER_HUT_POINTS = 5;
 
     // SawMill
     public static final int SAW_MILL_COST = 5;
     public static final int SAW_MILL_BONUS = 1;
-    public static final int SAW_MILL_POINTS = 5;
 
     //Mine
     public static final int MINE_COST = 5;
     public static final int MINE_BONUS = 2;
-    public static final int MINE_POINTS = 10;
     public static final Types.RESOURCE MINE_RES_CONSTRAINT = Types.RESOURCE.ORE;
 
     // Forge
     public static final int FORGE_COST = 5;
     public static final int FORGE_BONUS = 2;
-    public static final int FORGE_POINTS = 10;
 
     // Port
     public static final int PORT_COST = 10;
     public static final int PORT_BONUS = 2;
     public static final int PORT_TRADE_DISTANCE = 3;
-    public static final int PORT_POINTS = 10;
 
     // Custom House
     public static final int CUSTOM_COST = 5;
     public static final int CUSTOM_BONUS = 2;
-    public static final int CUSTOM_POINTS = 0;
 
     //Monuments
     public static final int MONUMENT_BONUS = 3;
@@ -208,6 +200,7 @@ public class TribesConfig
     public static final int FIRST_CITY_CLEAR_RANGE = 2;
     public static final int NEW_CITY_CLEAR_RANGE = 1;
     public static final int CITY_EXPANSION_TILES = 1;
+    public static final int POINTS_PER_POPULATION = 5;
 
     /* TRIBES */
     public static final int INITIAL_STARS = 5;

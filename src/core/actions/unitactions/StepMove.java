@@ -101,7 +101,7 @@ public class StepMove implements NeighbourHelper
                 stepCost = unit.MOV;
             }
             if(costFrom + stepCost <= unit.MOV){
-                neighbours.add(new PathNode(tile, costFrom + stepCost));
+                neighbours.add(new PathNode(tile, stepCost));
             }
         }
         return neighbours;

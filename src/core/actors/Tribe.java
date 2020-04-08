@@ -328,8 +328,8 @@ public class Tribe extends Actor {
         for (int i = 0; i < tribesMet.size(); i++) {
             // if tribes not in tribes met or tribe is itself then do nothing else add to tribesmet arraylist
             if (tribesMet.size() >= i && tribesMet.size() != 0) {
-                if (tribeID == tribesMet.get(i) || tribeID == this.getTribeId()) {
-                    inMetTribes[i] = true;
+                if (tribeID == this.getTribeId()) {
+                    inMetTribes[tribeID] = true;
                 }
             }
         }

@@ -115,7 +115,7 @@ public class Pathfinder
             if(node.getX() == goal.getX() && node.getY() == goal.getY())
                 return calculatePath(node);
 
-            ArrayList<PathNode> neighbours = provider.getNeighbours(root.getPosition(), root.getTotalCost());
+            ArrayList<PathNode> neighbours = provider.getNeighbours(node.getPosition(), node.getTotalCost());
 
             for (PathNode nb : neighbours) {
                 // This neighbour is a new object, it will not have any of the costs set up

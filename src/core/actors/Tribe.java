@@ -137,7 +137,10 @@ public class Tribe extends Actor {
         int size = obsGrid.length;
         Vector2d center = new Vector2d(x, y);
 
-        for(Vector2d tile : center.neighborhood(range, 0, size))
+        LinkedList<Vector2d> tiles = center.neighborhood(range, 0, size);
+        tiles.add(center);
+
+        for(Vector2d tile : tiles)
         {
             if (!obsGrid[tile.x][tile.y]) {
                 obsGrid[tile.x][tile.y] = true;

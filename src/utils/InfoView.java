@@ -211,7 +211,7 @@ public class InfoView extends JComponent {
         StringBuilder sb = new StringBuilder();
         sb.append("<h1>" + Types.TRIBE.values()[u.getTribeId()] + " " + u.getType() + "</h1>");
 //        sb.append("<table border=\"0\"><tr><td><img src=\"file:" + img + "\"/></p></td><td>");
-        sb.append("From city " + u.getCityID() + "<br/>");
+        sb.append("From city " + u.getCityId() + "<br/>");
         if (u.isVeteran()) {
             sb.append("<b>Veteran unit.</b>");
         } else {

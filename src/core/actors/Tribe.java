@@ -464,6 +464,7 @@ public class Tribe extends Actor {
     public void addExtraUnit(Unit target)
     {
         extraUnits.add(target.getActorId());
+        target.setCityId(-1);
     }
 
     /**

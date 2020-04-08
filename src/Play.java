@@ -18,6 +18,7 @@ public class Play {
 //        String filename = "MinimalLevel.csv";
 
         play4(filename, true, true, true, true);
+//        play4(filename, false, false, false, true);
     }
 
 

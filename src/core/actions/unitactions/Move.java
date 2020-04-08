@@ -28,7 +28,16 @@ public class Move extends UnitAction
 
         //If the unit can move and the destination is vacant, try to reach it.
         if(unit.canMove() && gs.getBoard().getUnitAt(destination.x, destination.y) == null) {
-            return !tp.findPathTo(destination).isEmpty();
+
+            try{
+                return !tp.findPathTo(destination).isEmpty();
+            }catch(Exception e)
+            {
+                System.out.println("Exception: ");
+                e.printStackTrace();
+                System.out.println("Error happened when checking if unit " + getUnitId() + " can move from " + unit.getPosition() + " to " + destination);
+                System.exit(0);
+            }
         }
         return false;
     }

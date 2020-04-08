@@ -35,17 +35,17 @@ public class Play {
 
         Agent ag2 = new HumanAgent(ac);
 ////        Agent ag2 = new RandomAgent(randomSeed);
-//        players.add(ag2);
+        players.add(ag2);
         tribes.add(new Tribe(Types.TRIBE.IMPERIUS));
 //
-        Agent ag3 = new HumanAgent(ac);
+        Agent ag3 = new  HumanAgent(ac);
 ////        Agent ag3 = new RandomAgent(randomSeed);
-//        players.add(ag3);
+        players.add(ag3);
         tribes.add(new Tribe(Types.TRIBE.BARDUR));
 //
         Agent ag4 = new HumanAgent(ac);
 ////        Agent ag4 = new RandomAgent(randomSeed);
-//        players.add(ag4);
+        players.add(ag4);
         tribes.add(new Tribe(Types.TRIBE.OUMAJI));
 
         Game game = new Game();

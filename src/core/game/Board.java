@@ -12,6 +12,8 @@ import utils.graph.*;
 
 import java.util.*;
 
+import static core.Types.TERRAIN.*;
+
 public class Board {
 
     // Array for the type of terrain that each tile of board will have
@@ -224,7 +226,7 @@ public class Board {
 
         //Water with a port this tribe owns?
         Types.BUILDING b = buildings[x][y];
-        if (terrain == Types.TERRAIN.SHALLOW_WATER) {
+        if (terrain == SHALLOW_WATER) {
             if (b == Types.BUILDING.PORT) {
                 City c = getCityInBorders(x, y);
                 if (c != null && c.getTribeId() == tribeId) {
@@ -357,11 +359,11 @@ public class Board {
                 return false;
 
             //Shallow water and no sailing
-            if (terrains[x][y] == Types.TERRAIN.SHALLOW_WATER && !tt.isResearched(Types.TECHNOLOGY.SAILING))
+            if (terrains[x][y] == SHALLOW_WATER && !tt.isResearched(Types.TECHNOLOGY.SAILING))
                 return false;
 
             //Deep water and no navigation
-            if (terrains[x][y] == Types.TERRAIN.DEEP_WATER && !tt.isResearched(Types.TECHNOLOGY.NAVIGATION))
+            if (terrains[x][y] == DEEP_WATER && !tt.isResearched(Types.TECHNOLOGY.NAVIGATION))
                 return false;
 
 
@@ -530,6 +532,10 @@ public class Board {
 //        setPointsForBorderExpansion(city);
     }
 
+    public boolean isRoad(int x, int y) {
+        return networkTiles[x][y] && terrains[x][y] != SHALLOW_WATER && terrains[x][y] != DEEP_WATER && terrains[x][y] != CITY;
+    }
+
     public int getCityIdAt(int x, int y)
     {
         return tileCityId[x][y];
@@ -579,12 +585,12 @@ public class Board {
             setBorderHelper(newCity, newCity.getBound());
 
             //This becomes a city.
-            setTerrainAt(x, y, Types.TERRAIN.CITY);
+            setTerrainAt(x, y, CITY);
 
             // Move the unit from one city to village. Rank: capital -> cities -> None
             moveOneToNewCity(newCity, capturingTribe, rnd);
 
-        }else if(ter == Types.TERRAIN.CITY)
+        }else if(ter == CITY)
         {
             City capturedCity = (City) gameActors.get(tileCityId[x][y]);
             Tribe previousOwner = tribes[capturedCity.getTribeId()];
@@ -706,7 +712,7 @@ public class Board {
                                 ports.add(new Vector2d(i, j));
 
                             //And navigable tiles
-                            if ((terrains[i][j] == Types.TERRAIN.SHALLOW_WATER || terrains[i][j] == Types.TERRAIN.DEEP_WATER) //WATER
+                            if ((terrains[i][j] == SHALLOW_WATER || terrains[i][j] == DEEP_WATER) //WATER
                                     && t.isVisible(i, j) && tileCityId[i][j] != -1) //VISIBLE AND NOT ENEMY
                             {
                                 navigable[i][j] = true;

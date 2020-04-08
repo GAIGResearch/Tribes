@@ -48,4 +48,9 @@ public class Disband extends UnitAction
     public Action copy() {
         return new Disband(this.unitId);
     }
+
+    @Override
+    public String toString() {
+        return "Disband{unitID=" + unitId + "}";
+    }
 }

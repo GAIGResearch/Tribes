@@ -12,8 +12,8 @@ public class BuildRoad extends TribeAction {
     {
         this.tribeId = tribeId;
     }
-    public void setPosition(int x, int y){
-        this.position = new Vector2d(x, y);
+    public void setPosition(Vector2d position){
+        this.position = position.copy();
     }
     public Vector2d getPosition() {
         return position;
@@ -48,7 +48,7 @@ public class BuildRoad extends TribeAction {
     @Override
     public Action copy() {
         BuildRoad buildRoad = new BuildRoad(this.tribeId);
-        buildRoad.setPosition(position.x, position.y);
+        buildRoad.setPosition(position);
         return buildRoad;
     }
 }

@@ -52,7 +52,7 @@ public class Tribe extends Actor {
     private HashMap<Types.BUILDING, MONUMENT_STATUS> monuments;
 
     //Tribes met by this tribe.
-    private ArrayList<Types.TRIBE> tribesMet;
+    private ArrayList<Integer> tribesMet;
 
     //Units that don't belong to a city (either converted of shifted).
     private ArrayList<Integer> extraUnits;
@@ -137,7 +137,10 @@ public class Tribe extends Actor {
         int size = obsGrid.length;
         Vector2d center = new Vector2d(x, y);
 
-        for(Vector2d tile : center.neighborhood(range, 0, size))
+        LinkedList<Vector2d> tiles = center.neighborhood(range, 0, size);
+        tiles.add(center);
+
+        for(Vector2d tile : tiles)
         {
             if (!obsGrid[tile.x][tile.y]) {
                 obsGrid[tile.x][tile.y] = true;
@@ -303,35 +306,31 @@ public class Tribe extends Actor {
             monuments.put(GATE_OF_POWER, MONUMENT_STATUS.AVAILABLE);
     }
 
-    public ArrayList<Types.TRIBE> getTribesMet() {
+    public ArrayList<Integer> getTribesMet() {
         return tribesMet;
     }
 
     public void meetTribe(Random r, Tribe[] tribes, int tribeID) {
 
-//        Tribe[] t = gs.getBoard().getTribes(); // get tribes from boards
 
         boolean[] inMetTribes = new boolean[tribes.length];
-        //loop through all tribes
-        for (int i = 0; i<inMetTribes.length; i++){
-            inMetTribes[i] = false;
-        }
 
-        for (int i = 0; i < tribes.length; i++) {
+
+        for (int i = 0; i < tribesMet.size(); i++) {
             // if tribes not in tribes met or tribe is itself then do nothing else add to tribesmet arraylist
-            if(tribesMet.size() >= i &&tribesMet.size() !=0) {
-                if (tribes[i].tribe.equals(tribesMet.get(i)) || tribes[i].tribeId == tribeID) {
-                    inMetTribes[i] = true;
+            if (tribesMet.size() >= i && tribesMet.size() != 0) {
+                if (tribeID == this.getTribeId()) {
+                    inMetTribes[tribeID] = true;
                 }
             }
-
-            if (!inMetTribes[i]) {
-                tribesMet.add(tribes[i].tribe); // add to this tribe
-                tribes[i].tribesMet.add(this.tribe); // add to met tribe as well
+        }
+            if (!inMetTribes[tribeID]) {
+                tribesMet.add(tribeID); // add to this tribe
+                tribes[tribeID].tribesMet.add(this.getTribeId()); // add to met tribe as well
 
                 //Pick a technology at random from the tribe to learn
                 TechnologyTree thisTribeTree = getTechTree();
-                TechnologyTree metTribeTree = tribes[i].getTechTree();
+                TechnologyTree metTribeTree = tribes[tribeID].getTechTree();
                 ArrayList<Types.TECHNOLOGY> techInThisTribe = new ArrayList<>(); //Check which tech in this tribe
                 ArrayList<Types.TECHNOLOGY> techInMetTribe = new ArrayList<>(); // Check which tech in met tribe
                 //Check which technologies both research trees contain
@@ -346,19 +345,19 @@ public class Tribe extends Actor {
                 ArrayList<Types.TECHNOLOGY> potentialTechForThisTribe = new ArrayList<>();
                 ArrayList<Types.TECHNOLOGY> potentialTechForMetTribe = new ArrayList<>();
 
-                for (int x = 0; i < techInMetTribe.size(); i++) {
+                for (int x = 0; x < techInMetTribe.size(); x++) {
                     if (!thisTribeTree.isResearched(techInMetTribe.get(x)))
                         potentialTechForThisTribe.add(techInMetTribe.get(x));
                 }
 
-                for (int x = 0; i < techInThisTribe.size(); i++) {
+                for (int x = 0; x < techInThisTribe.size(); x++) {
                     if (!metTribeTree.isResearched(techInThisTribe.get(x)))
                         potentialTechForMetTribe.add(techInThisTribe.get(x));
                 }
 
 
                 if (potentialTechForThisTribe.size() == 0 || potentialTechForMetTribe.size() == 0)
-                    continue;
+                    return;
 
                 Types.TECHNOLOGY techToGet = potentialTechForThisTribe.get(r.nextInt(potentialTechForThisTribe.size()));
                 thisTribeTree.doResearch(techToGet);
@@ -368,7 +367,7 @@ public class Tribe extends Actor {
             }
         }
 
-    }
+
 
     public void updateNetwork(Pathfinder tp, Board b, boolean thisTribesTurn) {
         ArrayList<Integer> lostCities = new ArrayList<>();

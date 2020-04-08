@@ -259,8 +259,8 @@ public class Board {
         ((Boat)boat).setBaseLandUnit(unit.getType());
         addUnit(city, boat);
 
-        System.out.println("Embarking unit. From id: " + unit.getActorId() + " to " + boat.getActorId() + ". City " + unit.getCityId() + "/" + boat.getCityId() +
-                 " has associated units: " + city.getUnitsID().toString());
+//        System.out.println("Embarking unit. From id: " + unit.getActorId() + " to " + boat.getActorId() + ". City " + unit.getCityId() + "/" + boat.getCityId() +
+//                 " has associated units: " + city.getUnitsID().toString());
     }
 
     public void disembark(Unit unit, int x, int y) {
@@ -293,8 +293,8 @@ public class Board {
         addUnit(city, newUnit);
 
 
-        System.out.println("Disembarking unit. From id: " + unit.getActorId() + " to " + newUnit.getActorId() + ". City " + unit.getCityId() + "/" + newUnit.getCityId() +
-                " has associated units: " + city.getUnitsID().toString());
+//        System.out.println("Disembarking unit. From id: " + unit.getActorId() + " to " + newUnit.getActorId() + ". City " + unit.getCityId() + "/" + newUnit.getCityId() +
+//                " has associated units: " + city.getUnitsID().toString());
     }
 
     public void moveUnit(Unit unit, int x0, int y0, int xF, int yF, Random r) {
@@ -787,11 +787,10 @@ public class Board {
 
     /**
      * Adds a unit to a city, which created it.
-     * @param c citi that created the unit
+     * @param c city that created the unit
      * @param u unit to add
-     * @return false if the unit coulnd't be added. That should not happen, so it prints a warning.
      */
-    public boolean addUnit(City c, Unit u)
+    public void addUnit(City c, Unit u)
     {
         //First, add the actor to the list of game state actors
         addActor(u);
@@ -800,13 +799,9 @@ public class Board {
         Vector2d pos = u.getPosition();
         setUnitIdAt(pos.x, pos.y, u);
 
-        //Finally, add the unit to the city that created it
-        boolean added = c.addUnit(u.getActorId());
-        if(!added){
-            System.out.println("ERROR: Unit failed to be added to city: u_id: " + u.getActorId() + ", c_id: " + c.getActorId());
-        }
-
-        return added;
+        //Finally, add the unit to the city that created it, unless it belongs to the tribe.
+        if(u.getCityId() != -1)
+            c.addUnit(u.getActorId());
     }
 
     public void removeUnitFromCity(Unit u, City city)

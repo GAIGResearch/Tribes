@@ -194,12 +194,6 @@ public class City extends Actor{
         return unitsID.remove(index);
     }
 
-    public ArrayList<Integer> moveUnits(){
-        ArrayList<Integer> lists = unitsID;
-        unitsID = new ArrayList<Integer>();
-        return lists;
-    }
-
     public int getLevel() {
         return level;
     }
@@ -273,6 +267,11 @@ public class City extends Actor{
 
     public ArrayList<Integer> getUnitsID() {
         return unitsID;
+    }
+
+    public int getNumUnits()
+    {
+        return unitsID.size();
     }
 
     public Building getBuilding(int x, int y){

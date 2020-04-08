@@ -20,13 +20,13 @@ public abstract class Unit extends Actor
 
     private int kills;
     private boolean isVeteran;
-    private int cityID;
+    private int cityId;
     private boolean isKilled; //TODO: This flag can probably be removed altogether. Check if dying by retaliation attack works fine before doing so.
 
     private Types.TURN_STATUS status;
 
 
-    public Unit(int atk, int def, int mov, int max_hp, int range, int cost, Vector2d pos, int kills, boolean isVeteran, int cityID, int tribeID){
+    public Unit(int atk, int def, int mov, int max_hp, int range, int cost, Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeID){
         this.ATK = atk;
         this.DEF = def;
         this.MOV = mov;
@@ -38,7 +38,7 @@ public abstract class Unit extends Actor
         this.position = pos;
         this.kills = kills;
         this.isVeteran = isVeteran;
-        this.cityID = cityID;
+        this.cityId = cityId;
         this.tribeId = tribeID;
         this.isKilled = false;
         this.status = FINISHED;
@@ -76,9 +76,11 @@ public abstract class Unit extends Actor
         isVeteran = veteran;
     }
 
-    public int getCityID(){
-        return cityID;
+    public int getCityId(){
+        return cityId;
     }
+
+    public void setCityId(int cityId) {this.cityId = cityId;}
 
     public abstract Types.UNIT getType();
 

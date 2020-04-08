@@ -248,20 +248,23 @@ public class Board {
 
 
     public void embark(Unit unit, int x, int y) {
-        City city = (City) gameActors.get(unit.getCityID());
+        City city = (City) gameActors.get(unit.getCityId());
         removeUnitFromBoard(unit);
         removeUnitFromCity(unit, city);
 
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(x, y);
-        Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), Types.UNIT.BOAT);
+        Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), Types.UNIT.BOAT);
         boat.setCurrentHP(unit.getCurrentHP());
         ((Boat)boat).setBaseLandUnit(unit.getType());
         addUnit(city, boat);
+
+//        System.out.println("Embarking unit. From id: " + unit.getActorId() + " to " + boat.getActorId() + ". City " + unit.getCityId() + "/" + boat.getCityId() +
+//                 " has associated units: " + city.getUnitsID().toString());
     }
 
     public void disembark(Unit unit, int x, int y) {
-        City city = (City) gameActors.get(unit.getCityID());
+        City city = (City) gameActors.get(unit.getCityId());
         removeUnitFromBoard(unit);
         removeUnitFromCity(unit, city);
         
@@ -285,9 +288,13 @@ public class Board {
         }
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(x, y);
-        Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), baseLandUnit);
+        Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), baseLandUnit);
         newUnit.setCurrentHP(unit.getCurrentHP());
         addUnit(city, newUnit);
+
+
+//        System.out.println("Disembarking unit. From id: " + unit.getActorId() + " to " + newUnit.getActorId() + ". City " + unit.getCityId() + "/" + newUnit.getCityId() +
+//                " has associated units: " + city.getUnitsID().toString());
     }
 
     public void moveUnit(Unit unit, int x0, int y0, int xF, int yF, Random r) {
@@ -567,15 +574,15 @@ public class Board {
             //Not a city. Needs to be created, assigned and its border calculated.
             City newCity = new City(x, y, capturingTribe.getTribeId());
 
-            // Move the unit from one city to village. Rank: capital -> cities -> None
-            moveOneToNewCity(newCity, capturingTribe, rnd);
-
             //Add city to board and set its borders
             addCityToTribe(newCity,gameState.getRandomGenerator());
             setBorderHelper(newCity, newCity.getBound());
 
             //This becomes a city.
             setTerrainAt(x, y, Types.TERRAIN.CITY);
+
+            // Move the unit from one city to village. Rank: capital -> cities -> None
+            moveOneToNewCity(newCity, capturingTribe, rnd);
 
         }else if(ter == Types.TERRAIN.CITY)
         {
@@ -633,40 +640,44 @@ public class Board {
         boolean ownsCapital = tribe.controlsCapital();
         City capital = (City) getActor(tribe.getCapitalID());
 
-        //Units to move
-        ArrayList<Integer> units = fromCity.moveUnits();
-
         //First to capital
-        while (ownsCapital && capital.canAddUnit() && units.size() > 0){
-            capital.addUnit(units.get(0));
-            units.remove(0);
+        if(ownsCapital) while (capital.canAddUnit() && fromCity.getNumUnits() > 0){
+            moveBelongingCity(fromCity, capital);
         }
 
         //Then, to all the other cities, picked at random.
-        if(units.size() > 0)
+        if(fromCity.getNumUnits() > 0)
         {
             LinkedList<Integer> cities = new LinkedList<>(tribe.getCitiesID());
             cities.remove((Integer)tribe.getCapitalID());
             Collections.shuffle(cities, rnd);
-            while (cities.size() > 0 && units.size() > 0){
+            while (cities.size() > 0 && fromCity.getNumUnits() > 0){
                 City destCity = (City)getActor(cities.removeFirst());
-                while (destCity.canAddUnit() && units.size() > 0){
-                    destCity.addUnit(units.get(0));
-                    units.remove(0);
+                while (destCity.canAddUnit() && fromCity.getNumUnits() > 0){
+                    moveBelongingCity(fromCity, destCity);
                 }
             }
 
             //If there are still units, they go to the tribe.
-            if (units.size() > 0){
-                tribe.moveAllUnits(units);
+            if (fromCity.getNumUnits() > 0){
+                for(Integer unitId: fromCity.getUnitsID())
+                {
+                    Unit removedUnit = (Unit) gameActors.get(unitId);
+                    tribe.addExtraUnit(removedUnit);
+                }
             }
         }
     }
 
     private void moveBelongingCity(City originalCity, City targetCity){
+        //Move the unit in the citys' unit lists.
         int index = originalCity.getUnitsID().size()-1;
         int actorID = originalCity.removeUnitByIndex(index);
         targetCity.addUnit(actorID);
+
+        //Assign new city to unit
+        Unit removedUnit = (Unit) gameActors.get(actorID);
+        removedUnit.setCityId(targetCity.getActorId());
     }
   
     private void computeTradeNetwork()
@@ -776,11 +787,10 @@ public class Board {
 
     /**
      * Adds a unit to a city, which created it.
-     * @param c citi that created the unit
+     * @param c city that created the unit
      * @param u unit to add
-     * @return false if the unit coulnd't be added. That should not happen, so it prints a warning.
      */
-    public boolean addUnit(City c, Unit u)
+    public void addUnit(City c, Unit u)
     {
         //First, add the actor to the list of game state actors
         addActor(u);
@@ -789,18 +799,16 @@ public class Board {
         Vector2d pos = u.getPosition();
         setUnitIdAt(pos.x, pos.y, u);
 
-        //Finally, add the unit to the city that created it
-        boolean added = c.addUnit(u.getActorId());
-        if(!added){
-            System.out.println("ERROR: Unit failed to be added to city: u_id: " + u.getActorId() + ", c_id: " + c.getActorId());
-        }
-
-        return added;
+        //Finally, add the unit to the city that created it, unless it belongs to the tribe.
+        if(u.getCityId() != -1)
+            c.addUnit(u.getActorId());
     }
 
     public void removeUnitFromCity(Unit u, City city)
     {
-        city.removeUnit(u.getActorId());
+        if(u.getCityId() != -1) { //This happens when the unit belongs to the city
+            city.removeUnit(u.getActorId());
+        }
     }
 
     /**

@@ -9,8 +9,6 @@ import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
 
-import java.util.LinkedList;
-
 public class Disband extends UnitAction
 {
     public Disband(int unitId)
@@ -31,7 +29,7 @@ public class Disband extends UnitAction
         Unit unit = (Unit) gs.getActor(this.unitId);
         Board b = gs.getBoard();
         Tribe t = gs.getTribe(unit.getTribeId());
-        City c = (City) b.getActor(unit.getCityID());
+        City c = (City) b.getActor(unit.getCityId());
 
         if(isFeasible(gs))
         {

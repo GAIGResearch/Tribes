@@ -18,7 +18,7 @@ public class Warrior extends Unit
 
     @Override
     public Warrior copy() {
-        Warrior c = new Warrior(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
+        Warrior c = new Warrior(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());

@@ -401,7 +401,6 @@ public class Tribe extends Actor {
                         connectedCities.add(cityId);
                         addedCities.add(cityId);
                     }
-
                 }
             }
 

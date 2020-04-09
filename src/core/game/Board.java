@@ -937,24 +937,16 @@ public class Board {
         public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
 
             ArrayList<PathNode> neighbours = new ArrayList<>();
-            int xMove[] = {0, -1, 0, 1, -1, -1, 1, 1};
-            int yMove[] = {1, 0, -1, 0, 1, -1, -1, 1};
             double stepCost = 1.0;
 
-            for(int i = 0; i < xMove.length; ++i)
-                for(int j = 0; j < yMove.length; ++j)
+            for(Vector2d tile : from.neighborhood(1, 0, size)) {
+                int x = tile.x;
+                int y = tile.y;
+                if(navigable[x][y] && costFrom+stepCost <= TribesConfig.PORT_TRADE_DISTANCE)
                 {
-                    int x = from.x + xMove[i];
-                    int y = from.y + yMove[i];
-
-                    if(x >= 0 && x < navigable.length && y >= 0 && y < navigable[y].length)
-                    {
-                        if(navigable[x][y] && costFrom+stepCost <= TribesConfig.PORT_TRADE_DISTANCE)
-                        {
-                            neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
-                        }
-                    }
+                    neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
                 }
+            }
 
             return neighbours;
         }

@@ -451,6 +451,16 @@ public class Tribe extends Actor {
         return citiesID.contains(capitalID);
     }
 
+    public boolean controlsCity(int cityId)
+    {
+        return citiesID.contains(cityId);
+    }
+
+    public int getNumCities()
+    {
+        return citiesID.size();
+    }
+
     public void cityMaxedUp() {
         if(monuments.get(PARK_OF_FORTUNE) == MONUMENT_STATUS.UNAVAILABLE)
             monuments.put(PARK_OF_FORTUNE, MONUMENT_STATUS.AVAILABLE);
@@ -522,4 +532,5 @@ public class Tribe extends Actor {
     }
 
     public void resetPacifistCount() {nPacifistCount = 0;}
+
 }

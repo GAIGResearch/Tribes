@@ -126,7 +126,7 @@ public class City extends Actor{
                 {
                     //the matching building belongs to this city
                     existingBuilding = this.getBuilding(adjPosition.x, adjPosition.y);
-                }else if(tribe.getCitiesID().contains(cityId)) {
+                }else if(tribe.controlsCity(cityId)) {
                     //the matching building belongs to a city from a different tribe
                     City city = (City) gameState.getActor(cityId);
                     existingBuilding = city.getBuilding(adjPosition.x, adjPosition.y);

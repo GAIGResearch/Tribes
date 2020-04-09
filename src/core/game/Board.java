@@ -703,7 +703,8 @@ public class Board {
                 for (int i = 0; i < networkTiles.length; ++i) {
                     for (int j = 0; j < networkTiles[0].length; ++j) {
                         //Only for this tribe
-                        if (tileCityId[i][j] == tribeId) {
+                        int cityId = tileCityId[i][j];
+                        if (t.controlsCity(cityId)) {
                             // Map cities, roads and ports
                             connectedTiles[i][j] = networkTiles[i][j];
 
@@ -985,25 +986,16 @@ public class Board {
         public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
 
             ArrayList<PathNode> neighbours = new ArrayList<>();
-            int xMove[] = {0, -1, 0, 1, -1, -1, 1, 1};
-            int yMove[] = {1, 0, -1, 0, 1, -1, -1, 1};
             double stepCost = 1.0;
 
-            for(int i = 0; i < xMove.length; ++i)
-                for(int j = 0; j < yMove.length; ++j)
+            for(Vector2d tile : from.neighborhood(1, 0, size)) {
+                int x = tile.x;
+                int y = tile.y;
+                if(connected[x][y])
                 {
-                    int x = from.x + xMove[i];
-                    int y = from.y + yMove[i];
-
-                    if(x >= 0 && x < connected.length && y >= 0 && y < connected[y].length)
-                    {
-                        if(connected[x][y])
-                        {
-                            neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
-                        }
-                    }
+                    neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
                 }
-
+            }
 
             //Now, add the jump link neighbours
             if(jumpLinks.containsKey(from))

@@ -267,10 +267,6 @@ public class Tribe extends Actor {
         return capitalID;
     }
 
-    public boolean hasCity(int cityId) {
-        return this.citiesID.contains(cityId);
-    }
-
     public void setPosition(int x, int y) {
         position = null;
     } //this doesn't make sense
@@ -397,7 +393,7 @@ public class Tribe extends Actor {
                     if (connectedCities.contains(cityId)) {
                         if (!connectedNow) {
                             //drops from the network
-                            connectedCities.remove(cityId);
+                            dropCityFromNetwork(nonCapitalCity);
                             lostCities.add(cityId);
                         }
                     } else if (connectedNow) {
@@ -408,6 +404,19 @@ public class Tribe extends Actor {
 
                 }
             }
+
+            //There may be some connected cities that we don't longer own
+            // (i.e. we're here because an enemy captured one of our cities in the network)
+            ArrayList<Integer> connCities = new ArrayList<>(connectedCities);
+            for(Integer cityId : connCities)
+            {
+                if(!this.controlsCity(cityId))
+                {
+                    dropCityFromNetwork((City) b.getActor(cityId));
+                    lostCities.add(cityId);
+                }
+            }
+
 
             //The capital gains 1 population for each city connected, -1 for each city disconnected
             int capitalGain = addedCities.size() - lostCities.size();
@@ -434,6 +443,20 @@ public class Tribe extends Actor {
                 nonCapitalCity.addPopulation(this, 1);
             }
         }
+    }
+
+    /**
+     * Drops a city from the network. Removes the associated population required to that city.
+     * @param lostCity city to remove from network
+     */
+    private void dropCityFromNetwork(City lostCity)
+    {
+        int cityId = lostCity.getActorId();
+        int cityIdx = connectedCities.indexOf(cityId);
+        connectedCities.remove(cityIdx);
+
+        //this city loses 1 population
+        lostCity.addPopulation(this, -1);
     }
 
     public int getMaxProduction(GameState gs)

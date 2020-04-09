@@ -692,8 +692,6 @@ public class Board {
 
             if (t.controlsCapital()) {
 
-                int tribeId = t.getTribeId();
-
                 boolean[][] connectedTiles = new boolean[networkTiles.length][networkTiles[0].length];
                 boolean[][] navigable = new boolean[networkTiles.length][networkTiles[0].length];
 
@@ -883,7 +881,7 @@ public class Board {
             {
                 //Only on tiles that are neutral or in my cities
                 int cityId = tileCityId[x][y];
-                if(cityId == -1 || tribes[tribeId].hasCity(cityId))
+                if(cityId == -1 || tribes[tribeId].controlsCity(cityId))
                 {
                     //There should be no road already here
                     if(!networkTiles[x][y])

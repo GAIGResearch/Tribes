@@ -257,8 +257,6 @@ public class Game {
                     frame.update(getGameState(-1));
                 else
                     frame.update(gameStateObservations[gs.getActiveTribeID()]);        //Partial Obs
-                Thread gui = new Thread(frame);
-                gui.start();
             }
 
             //the timer needs to be updated to the remaining time, not counting action computation.

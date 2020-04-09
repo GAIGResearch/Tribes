@@ -404,7 +404,6 @@ public class InfoView extends JComponent {
     void paint(GameState gs)
     {
         this.gs = gs;
-        this.repaint();
     }
 
     /**

@@ -21,7 +21,7 @@ import java.util.Map;
 import static core.Constants.*;
 
 
-public class GUI extends JFrame implements Runnable {
+public class GUI extends JFrame {
     private JLabel appTurn;
     private JLabel activeTribe, activeTribeInfo, otherInfo;
     private int otherInfoDelay = GUI_INFO_DELAY;
@@ -299,9 +299,18 @@ public class GUI extends JFrame implements Runnable {
             ac.reset();  // Clear action queue on turn change
         }
 
+        // Display result of Examine action
+        Action a = ac.getLastActionPlayed();
+        if (a instanceof Examine) {
+            lastExamineAction = (Examine)a;
+            ac.setLastActionPlayed(null);
+        }
+
+        this.gs = gs;
+        performUpdate();
+
         // Check if city is levelling up, pop up dialogue to choose options if human agent
         if (gs.isLevelingUp() && game.getPlayers()[gs.getActiveTribeID()] instanceof HumanAgent) {
-            view.paint(gs);
             int n = -1;
             Object[] options = new String[2];
             Action[] optionsA = new Action[2];
@@ -324,15 +333,6 @@ public class GUI extends JFrame implements Runnable {
             }
             ac.addAction(optionsA[n], gs);
         }
-
-        // Display result of Examine action
-        Action a = ac.getLastActionPlayed();
-        if (a instanceof Examine) {
-            lastExamineAction = (Examine)a;
-            ac.setLastActionPlayed(null);
-        }
-
-        this.gs = gs;
     }
 
     public boolean nextMove() {
@@ -363,10 +363,7 @@ public class GUI extends JFrame implements Runnable {
         return null;
     }
 
-    @Override
-    public void run() {
-        finishedUpdate = false;
-
+    private void performUpdate() {
         view.paint(gs);
         tribeView.paint(gs);
         techView.paint(gs);
@@ -385,14 +382,7 @@ public class GUI extends JFrame implements Runnable {
                 }
             }
         }
-        try {
-            Thread.sleep(1);
-//            Thread.sleep(FRAME_DELAY);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        finishedUpdate = true;
+        repaint();
     }
 
 

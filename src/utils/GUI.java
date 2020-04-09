@@ -37,8 +37,6 @@ public class GUI extends JFrame {
     private TechView techView;
     private InfoView infoView;
 
-    private boolean finishedUpdate = true;
-
     // Zoomed screen dragging vars
     private Point2D startDrag, endDrag, panTranslate;
 
@@ -333,10 +331,6 @@ public class GUI extends JFrame {
             }
             ac.addAction(optionsA[n], gs);
         }
-    }
-
-    public boolean nextMove() {
-        return finishedUpdate;
     }
 
     /**

@@ -488,7 +488,6 @@ public class GameView extends JComponent {
         //int gameTurn = 0;// gs.getTick() % gs.getTribes().length;
         gameState = gs; //.copy(gameTurn);
         board = gameState.getBoard();
-        this.repaint();
     }
 
     void updatePan(Point2D panTranslate) {

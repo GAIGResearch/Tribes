@@ -702,21 +702,21 @@ public class Board {
                     for (int j = 0; j < networkTiles[0].length; ++j) {
                         //Only for this tribe
                         int cityId = tileCityId[i][j];
-                        if (t.controlsCity(cityId)) {
+                        boolean myCity = t.controlsCity(cityId);
+                        if (myCity) {
                             // Map cities, roads and ports
                             connectedTiles[i][j] = networkTiles[i][j];
 
                             //Keep a list of my ports
                             if (buildings[i][j] == Types.BUILDING.PORT)
                                 ports.add(new Vector2d(i, j));
+                        }
 
-                            //And navigable tiles
-                            if ((terrains[i][j] == SHALLOW_WATER || terrains[i][j] == DEEP_WATER) //WATER
-                                    && t.isVisible(i, j) && tileCityId[i][j] != -1) //VISIBLE AND NOT ENEMY
-                            {
-                                navigable[i][j] = true;
-                            }
-
+                        //And navigable tiles: WATER, VISIBLE AND NOT ENEMY
+                        if ((terrains[i][j] == SHALLOW_WATER || terrains[i][j] == DEEP_WATER)
+                                && t.isVisible(i, j)
+                                && (tileCityId[i][j] == -1 || myCity)) {
+                            navigable[i][j] = true;
                         }
                     }
                 }
@@ -725,9 +725,12 @@ public class Board {
 
                 //Now, we need to add jump links. In this case, two ports are connected if
                 // separated by [0,TribesConfig.PORT_TRADE_DISTANCE] WATER, VISIBLE, NON-ENEMY tiles
-                for (Vector2d portFrom : ports) {
-                    for (Vector2d portTo : ports) {
-                        if (!portFrom.equals(portTo)) {
+                int nPorts = ports.size();
+                for (int i = 0; i < nPorts - 1; ++i) {
+                    for (int j = i; j < nPorts; ++j) {
+                        if (i != j) {
+                            Vector2d portFrom = ports.get(i);
+                            Vector2d portTo = ports.get(j);
 
                             Vector2d originPortPos = new Vector2d(portFrom.x, portFrom.y);
                             Pathfinder tp = new Pathfinder(originPortPos, new TradeWaterStep(navigable));
@@ -738,6 +741,7 @@ public class Board {
                                 //We add this as a link between ports.
                                 tns.addJumpLink(portFrom, portTo, true);
                             }
+
                         }
                     }
                 }

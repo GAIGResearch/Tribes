@@ -431,10 +431,10 @@ public class Tribe extends Actor {
         if (thisTribesTurn) {
 
             //All cities that lost connection with the capital lose 1 population
-            for (int cityId : lostCities) {
-                City nonCapitalCity = (City) b.getActor(cityId);
-                nonCapitalCity.addPopulation(this, -1);
-            }
+//            for (int cityId : lostCities) {
+//                City nonCapitalCity = (City) b.getActor(cityId);
+//                nonCapitalCity.addPopulation(this, -1);
+//            }
 
             //All cities that gained connection with the capital gain 1 population.
             for (int cityId : addedCities) {

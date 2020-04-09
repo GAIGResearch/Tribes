@@ -17,11 +17,12 @@ public class Play {
 
     public static void main(String[] args) {
 //        String filename = "SampleLevel2p.csv";
-        String filename = "SampleLevel.csv";
+//        String filename = "SampleLevel.csv";
 //        String filename = "MinimalLevel.csv";
+        String filename = "MinimalLevel2.csv";
 
-//        play(filename, new boolean[]{true,true}, new Types.TRIBE[] {IMPERIUS, OUMAJI});
-        play(filename, new boolean[]{true, true, true, true}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI});
+        play(filename, new boolean[]{true,true}, new Types.TRIBE[] {IMPERIUS, OUMAJI});
+//        play(filename, new boolean[]{true, true, true, true}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI});
 //        play(filename, new boolean[]{true,}, new Types.TRIBE[] {OUMAJI});
     }
 

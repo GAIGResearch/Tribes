@@ -55,7 +55,7 @@ public class Upgrade extends UnitAction
 
             //We first remove the unit, so there's space for the new one to take its place.
             board.removeUnitFromBoard(unit);
-            board.removeUnitFromCity(unit, city);
+            board.removeUnitFromCity(unit, city, tribe);
             board.addUnit(city, newUnit);
             return true;
         }

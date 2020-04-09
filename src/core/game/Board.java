@@ -176,25 +176,26 @@ public class Board {
      * unit disappears.
      * See Push Grid at: https://polytopia.fandom.com/wiki/Giant
      *
-     * @param tribeId: Id of the tribe the unit belongs to
+     * @param tribe:   Tribe the unit belongs to
      * @param toPush   Unit to be pushed
      * @param startX   x coordinate of the starting position of the unit to push
      * @param startY   y coordinate of the starting position of the unit to push
      * @return true if the unit could be pushed.
      */
 
-    public boolean pushUnit(int tribeId, Unit toPush, int startX, int startY, Random r) {
-        int xPush[] = {0, -1, 0, 1, -1, -1, 1, 1};
-        int yPush[] = {1, 0, -1, 0, 1, -1, -1, 1};
+    public boolean pushUnit(Tribe tribe, Unit toPush, int startX, int startY, Random r) {
+        int[] xPush = {0, -1, 0, 1, -1, -1, 1, 1};
+        int[] yPush = {1, 0, -1, 0, 1, -1, -1, 1};
         int idx = 0;
         boolean pushed = false;
+        int tribeId = tribe.getTribeId();
 
         while (!pushed && idx < xPush.length) {
             int x = startX + xPush[idx];
             int y = startY + yPush[idx];
 
             if (x >= 0 && y >= 0 && x < size && y < size) {
-                pushed = tryPush(tribeId, toPush, startX, startY, x, y, r);
+                pushed = tryPush(tribe, toPush, startX, startY, x, y, r);
             }
             idx++;
         }
@@ -205,14 +206,14 @@ public class Board {
         return pushed;
     }
 
-    public boolean tryPush(int tribeId, Unit toPush, int startX, int startY, int x, int y, Random r) {
+    public boolean tryPush(Tribe tribe, Unit toPush, int startX, int startY, int x, int y, Random r) {
         //there's no unit? (or killed)
         Unit u = getUnitAt(x, y);
         if (u != null && !u.isKilled())
         {
             return false;
         }
-
+        int tribeId = tribe.getTribeId();
 
         //climbable mountain?
         Types.TERRAIN terrain = terrains[x][y];
@@ -230,7 +231,7 @@ public class Board {
             if (b == Types.BUILDING.PORT) {
                 City c = getCityInBorders(x, y);
                 if (c != null && c.getTribeId() == tribeId) {
-                    embark(toPush, x, y);
+                    embark(toPush, tribe, x, y);
                     return true;
                 }
 
@@ -249,10 +250,10 @@ public class Board {
     }
 
 
-    public void embark(Unit unit, int x, int y) {
+    public void embark(Unit unit, Tribe tribe, int x, int y) {
         City city = (City) gameActors.get(unit.getCityId());
         removeUnitFromBoard(unit);
-        removeUnitFromCity(unit, city);
+        removeUnitFromCity(unit, city, tribe);
 
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(x, y);
@@ -265,10 +266,10 @@ public class Board {
 //                 " has associated units: " + city.getUnitsID().toString());
     }
 
-    public void disembark(Unit unit, int x, int y) {
+    public void disembark(Unit unit, Tribe tribe, int x, int y) {
         City city = (City) gameActors.get(unit.getCityId());
         removeUnitFromBoard(unit);
-        removeUnitFromCity(unit, city);
+        removeUnitFromCity(unit, city, tribe);
         
         Types.UNIT baseLandUnit;
         switch (unit.getType())
@@ -692,8 +693,6 @@ public class Board {
 
             if (t.controlsCapital()) {
 
-                int tribeId = t.getTribeId();
-
                 boolean[][] connectedTiles = new boolean[networkTiles.length][networkTiles[0].length];
                 boolean[][] navigable = new boolean[networkTiles.length][networkTiles[0].length];
 
@@ -811,10 +810,12 @@ public class Board {
             c.addUnit(u.getActorId());
     }
 
-    public void removeUnitFromCity(Unit u, City city)
+    public void removeUnitFromCity(Unit u, City city, Tribe tribe)
     {
         if(u.getCityId() != -1) { //This happens when the unit belongs to the city
             city.removeUnit(u.getActorId());
+        }else{
+            tribe.removeExtraUnit(u);
         }
     }
 
@@ -883,7 +884,7 @@ public class Board {
             {
                 //Only on tiles that are neutral or in my cities
                 int cityId = tileCityId[x][y];
-                if(cityId == -1 || tribes[tribeId].hasCity(cityId))
+                if(cityId == -1 || tribes[tribeId].controlsCity(cityId))
                 {
                     //There should be no road already here
                     if(!networkTiles[x][y])
@@ -939,24 +940,16 @@ public class Board {
         public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
 
             ArrayList<PathNode> neighbours = new ArrayList<>();
-            int xMove[] = {0, -1, 0, 1, -1, -1, 1, 1};
-            int yMove[] = {1, 0, -1, 0, 1, -1, -1, 1};
             double stepCost = 1.0;
 
-            for(int i = 0; i < xMove.length; ++i)
-                for(int j = 0; j < yMove.length; ++j)
+            for(Vector2d tile : from.neighborhood(1, 0, size)) {
+                int x = tile.x;
+                int y = tile.y;
+                if(navigable[x][y] && costFrom+stepCost <= TribesConfig.PORT_TRADE_DISTANCE)
                 {
-                    int x = from.x + xMove[i];
-                    int y = from.y + yMove[i];
-
-                    if(x >= 0 && x < navigable.length && y >= 0 && y < navigable[y].length)
-                    {
-                        if(navigable[x][y] && costFrom+stepCost <= TribesConfig.PORT_TRADE_DISTANCE)
-                        {
-                            neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
-                        }
-                    }
+                    neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
                 }
+            }
 
             return neighbours;
         }

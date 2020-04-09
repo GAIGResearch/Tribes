@@ -499,6 +499,13 @@ public class Tribe extends Actor {
         target.setCityId(-1);
     }
 
+    public void removeExtraUnit(Unit target)
+    {
+        int index = extraUnits.indexOf(target.getActorId());
+        if(index != -1)
+            extraUnits.remove(index);
+    }
+
     /**
      * Checks if the tribe can build roads
      * @return if tribe can build roads

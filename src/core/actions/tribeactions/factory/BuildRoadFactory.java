@@ -26,7 +26,7 @@ public class BuildRoadFactory implements ActionFactory {
         ArrayList<Vector2d> positions = gs.getBoard().getBuildRoadPositions(tribe.getTribeId());
         for (Vector2d v : positions) {
             BuildRoad br = new BuildRoad(tribe.getTribeId());
-            br.setPosition(v.x, v.y);
+            br.setPosition(v);
             actions.add(br);
         }
 

@@ -35,7 +35,7 @@ public class Upgrade extends UnitAction
         Unit unit = (Unit) gs.getActor(this.unitId);
         Tribe tribe = gs.getTribe(unit.getTribeId());
         Board board = gs.getBoard();
-        City city = (City) board.getActor(unit.getCityID());
+        City city = (City) board.getActor(unit.getCityId());
 
         if(isFeasible(gs)){
             Types.UNIT unitType = unit.getType();
@@ -47,7 +47,7 @@ public class Upgrade extends UnitAction
             else return false; //this shouldn't happen, isFeasible should've captured this case
 
             //Create the new unit
-            Unit newUnit = Types.UNIT.createUnit(unit.getPosition(), unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), nextType);
+            Unit newUnit = Types.UNIT.createUnit(unit.getPosition(), unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), nextType);
             newUnit.setCurrentHP(unit.getCurrentHP());
 
             //adjustments in tribe and board.
@@ -55,7 +55,7 @@ public class Upgrade extends UnitAction
 
             //We first remove the unit, so there's space for the new one to take its place.
             board.removeUnitFromBoard(unit);
-            board.removeUnitFromCity(unit, city);
+            board.removeUnitFromCity(unit, city, tribe);
             board.addUnit(city, newUnit);
             return true;
         }

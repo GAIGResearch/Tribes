@@ -2,6 +2,8 @@ package core.actions.unitactions;
 
 import core.Types;
 import core.actions.Action;
+import core.actors.City;
+import core.actors.Tribe;
 import core.game.GameState;
 import core.actors.units.Unit;
 
@@ -25,6 +27,10 @@ public class Convert extends UnitAction
         Unit target = (Unit) gs.getActor(this.targetId);
         Unit unit = (Unit) gs.getActor(this.unitId);
 
+        //Only MIND_BENDER can execute this action
+        if(unit.getType() != Types.UNIT.MIND_BENDER)
+            return false;
+
         // Check if target is not null
         if(target == null || !unit.canAttack())
             return false;
@@ -38,10 +44,15 @@ public class Convert extends UnitAction
         if(isFeasible(gs)) {
             Unit target = (Unit) gs.getActor(this.targetId);
             Unit unit = (Unit) gs.getActor(this.unitId);
+            Tribe targetTribe = gs.getTribe(target.getTribeId());
 
+            //remove the unit from its original city.
+            int cityId = target.getCityId();
+            City c = (City) gs.getActor(cityId);
+            gs.getBoard().removeUnitFromCity(unit, c, targetTribe);
+
+            //add tribe to converted unit
             target.setTribeId(unit.getTribeId());
-
-            //add tribe to converted units
             gs.getActiveTribe().addExtraUnit(target);
 
             //manage status of the units after the action is executed

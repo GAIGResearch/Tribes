@@ -6,52 +6,51 @@ import players.*;
 
 import java.util.ArrayList;
 
+import static core.Types.TRIBE.*;
+import static core.Types.TRIBE.OUMAJI;
+
 /**
  * Entry point of the framework.
  */
 public class Play {
 
-    public static void main(String[] args) {
 
+    public static void main(String[] args) {
+//        String filename = "SampleLevel2p.csv";
+//        String filename = "SampleLevel.csv";
+//        String filename = "MinimalLevel.csv";
+        String filename = "MinimalLevel2.csv";
+
+        play(filename, new boolean[]{true,true}, new Types.TRIBE[] {IMPERIUS, OUMAJI});
+//        play(filename, new boolean[]{true, true, true, true}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI});
+//        play(filename, new boolean[]{true,}, new Types.TRIBE[] {OUMAJI});
+    }
+
+    public static void play(String filename, boolean[] humans, Types.TRIBE[] tribes)
+    {
         KeyController ki = new KeyController(true);
         ActionController ac = new ActionController();
 
         long seed = System.currentTimeMillis();
-        System.out.println("Game seed: " + seed);
-//        String filename = "SampleLevel2p.csv";
-        String filename = "SampleLevel.csv";
-//        String filename = "MinimalLevel.csv";
+        long randomSeed = System.currentTimeMillis();
+        System.out.println("Game seed: " + seed + ", random seed: " + randomSeed);
 
         ArrayList<Agent> players = new ArrayList<>();
-        ArrayList<Tribe> tribes = new ArrayList<>();
+        ArrayList<Tribe> tribes_list = new ArrayList<>();
 
-        Agent ag1 = new HumanAgent(ac);
-//        long randomSeed = System.currentTimeMillis();
-//        System.out.println("Agent 1 random seed: " + randomSeed);
-//        Agent ag1 = new RandomAgent(randomSeed);
-        players.add(ag1);
-//        tribes.add(new Tribe(Types.TRIBE.OUMAJI));
-        tribes.add(new Tribe(Types.TRIBE.XIN_XI));
-
-        Agent ag2 = new HumanAgent(ac);
-////        Agent ag2 = new RandomAgent(randomSeed);
-        players.add(ag2);
-        tribes.add(new Tribe(Types.TRIBE.IMPERIUS));
-//
-        Agent ag3 = new  HumanAgent(ac);
-////        Agent ag3 = new RandomAgent(randomSeed);
-        players.add(ag3);
-        tribes.add(new Tribe(Types.TRIBE.BARDUR));
-//
-        Agent ag4 = new HumanAgent(ac);
-////        Agent ag4 = new RandomAgent(randomSeed);
-        players.add(ag4);
-        tribes.add(new Tribe(Types.TRIBE.OUMAJI));
+        for(int i = 0; i < humans.length; ++i)
+        {
+            Agent ag = humans[i] ? new HumanAgent(ac) : new RandomAgent(randomSeed);
+            players.add(ag);
+            tribes_list.add(new Tribe(tribes[i]));
+        }
 
         Game game = new Game();
-        game.init(players, tribes, filename, seed);
+        game.init(players, tribes_list, filename, seed);
 
         Run.runGame(game, ki, ac);
         System.out.println("Running Tribes...");
     }
+
+
 }

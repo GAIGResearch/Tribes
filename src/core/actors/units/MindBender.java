@@ -18,7 +18,7 @@ public class MindBender extends Unit
 
     @Override
     public MindBender copy() {
-        MindBender c = new MindBender(getPosition(), getKills(), isVeteran(), getCityID(), getTribeId());
+        MindBender c = new MindBender(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());

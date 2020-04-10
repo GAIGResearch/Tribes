@@ -126,7 +126,7 @@ public class City extends Actor{
                 {
                     //the matching building belongs to this city
                     existingBuilding = this.getBuilding(adjPosition.x, adjPosition.y);
-                }else if(tribe.getCitiesID().contains(cityId)) {
+                }else if(tribe.controlsCity(cityId)) {
                     //the matching building belongs to a city from a different tribe
                     City city = (City) gameState.getActor(cityId);
                     existingBuilding = city.getBuilding(adjPosition.x, adjPosition.y);
@@ -192,12 +192,6 @@ public class City extends Actor{
 
     public Integer removeUnitByIndex(int index){
         return unitsID.remove(index);
-    }
-
-    public ArrayList<Integer> moveUnits(){
-        ArrayList<Integer> lists = unitsID;
-        unitsID = new ArrayList<Integer>();
-        return lists;
     }
 
     public int getLevel() {
@@ -273,6 +267,11 @@ public class City extends Actor{
 
     public ArrayList<Integer> getUnitsID() {
         return unitsID;
+    }
+
+    public int getNumUnits()
+    {
+        return unitsID.size();
     }
 
     public Building getBuilding(int x, int y){

@@ -12,6 +12,8 @@ import utils.graph.*;
 
 import java.util.*;
 
+import static core.Types.TERRAIN.*;
+
 public class Board {
 
     // Array for the type of terrain that each tile of board will have
@@ -174,25 +176,26 @@ public class Board {
      * unit disappears.
      * See Push Grid at: https://polytopia.fandom.com/wiki/Giant
      *
-     * @param tribeId: Id of the tribe the unit belongs to
+     * @param tribe:   Tribe the unit belongs to
      * @param toPush   Unit to be pushed
      * @param startX   x coordinate of the starting position of the unit to push
      * @param startY   y coordinate of the starting position of the unit to push
      * @return true if the unit could be pushed.
      */
 
-    public boolean pushUnit(int tribeId, Unit toPush, int startX, int startY, Random r) {
-        int xPush[] = {0, -1, 0, 1, -1, -1, 1, 1};
-        int yPush[] = {1, 0, -1, 0, 1, -1, -1, 1};
+    public boolean pushUnit(Tribe tribe, Unit toPush, int startX, int startY, Random r) {
+        int[] xPush = {0, -1, 0, 1, -1, -1, 1, 1};
+        int[] yPush = {1, 0, -1, 0, 1, -1, -1, 1};
         int idx = 0;
         boolean pushed = false;
+        int tribeId = tribe.getTribeId();
 
         while (!pushed && idx < xPush.length) {
             int x = startX + xPush[idx];
             int y = startY + yPush[idx];
 
             if (x >= 0 && y >= 0 && x < size && y < size) {
-                pushed = tryPush(tribeId, toPush, startX, startY, x, y, r);
+                pushed = tryPush(tribe, toPush, startX, startY, x, y, r);
             }
             idx++;
         }
@@ -203,14 +206,14 @@ public class Board {
         return pushed;
     }
 
-    public boolean tryPush(int tribeId, Unit toPush, int startX, int startY, int x, int y, Random r) {
+    public boolean tryPush(Tribe tribe, Unit toPush, int startX, int startY, int x, int y, Random r) {
         //there's no unit? (or killed)
         Unit u = getUnitAt(x, y);
         if (u != null && !u.isKilled())
         {
             return false;
         }
-
+        int tribeId = tribe.getTribeId();
 
         //climbable mountain?
         Types.TERRAIN terrain = terrains[x][y];
@@ -224,11 +227,11 @@ public class Board {
 
         //Water with a port this tribe owns?
         Types.BUILDING b = buildings[x][y];
-        if (terrain == Types.TERRAIN.SHALLOW_WATER) {
+        if (terrain == SHALLOW_WATER) {
             if (b == Types.BUILDING.PORT) {
                 City c = getCityInBorders(x, y);
                 if (c != null && c.getTribeId() == tribeId) {
-                    embark(toPush, x, y);
+                    embark(toPush, tribe, x, y);
                     return true;
                 }
 
@@ -247,23 +250,26 @@ public class Board {
     }
 
 
-    public void embark(Unit unit, int x, int y) {
-        City city = (City) gameActors.get(unit.getCityID());
+    public void embark(Unit unit, Tribe tribe, int x, int y) {
+        City city = (City) gameActors.get(unit.getCityId());
         removeUnitFromBoard(unit);
-        removeUnitFromCity(unit, city);
+        removeUnitFromCity(unit, city, tribe);
 
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(x, y);
-        Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), Types.UNIT.BOAT);
+        Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), Types.UNIT.BOAT);
         boat.setCurrentHP(unit.getCurrentHP());
         ((Boat)boat).setBaseLandUnit(unit.getType());
         addUnit(city, boat);
+
+//        System.out.println("Embarking unit. From id: " + unit.getActorId() + " to " + boat.getActorId() + ". City " + unit.getCityId() + "/" + boat.getCityId() +
+//                 " has associated units: " + city.getUnitsID().toString());
     }
 
-    public void disembark(Unit unit, int x, int y) {
-        City city = (City) gameActors.get(unit.getCityID());
+    public void disembark(Unit unit, Tribe tribe, int x, int y) {
+        City city = (City) gameActors.get(unit.getCityId());
         removeUnitFromBoard(unit);
-        removeUnitFromCity(unit, city);
+        removeUnitFromCity(unit, city, tribe);
         
         Types.UNIT baseLandUnit;
         switch (unit.getType())
@@ -285,9 +291,13 @@ public class Board {
         }
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(x, y);
-        Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityID(), unit.getTribeId(), baseLandUnit);
+        Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), baseLandUnit);
         newUnit.setCurrentHP(unit.getCurrentHP());
         addUnit(city, newUnit);
+
+
+//        System.out.println("Disembarking unit. From id: " + unit.getActorId() + " to " + newUnit.getActorId() + ". City " + unit.getCityId() + "/" + newUnit.getCityId() +
+//                " has associated units: " + city.getUnitsID().toString());
     }
 
     public void moveUnit(Unit unit, int x0, int y0, int xF, int yF, Random r) {
@@ -350,11 +360,11 @@ public class Board {
                 return false;
 
             //Shallow water and no sailing
-            if (terrains[x][y] == Types.TERRAIN.SHALLOW_WATER && !tt.isResearched(Types.TECHNOLOGY.SAILING))
+            if (terrains[x][y] == SHALLOW_WATER && !tt.isResearched(Types.TECHNOLOGY.SAILING))
                 return false;
 
             //Deep water and no navigation
-            if (terrains[x][y] == Types.TERRAIN.DEEP_WATER && !tt.isResearched(Types.TECHNOLOGY.NAVIGATION))
+            if (terrains[x][y] == DEEP_WATER && !tt.isResearched(Types.TECHNOLOGY.NAVIGATION))
                 return false;
 
 
@@ -523,6 +533,10 @@ public class Board {
 //        setPointsForBorderExpansion(city);
     }
 
+    public boolean isRoad(int x, int y) {
+        return networkTiles[x][y] && terrains[x][y] != SHALLOW_WATER && terrains[x][y] != DEEP_WATER && terrains[x][y] != CITY;
+    }
+
     public int getCityIdAt(int x, int y)
     {
         return tileCityId[x][y];
@@ -567,17 +581,17 @@ public class Board {
             //Not a city. Needs to be created, assigned and its border calculated.
             City newCity = new City(x, y, capturingTribe.getTribeId());
 
-            // Move the unit from one city to village. Rank: capital -> cities -> None
-            moveOneToNewCity(newCity, capturingTribe, rnd);
-
             //Add city to board and set its borders
             addCityToTribe(newCity,gameState.getRandomGenerator());
             setBorderHelper(newCity, newCity.getBound());
 
             //This becomes a city.
-            setTerrainAt(x, y, Types.TERRAIN.CITY);
+            setTerrainAt(x, y, CITY);
 
-        }else if(ter == Types.TERRAIN.CITY)
+            // Move the unit from one city to village. Rank: capital -> cities -> None
+            moveOneToNewCity(newCity, capturingTribe, rnd);
+
+        }else if(ter == CITY)
         {
             City capturedCity = (City) gameActors.get(tileCityId[x][y]);
             Tribe previousOwner = tribes[capturedCity.getTribeId()];
@@ -633,40 +647,44 @@ public class Board {
         boolean ownsCapital = tribe.controlsCapital();
         City capital = (City) getActor(tribe.getCapitalID());
 
-        //Units to move
-        ArrayList<Integer> units = fromCity.moveUnits();
-
         //First to capital
-        while (ownsCapital && capital.canAddUnit() && units.size() > 0){
-            capital.addUnit(units.get(0));
-            units.remove(0);
+        if(ownsCapital) while (capital.canAddUnit() && fromCity.getNumUnits() > 0){
+            moveBelongingCity(fromCity, capital);
         }
 
         //Then, to all the other cities, picked at random.
-        if(units.size() > 0)
+        if(fromCity.getNumUnits() > 0)
         {
             LinkedList<Integer> cities = new LinkedList<>(tribe.getCitiesID());
             cities.remove((Integer)tribe.getCapitalID());
             Collections.shuffle(cities, rnd);
-            while (cities.size() > 0 && units.size() > 0){
+            while (cities.size() > 0 && fromCity.getNumUnits() > 0){
                 City destCity = (City)getActor(cities.removeFirst());
-                while (destCity.canAddUnit() && units.size() > 0){
-                    destCity.addUnit(units.get(0));
-                    units.remove(0);
+                while (destCity.canAddUnit() && fromCity.getNumUnits() > 0){
+                    moveBelongingCity(fromCity, destCity);
                 }
             }
 
             //If there are still units, they go to the tribe.
-            if (units.size() > 0){
-                tribe.moveAllUnits(units);
+            if (fromCity.getNumUnits() > 0){
+                for(Integer unitId: fromCity.getUnitsID())
+                {
+                    Unit removedUnit = (Unit) gameActors.get(unitId);
+                    tribe.addExtraUnit(removedUnit);
+                }
             }
         }
     }
 
     private void moveBelongingCity(City originalCity, City targetCity){
+        //Move the unit in the citys' unit lists.
         int index = originalCity.getUnitsID().size()-1;
         int actorID = originalCity.removeUnitByIndex(index);
         targetCity.addUnit(actorID);
+
+        //Assign new city to unit
+        Unit removedUnit = (Unit) gameActors.get(actorID);
+        removedUnit.setCityId(targetCity.getActorId());
     }
   
     private void computeTradeNetwork()
@@ -674,8 +692,6 @@ public class Board {
         for(Tribe t : tribes) {
 
             if (t.controlsCapital()) {
-
-                int tribeId = t.getTribeId();
 
                 boolean[][] connectedTiles = new boolean[networkTiles.length][networkTiles[0].length];
                 boolean[][] navigable = new boolean[networkTiles.length][networkTiles[0].length];
@@ -686,7 +702,8 @@ public class Board {
                 for (int i = 0; i < networkTiles.length; ++i) {
                     for (int j = 0; j < networkTiles[0].length; ++j) {
                         //Only for this tribe
-                        if (tileCityId[i][j] == tribeId) {
+                        int cityId = tileCityId[i][j];
+                        if (t.controlsCity(cityId)) {
                             // Map cities, roads and ports
                             connectedTiles[i][j] = networkTiles[i][j];
 
@@ -695,7 +712,7 @@ public class Board {
                                 ports.add(new Vector2d(i, j));
 
                             //And navigable tiles
-                            if ((terrains[i][j] == Types.TERRAIN.SHALLOW_WATER || terrains[i][j] == Types.TERRAIN.DEEP_WATER) //WATER
+                            if ((terrains[i][j] == SHALLOW_WATER || terrains[i][j] == DEEP_WATER) //WATER
                                     && t.isVisible(i, j) && tileCityId[i][j] != -1) //VISIBLE AND NOT ENEMY
                             {
                                 navigable[i][j] = true;
@@ -776,11 +793,10 @@ public class Board {
 
     /**
      * Adds a unit to a city, which created it.
-     * @param c citi that created the unit
+     * @param c city that created the unit
      * @param u unit to add
-     * @return false if the unit coulnd't be added. That should not happen, so it prints a warning.
      */
-    public boolean addUnit(City c, Unit u)
+    public void addUnit(City c, Unit u)
     {
         //First, add the actor to the list of game state actors
         addActor(u);
@@ -789,18 +805,18 @@ public class Board {
         Vector2d pos = u.getPosition();
         setUnitIdAt(pos.x, pos.y, u);
 
-        //Finally, add the unit to the city that created it
-        boolean added = c.addUnit(u.getActorId());
-        if(!added){
-            System.out.println("ERROR: Unit failed to be added to city: u_id: " + u.getActorId() + ", c_id: " + c.getActorId());
-        }
-
-        return added;
+        //Finally, add the unit to the city that created it, unless it belongs to the tribe.
+        if(u.getCityId() != -1)
+            c.addUnit(u.getActorId());
     }
 
-    public void removeUnitFromCity(Unit u, City city)
+    public void removeUnitFromCity(Unit u, City city, Tribe tribe)
     {
-        city.removeUnit(u.getActorId());
+        if(u.getCityId() != -1) { //This happens when the unit belongs to the city
+            city.removeUnit(u.getActorId());
+        }else{
+            tribe.removeExtraUnit(u);
+        }
     }
 
     /**
@@ -868,7 +884,7 @@ public class Board {
             {
                 //Only on tiles that are neutral or in my cities
                 int cityId = tileCityId[x][y];
-                if(cityId == -1 || tribes[tribeId].hasCity(cityId))
+                if(cityId == -1 || tribes[tribeId].controlsCity(cityId))
                 {
                     //There should be no road already here
                     if(!networkTiles[x][y])
@@ -924,24 +940,16 @@ public class Board {
         public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
 
             ArrayList<PathNode> neighbours = new ArrayList<>();
-            int xMove[] = {0, -1, 0, 1, -1, -1, 1, 1};
-            int yMove[] = {1, 0, -1, 0, 1, -1, -1, 1};
             double stepCost = 1.0;
 
-            for(int i = 0; i < xMove.length; ++i)
-                for(int j = 0; j < yMove.length; ++j)
+            for(Vector2d tile : from.neighborhood(1, 0, size)) {
+                int x = tile.x;
+                int y = tile.y;
+                if(navigable[x][y] && costFrom+stepCost <= TribesConfig.PORT_TRADE_DISTANCE)
                 {
-                    int x = from.x + xMove[i];
-                    int y = from.y + yMove[i];
-
-                    if(x >= 0 && x < navigable.length && y >= 0 && y < navigable[y].length)
-                    {
-                        if(navigable[x][y] && costFrom+stepCost <= TribesConfig.PORT_TRADE_DISTANCE)
-                        {
-                            neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
-                        }
-                    }
+                    neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
                 }
+            }
 
             return neighbours;
         }
@@ -971,25 +979,16 @@ public class Board {
         public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
 
             ArrayList<PathNode> neighbours = new ArrayList<>();
-            int xMove[] = {0, -1, 0, 1, -1, -1, 1, 1};
-            int yMove[] = {1, 0, -1, 0, 1, -1, -1, 1};
             double stepCost = 1.0;
 
-            for(int i = 0; i < xMove.length; ++i)
-                for(int j = 0; j < yMove.length; ++j)
+            for(Vector2d tile : from.neighborhood(1, 0, size)) {
+                int x = tile.x;
+                int y = tile.y;
+                if(connected[x][y])
                 {
-                    int x = from.x + xMove[i];
-                    int y = from.y + yMove[i];
-
-                    if(x >= 0 && x < connected.length && y >= 0 && y < connected[y].length)
-                    {
-                        if(connected[x][y])
-                        {
-                            neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
-                        }
-                    }
+                    neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
                 }
-
+            }
 
             //Now, add the jump link neighbours
             if(jumpLinks.containsKey(from))

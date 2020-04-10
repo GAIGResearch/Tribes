@@ -24,6 +24,7 @@ import javafx.util.Pair;
 import static core.Constants.*;
 import static core.Types.TERRAIN.*;
 
+@SuppressWarnings({"SuspiciousNameCombination", "unchecked"})
 public class GameView extends JComponent {
 
     static int gridSize;
@@ -36,7 +37,7 @@ public class GameView extends JComponent {
 
     private Color progressColor = new Color(53, 183, 255);
     private Color negativeColor = new Color(255, 63, 73);
-    private Image starImg, starShadow, capitalImg, capitalShadow;
+    private Image starImg, starShadow, capitalImg, capitalShadow, cityWalls, road;
 
     boolean[][] actionable;
 
@@ -64,6 +65,8 @@ public class GameView extends JComponent {
         starShadow = ImageIO.GetInstance().getImage("img/decorations/starShadow.png");
         capitalImg = ImageIO.GetInstance().getImage("img/decorations/capital.png");
         capitalShadow = ImageIO.GetInstance().getImage("img/decorations/capitalShadow.png");
+        cityWalls = ImageIO.GetInstance().getImage("img/terrain/walls.png");
+        road = ImageIO.GetInstance().getImage("img/terrain/road.png");
     }
 
 
@@ -85,6 +88,26 @@ public class GameView extends JComponent {
         g.fillRect(0, 0, dimension.width, dimension.height);
 
         // Update list of actionable tiles to be highlighted (collectible resources)
+        updateActionableTiles();
+        paintTerrains(g);
+        paintRoads(g);
+        paintResourcesBuildings(g);
+
+        int highlightX = infoView.getHighlightX();
+        int highlightY = infoView.getHighlightY();
+
+        highlightTile(g, highlightX, highlightY);
+
+        drawCityDecorations(g);
+        paintUnits(g);
+        paintActionsHighlightedUnit(g, highlightX, highlightY);
+        paintOtherActions(g);
+
+        g.setColor(Color.BLACK);
+        //player.draw(g); //if we want to give control to the agent to paint something (for debug), start here.
+    }
+
+    private void updateActionableTiles() {
         actionable = new boolean[gridSize][gridSize];
         HashMap<Integer, ArrayList<Action>> actions = gameState.getCityActions();
         for (Map.Entry<Integer, ArrayList<Action>> e: actions.entrySet()) {
@@ -97,19 +120,36 @@ public class GameView extends JComponent {
                 }
             }
         }
+    }
 
+    private void paintTerrains(Graphics2D g) {
         for(int i = 0; i < gridSize; ++i) {
             for(int j = 0; j < gridSize; ++j) {
-                // We paint all base terrains, resources and buildings first
                 Types.TERRAIN t = board.getTerrainAt(i,j);
                 if(t == null) {
                     paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, fogImg, CELL_SIZE, panTranslate);
-//                    paintFog(g, i, j, CELL_SIZE, panTranslate);
                 } else {
                     Image toPaint = getContextImg(i, j, t);
                     paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, toPaint, CELL_SIZE, panTranslate);
                 }
+            }
+        }
+    }
 
+    private void paintRoads(Graphics2D g) {
+        for(int i = 0; i < gridSize; ++i) {
+            for (int j = 0; j < gridSize; ++j) {
+                if (board.isRoad(i, j)) {
+                    paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, road, CELL_SIZE, panTranslate);
+                }
+            }
+        }
+    }
+
+    private void paintResourcesBuildings(Graphics2D g) {
+        for(int i = 0; i < gridSize; ++i) {
+            for(int j = 0; j < gridSize; ++j) {
+                Types.TERRAIN t = board.getTerrainAt(i,j);
                 Types.RESOURCE r = board.getResourceAt(i,j);
                 if (actionable[i][j]) paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, shineImg, CELL_SIZE, panTranslate);
                 int imgSize = (int) (CELL_SIZE * 0.75);
@@ -119,12 +159,10 @@ public class GameView extends JComponent {
                 paintImageRotated(g, j*CELL_SIZE, i*CELL_SIZE, (b == null) ? null : b.getImage(), CELL_SIZE, panTranslate);
             }
         }
+    }
 
-        //If there is a highlighted tile, highlight it.
-        int highlightX = infoView.getHighlightX();
-        int highlightY = infoView.getHighlightY();
+    private void highlightTile(Graphics2D g, int highlightX, int highlightY) {
         if (highlightX != -1) {
-
             Stroke oldStroke = g.getStroke();
             g.setColor(Color.BLUE);
             g.setStroke(new BasicStroke(3));
@@ -134,22 +172,13 @@ public class GameView extends JComponent {
             g.setStroke(oldStroke);
             g.setColor(Color.BLACK);
         }
+    }
 
-        for(int i = 0; i < gridSize; ++i) {
-            for (int j = 0; j < gridSize; ++j) {
-                // We then paint cities decorations
-                Types.TERRAIN t = board.getTerrainAt(i, j);
-                if (t == CITY) {
-                    drawCityDecorations(g, i, j);
-                }
-            }
-        }
-
+    private void paintUnits(Graphics2D g) {
         for(int i = 0; i < gridSize; ++i) {
             for(int j = 0; j < gridSize; ++j) {
                 Unit u = board.getUnitAt(i,j);
                 if (u != null) {
-
                     int imgSize = (int) (CELL_SIZE * 0.75);
                     if (u instanceof SuperUnit || u instanceof Catapult) imgSize = CELL_SIZE;
                     String imgFile = u.getType().getImageFile();
@@ -171,8 +200,9 @@ public class GameView extends JComponent {
                 }
             }
         }
+    }
 
-        // Draw unit actions for highlighted unit
+    private void paintActionsHighlightedUnit(Graphics2D g, int highlightX, int highlightY) {
         if (infoView.highlightInGridBounds()) {
             Unit u = board.getUnitAt(highlightY, highlightX);
             if (u != null && !infoView.clickedTwice()) {
@@ -194,8 +224,10 @@ public class GameView extends JComponent {
                 }
             }
         }
-        // Draw actions that don't need highlight separately
-        actions = gameState.getUnitActions();
+    }
+
+    private void paintOtherActions(Graphics2D g) {
+        HashMap<Integer, ArrayList<Action>> actions = gameState.getUnitActions();
         for (Map.Entry<Integer, ArrayList<Action>> e: actions.entrySet()) {
             for (Action a : e.getValue()) {
                 if (a instanceof Examine || a instanceof Capture) {
@@ -213,17 +245,9 @@ public class GameView extends JComponent {
                 }
             }
         }
-
-        g.setColor(Color.BLACK);
-        //player.draw(g); //if we want to give control to the agent to paint something (for debug), start here.
     }
 
-    private static void paintFog(Graphics2D gphx, int i, int j, int cellSize, Point2D panTranslate)
-    {
-        Point2D p = rotatePoint(j, i);
-        gphx.setColor(Color.black);
-        fillRotatedRect(gphx, (int)(p.getX() - 1), (int)(p.getY() - 1), cellSize + 2, cellSize + 2, panTranslate);
-    }
+    // *****************************************************************************************************************
 
     private static void paintImageRotated(Graphics2D gphx, int x, int y, Image img, int imgSize, Point2D panTranslate)
     {
@@ -264,15 +288,6 @@ public class GameView extends JComponent {
         g2.dispose();
     }
 
-    private static void fillRotatedRect(Graphics2D g, int x, int y, int width, int height, Point2D panTranslate) {
-        Graphics2D g2 = (Graphics2D) g.create();
-        x += panTranslate.getX();
-        y += panTranslate.getY();
-        g2.rotate(Math.toRadians(isometricAngle), x, y);
-        g2.fillRect(x, y, width, height);
-        g2.dispose();
-    }
-
     /**
      * Expects coordinates in grid, translates to screen coordinates.
      */
@@ -295,140 +310,153 @@ public class GameView extends JComponent {
         return new Point2D.Double(x2, y2);
     }
 
-    private void drawCityDecorations(Graphics2D g, int i, int j) {
-        int d = (int)Math.sqrt(CELL_SIZE*CELL_SIZE*2);
-        int fontSize = CELL_SIZE/3;
-        Font textFont = new Font(getFont().getName(), Font.PLAIN, fontSize);
-        g.setFont(textFont);
+    private void drawCityDecorations(Graphics2D g) {
+        for(int i = 0; i < gridSize; ++i) {
+            for (int j = 0; j < gridSize; ++j) {
+                Types.TERRAIN terrainAt = board.getTerrainAt(i, j);
+                if (terrainAt == CITY) {
+                    int d = (int)Math.sqrt(CELL_SIZE*CELL_SIZE*2);
+                    int fontSize = CELL_SIZE/3;
+                    Font textFont = new Font(getFont().getName(), Font.PLAIN, fontSize);
+                    g.setFont(textFont);
 
-        int cityID = board.getCityIdAt(i,j);
-        City c = (City) board.getActor(cityID);
+                    int cityID = board.getCityIdAt(i,j);
+                    City c = (City) board.getActor(cityID);
 
-        if (c != null) {  // TODO: this shouldn't happen, there's a city here
-            int cityCapacity = c.getLevel() + 1;
-            int progress = c.getPopulation();
-            int units = c.getUnitsID().size();
-            Color col = Types.TRIBE.values()[c.getTribeId()].getColorDark();
-            Color colTransparent = new Color(col.getRed(), col.getGreen(), col.getBlue(), 170);
+                    if (c != null) {  // TODO: this shouldn't happen, there's a city here
+                        int cityCapacity = c.getLevel() + 1;
+                        int progress = c.getPopulation();
+                        int units = c.getUnitsID().size();
+                        Color col = Types.TRIBE.values()[c.getTribeId()].getColorDark();
+                        Color colTransparent = new Color(col.getRed(), col.getGreen(), col.getBlue(), 170);
 
-            // Draw city border
-            LinkedList<Vector2d> tiles = board.getCityTiles(cityID);
-            int nCityTiles = tiles.size();
-            int nNeighbours = 4;
-            boolean[][] tileNeighbours = new boolean[nCityTiles][nNeighbours];  // order: left, right, up, down
-            Pair<Vector2d, Vector2d>[] lines = new Pair[]{new Pair(new Vector2d(0, 0), new Vector2d(0, 1)),
-                                                        new Pair(new Vector2d(1, 0), new Vector2d(1, 1)),
-                                                        new Pair(new Vector2d(0, 0), new Vector2d(1, 0)),
-                                                        new Pair(new Vector2d(0, 1), new Vector2d(1, 1))};
-            for (int k = 0; k < nCityTiles-1; k++) {
-                Vector2d t1 = tiles.get(k);
-                for (int p = k+1; p < nCityTiles; p++) {
-                    Vector2d t2 = tiles.get(p);
-                    if (t1.equals(t2)) continue;
-                    if (t1.x - t2.x == 1 && t1.y == t2.y) {  // t1 to the right of t2
-                        tileNeighbours[k][0] = true;
-                        tileNeighbours[p][1] = true;
-                    } else if (t1.x - t2.x == -1 && t1.y == t2.y) { // t1 to the left of t2
-                        tileNeighbours[k][1] = true;
-                        tileNeighbours[p][0] = true;
-                    } else if (t1.x == t2.x && t1.y - t2.y == 1) {  // t1 underneath t2
-                        tileNeighbours[k][2] = true;
-                        tileNeighbours[p][3] = true;
-                    } else if (t1.x == t2.x && t1.y - t2.y == -1) {  // t1 above t2
-                        tileNeighbours[k][3] = true;
-                        tileNeighbours[p][2] = true;
+                        // Draw city walls
+                        if (c.hasWalls()) {
+                            Point2D rotatedP = rotatePoint(j + 0.4, i - 0.2);
+                            paintImage(g, (int)(rotatedP.getX()), (int)(rotatedP.getY()), cityWalls, CELL_SIZE, panTranslate);
+                        }
+
+                        // Draw city border
+                        LinkedList<Vector2d> tiles = board.getCityTiles(cityID);
+                        int nCityTiles = tiles.size();
+                        int nNeighbours = 4;
+                        boolean[][] tileNeighbours = new boolean[nCityTiles][nNeighbours];  // order: left, right, up, down
+                        Pair<Vector2d, Vector2d>[] lines = new Pair[]{new Pair<>(new Vector2d(0, 0), new Vector2d(0, 1)),
+                                new Pair<>(new Vector2d(1, 0), new Vector2d(1, 1)),
+                                new Pair<>(new Vector2d(0, 0), new Vector2d(1, 0)),
+                                new Pair<>(new Vector2d(0, 1), new Vector2d(1, 1))};
+                        for (int k = 0; k < nCityTiles-1; k++) {
+                            Vector2d t1 = tiles.get(k);
+                            for (int p = k+1; p < nCityTiles; p++) {
+                                Vector2d t2 = tiles.get(p);
+                                if (t1.equals(t2)) continue;
+                                if (t1.x - t2.x == 1 && t1.y == t2.y) {  // t1 to the right of t2
+                                    tileNeighbours[k][0] = true;
+                                    tileNeighbours[p][1] = true;
+                                } else if (t1.x - t2.x == -1 && t1.y == t2.y) { // t1 to the left of t2
+                                    tileNeighbours[k][1] = true;
+                                    tileNeighbours[p][0] = true;
+                                } else if (t1.x == t2.x && t1.y - t2.y == 1) {  // t1 underneath t2
+                                    tileNeighbours[k][2] = true;
+                                    tileNeighbours[p][3] = true;
+                                } else if (t1.x == t2.x && t1.y - t2.y == -1) {  // t1 above t2
+                                    tileNeighbours[k][3] = true;
+                                    tileNeighbours[p][2] = true;
+                                }
+                            }
+                        }
+                        g.setColor(col);
+                        Stroke oldStroke = g.getStroke();
+                        g.setStroke(new BasicStroke(5, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0));
+                        // Draw lines for tiles that don't have a neighbour on a side
+                        for (int t = 0; t < nCityTiles; t++) {
+                            Vector2d tile = tiles.get(t);
+                            for (int n = 0; n < nNeighbours; n++) {
+                                if (!tileNeighbours[t][n]) {
+                                    // draw line on this side
+                                    Point2D from = rotatePoint(lines[n].getKey().y + tile.y, lines[n].getKey().x + tile.x);
+                                    Point2D to = rotatePoint(lines[n].getValue().y + tile.y, lines[n].getValue().x + tile.x);
+                                    g.drawLine((int)from.getX() + (int)panTranslate.getX(), (int)from.getY() + (int)panTranslate.getY(),
+                                            (int)to.getX() + (int)panTranslate.getX(), (int)to.getY() + (int)panTranslate.getY());
+                                }
+                            }
+                        }
+                        g.setStroke(oldStroke);
+
+                        // Draw capital img + city name/ID + number of stars
+                        String cityName = "" + cityID;
+                        String production = "" + c.getProduction();
+
+                        int sections = 2;
+                        if (c.isCapital()) {
+                            sections = 3;
+                        }
+                        double h = d / 4.0;
+                        double nameWidth = GUI_CITY_TAG_WIDTH + sections * h;
+                        Point2D namePos = rotatePoint(j, i);
+                        Rectangle nameRect = new Rectangle((int) (namePos.getX() + d / 2.0 - nameWidth * 2 / 3.0),
+                                (int) (namePos.getY() + d / 2.0 - h), (int) nameWidth, (int) h);
+                        g.setColor(colTransparent);
+                        g.fillRect((int) (nameRect.x + panTranslate.getX()), (int) (nameRect.y + panTranslate.getY()), nameRect.width, nameRect.height);
+                        g.setColor(Color.WHITE);
+
+                        g.drawString(cityName, (int) (nameRect.x + (sections-2) * h + fontSize / 4.0 + panTranslate.getX()),
+                                (int) (nameRect.y + h * 1.1 - fontSize / 4.0 + panTranslate.getY()));
+
+                        // Draw number of stars
+                        paintImage(g, (int) (nameRect.x + nameRect.width * (0.35 + (sections-2)*0.2) + SHADOW_OFFSET),
+                                nameRect.y + SHADOW_OFFSET, starShadow, (int) h, panTranslate);
+                        paintImage(g, (int) (nameRect.x + nameRect.width * (0.35 + (sections-2)*0.2)), nameRect.y, starImg, (int) h, panTranslate);
+                        drawStringShadow(g, production, (int) (nameRect.x + nameRect.width - fontSize * 0.75),
+                                (int) (nameRect.y + h * 1.1 - fontSize / 4.0));
+                        g.setColor(Color.WHITE);
+                        g.drawString(production, (int) (nameRect.x + nameRect.width - fontSize * 0.75 + panTranslate.getX()),
+                                (int) (nameRect.y + h * 1.1 - fontSize / 4.0 + panTranslate.getY()));
+
+                        // Draw capital sign
+                        if (c.isCapital()) {
+                            paintImage(g, nameRect.x + SHADOW_OFFSET, nameRect.y + SHADOW_OFFSET, capitalShadow, (int) h, panTranslate);
+                            paintImage(g, nameRect.x, nameRect.y, capitalImg, (int) h, panTranslate);
+                        }
+
+                        // Draw level
+                        h /= 2;
+                        int sectionWidth = (int)h;
+                        int w = cityCapacity * sectionWidth;
+                        Rectangle bgRect = new Rectangle(nameRect.x + nameRect.width / 2 - w / 2, nameRect.y + nameRect.height, w, (int) h);
+                        drawRoundRectShadowHighlight(g, bgRect);
+                        g.setColor(Color.WHITE);
+                        g.fillRoundRect((int) (bgRect.x + panTranslate.getX()), (int) (bgRect.y + panTranslate.getY()),
+                                bgRect.width, bgRect.height, ROUND_RECT_ARC, ROUND_RECT_ARC);
+
+                        // Draw population/progress
+                        if (progress >= 0) {
+                            g.setColor(progressColor);
+                        } else {
+                            g.setColor(negativeColor);
+                        }
+                        int pw = Math.abs(progress) * sectionWidth;
+                        Rectangle pgRect = new Rectangle(bgRect.x, bgRect.y, pw, bgRect.height);
+                        g.fillRoundRect((int) (pgRect.x + panTranslate.getX()), (int) (pgRect.y + +panTranslate.getY()),
+                                pgRect.width, pgRect.height, ROUND_RECT_ARC, ROUND_RECT_ARC);
+
+                        // Draw unit counts
+                        g.setColor(Color.black);
+                        double radius = h / 2.0;
+                        double unitHeight = bgRect.y + h / 2 - radius / 2;
+                        for (int u = 0; u < units; u++) {
+                            g.fillOval((int) (bgRect.x + sectionWidth * u + sectionWidth / 2.0 - radius / 2.0 + panTranslate.getX()),
+                                    (int) (unitHeight + panTranslate.getY()), (int) radius, (int) radius);
+                        }
+
+                        // Draw section separations
+                        for (int l = 0; l < cityCapacity - 1; l++) {
+                            int lx = bgRect.x + sectionWidth * (l + 1);
+                            g.drawLine((int) (lx + panTranslate.getX()), (int) (bgRect.y + panTranslate.getY()),
+                                    (int) (lx + panTranslate.getX()), (int) (bgRect.y + bgRect.height + panTranslate.getY()));
+                        }
                     }
                 }
-            }
-            g.setColor(col);
-            Stroke oldStroke = g.getStroke();
-            g.setStroke(new BasicStroke(5, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0));
-            // Draw lines for tiles that don't have a neighbour on a side
-            for (int t = 0; t < nCityTiles; t++) {
-                Vector2d tile = tiles.get(t);
-                for (int n = 0; n < nNeighbours; n++) {
-                    if (!tileNeighbours[t][n]) {
-                        // draw line on this side
-                        Point2D from = rotatePoint(lines[n].getKey().y + tile.y, lines[n].getKey().x + tile.x);
-                        Point2D to = rotatePoint(lines[n].getValue().y + tile.y, lines[n].getValue().x + tile.x);
-                        g.drawLine((int)from.getX() + (int)panTranslate.getX(), (int)from.getY() + (int)panTranslate.getY(),
-                                (int)to.getX() + (int)panTranslate.getX(), (int)to.getY() + (int)panTranslate.getY());
-                    }
-                }
-            }
-            g.setStroke(oldStroke);
-
-            // Draw capital img + city name/ID + number of stars
-            String cityName = "" + cityID;
-            String production = "" + c.getProduction();
-
-            int sections = 2;
-            if (c.isCapital()) {
-                sections = 3;
-            }
-            double h = d / 4.0;
-            double nameWidth = GUI_CITY_TAG_WIDTH + sections * h;
-            Point2D namePos = rotatePoint(j, i);
-            Rectangle nameRect = new Rectangle((int) (namePos.getX() + d / 2.0 - nameWidth * 2 / 3.0),
-                    (int) (namePos.getY() + d / 2.0 - h), (int) nameWidth, (int) h);
-            g.setColor(colTransparent);
-            g.fillRect((int) (nameRect.x + panTranslate.getX()), (int) (nameRect.y + panTranslate.getY()), nameRect.width, nameRect.height);
-            g.setColor(Color.WHITE);
-
-            g.drawString(cityName, (int) (nameRect.x + (sections-2) * h + fontSize / 4.0 + panTranslate.getX()),
-                    (int) (nameRect.y + h * 1.1 - fontSize / 4.0 + panTranslate.getY()));
-
-            // Draw number of stars
-            paintImage(g, (int) (nameRect.x + nameRect.width * (0.35 + (sections-2)*0.2) + SHADOW_OFFSET),
-                    nameRect.y + SHADOW_OFFSET, starShadow, (int) h, panTranslate);
-            paintImage(g, (int) (nameRect.x + nameRect.width * (0.35 + (sections-2)*0.2)), nameRect.y, starImg, (int) h, panTranslate);
-            drawStringShadow(g, production, (int) (nameRect.x + nameRect.width - fontSize * 0.75),
-                    (int) (nameRect.y + h * 1.1 - fontSize / 4.0));
-            g.setColor(Color.WHITE);
-            g.drawString(production, (int) (nameRect.x + nameRect.width - fontSize * 0.75 + panTranslate.getX()),
-                    (int) (nameRect.y + h * 1.1 - fontSize / 4.0 + panTranslate.getY()));
-
-            // Draw capital sign
-            if (c.isCapital()) {
-                paintImage(g, nameRect.x + SHADOW_OFFSET, nameRect.y + SHADOW_OFFSET, capitalShadow, (int) h, panTranslate);
-                paintImage(g, nameRect.x, nameRect.y, capitalImg, (int) h, panTranslate);
-            }
-
-            // Draw level
-            h /= 2;
-            int sectionWidth = (int)h;
-            int w = cityCapacity * sectionWidth;
-            Rectangle bgRect = new Rectangle(nameRect.x + nameRect.width / 2 - w / 2, nameRect.y + nameRect.height, w, (int) h);
-            drawRoundRectShadowHighlight(g, bgRect);
-            g.setColor(Color.WHITE);
-            g.fillRoundRect((int) (bgRect.x + panTranslate.getX()), (int) (bgRect.y + panTranslate.getY()),
-                    bgRect.width, bgRect.height, ROUND_RECT_ARC, ROUND_RECT_ARC);
-
-            // Draw population/progress
-            if (progress >= 0) {
-                g.setColor(progressColor);
-            } else {
-                g.setColor(negativeColor);
-            }
-            int pw = Math.abs(progress) * sectionWidth;
-            Rectangle pgRect = new Rectangle(bgRect.x, bgRect.y, pw, bgRect.height);
-            g.fillRoundRect((int) (pgRect.x + panTranslate.getX()), (int) (pgRect.y + +panTranslate.getY()),
-                    pgRect.width, pgRect.height, ROUND_RECT_ARC, ROUND_RECT_ARC);
-
-            // Draw unit counts
-            g.setColor(Color.black);
-            double radius = h / 2.0;
-            double unitHeight = bgRect.y + h / 2 - radius / 2;
-            for (int u = 0; u < units; u++) {
-                g.fillOval((int) (bgRect.x + sectionWidth * u + sectionWidth / 2.0 - radius / 2.0 + panTranslate.getX()),
-                        (int) (unitHeight + panTranslate.getY()), (int) radius, (int) radius);
-            }
-
-            // Draw section separations
-            for (int l = 0; l < cityCapacity - 1; l++) {
-                int lx = bgRect.x + sectionWidth * (l + 1);
-                g.drawLine((int) (lx + panTranslate.getX()), (int) (bgRect.y + panTranslate.getY()),
-                        (int) (lx + panTranslate.getX()), (int) (bgRect.y + bgRect.height + panTranslate.getY()));
             }
         }
     }
@@ -460,7 +488,6 @@ public class GameView extends JComponent {
         //int gameTurn = 0;// gs.getTick() % gs.getTribes().length;
         gameState = gs; //.copy(gameTurn);
         board = gameState.getBoard();
-        this.repaint();
     }
 
     void updatePan(Point2D panTranslate) {

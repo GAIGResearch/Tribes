@@ -84,7 +84,7 @@ public class StepMove implements NeighbourHelper
                         //Embarking takes a turn of movement.
                         if(board.getBuildingAt(tile.x, tile.y) == Types.BUILDING.PORT) {
                             stepCost = unit.MOV;
-                        }
+                        }else{ continue; }
                         break;
                     case PLAIN:
                     case CITY:

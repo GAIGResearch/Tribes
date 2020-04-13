@@ -28,7 +28,7 @@ import static core.Constants.*;
 
 public class Game {
 
-    private boolean FORCE_FULL_OBSERVABILITY = false;
+    private boolean FORCE_FULL_OBSERVABILITY = true;
 
     // State of the game (objects, ticks, etc).
     private GameState gs;
@@ -311,8 +311,8 @@ public class Game {
         ArrayList<Integer> allTribeUnits = new ArrayList<>();
         gs.endTurn(false);
 
-        //1. Compute stars and score per turn.
-        int acumProd = 0, turnScore = 0;
+        //1. Compute stars per turn.
+        int acumProd = 0;
         for (int cityId : tribeCities) {
             City city = (City) gs.getActor(cityId);
 
@@ -347,9 +347,7 @@ public class Game {
             tribe.setStars(TribesConfig.INITIAL_STARS);
         }else{
             tribe.addStars(acumProd);
-            tribe.addScore(turnScore);
         }
-        tribe.setTotalProduction(acumProd);
 
         //2. Units: all become available. This needs to be done here as some units may have become
         // pushed during other player's turn.
@@ -367,8 +365,9 @@ public class Game {
         //3. Update tribe pacifist counter
         tribe.addPacifistCount();
 
-        //4. Compute the actions available for this player.
+        //4. Compute the actions available for this player and copy observations.
         gs.computePlayerActions(tribe);
+        updateAssignedGameStates();
     }
 
 

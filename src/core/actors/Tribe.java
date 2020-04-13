@@ -5,6 +5,7 @@ import core.TribesConfig;
 import core.Types;
 import core.actors.units.Unit;
 import core.game.Board;
+import core.game.Game;
 import core.game.GameState;
 import utils.Vector2d;
 import utils.graph.PathNode;
@@ -59,9 +60,6 @@ public class Tribe extends Actor {
     //Kills by this tribe
     private int nKills;
 
-    //Total production for this turn.
-    private int totalProduction;
-
     //Turns since the last attack of this tribe if Meditation is reseached.
     private int nPacifistCount;
 
@@ -89,7 +87,6 @@ public class Tribe extends Actor {
         connectedCities = new ArrayList<>();
         monuments = Types.BUILDING.initMonuments();
         nKills = 0;
-        totalProduction = 0;
         nPacifistCount = 0;
     }
 
@@ -107,7 +104,6 @@ public class Tribe extends Actor {
         tribeCopy.score = this.score;
         tribeCopy.capitalID = this.capitalID;
         tribeCopy.nKills = this.nKills;
-        tribeCopy.totalProduction = this.totalProduction;
         tribeCopy.nPacifistCount = this.nPacifistCount;
 
         tribeCopy.techTree = this.techTree.copy();
@@ -299,14 +295,6 @@ public class Tribe extends Actor {
         return nKills;
     }
 
-    public int getTotalProduction() {
-        return totalProduction;
-    }
-
-    public void setTotalProduction(int totalProduction) {
-        this.totalProduction = totalProduction;
-    }
-
     public void addKill() {
         this.nKills++;
 
@@ -325,11 +313,18 @@ public class Tribe extends Actor {
 
         boolean[] inMetTribes = new boolean[tribes.length];
         //loop through all tribes
+        for (int i = 0; i<inMetTribes.length; i++){
+            inMetTribes[i] = false;
+        }
+
         for (int i = 0; i < tribes.length; i++) {
             // if tribes not in tribes met or tribe is itself then do nothing else add to tribesmet arraylist
-            if (tribes[i].tribe == this.tribesMet.get(i) || tribes[i].tribeId == tribeID) {
-                inMetTribes[i] = true;
+            if(tribesMet.size() >= i &&tribesMet.size() !=0) {
+                if (tribes[i].tribe.equals(tribesMet.get(i)) || tribes[i].tribeId == tribeID) {
+                    inMetTribes[i] = true;
+                }
             }
+
             if (!inMetTribes[i]) {
                 tribesMet.add(tribes[i].tribe); // add to this tribe
                 tribes[i].tribesMet.add(this.tribe); // add to met tribe as well
@@ -417,7 +412,7 @@ public class Tribe extends Actor {
 
             //The capital gains 1 population for each city connected, -1 for each city disconnected
             int capitalGain = addedCities.size() - lostCities.size();
-            capital.addPopulation(capitalGain);
+            capital.addPopulation(this, capitalGain);
 
             //We may be adding a new monument to the pool!
             if(connectedCities.size() >= TribesConfig.GRAND_BAZAR_CITIES && monuments.get(GRAND_BAZAR) == MONUMENT_STATUS.UNAVAILABLE)
@@ -431,16 +426,27 @@ public class Tribe extends Actor {
             //All cities that lost connection with the capital lose 1 population
             for (int cityId : lostCities) {
                 City nonCapitalCity = (City) b.getActor(cityId);
-                nonCapitalCity.addPopulation(-1);
+                nonCapitalCity.addPopulation(this, -1);
             }
 
             //All cities that gained connection with the capital gain 1 population.
             for (int cityId : addedCities) {
                 City nonCapitalCity = (City) b.getActor(cityId);
-                nonCapitalCity.addPopulation(1);
+                nonCapitalCity.addPopulation(this, 1);
             }
         }
     }
+
+    public int getMaxProduction(GameState gs)
+    {
+        int acumProd = 0;
+        for (int cityId : citiesID) {
+            City city = (City) gs.getActor(cityId);
+            acumProd += city.getProduction();
+        }
+        return acumProd;
+    }
+
 
     public boolean controlsCapital() {
         return citiesID.contains(capitalID);

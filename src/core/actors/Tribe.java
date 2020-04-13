@@ -43,7 +43,7 @@ public class Tribe extends Actor {
     private int score = 0;
 
     //Indicates if the position in the board is visible
-    private boolean obsGrid[][];
+    private boolean[][] obsGrid;
 
     //List of city ids connected to the capital (capital not included)
     private ArrayList<Integer> connectedCities = new ArrayList<>();
@@ -158,8 +158,8 @@ public class Tribe extends Actor {
         //We may be clearing the last tiles of the board, which grants a monument
         if(monuments.get(EYE_OF_GOD) == MONUMENT_STATUS.UNAVAILABLE)
         {
-            for(int i = 0; i <= obsGrid.length; ++i)
-                for(int j = 0; j <= obsGrid[0].length; ++j)
+            for(int i = 0; i < obsGrid.length; ++i)
+                for(int j = 0; j < obsGrid[0].length; ++j)
                 {
                     if(!obsGrid[i][j]) return;
                 }
@@ -422,8 +422,9 @@ public class Tribe extends Actor {
             capital.addPopulation(this, capitalGain);
 
             //We may be adding a new monument to the pool!
-            if(connectedCities.size() >= TribesConfig.GRAND_BAZAR_CITIES && monuments.get(GRAND_BAZAR) == MONUMENT_STATUS.UNAVAILABLE)
+            if(connectedCities.size() >= TribesConfig.GRAND_BAZAR_CITIES && monuments.get(GRAND_BAZAR) == MONUMENT_STATUS.UNAVAILABLE) {
                 monuments.put(GRAND_BAZAR, MONUMENT_STATUS.AVAILABLE);
+            }
         }
 
 
@@ -431,10 +432,10 @@ public class Tribe extends Actor {
         if (thisTribesTurn) {
 
             //All cities that lost connection with the capital lose 1 population
-            for (int cityId : lostCities) {
-                City nonCapitalCity = (City) b.getActor(cityId);
-                nonCapitalCity.addPopulation(this, -1);
-            }
+//            for (int cityId : lostCities) {
+//                City nonCapitalCity = (City) b.getActor(cityId);
+//                nonCapitalCity.addPopulation(this, -1);
+//            }
 
             //All cities that gained connection with the capital gain 1 population.
             for (int cityId : addedCities) {

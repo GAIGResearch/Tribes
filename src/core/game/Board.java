@@ -511,20 +511,6 @@ public class Board {
         }
     }
 
-//    //Set extra points for tribe on border expansion
-//    private void setPointsForBorderExpansion(City c){
-//        Tribe t = getTribe(c.getTribeId());
-//        Vector2d cityPos = c.getPosition();
-//        for(Vector2d tile : cityPos.neighborhood(TribesConfig.CITY_EXPANSION_TILES, 0, size))
-//        {
-//            if(tileCityId[tile.x][tile.y] == c.getActorId())
-//            {
-//                t.addScore(TribesConfig.CITY_BORDER_POINTS);
-//                c.addPointsWorth(TribesConfig.CITY_BORDER_POINTS);
-//            }
-//        }
-//    }
-
     // Method to expand city borders, take city as param
     public void expandBorder(City city){
         city.setBound(city.getBound()+TribesConfig.CITY_EXPANSION_TILES);
@@ -713,7 +699,7 @@ public class Board {
                                 ports.add(new Vector2d(i, j));
 
                         //Roads, must be within my city boundaries OR in a neutral tile.
-                        }else if (notEnemy && networkTiles[i][j])
+                        }else if (notEnemy && isRoad(i,j))
                         {
                            connectedTiles[i][j] = networkTiles[i][j];
                         }

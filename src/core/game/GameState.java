@@ -256,7 +256,8 @@ public class GameState {
      */
     public void pushUnit(Unit toPush, int startX, int startY)
     {
-        boolean pushed = board.pushUnit(toPush.getTribeId(), toPush, startX, startY, rnd);
+        Tribe tribe = getTribe(toPush.getTribeId());
+        boolean pushed = board.pushUnit(tribe, toPush, startX, startY, rnd);
         if(!pushed)
         {
             killUnit(toPush);
@@ -271,7 +272,8 @@ public class GameState {
     {
         board.removeUnitFromBoard(toKill);
         City c = (City) getActor(toKill.getCityId());
-        board.removeUnitFromCity(toKill, c);
+        Tribe tribe = getTribe(toKill.getTribeId());
+        board.removeUnitFromCity(toKill, c, tribe);
         Tribe t = getTribe(toKill.getTribeId());
         t.subtractScore(toKill.getType().getPoints());
     }

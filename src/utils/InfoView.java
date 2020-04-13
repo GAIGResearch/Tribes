@@ -265,8 +265,13 @@ public class InfoView extends JComponent {
         resetButtonVisibility();
 
         if (board.getTribe(board.getActiveTribeID()).getTechTree().isResearched(Types.TECHNOLOGY.ROADS)) {
-            actionRoad.setVisible(true);
-            listenerRoad.update(board.getActiveTribeID(), position, ac, gs);
+            ArrayList<Action> acts = gs.getTribeActions();
+            for (Action a: acts) {
+                if (a instanceof BuildRoad && ((BuildRoad) a).getPosition().equals(position)) {
+                    actionRoad.setVisible(true);
+                    listenerRoad.update(board.getActiveTribeID(), position, ac, gs);
+                }
+            }
         }
 
         if (cityID != -1) {
@@ -283,43 +288,34 @@ public class InfoView extends JComponent {
                 boolean[] foundB = new boolean[actionB.length];
                 if (acts != null && acts.size() > 0) {
                     for (Action a : acts) {
-                        if (a instanceof ResourceGathering) {
-                            if (((ResourceGathering) a).getResource().equals(r)
-                                    && ((ResourceGathering) a).getTargetPos().equals(position)) {
-                                listenerRG.update(cityID, position, ac, gs);
-                                listenerRG.setResource(r);
-                                foundRG = true;
-                            }
-                        } else if (a instanceof BurnForest) {
-                            if (((BurnForest) a).getTargetPos().equals(position)) {
+                        if (a != null && ((CityAction) a).getTargetPos() != null && // TODO: why are these suddenly null?
+                                ((CityAction) a).getTargetPos().equals(position)) {
+                            if (a instanceof ResourceGathering) {
+                                if (((ResourceGathering) a).getResource().equals(r)) {
+                                    listenerRG.update(cityID, position, ac, gs);
+                                    listenerRG.setResource(r);
+                                    foundRG = true;
+                                }
+                            } else if (a instanceof BurnForest) {
                                 listenerBF.update(cityID, position, ac, gs);
                                 foundBF = true;
-                            }
-                        } else if (a instanceof ClearForest) {
-                            if (((ClearForest) a).getTargetPos().equals(position)) {
+                            } else if (a instanceof ClearForest) {
                                 listenerCF.update(cityID, position, ac, gs);
                                 foundCF = true;
-                            }
-                        } else if (a instanceof GrowForest) {
-                            if (((GrowForest) a).getTargetPos().equals(position)) {
+                            } else if (a instanceof GrowForest) {
                                 listenerGF.update(cityID, position, ac, gs);
                                 foundGF = true;
-                            }
-                        } else if (a instanceof Destroy) {
-                            if (((Destroy) a).getTargetPos().equals(position)) {
+                            } else if (a instanceof Destroy) {
                                 listenerD.update(cityID, position, ac, gs);
                                 foundD = true;
                                 break;
-                            }
-                        } else if (a instanceof Spawn) {
-                            Types.UNIT unitType = ((Spawn) a).getUnitType();
-                            int idx = Types.UNIT.getSpawnableTypes().indexOf(unitType);
-                            listenerS.update(cityID, position, ac, gs);
-                            foundS[idx] = true;
-                        } else if (a instanceof Build) {
-                            Types.BUILDING buildingType = ((Build) a).getBuildingType();
-                            if (((Build) a).getTargetPos().equals(position))
-                            {
+                            } else if (a instanceof Spawn) {
+                                Types.UNIT unitType = ((Spawn) a).getUnitType();
+                                int idx = Types.UNIT.getSpawnableTypes().indexOf(unitType);
+                                listenerS.update(cityID, position, ac, gs);
+                                foundS[idx] = true;
+                            } else if (a instanceof Build) {
+                                Types.BUILDING buildingType = ((Build) a).getBuildingType();
                                 int idx = buildingType.getKey();
                                 listenerB.update(cityID, position, ac, gs);
                                 foundB[idx] = true;
@@ -355,7 +351,7 @@ public class InfoView extends JComponent {
                 if (tt != null) {
                     boolean researched = tt.isResearched(techHighlight);
                     boolean techRequirement = tt.isResearchable(techHighlight);
-                    int starCost = techHighlight.getCost(t.getCitiesID().size());
+                    int starCost = techHighlight.getCost(t.getNumCities());
                     boolean starRequirement = t.getStars() >= starCost;
                     boolean researchable = techRequirement && starRequirement;
 
@@ -408,7 +404,6 @@ public class InfoView extends JComponent {
     void paint(GameState gs)
     {
         this.gs = gs;
-        this.repaint();
     }
 
     /**

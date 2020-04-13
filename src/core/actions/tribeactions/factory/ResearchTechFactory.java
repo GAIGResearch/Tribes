@@ -20,7 +20,7 @@ public class ResearchTechFactory implements ActionFactory {
         LinkedList<Action> actions = new LinkedList<>();
         TechnologyTree techTree = tribe.getTechTree();
         int stars = tribe.getStars();
-        int numCities = tribe.getCitiesID().size();
+        int numCities = tribe.getNumCities();
 
         //Technically, we can do faster than this (by pruning branches of the
         // tech tree that are not reachable), although this makes the code more general.

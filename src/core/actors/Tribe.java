@@ -340,20 +340,17 @@ public class Tribe extends Actor {
                     if (metTribeTree.isResearched(tech))
                         techInMetTribe.add(tech);
                 }
-                ArrayList<Types.TECHNOLOGY> potentialTechForThisTribe = new ArrayList<>();
+                ArrayList<Types.TECHNOLOGY> potentialTech = new ArrayList<>();
 
                 for (int x = 0; x < techInMetTribe.size(); x++) {
                     if (!thisTribeTree.isResearched(techInMetTribe.get(x)))
-                        potentialTechForThisTribe.add(techInMetTribe.get(x));
+                        potentialTech.add(techInMetTribe.get(x));
                 }
 
-
-
-
-                if (potentialTechForThisTribe.size() == 0)
+                if (potentialTech.size() == 0)
                     return;
 
-                Types.TECHNOLOGY techToGet = potentialTechForThisTribe.get(r.nextInt(potentialTechForThisTribe.size()));
+                Types.TECHNOLOGY techToGet = potentialTech.get(r.nextInt(potentialTech.size()));
                 thisTribeTree.doResearch(techToGet);
 
             }

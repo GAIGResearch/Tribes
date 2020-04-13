@@ -23,7 +23,8 @@ public class Play {
 //        String filename = "MinimalLevel2.csv";
 
 //        play(filename, new boolean[]{true,true}, new Types.TRIBE[] {IMPERIUS, OUMAJI});
-        play(filename, new boolean[]{true, true, true, true}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI});
+//        play(filename, new boolean[]{true, true, true, true}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI});
+        play(filename, new boolean[]{false, false, false, true}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI});
     }
 
     public static void play(String filename, boolean[] humans, Types.TRIBE[] tribes)

@@ -190,12 +190,15 @@ public class GameView extends JComponent {
                     ArrayList<Action> possibleActions = gameState.getUnitActions(u);
                     boolean exhausted = (possibleActions == null || possibleActions.size() == 0);
 
+                    Tribe t = gameState.getTribe(u.getTribeId());
+                    int imageTribeId = t.getType().getKey();
+
                     if (exhausted) {
-                        String exhaustedStr = imgFile + u.getTribeId() + "Exhausted.png";
+                        String exhaustedStr = imgFile + imageTribeId + "Exhausted.png";
                         Image exhaustedImg = ImageIO.GetInstance().getImage(exhaustedStr);
                         paintImage(g, x, y, exhaustedImg, imgSize, panTranslate);
                     } else {
-                        paintImage(g, x, y, u.getType().getImage(u.getTribeId()), imgSize, panTranslate);
+                        paintImage(g, x, y, u.getType().getImage(imageTribeId), imgSize, panTranslate);
                     }
                 }
             }
@@ -327,7 +330,8 @@ public class GameView extends JComponent {
                         int cityCapacity = c.getLevel() + 1;
                         int progress = c.getPopulation();
                         int units = c.getUnitsID().size();
-                        Color col = Types.TRIBE.values()[c.getTribeId()].getColorDark();
+                        Tribe tr = gameState.getTribe(c.getTribeId());
+                        Color col = Types.TRIBE.values()[tr.getType().getKey()].getColorDark();
                         Color colTransparent = new Color(col.getRed(), col.getGreen(), col.getBlue(), 170);
 
                         // Draw city walls

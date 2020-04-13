@@ -43,7 +43,7 @@ public class Tribe extends Actor {
     private int score = 0;
 
     //Indicates if the position in the board is visible
-    private boolean obsGrid[][];
+    private boolean[][] obsGrid;
 
     //List of city ids connected to the capital (capital not included)
     private ArrayList<Integer> connectedCities = new ArrayList<>();
@@ -498,6 +498,13 @@ public class Tribe extends Actor {
     {
         extraUnits.add(target.getActorId());
         target.setCityId(-1);
+    }
+
+    public void removeExtraUnit(Unit target)
+    {
+        int index = extraUnits.indexOf(target.getActorId());
+        if(index != -1)
+            extraUnits.remove(index);
     }
 
     /**

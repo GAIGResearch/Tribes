@@ -155,7 +155,6 @@ public class TechView extends JComponent {
     void paint(GameState gs)
     {
         this.gs = gs;
-        this.repaint();
     }
 
     /**

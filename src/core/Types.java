@@ -453,9 +453,7 @@ public class Types {
             return null;
         }
 
-        public int getKey() {  return key; }
-        public Image getImage(int playerID) { return ImageIO.GetInstance().getImage(imageFile + playerID + ".png"); }
-        public String getImageStr(int playerID) { return imageFile + playerID + ".png"; }
+        public Image getImage(int tribeKey) { return ImageIO.GetInstance().getImage(imageFile + tribeKey + ".png"); }
         public String getImageFile() { return imageFile; }
         public int getCost() {
             return cost;

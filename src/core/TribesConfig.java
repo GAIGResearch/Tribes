@@ -153,7 +153,7 @@ public class TribesConfig
     // Port
     public static final int PORT_COST = 10;
     public static final int PORT_BONUS = 2;
-    public static final int PORT_TRADE_DISTANCE = 3;
+    public static final int PORT_TRADE_DISTANCE = 4; //Count includes destination port.
 
     // Custom House
     public static final int CUSTOM_COST = 5;

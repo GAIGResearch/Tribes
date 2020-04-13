@@ -19,11 +19,11 @@ public class Play {
 //        String filename = "SampleLevel2p.csv";
         String filename = "SampleLevel.csv";
 //        String filename = "MinimalLevel.csv";
+//        String filename = "MinimalLevel_water.csv";
 //        String filename = "MinimalLevel2.csv";
 
 //        play(filename, new boolean[]{true,true}, new Types.TRIBE[] {IMPERIUS, OUMAJI});
         play(filename, new boolean[]{true, true, true, true}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI});
-//        play(filename, new boolean[]{true,}, new Types.TRIBE[] {OUMAJI});
     }
 
     public static void play(String filename, boolean[] humans, Types.TRIBE[] tribes)

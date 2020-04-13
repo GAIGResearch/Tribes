@@ -35,6 +35,11 @@ public class City extends Actor{
 
     // Increase population
     public void addPopulation(Tribe tribe, int value){
+
+        //-level is a maximum negative value.
+        if(population + value < -level)
+            value = - level - population;
+
         population += value;
         tribe.addScore(value * TribesConfig.POINTS_PER_POPULATION);
         addPointsWorth(value * TribesConfig.POINTS_PER_POPULATION);
@@ -94,6 +99,7 @@ public class City extends Actor{
             case GATE_OF_POWER:
             case PARK_OF_FORTUNE:
             case TOWER_OF_WISDOM:
+            case GRAND_BAZAR:
                 if(!onlyMatching) addPopulation(tribe,building.type.getBonus() * multiplier);
                 tribe.addScore(TribesConfig.MONUMENT_POINTS * multiplier);
                 break;
@@ -145,15 +151,12 @@ public class City extends Actor{
         }
     }
 
-
-
     public int getProduction(){
-        // If population less than 0, return start between [0 ~ level+production]
         if(population >= 0) {
             int capitalBonus = isCapital ? TribesConfig.PROD_CAPITAL_BONUS : 0;
-            return level + capitalBonus;
+            return level + production + capitalBonus;
         }
-        return (level + production - population);
+        return population;
     }
 
     public boolean canLevelUp()

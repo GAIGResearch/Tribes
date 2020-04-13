@@ -512,20 +512,6 @@ public class Board {
         }
     }
 
-//    //Set extra points for tribe on border expansion
-//    private void setPointsForBorderExpansion(City c){
-//        Tribe t = getTribe(c.getTribeId());
-//        Vector2d cityPos = c.getPosition();
-//        for(Vector2d tile : cityPos.neighborhood(TribesConfig.CITY_EXPANSION_TILES, 0, size))
-//        {
-//            if(tileCityId[tile.x][tile.y] == c.getActorId())
-//            {
-//                t.addScore(TribesConfig.CITY_BORDER_POINTS);
-//                c.addPointsWorth(TribesConfig.CITY_BORDER_POINTS);
-//            }
-//        }
-//    }
-
     // Method to expand city borders, take city as param
     public void expandBorder(City city){
         city.setBound(city.getBound()+TribesConfig.CITY_EXPANSION_TILES);
@@ -703,21 +689,26 @@ public class Board {
                     for (int j = 0; j < networkTiles[0].length; ++j) {
                         //Only for this tribe
                         int cityId = tileCityId[i][j];
-                        if (t.controlsCity(cityId)) {
-                            // Map cities, roads and ports
-                            connectedTiles[i][j] = networkTiles[i][j];
+                        boolean myCity = t.controlsCity(cityId);
+                        boolean notEnemy = myCity || tileCityId[i][j] == -1;
 
-                            //Keep a list of my ports
-                            if (buildings[i][j] == Types.BUILDING.PORT)
+                        //cities and ports, must be within my city boundaries.
+                        if(myCity && (terrains[i][j] == CITY || buildings[i][j] == Types.BUILDING.PORT))
+                        {
+                            connectedTiles[i][j] = networkTiles[i][j];
+                            if(buildings[i][j] == Types.BUILDING.PORT)
                                 ports.add(new Vector2d(i, j));
 
-                            //And navigable tiles
-                            if ((terrains[i][j] == SHALLOW_WATER || terrains[i][j] == DEEP_WATER) //WATER
-                                    && t.isVisible(i, j) && tileCityId[i][j] != -1) //VISIBLE AND NOT ENEMY
-                            {
-                                navigable[i][j] = true;
-                            }
+                        //Roads, must be within my city boundaries OR in a neutral tile.
+                        }else if (notEnemy && isRoad(i,j))
+                        {
+                           connectedTiles[i][j] = networkTiles[i][j];
+                        }
 
+                        //And navigable tiles: WATER, VISIBLE AND NOT ENEMY
+                        if ((terrains[i][j] == SHALLOW_WATER || terrains[i][j] == DEEP_WATER)
+                                && t.isVisible(i, j) && notEnemy) {
+                            navigable[i][j] = true;
                         }
                     }
                 }
@@ -726,9 +717,12 @@ public class Board {
 
                 //Now, we need to add jump links. In this case, two ports are connected if
                 // separated by [0,TribesConfig.PORT_TRADE_DISTANCE] WATER, VISIBLE, NON-ENEMY tiles
-                for (Vector2d portFrom : ports) {
-                    for (Vector2d portTo : ports) {
-                        if (!portFrom.equals(portTo)) {
+                int nPorts = ports.size();
+                for (int i = 0; i < nPorts - 1; ++i) {
+                    for (int j = i; j < nPorts; ++j) {
+                        if (i != j) {
+                            Vector2d portFrom = ports.get(i);
+                            Vector2d portTo = ports.get(j);
 
                             Vector2d originPortPos = new Vector2d(portFrom.x, portFrom.y);
                             Pathfinder tp = new Pathfinder(originPortPos, new TradeWaterStep(navigable));
@@ -739,6 +733,7 @@ public class Board {
                                 //We add this as a link between ports.
                                 tns.addJumpLink(portFrom, portTo, true);
                             }
+
                         }
                     }
                 }
@@ -949,6 +944,10 @@ public class Board {
                 {
                     neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
                 }
+//                else if(navigable[x][y])
+//                {
+//                    System.out.println("No jump link from " + from + " to " + tile + "; cost: " + (costFrom+stepCost));
+//                }
             }
 
             return neighbours;

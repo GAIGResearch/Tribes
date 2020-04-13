@@ -703,19 +703,24 @@ public class Board {
                         //Only for this tribe
                         int cityId = tileCityId[i][j];
                         boolean myCity = t.controlsCity(cityId);
-                        if (myCity) {
-                            // Map cities, roads and ports
-                            connectedTiles[i][j] = networkTiles[i][j];
+                        boolean notEnemy = myCity || tileCityId[i][j] == -1;
 
-                            //Keep a list of my ports
-                            if (buildings[i][j] == Types.BUILDING.PORT)
+                        //cities and ports, must be within my city boundaries.
+                        if(myCity && (terrains[i][j] == CITY || buildings[i][j] == Types.BUILDING.PORT))
+                        {
+                            connectedTiles[i][j] = networkTiles[i][j];
+                            if(buildings[i][j] == Types.BUILDING.PORT)
                                 ports.add(new Vector2d(i, j));
+
+                        //Roads, must be within my city boundaries OR in a neutral tile.
+                        }else if (notEnemy && networkTiles[i][j])
+                        {
+                           connectedTiles[i][j] = networkTiles[i][j];
                         }
 
                         //And navigable tiles: WATER, VISIBLE AND NOT ENEMY
                         if ((terrains[i][j] == SHALLOW_WATER || terrains[i][j] == DEEP_WATER)
-                                && t.isVisible(i, j)
-                                && (tileCityId[i][j] == -1 || myCity)) {
+                                && t.isVisible(i, j) && notEnemy) {
                             navigable[i][j] = true;
                         }
                     }
@@ -950,6 +955,10 @@ public class Board {
                 {
                     neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
                 }
+//                else if(navigable[x][y])
+//                {
+//                    System.out.println("No jump link from " + from + " to " + tile + "; cost: " + (costFrom+stepCost));
+//                }
             }
 
             return neighbours;

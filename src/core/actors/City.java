@@ -99,6 +99,7 @@ public class City extends Actor{
             case GATE_OF_POWER:
             case PARK_OF_FORTUNE:
             case TOWER_OF_WISDOM:
+            case GRAND_BAZAR:
                 if(!onlyMatching) addPopulation(tribe,building.type.getBonus() * multiplier);
                 tribe.addScore(TribesConfig.MONUMENT_POINTS * multiplier);
                 break;

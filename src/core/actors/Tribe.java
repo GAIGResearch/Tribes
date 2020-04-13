@@ -312,17 +312,19 @@ public class Tribe extends Actor {
         boolean[] inMetTribes = new boolean[tribes.length];
 
 
-        for (int i = 0; i < tribesMet.size(); i++) {
             // if tribes not in tribes met or tribe is itself then do nothing else add to tribesmet arraylist
-            if (tribesMet.size() >= i && tribesMet.size() != 0) {
                 if (tribeID == this.getTribeId()) {
                     inMetTribes[tribeID] = true;
                 }
-            }
-        }
+
+                for(int i = 0; i<tribesMet.size();i++){
+                    if (tribesMet.get(i) == tribeID)
+                        inMetTribes[tribeID] = true;
+                }
+
             if (!inMetTribes[tribeID]) {
                 tribesMet.add(tribeID); // add to this tribe
-                tribes[tribeID].tribesMet.add(this.getTribeId()); // add to met tribe as well
+                //tribes[tribeID].tribesMet.add(this.getTribeId()); // add to met tribe as well
 
                 //Pick a technology at random from the tribe to learn
                 TechnologyTree thisTribeTree = getTechTree();
@@ -339,27 +341,21 @@ public class Tribe extends Actor {
                         techInMetTribe.add(tech);
                 }
                 ArrayList<Types.TECHNOLOGY> potentialTechForThisTribe = new ArrayList<>();
-                ArrayList<Types.TECHNOLOGY> potentialTechForMetTribe = new ArrayList<>();
 
                 for (int x = 0; x < techInMetTribe.size(); x++) {
                     if (!thisTribeTree.isResearched(techInMetTribe.get(x)))
                         potentialTechForThisTribe.add(techInMetTribe.get(x));
                 }
 
-                for (int x = 0; x < techInThisTribe.size(); x++) {
-                    if (!metTribeTree.isResearched(techInThisTribe.get(x)))
-                        potentialTechForMetTribe.add(techInThisTribe.get(x));
-                }
 
 
-                if (potentialTechForThisTribe.size() == 0 || potentialTechForMetTribe.size() == 0)
+
+                if (potentialTechForThisTribe.size() == 0)
                     return;
 
                 Types.TECHNOLOGY techToGet = potentialTechForThisTribe.get(r.nextInt(potentialTechForThisTribe.size()));
                 thisTribeTree.doResearch(techToGet);
 
-                techToGet = potentialTechForMetTribe.get(r.nextInt(potentialTechForMetTribe.size()));
-                metTribeTree.doResearch(techToGet);
             }
         }
 

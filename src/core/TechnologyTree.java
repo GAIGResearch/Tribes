@@ -86,5 +86,7 @@ public class TechnologyTree {
        return doResearch(t);
    }
 
-
+    public boolean[] getResearched() {
+        return researched;
+    }
 }

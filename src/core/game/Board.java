@@ -905,6 +905,9 @@ public class Board {
         setTradeNetwork(x, y, true);
     }
 
+    public boolean getNetworkTilesAt(int x, int y) {
+        return this.networkTiles[x][y];
+    }
 
     private class TradeWaterStep implements NeighbourHelper
     {
@@ -1018,5 +1021,7 @@ public class Board {
             connected.add(to);
         }
     }
+
+
 
 }

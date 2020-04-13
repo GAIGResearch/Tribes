@@ -225,9 +225,18 @@ public class Types {
         }
 
         public enum MONUMENT_STATUS {
-            UNAVAILABLE,
-            AVAILABLE,
-            BUILT;
+            UNAVAILABLE(0),
+            AVAILABLE(1),
+            BUILT(2);
+
+            private int key;
+            MONUMENT_STATUS(int numVal){
+                this.key = numVal;
+            }
+
+            public int getKey() {
+                return key;
+            }
         }
 
         private int key;

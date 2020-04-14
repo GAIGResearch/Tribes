@@ -284,7 +284,7 @@ public class Game {
                         uInfo.put("y", j);
                         uInfo.put("kill", u.getKills());
                         uInfo.put("isVeteran", u.isVeteran());
-                        uInfo.put("cityID", u.getCityID());
+                        uInfo.put("cityID", u.getCityId());
                         uInfo.put("tribeId", u.getTribeId());
                         uInfo.put("currentHP", u.getCurrentHP());
                         unit.put(String.valueOf(unitINFO), uInfo);
@@ -378,9 +378,9 @@ public class Game {
                 }
                 tribeInfo.put("monuments", monumentInfo);
                 JSONArray tribesMetInfo = new JSONArray();
-                ArrayList<Types.TRIBE> tribesMet= t.getTribesMet();
-                for (Types.TRIBE tribe : tribesMet){
-                    tribesMetInfo.put(tribe.getKey());
+                ArrayList<Integer> tribesMet= t.getTribesMet();
+                for (Integer tribeId : tribesMet){
+                    tribesMetInfo.put(tribeId);
                 }
                 tribeInfo.put("tribesMet", tribesMetInfo);
                 tribeInfo.put("extraUnits", t.getExtraUnits());

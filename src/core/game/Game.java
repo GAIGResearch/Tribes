@@ -10,6 +10,8 @@ import core.actors.City;
 import core.actors.Temple;
 import core.actors.Tribe;
 import core.actors.units.Unit;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import players.Agent;
 import players.HumanAgent;
 import utils.ElapsedCpuTimer;
@@ -17,7 +19,11 @@ import utils.GUI;
 import utils.Vector2d;
 import utils.WindowInput;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -194,6 +200,9 @@ public class Game {
             //play the full turn for this player
             processTurn(i, tribe, frame);
 
+            // Save Game
+            saveGame();
+
             //it may be that this player won the game, no more playing.
             if(isEnded())
             {
@@ -203,6 +212,203 @@ public class Game {
 
         //All turns passed, time to increase the tick.
         gs.incTick();
+    }
+
+    public void saveGame(){
+        try{
+            File rootFileLoc = new File("save/" + this.seed);
+            File turnFile = new File(rootFileLoc, gs.getTick() + "_" + gs.getBoard().getActiveTribeID());
+
+            // Only create root file for first time
+            if(gs.getTick() == 0 && gs.getActiveTribeID() == 0){
+                //Create dictionary
+                rootFileLoc.mkdirs();
+            }
+
+
+            turnFile.mkdir();
+
+            // JSON
+            JSONObject game = new JSONObject();
+
+            // Board INFO (2D array) - Terrain, Resource, UnitID, CityID, NetWorks
+            JSONObject board = new JSONObject();
+            JSONArray terrain2D = new JSONArray();
+            JSONArray terrain;
+
+            JSONArray resource2D = new JSONArray();
+            JSONArray resource;
+
+            JSONArray unit2D = new JSONArray();
+            JSONArray units;
+
+            JSONArray city2D = new JSONArray();
+            JSONArray cities;
+
+            JSONArray network2D = new JSONArray();
+            JSONArray networks;
+
+            // Unit INFO: id:{type, x, y, kills, isVeteran, cityId, tribeId, HP}
+            JSONObject unit = new JSONObject();
+
+            // City INFO: id:{x, y, tribeId, population_need, bound, level, isCapital, population,
+            //                production, hasWalls, pointsWorth, building(array)}
+            JSONObject city = new JSONObject();
+
+            // Building INFO: {x, y, type, level(optional), turnsToScore(optional), bonus}
+            JSONObject building = new JSONObject();
+
+            for (int i=0; i<getBoard().getSize(); i++){
+
+                // Initial JSON Object for each row
+                terrain = new JSONArray();
+                resource = new JSONArray();
+                units = new JSONArray();
+                cities = new JSONArray();
+                networks = new JSONArray();
+
+                for(int j=0; j<getBoard().getSize(); j++){
+                    // Save Terrain INFO
+                    terrain.put(gs.getBoard().getTerrainAt(i, j).getKey());
+                    // Save Resource INFO
+                    resource.put(gs.getBoard().getResourceAt(i, j) != null? gs.getBoard().getResourceAt(i, j).getKey():-1);
+
+                    // Save unit INFO
+                    int unitINFO = gs.getBoard().getUnitIDAt(i, j);
+                    units.put(unitINFO);
+                    if (unitINFO != 0){
+                        Unit u = (Unit)gs.getActor(unitINFO);
+                        JSONObject uInfo = new JSONObject();
+                        uInfo.put("type", u.getType().getKey());
+                        uInfo.put("x", i);
+                        uInfo.put("y", j);
+                        uInfo.put("kill", u.getKills());
+                        uInfo.put("isVeteran", u.isVeteran());
+                        uInfo.put("cityID", u.getCityID());
+                        uInfo.put("tribeId", u.getTribeId());
+                        uInfo.put("currentHP", u.getCurrentHP());
+                        unit.put(String.valueOf(unitINFO), uInfo);
+                    }
+                    // Save city INFO
+                    int cityINFO = gs.getBoard().getCityIdAt(i, j);
+                    cities.put(cityINFO);
+                    if (cityINFO != -1){
+                        City c = (City)gs.getActor(cityINFO);
+                        // City INFO: id:{x, y, tribeId, population_need, bound, level, isCapital, population,
+                        //                production, hasWalls, pointsWorth, building(array)}
+                        JSONObject cInfo = new JSONObject();
+                        cInfo.put("x", i);
+                        cInfo.put("y", j);
+                        cInfo.put("tribeID", c.getTribeId());
+                        cInfo.put("population_need", c.getPopulation_need());
+                        cInfo.put("bound", c.getBound());
+                        cInfo.put("level", c.getLevel());
+                        cInfo.put("isCapital", c.isCapital());
+                        cInfo.put("population", c.getPopulation());
+                        cInfo.put("production", c.getProduction());
+                        cInfo.put("hasWalls", c.hasWalls());
+                        cInfo.put("pointsWorth", c.getPointsWorth());
+                        // Save Buildings INFO
+                        JSONArray buildingList = new JSONArray();
+                        LinkedList<Building> buildings = c.getBuildings();
+                        if (buildings != null) {
+                            for (Building b : buildings) {
+                                JSONObject bInfo = new JSONObject();
+                                bInfo.put("x", b.position.x);
+                                bInfo.put("y", b.position.y);
+                                bInfo.put("type", b.type.getKey());
+                                bInfo.put("bonus", b.getBonus());
+                                if (b.type == Types.BUILDING.TEMPLE || b.type == Types.BUILDING.WATER_TEMPLE || b.type == Types.BUILDING.FOREST_TEMPLE) {
+                                    Temple t = (Temple) b;
+                                    bInfo.put("level", t.getLevel());
+                                    bInfo.put("turnsToScore", t.getTurnsToScore());
+                                }
+                                buildingList.put(bInfo);
+                            }
+                        }
+                        cInfo.put("buildings", buildingList);
+                        city.put(String.valueOf(unitINFO), cInfo);
+                    }
+
+                    // Save network INFO
+                    networks.put(gs.getBoard().getNetworkTilesAt(i, j));
+
+                }
+                // Update row value
+                terrain2D.put(terrain);
+                resource2D.put(resource);
+                unit2D.put(units);
+                city2D.put(cities);
+                network2D.put(networks);
+            }
+
+            board.put("terrain", terrain2D);
+            board.put("resource", resource2D);
+            board.put("unitID", unit2D);
+            board.put("cityID", city2D);
+            board.put("network", network2D);
+
+            game.put("board", board);
+            game.put("unit", unit);
+            game.put("city", city);
+
+            // Save Tribes Information () - id: {citiesID, capitalID, type, techTree, stars, winner, score, obsGrid,
+            //                                   connectedCities, monuments:{type: status}, tribesMet, extraUnits,
+            //                                   nKills, nPacifistCount}
+            JSONObject tribesINFO = new JSONObject();
+            Tribe[] tribes = gs.getTribes();
+            for(Tribe t: tribes){
+                JSONObject tribeInfo = new JSONObject();
+                tribeInfo.put("citiesID", t.getCitiesID());
+                tribeInfo.put("capitalID", t.getCapitalID());
+                tribeInfo.put("type", t.getType().getKey());
+                JSONObject techINFO = new JSONObject();
+                techINFO.put("researched", t.getTechTree().getResearched());
+                techINFO.put("everythingResearched", t.getTechTree().isEverythingResearched());
+                tribeInfo.put("technology", techINFO);
+                tribeInfo.put("star", t.getStars());
+                tribeInfo.put("winner", t.getWinner().getKey());
+                tribeInfo.put("score", t.getScore());
+                tribeInfo.put("obsGrid", t.getObsGrid());
+                tribeInfo.put("connectedCities", t.getConnectedCities());
+                HashMap<Types.BUILDING, Types.BUILDING.MONUMENT_STATUS> m = t.getMonuments();
+                JSONObject monumentInfo = new JSONObject();
+                for (Types.BUILDING key : m.keySet()) {
+                    monumentInfo.put(String.valueOf(key.getKey()), m.get(key).getKey());
+                }
+                tribeInfo.put("monuments", monumentInfo);
+                JSONArray tribesMetInfo = new JSONArray();
+                ArrayList<Types.TRIBE> tribesMet= t.getTribesMet();
+                for (Types.TRIBE tribe : tribesMet){
+                    tribesMetInfo.put(tribe.getKey());
+                }
+                tribeInfo.put("tribesMet", tribesMetInfo);
+                tribeInfo.put("extraUnits", t.getExtraUnits());
+                tribeInfo.put("nKills", t.getnKills());
+                tribeInfo.put("nPacifistCount", t.getnPacifistCount());
+                tribesINFO.put(String.valueOf(t.getActorId()), tribeInfo);
+            }
+
+            game.put("tribes", tribesINFO);
+            game.put("seed", seed);
+            game.put("tick", gs.getTick());
+            game.put("activeTribeID", gs.getActiveTribeID());
+
+
+//            JSONObject read = new JSONObject(game.toString());
+//            System.out.println(read.get("board"));
+//            System.out.println(read.get("board"));
+//
+//            JSONObject board_read = read.getJSONObject("board");
+//            System.out.println(board_read.get("resource"));
+
+            FileWriter fw_game = new FileWriter(turnFile.getPath() + "/game.json");
+            fw_game.write(game.toString());
+            fw_game.close();
+
+        } catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     /**

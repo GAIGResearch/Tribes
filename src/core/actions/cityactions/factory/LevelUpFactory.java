@@ -21,6 +21,7 @@ public class LevelUpFactory implements ActionFactory {
         for (Types.CITY_LEVEL_UP bonus : bonuses) {
             LevelUp lUp = new LevelUp(city.getActorId());
             lUp.setBonus(bonus);
+            lUp.setTargetPos(city.getPosition().copy());
             if(lUp.isFeasible(gs)) {
                 actions.add(lUp);
             }

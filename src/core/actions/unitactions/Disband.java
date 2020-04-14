@@ -9,8 +9,6 @@ import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
 
-import java.util.LinkedList;
-
 public class Disband extends UnitAction
 {
     public Disband(int unitId)
@@ -31,14 +29,14 @@ public class Disband extends UnitAction
         Unit unit = (Unit) gs.getActor(this.unitId);
         Board b = gs.getBoard();
         Tribe t = gs.getTribe(unit.getTribeId());
-        City c = (City) b.getActor(unit.getCityID());
+        City c = (City) b.getActor(unit.getCityId());
 
         if(isFeasible(gs))
         {
             int starsGained = (int) (unit.COST / 2.0); //half, rounded down
             t.addStars(starsGained);
             b.removeUnitFromBoard(unit);
-            b.removeUnitFromCity(unit, c);
+            b.removeUnitFromCity(unit, c, t);
             t.subtractScore(unit.getType().getPoints());
             return true;
         }
@@ -49,5 +47,10 @@ public class Disband extends UnitAction
     @Override
     public Action copy() {
         return new Disband(this.unitId);
+    }
+
+    @Override
+    public String toString() {
+        return "Disband{unitID=" + unitId + "}";
     }
 }

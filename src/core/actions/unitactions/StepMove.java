@@ -32,6 +32,15 @@ public class StepMove implements NeighbourHelper
         ArrayList<PathNode> neighbours = new ArrayList<>();
         Board board = gs.getBoard();
         boolean inZoneOfControl = false;
+        boolean onRoad = false;
+
+        //Check if unit is on a neutral or a friendly road, cities also count as roads.
+        if(board.isRoad(from.x, from.y) || board.getTerrainAt(from.x, from.y) == Types.TERRAIN.CITY){
+            int cityId = board.getCityIdAt(from.x, from.y);
+            if(cityId == -1 || board.getTribe(unit.getTribeId()).controlsCity(cityId)) {
+                onRoad = true;
+            }
+        }
 
         //Check if there is an enemy unit adjacent.
         for(Vector2d tile : from.neighborhood(1, 0, board.getSize())) {
@@ -84,7 +93,7 @@ public class StepMove implements NeighbourHelper
                         //Embarking takes a turn of movement.
                         if(board.getBuildingAt(tile.x, tile.y) == Types.BUILDING.PORT) {
                             stepCost = unit.MOV;
-                        }
+                        }else{ continue; }
                         break;
                     case PLAIN:
                     case CITY:
@@ -97,11 +106,19 @@ public class StepMove implements NeighbourHelper
                         break;
 
                 }
+                //If there is a friendly/neutral road connection between two tiles then the movement cost is halved.
+                //This movement boost applies only to ground units.
+                if(onRoad && (board.isRoad(tile.x, tile.y) || board.getTerrainAt(tile.x, tile.y) == Types.TERRAIN.CITY)) {
+                    int cityId = board.getCityIdAt(from.x, from.y);
+                    if(cityId == -1 || board.getTribe(unit.getTribeId()).controlsCity(cityId)) {
+                        stepCost = stepCost / 2.0;
+                    }
+                }
             if(inZoneOfControl){
                 stepCost = unit.MOV;
             }
             if(costFrom + stepCost <= unit.MOV){
-                neighbours.add(new PathNode(tile, costFrom + stepCost));
+                neighbours.add(new PathNode(tile, stepCost));
             }
         }
         return neighbours;

@@ -72,7 +72,6 @@ public class TribeView extends JComponent {
     void paint(GameState gameState)
     {
         this.gs = gameState;
-        this.repaint();
     }
 
 

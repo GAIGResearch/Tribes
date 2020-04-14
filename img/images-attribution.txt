@@ -7,6 +7,7 @@ Mountain - https://www.the3rdsequence.com/texturedb/texture/102/mountain+stone+r
 Village - "LPC Thatched-roof Cottage" by bluecarrot16. License: CC-BY-SA 3.0 / GPL 3.0+ Based on: "LPC Base Assets" by Lanea Zimmerman (AKA Sharm) and Daniel Armstrong (AKA HughSpectrum). License: CC-BY-SA 3.0 / GPL 3.0+. http://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles "LPC art entry" by Casper Nilsson. License: CC-BY-SA 3.0 / GPL 3.0+. http://opengameart.org/content/lpc-cnilsson
 City - https://www.pinterest.co.uk/pin/308074430737611308/
 Ruins - https://opengameart.org/content/broken-tower
+Walls - Hansjörg Malthaner, http://opengameart.org/users/varkalandar
 
 Resource/
 Whale - https://sonic.fandom.com/wiki/Orca?file=Sonic_Runners_Orca.png

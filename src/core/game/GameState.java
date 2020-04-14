@@ -5,7 +5,6 @@ import core.actions.Action;
 import core.actions.cityactions.factory.CityActionBuilder;
 import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.factory.TribeActionBuilder;
-import core.actions.unitactions.UnitAction;
 import core.actions.unitactions.factory.UnitActionBuilder;
 import core.actors.Actor;
 import core.actors.City;
@@ -257,7 +256,8 @@ public class GameState {
      */
     public void pushUnit(Unit toPush, int startX, int startY)
     {
-        boolean pushed = board.pushUnit(toPush.getTribeId(), toPush, startX, startY, rnd);
+        Tribe tribe = getTribe(toPush.getTribeId());
+        boolean pushed = board.pushUnit(tribe, toPush, startX, startY, rnd);
         if(!pushed)
         {
             killUnit(toPush);
@@ -271,8 +271,9 @@ public class GameState {
     public void killUnit(Unit toKill)
     {
         board.removeUnitFromBoard(toKill);
-        City c = (City) getActor(toKill.getCityID());
-        board.removeUnitFromCity(toKill, c);
+        City c = (City) getActor(toKill.getCityId());
+        Tribe tribe = getTribe(toKill.getTribeId());
+        board.removeUnitFromCity(toKill, c, tribe);
         Tribe t = getTribe(toKill.getTribeId());
         t.subtractScore(toKill.getType().getPoints());
     }

@@ -300,7 +300,8 @@ public class Types {
         public boolean isMonument()
         {
             return this == ALTAR_OF_PEACE || this == EMPERORS_TOMB || this == EYE_OF_GOD ||
-                    this == GATE_OF_POWER || this == PARK_OF_FORTUNE || this == TOWER_OF_WISDOM;
+                    this == GATE_OF_POWER || this == PARK_OF_FORTUNE || this == TOWER_OF_WISDOM
+                    || this == GRAND_BAZAR;
         }
 
         public boolean isTemple()
@@ -318,6 +319,7 @@ public class Types {
             monuments.put(GATE_OF_POWER, UNAVAILABLE);
             monuments.put(PARK_OF_FORTUNE, UNAVAILABLE);
             monuments.put(TOWER_OF_WISDOM, UNAVAILABLE);
+            monuments.put(GRAND_BAZAR, UNAVAILABLE);
             return monuments;
         }
     }
@@ -460,9 +462,7 @@ public class Types {
             return null;
         }
 
-        public int getKey() {  return key; }
-        public Image getImage(int playerID) { return ImageIO.GetInstance().getImage(imageFile + playerID + ".png"); }
-        public String getImageStr(int playerID) { return imageFile + playerID + ".png"; }
+        public Image getImage(int tribeKey) { return ImageIO.GetInstance().getImage(imageFile + tribeKey + ".png"); }
         public String getImageFile() { return imageFile; }
         public int getCost() {
             return cost;

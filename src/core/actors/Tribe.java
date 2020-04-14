@@ -43,7 +43,7 @@ public class Tribe extends Actor {
     private int score = 0;
 
     //Indicates if the position in the board is visible
-    private boolean obsGrid[][];
+    private boolean[][] obsGrid;
 
     //List of city ids connected to the capital (capital not included)
     private ArrayList<Integer> connectedCities = new ArrayList<>();
@@ -52,7 +52,7 @@ public class Tribe extends Actor {
     private HashMap<Types.BUILDING, MONUMENT_STATUS> monuments;
 
     //Tribes met by this tribe.
-    private ArrayList<Types.TRIBE> tribesMet;
+    private ArrayList<Integer> tribesMet;
 
     //Units that don't belong to a city (either converted of shifted).
     private ArrayList<Integer> extraUnits;
@@ -137,7 +137,10 @@ public class Tribe extends Actor {
         int size = obsGrid.length;
         Vector2d center = new Vector2d(x, y);
 
-        for(Vector2d tile : center.neighborhood(range, 0, size))
+        LinkedList<Vector2d> tiles = center.neighborhood(range, 0, size);
+        tiles.add(center);
+
+        for(Vector2d tile : tiles)
         {
             if (!obsGrid[tile.x][tile.y]) {
                 obsGrid[tile.x][tile.y] = true;
@@ -155,8 +158,8 @@ public class Tribe extends Actor {
         //We may be clearing the last tiles of the board, which grants a monument
         if(monuments.get(EYE_OF_GOD) == MONUMENT_STATUS.UNAVAILABLE)
         {
-            for(int i = 0; i <= obsGrid.length; ++i)
-                for(int j = 0; j <= obsGrid[0].length; ++j)
+            for(int i = 0; i < obsGrid.length; ++i)
+                for(int j = 0; j < obsGrid[0].length; ++j)
                 {
                     if(!obsGrid[i][j]) return;
                 }
@@ -264,10 +267,6 @@ public class Tribe extends Actor {
         return capitalID;
     }
 
-    public boolean hasCity(int cityId) {
-        return this.citiesID.contains(cityId);
-    }
-
     public void setPosition(int x, int y) {
         position = null;
     } //this doesn't make sense
@@ -303,35 +302,31 @@ public class Tribe extends Actor {
             monuments.put(GATE_OF_POWER, MONUMENT_STATUS.AVAILABLE);
     }
 
-    public ArrayList<Types.TRIBE> getTribesMet() {
+    public ArrayList<Integer> getTribesMet() {
         return tribesMet;
     }
 
     public void meetTribe(Random r, Tribe[] tribes, int tribeID) {
 
-//        Tribe[] t = gs.getBoard().getTribes(); // get tribes from boards
 
         boolean[] inMetTribes = new boolean[tribes.length];
-        //loop through all tribes
-        for (int i = 0; i<inMetTribes.length; i++){
-            inMetTribes[i] = false;
-        }
 
-        for (int i = 0; i < tribes.length; i++) {
+
+        for (int i = 0; i < tribesMet.size(); i++) {
             // if tribes not in tribes met or tribe is itself then do nothing else add to tribesmet arraylist
-            if(tribesMet.size() >= i &&tribesMet.size() !=0) {
-                if (tribes[i].tribe.equals(tribesMet.get(i)) || tribes[i].tribeId == tribeID) {
-                    inMetTribes[i] = true;
+            if (tribesMet.size() >= i && tribesMet.size() != 0) {
+                if (tribeID == this.getTribeId()) {
+                    inMetTribes[tribeID] = true;
                 }
             }
-
-            if (!inMetTribes[i]) {
-                tribesMet.add(tribes[i].tribe); // add to this tribe
-                tribes[i].tribesMet.add(this.tribe); // add to met tribe as well
+        }
+            if (!inMetTribes[tribeID]) {
+                tribesMet.add(tribeID); // add to this tribe
+                tribes[tribeID].tribesMet.add(this.getTribeId()); // add to met tribe as well
 
                 //Pick a technology at random from the tribe to learn
                 TechnologyTree thisTribeTree = getTechTree();
-                TechnologyTree metTribeTree = tribes[i].getTechTree();
+                TechnologyTree metTribeTree = tribes[tribeID].getTechTree();
                 ArrayList<Types.TECHNOLOGY> techInThisTribe = new ArrayList<>(); //Check which tech in this tribe
                 ArrayList<Types.TECHNOLOGY> techInMetTribe = new ArrayList<>(); // Check which tech in met tribe
                 //Check which technologies both research trees contain
@@ -346,19 +341,19 @@ public class Tribe extends Actor {
                 ArrayList<Types.TECHNOLOGY> potentialTechForThisTribe = new ArrayList<>();
                 ArrayList<Types.TECHNOLOGY> potentialTechForMetTribe = new ArrayList<>();
 
-                for (int x = 0; i < techInMetTribe.size(); i++) {
+                for (int x = 0; x < techInMetTribe.size(); x++) {
                     if (!thisTribeTree.isResearched(techInMetTribe.get(x)))
                         potentialTechForThisTribe.add(techInMetTribe.get(x));
                 }
 
-                for (int x = 0; i < techInThisTribe.size(); i++) {
+                for (int x = 0; x < techInThisTribe.size(); x++) {
                     if (!metTribeTree.isResearched(techInThisTribe.get(x)))
                         potentialTechForMetTribe.add(techInThisTribe.get(x));
                 }
 
 
                 if (potentialTechForThisTribe.size() == 0 || potentialTechForMetTribe.size() == 0)
-                    continue;
+                    return;
 
                 Types.TECHNOLOGY techToGet = potentialTechForThisTribe.get(r.nextInt(potentialTechForThisTribe.size()));
                 thisTribeTree.doResearch(techToGet);
@@ -368,7 +363,7 @@ public class Tribe extends Actor {
             }
         }
 
-    }
+
 
     public void updateNetwork(Pathfinder tp, Board b, boolean thisTribesTurn) {
         ArrayList<Integer> lostCities = new ArrayList<>();
@@ -398,7 +393,7 @@ public class Tribe extends Actor {
                     if (connectedCities.contains(cityId)) {
                         if (!connectedNow) {
                             //drops from the network
-                            connectedCities.remove(cityId);
+                            dropCityFromNetwork(nonCapitalCity);
                             lostCities.add(cityId);
                         }
                     } else if (connectedNow) {
@@ -406,17 +401,30 @@ public class Tribe extends Actor {
                         connectedCities.add(cityId);
                         addedCities.add(cityId);
                     }
-
                 }
             }
+
+            //There may be some connected cities that we don't longer own
+            // (i.e. we're here because an enemy captured one of our cities in the network)
+            ArrayList<Integer> connCities = new ArrayList<>(connectedCities);
+            for(Integer cityId : connCities)
+            {
+                if(!this.controlsCity(cityId))
+                {
+                    dropCityFromNetwork((City) b.getActor(cityId));
+                    lostCities.add(cityId);
+                }
+            }
+
 
             //The capital gains 1 population for each city connected, -1 for each city disconnected
             int capitalGain = addedCities.size() - lostCities.size();
             capital.addPopulation(this, capitalGain);
 
             //We may be adding a new monument to the pool!
-            if(connectedCities.size() >= TribesConfig.GRAND_BAZAR_CITIES && monuments.get(GRAND_BAZAR) == MONUMENT_STATUS.UNAVAILABLE)
+            if(connectedCities.size() >= TribesConfig.GRAND_BAZAR_CITIES && monuments.get(GRAND_BAZAR) == MONUMENT_STATUS.UNAVAILABLE) {
                 monuments.put(GRAND_BAZAR, MONUMENT_STATUS.AVAILABLE);
+            }
         }
 
 
@@ -424,10 +432,10 @@ public class Tribe extends Actor {
         if (thisTribesTurn) {
 
             //All cities that lost connection with the capital lose 1 population
-            for (int cityId : lostCities) {
-                City nonCapitalCity = (City) b.getActor(cityId);
-                nonCapitalCity.addPopulation(this, -1);
-            }
+//            for (int cityId : lostCities) {
+//                City nonCapitalCity = (City) b.getActor(cityId);
+//                nonCapitalCity.addPopulation(this, -1);
+//            }
 
             //All cities that gained connection with the capital gain 1 population.
             for (int cityId : addedCities) {
@@ -435,6 +443,20 @@ public class Tribe extends Actor {
                 nonCapitalCity.addPopulation(this, 1);
             }
         }
+    }
+
+    /**
+     * Drops a city from the network. Removes the associated population required to that city.
+     * @param lostCity city to remove from network
+     */
+    private void dropCityFromNetwork(City lostCity)
+    {
+        int cityId = lostCity.getActorId();
+        int cityIdx = connectedCities.indexOf(cityId);
+        connectedCities.remove(cityIdx);
+
+        //this city loses 1 population
+        lostCity.addPopulation(this, -1);
     }
 
     public int getMaxProduction(GameState gs)
@@ -452,6 +474,16 @@ public class Tribe extends Actor {
         return citiesID.contains(capitalID);
     }
 
+    public boolean controlsCity(int cityId)
+    {
+        return citiesID.contains(cityId);
+    }
+
+    public int getNumCities()
+    {
+        return citiesID.size();
+    }
+
     public void cityMaxedUp() {
         if(monuments.get(PARK_OF_FORTUNE) == MONUMENT_STATUS.UNAVAILABLE)
             monuments.put(PARK_OF_FORTUNE, MONUMENT_STATUS.AVAILABLE);
@@ -465,6 +497,14 @@ public class Tribe extends Actor {
     public void addExtraUnit(Unit target)
     {
         extraUnits.add(target.getActorId());
+        target.setCityId(-1);
+    }
+
+    public void removeExtraUnit(Unit target)
+    {
+        int index = extraUnits.indexOf(target.getActorId());
+        if(index != -1)
+            extraUnits.remove(index);
     }
 
     /**
@@ -538,4 +578,5 @@ public class Tribe extends Actor {
     public int getnPacifistCount() {
         return nPacifistCount;
     }
+
 }

@@ -2,6 +2,7 @@ package core.actions.unitactions;
 
 import core.Types;
 import core.actions.Action;
+import core.actors.Tribe;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
@@ -39,17 +40,18 @@ public class Move extends UnitAction
         if(isFeasible(gs)) {
             Unit unit = (Unit) gs.getActor(this.unitId);
             Board board = gs.getBoard();
+            Tribe tribe = gs.getTribe(unit.getTribeId());
             Types.TERRAIN destinationTerrain = board.getTerrainAt(destination.x, destination.y);
 
             board.moveUnit(unit, unit.getPosition().x, unit.getPosition().y, destination.x, destination.y, gs.getRandomGenerator());
 
             if(unit.getType() == Types.UNIT.BOAT || unit.getType() == Types.UNIT.SHIP || unit.getType() == Types.UNIT.BATTLESHIP) {
                 if(destinationTerrain != Types.TERRAIN.SHALLOW_WATER && destinationTerrain != Types.TERRAIN.DEEP_WATER && destinationTerrain != Types.TERRAIN.CITY){
-                    board.disembark(unit, destination.x, destination.y);
+                    board.disembark(unit, tribe, destination.x, destination.y);
                 }
             }else {
                 if(board.getBuildingAt(destination.x, destination.y) == Types.BUILDING.PORT){
-                    board.embark(unit, destination.x, destination.y);
+                    board.embark(unit, tribe, destination.x, destination.y);
                 }
             }
 
@@ -65,6 +67,11 @@ public class Move extends UnitAction
         Move move = new Move(this.unitId);
         move.setDestination(this.destination);
         return move;
+    }
+
+    public String toString()
+    {
+        return "MOVE unit " + this.unitId + " to " + destination;
     }
 
 }

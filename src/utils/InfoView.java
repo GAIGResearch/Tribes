@@ -3,6 +3,7 @@ package utils;
 import core.TechnologyTree;
 import core.Types;
 import core.actions.cityactions.*;
+import core.actions.tribeactions.BuildRoad;
 import core.actions.tribeactions.ResearchTech;
 import core.actors.City;
 import core.actors.Tribe;
@@ -23,7 +24,7 @@ import static core.Constants.*;
 import static core.TribesConfig.VETERAN_KILLS;
 import static utils.GameView.gridSize;
 
-@SuppressWarnings({"SuspiciousNameCombination", "StringConcatenationInsideStringBufferAppend"})
+@SuppressWarnings({"StringConcatenationInsideStringBufferAppend", "SuspiciousNameCombination"})
 public class InfoView extends JComponent {
 
     // Dimensions of the window.
@@ -32,10 +33,12 @@ public class InfoView extends JComponent {
 
     private JButton actionBF, actionCF, actionD, actionGF, actionRG;
     private JButton[] actionB, actionS;
+    private JButton actionRoad;
     private JButton actionResearch;
-    private CityActionListener listenerBF, listenerCF, listenerD, listenerGF, listenerRG;
-    private CityActionListener listenerS, listenerB;
-    private CityActionListener listenerResearch;
+    private TribesActionListener listenerBF, listenerCF, listenerD, listenerGF, listenerRG;
+    private TribesActionListener listenerS, listenerB;
+    private TribesActionListener listenerResearch;
+    private TribesActionListener listenerRoad;
     private ActionController ac;
 
     private int highlightX, highlightY;
@@ -70,23 +73,23 @@ public class InfoView extends JComponent {
 
         // Simple actions: BurnForest, ClearForest, Destroy, GrowForest, GatherResource
         actionBF = new JButton("Burn");  // If forest
-        listenerBF = new CityActionListener("BurnForest");
+        listenerBF = new TribesActionListener("BurnForest");
         actionBF.addActionListener(listenerBF);
         actionBF.setVisible(false);
         actionCF = new JButton("Clear");  // If forest
-        listenerCF = new CityActionListener("ClearForest");
+        listenerCF = new TribesActionListener("ClearForest");
         actionCF.addActionListener(listenerCF);
         actionCF.setVisible(false);
         actionD = new JButton("Destroy");  // If building
-        listenerD = new CityActionListener("Destroy");
+        listenerD = new TribesActionListener("Destroy");
         actionD.addActionListener(listenerD);
         actionD.setVisible(false);
         actionGF = new JButton("Grow");  // If plain
-        listenerGF = new CityActionListener("GrowForest");
+        listenerGF = new TribesActionListener("GrowForest");
         actionGF.addActionListener(listenerGF);
         actionGF.setVisible(false);
         actionRG = new JButton("Gather");  // If resource
-        listenerRG = new CityActionListener("ResourceGathering");
+        listenerRG = new TribesActionListener("ResourceGathering");
         actionRG.addActionListener(listenerRG);
         actionRG.setVisible(false);
         actionPanel.add(actionRG);
@@ -98,7 +101,7 @@ public class InfoView extends JComponent {
         // Complex actions: Build X, Spawn X
         int nBuildings = Types.BUILDING.values().length;
         actionB = new JButton[nBuildings];
-        listenerB = new CityActionListener("Build");
+        listenerB = new TribesActionListener("Build");
         for (int i = 0; i < nBuildings; i++) {
             actionB[i] = new JButton("Build " + Types.BUILDING.values()[i]);
             actionB[i].addActionListener(listenerB);
@@ -108,7 +111,7 @@ public class InfoView extends JComponent {
         ArrayList<Types.UNIT> spawnableUnits = Types.UNIT.getSpawnableTypes();
         int nUnits = spawnableUnits.size();
         actionS = new JButton[nUnits];
-        listenerS = new CityActionListener("Spawn");
+        listenerS = new TribesActionListener("Spawn");
         for (int i = 0; i < nUnits; i++) {
             actionS[i] = new JButton("Spawn " + spawnableUnits.get(i));
             actionS[i].addActionListener(listenerS);
@@ -118,9 +121,15 @@ public class InfoView extends JComponent {
 
         actionResearch = new JButton("Research");
         actionResearch.setVisible(false);
-        listenerResearch = new CityActionListener("Research");
+        listenerResearch = new TribesActionListener("Research");
         actionResearch.addActionListener(listenerResearch);
         actionPanel.add(actionResearch);
+
+        actionRoad = new JButton("Build Road");
+        actionRoad.setVisible(false);
+        listenerRoad = new TribesActionListener("BuildRoad");
+        actionRoad.addActionListener(listenerRoad);
+        actionPanel.add(actionRoad);
 
         this.setLayout(new FlowLayout());
         JScrollPane scrollPane1 = new JScrollPane(textArea);
@@ -192,14 +201,13 @@ public class InfoView extends JComponent {
                     }
                 }
                 s += "</h1>";
-
-                updateButtons();
             }
 
             if (!textArea.getText().equals(s) && updateHighlight) {
                 textArea.setText(s);
                 techHighlight = null;
                 updateHighlight = false;
+                updateButtons();
             }
         }
         updateTechButton();
@@ -211,7 +219,7 @@ public class InfoView extends JComponent {
         StringBuilder sb = new StringBuilder();
         sb.append("<h1>" + Types.TRIBE.values()[u.getTribeId()] + " " + u.getType() + "</h1>");
 //        sb.append("<table border=\"0\"><tr><td><img src=\"file:" + img + "\"/></p></td><td>");
-        sb.append("From city " + u.getCityID() + "<br/>");
+        sb.append("From city " + u.getCityId() + "<br/>");
         if (u.isVeteran()) {
             sb.append("<b>Veteran unit.</b>");
         } else {
@@ -252,129 +260,79 @@ public class InfoView extends JComponent {
     private void updateButtons() {
         Board board = gs.getBoard();
         int cityID = board.getCityIdAt(highlightY, highlightX);
-        Types.TERRAIN t = board.getTerrainAt(highlightY, highlightX);
         Types.RESOURCE r = board.getResourceAt(highlightY, highlightX);
-        Types.BUILDING b = board.getBuildingAt(highlightY, highlightX);
         Vector2d position = new Vector2d(highlightY, highlightX);
         resetButtonVisibility();
+
+        if (board.getTribe(board.getActiveTribeID()).getTechTree().isResearched(Types.TECHNOLOGY.ROADS)) {
+            ArrayList<Action> acts = gs.getTribeActions();
+            for (Action a: acts) {
+                if (a instanceof BuildRoad && ((BuildRoad) a).getPosition().equals(position)) {
+                    actionRoad.setVisible(true);
+                    listenerRoad.update(board.getActiveTribeID(), position, ac, gs);
+                }
+            }
+        }
 
         if (cityID != -1) {
             City c = (City) gs.getBoard().getActor(cityID);
             if (c != null) {  // TODO: this should not be the case. Fix partial observability.
                 ArrayList<Action> acts = gs.getCityActions(c);
 
-                if (r != null) {
-                    boolean found = false;
-                    if (acts != null && acts.size() > 0) {
-                        for (Action a : acts) {
+                boolean foundRG = false;
+                boolean foundBF = false;
+                boolean foundCF = false;
+                boolean foundGF = false;
+                boolean foundD = false;
+                boolean[] foundS = new boolean[actionS.length];
+                boolean[] foundB = new boolean[actionB.length];
+                if (acts != null && acts.size() > 0) {
+                    for (Action a : acts) {
+                        if (a != null && ((CityAction) a).getTargetPos() != null && // TODO: why are these suddenly null?
+                                ((CityAction) a).getTargetPos().equals(position)) {
                             if (a instanceof ResourceGathering) {
-                                if (((ResourceGathering) a).getResource().equals(r)
-                                        && ((ResourceGathering) a).getTargetPos().equals(position)) {
-                                    // Could try to collect this resource, set button value
+                                if (((ResourceGathering) a).getResource().equals(r)) {
                                     listenerRG.update(cityID, position, ac, gs);
                                     listenerRG.setResource(r);
-                                    found = true;
-                                    break;
+                                    foundRG = true;
                                 }
-                            }
-                        }
-                    }
-                    actionRG.setVisible(found);
-                }
-                if (t != null) {
-                    // if forest: Burn & Clear
-                    // if plain: Grow forest
-                    if (t == Types.TERRAIN.FOREST) {
-                        boolean foundBF = false;
-                        boolean foundCF = false;
-                        if (acts != null && acts.size() > 0) {
-                            for (Action a : acts) {
-                                if (a instanceof BurnForest) {
-                                    if (((BurnForest) a).getTargetPos().equals(position)) {
-                                        listenerBF.update(cityID, position, ac, gs);
-                                        foundBF = true;
-                                    }
-                                } else if (a instanceof ClearForest) {
-                                    if (((ClearForest) a).getTargetPos().equals(position)) {
-                                        listenerCF.update(cityID, position, ac, gs);
-                                        foundCF = true;
-                                    }
-                                }
-                            }
-                        }
-                        actionBF.setVisible(foundBF);
-                        actionCF.setVisible(foundCF);
-
-                    } else if (t == Types.TERRAIN.PLAIN) {
-                        boolean foundGF = false;
-                        if (acts != null && acts.size() > 0) {
-                            for (Action a : acts) {
-                                if (a instanceof GrowForest) {
-                                    if (((GrowForest) a).getTargetPos().equals(position)) {
-                                        listenerGF.update(cityID, position, ac, gs);
-                                        foundGF = true;
-                                    }
-                                }
-                            }
-                        }
-                        actionGF.setVisible(foundGF);
-                    }
-                }
-                if (b != null) {
-                    boolean found = false;
-                    if (acts != null && acts.size() > 0) {
-                        for (Action a : acts) {
-                            if (a instanceof Destroy) {
-                                if (((Destroy) a).getTargetPos().equals(position)) {
-                                    listenerD.update(cityID, position, ac, gs);
-                                    found = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    actionD.setVisible(found);
-                }
-                if (c.getPosition().equals(position)) {
-                    // We've highlighted the city, all spawn actions show up
-                    boolean[] found = new boolean[actionS.length];
-                    if (acts != null && acts.size() > 0) {
-                        for (Action a : acts) {
-                            if (a instanceof Spawn) {
+                            } else if (a instanceof BurnForest) {
+                                listenerBF.update(cityID, position, ac, gs);
+                                foundBF = true;
+                            } else if (a instanceof ClearForest) {
+                                listenerCF.update(cityID, position, ac, gs);
+                                foundCF = true;
+                            } else if (a instanceof GrowForest) {
+                                listenerGF.update(cityID, position, ac, gs);
+                                foundGF = true;
+                            } else if (a instanceof Destroy) {
+                                listenerD.update(cityID, position, ac, gs);
+                                foundD = true;
+                                break;
+                            } else if (a instanceof Spawn) {
                                 Types.UNIT unitType = ((Spawn) a).getUnitType();
                                 int idx = Types.UNIT.getSpawnableTypes().indexOf(unitType);
                                 listenerS.update(cityID, position, ac, gs);
-                                found[idx] = true;
-                            }
-                        }
-                    }
-                    for (int i = 0; i < actionS.length; i++) {
-                        actionS[i].setVisible(found[i]);
-                    }
-                } else if (t != null && b == null) {
-                    // We might be able to build here
-                    boolean[] found = new boolean[actionB.length];
-                    if (acts != null && acts.size() > 0) {
-                        for (Action a : acts) {
-                            if (a instanceof Build) {
+                                foundS[idx] = true;
+                            } else if (a instanceof Build) {
                                 Types.BUILDING buildingType = ((Build) a).getBuildingType();
-//                                if (buildingType.getTerrainRequirements().contains(t) &&
-//                                if (a.isFeasible(gs) &&
-                                if (((Build) a).getTargetPos().equals(position))
-                                {
-                                    int idx = buildingType.getKey();
-                                    listenerB.update(cityID, position, ac, gs);
-                                    found[idx] = true;
-                                }
+                                int idx = buildingType.getKey();
+                                listenerB.update(cityID, position, ac, gs);
+                                foundB[idx] = true;
                             }
                         }
                     }
-                    for (int i = 0; i < actionB.length; i++) {
-//                        if (Types.BUILDING.values()[i].getTerrainRequirements().contains(t)) {
-//                        if()
-                            actionB[i].setVisible(found[i]);
-//                        }
-                    }
+                }
+                actionRG.setVisible(foundRG);
+                actionBF.setVisible(foundBF);
+                actionCF.setVisible(foundCF);
+                actionGF.setVisible(foundGF);
+                actionD.setVisible(foundD);
+                for (int i = 0; i < actionS.length; i++) {
+                    actionS[i].setVisible(foundS[i]);
+                }
+                for (int i = 0; i < actionB.length; i++) {
+                    actionB[i].setVisible(foundB[i]);
                 }
             }
         }
@@ -382,6 +340,8 @@ public class InfoView extends JComponent {
 
     private void updateTechButton() {
         if (techHighlight != null && updateTechHighlight) {
+            resetButtonVisibility();
+            updateHighlight = false;
             actionResearch.setVisible(true);
             listenerResearch.update(techHighlight, ac, gs);
 
@@ -391,7 +351,7 @@ public class InfoView extends JComponent {
                 if (tt != null) {
                     boolean researched = tt.isResearched(techHighlight);
                     boolean techRequirement = tt.isResearchable(techHighlight);
-                    int starCost = techHighlight.getCost(t.getCitiesID().size());
+                    int starCost = techHighlight.getCost(t.getNumCities());
                     boolean starRequirement = t.getStars() >= starCost;
                     boolean researchable = techRequirement && starRequirement;
 
@@ -431,6 +391,7 @@ public class InfoView extends JComponent {
         actionD.setVisible(false);
         actionGF.setVisible(false);
         actionRG.setVisible(false);
+        actionRoad.setVisible(false);
         actionResearch.setVisible(false);
         for (JButton jb: actionB) {
             jb.setVisible(false);
@@ -443,7 +404,6 @@ public class InfoView extends JComponent {
     void paint(GameState gs)
     {
         this.gs = gs;
-        this.repaint();
     }
 
     /**
@@ -502,16 +462,16 @@ public class InfoView extends JComponent {
         techHighlight = t;
     }
 
-    class CityActionListener implements ActionListener {
+    class TribesActionListener implements ActionListener {
         int cityID;
         Vector2d position;
         ActionController ac;
         GameState gs;
-        String actionType = "";
+        String actionType;
         Types.RESOURCE resource;
         Types.TECHNOLOGY tech;
 
-        CityActionListener(String type) {
+        TribesActionListener(String type) {
             this.actionType = type;
         }
 
@@ -536,6 +496,10 @@ public class InfoView extends JComponent {
         public void actionPerformed(ActionEvent e) {
             Action a = null;
             switch (actionType) {
+                case "BuildRoad":
+                    a = new BuildRoad(cityID);
+                    ((BuildRoad) a).setPosition(position);
+                    break;
                 case "BurnForest":
                     a = new BurnForest(cityID);
                     ((BurnForest) a).setTargetPos(position);
@@ -578,7 +542,7 @@ public class InfoView extends JComponent {
                 case "Research":
                     if (e.getSource() instanceof JButton) {
                         a = new ResearchTech(gs.getActiveTribeID());
-                        ((ResearchTech)a).setTech(tech);  // TODO: confirmation
+                        ((ResearchTech)a).setTech(tech);
                     }
                     break;
             }

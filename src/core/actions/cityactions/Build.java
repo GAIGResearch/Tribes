@@ -55,6 +55,7 @@ public class Build extends CityAction
             case GATE_OF_POWER:
             case PARK_OF_FORTUNE:
             case TOWER_OF_WISDOM:
+            case GRAND_BAZAR:
                 boolean buildingConstraintsOk = isBuildable(gs, buildingType.getCost(), false);
                 if(buildingConstraintsOk)
                 {

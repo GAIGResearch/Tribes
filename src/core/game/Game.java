@@ -447,24 +447,10 @@ public class Game {
             // Update GUI after every action
             // Paint game state
             if (VISUALS && frame != null) {
-
-                // GUI might take several frames to update with animations,
-                // wait for that to be done before doing next update. Using thread to run the update asynchronous,
-                // while the next action is being computed
-                while (!frame.nextMove()) {
-                    try {
-                        Thread.sleep(FRAME_DELAY);
-                    } catch (Exception e) {
-                        System.out.println("EXCEPTION " + e);
-                    }
-                }
-
                 if(FORCE_FULL_OBSERVABILITY)
                     frame.update(getGameState(-1));
                 else
                     frame.update(gameStateObservations[gs.getActiveTribeID()]);        //Partial Obs
-                Thread gui = new Thread(frame);
-                gui.start();
             }
 
             //the timer needs to be updated to the remaining time, not counting action computation.

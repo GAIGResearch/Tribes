@@ -471,6 +471,7 @@ public class Types {
             return requirement;
         }
         public int getPoints() { return points; }
+        public int getKey() {return key;}
 
         public static Unit createUnit (Vector2d pos, int kills, boolean isVeteran, int ownerID, int tribeID, UNIT type)
         {

@@ -309,18 +309,16 @@ public class Tribe extends Actor {
     public void meetTribe(Random r, Tribe[] tribes, int tribeID) {
 
 
-        boolean[] inMetTribes = new boolean[tribes.length];
+       // boolean[] inMetTribes = new boolean[tribes.length];
 
 
         for (int i = 0; i < tribesMet.size(); i++) {
             // if tribes not in tribes met or tribe is itself then do nothing else add to tribesmet arraylist
-            if (tribesMet.size() >= i && tribesMet.size() != 0) {
-                if (tribeID == this.getTribeId()) {
-                    inMetTribes[tribeID] = true;
-                }
+                if (tribeID == this.tribesMet.get(i) || tribeID == this.getTribeId()) {
+                    return;
+
             }
         }
-            if (!inMetTribes[tribeID]) {
                 tribesMet.add(tribeID); // add to this tribe
                 tribes[tribeID].tribesMet.add(this.getTribeId()); // add to met tribe as well
 
@@ -360,7 +358,7 @@ public class Tribe extends Actor {
 
                 techToGet = potentialTechForMetTribe.get(r.nextInt(potentialTechForMetTribe.size()));
                 metTribeTree.doResearch(techToGet);
-            }
+
         }
 
 

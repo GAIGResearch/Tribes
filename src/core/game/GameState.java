@@ -114,7 +114,7 @@ public class GameState {
     /**
      * Increases the tick of the game. One tick encompasses a turn for all players in the game.
      */
-    public void incTick()
+    void incTick()
     {
         tick++;
     }

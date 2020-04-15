@@ -563,4 +563,20 @@ public class Tribe extends Actor {
 
     public void resetPacifistCount() {nPacifistCount = 0;}
 
+    public ArrayList<Integer> getConnectedCities() {
+        return connectedCities;
+    }
+
+    public HashMap<Types.BUILDING, MONUMENT_STATUS> getMonuments() {
+        return monuments;
+    }
+
+    public int getnKills() {
+        return nKills;
+    }
+
+    public int getnPacifistCount() {
+        return nPacifistCount;
+    }
+
 }

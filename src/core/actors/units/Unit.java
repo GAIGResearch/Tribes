@@ -56,6 +56,8 @@ public abstract class Unit extends Actor
         return currentHP;
     }
 
+    public void setKills(int nKills) {this.kills = nKills;}
+
     public int getKills() {
         return kills;
     }
@@ -195,7 +197,7 @@ public abstract class Unit extends Actor
     }
 
 
-    public abstract Unit copy();
+    public abstract Unit copy(boolean hideInfo);
 
     public void setKilled(boolean isKilled){
         this.isKilled = isKilled;
@@ -207,4 +209,10 @@ public abstract class Unit extends Actor
         return isKilled;
     }
 
+    Unit hide()
+    {
+        this.cityId = -1;
+        this.kills = 0;
+        return this;
+    }
 }

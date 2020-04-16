@@ -27,13 +27,13 @@ public class Boat extends Unit
     }
 
     @Override
-    public Boat copy() {
+    public Boat copy(boolean hideInfo) {
         Boat c = new Boat(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         c.setBaseLandUnit(getBaseLandUnit());
         c.setKilled(isKilled());
-        return c;
+        return hideInfo ? (Boat) c.hide() : c;
     }
 }

@@ -17,12 +17,12 @@ public class Rider extends Unit
     }
 
     @Override
-    public Rider copy() {
+    public Rider copy(boolean hideInfo) {
         Rider c = new Rider(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         c.setKilled(isKilled());
-        return c;
+        return hideInfo ? (Rider) c.hide() : c;
     }
 }

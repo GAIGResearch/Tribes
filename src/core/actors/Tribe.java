@@ -95,37 +95,37 @@ public class Tribe extends Actor {
     }
 
 
-    public Tribe copy() {
+    public Tribe copy(boolean hideInfo) {
         Tribe tribeCopy = new Tribe(this.tribe);
         tribeCopy.actorId = this.actorId;
         tribeCopy.tribeId = this.tribeId;
-        tribeCopy.stars = this.stars;
+        tribeCopy.stars = hideInfo ? 0 : this.stars;
         tribeCopy.winner = this.winner;
         tribeCopy.score = this.score;
         tribeCopy.capitalID = this.capitalID;
-        tribeCopy.nKills = this.nKills;
-        tribeCopy.nPacifistCount = this.nPacifistCount;
+        tribeCopy.nKills = hideInfo ? 0 : this.nKills;
+        tribeCopy.nPacifistCount = hideInfo ? 0 : this.nPacifistCount;
 
-        tribeCopy.techTree = this.techTree.copy();
+        tribeCopy.techTree = hideInfo ? new TechnologyTree() : this.techTree.copy();
 
         tribeCopy.obsGrid = new boolean[obsGrid.length][obsGrid.length];
-        for (int i = 0; i < obsGrid.length; ++i)
+        if(!hideInfo) for (int i = 0; i < obsGrid.length; ++i)
             System.arraycopy(obsGrid[i], 0, tribeCopy.obsGrid[i], 0, obsGrid.length);
 
         tribeCopy.citiesID = new ArrayList<>();
-        tribeCopy.citiesID.addAll(citiesID);
+        if(!hideInfo) tribeCopy.citiesID.addAll(citiesID);
 
         tribeCopy.connectedCities = new ArrayList<>();
-        tribeCopy.connectedCities.addAll(connectedCities);
+        if(!hideInfo) tribeCopy.connectedCities.addAll(connectedCities);
 
         tribeCopy.tribesMet = new ArrayList<>();
-        tribeCopy.tribesMet.addAll(tribesMet);
+        if(!hideInfo) tribeCopy.tribesMet.addAll(tribesMet);
 
         tribeCopy.extraUnits = new ArrayList<>();
-        tribeCopy.extraUnits.addAll(extraUnits);
+        if(!hideInfo) tribeCopy.extraUnits.addAll(extraUnits);
 
         tribeCopy.monuments = new HashMap<>();
-        for(Types.BUILDING b : monuments.keySet())
+        if(!hideInfo) for(Types.BUILDING b : monuments.keySet())
         {
             tribeCopy.monuments.put(b, monuments.get(b));
         }

@@ -145,14 +145,26 @@ public class Tribe extends Actor {
             if (!obsGrid[tile.x][tile.y]) {
                 obsGrid[tile.x][tile.y] = true;
                 this.score += TribesConfig.CLEAR_VIEW_POINTS;
-                Unit u = b.getUnitAt(tile.x,tile.y);
-                City c = b.getCityInBorders(tile.x,tile.y);
-                if( u !=null){
-                    meetTribe(r,b.getTribes(),u.getTribeId());
-                }else if(c !=null){
-                    meetTribe(r,b.getTribes(),c.getTribeId());
+            }
+
+            Unit u = b.getUnitAt(tile.x,tile.y);
+            City c = b.getCityInBorders(tile.x,tile.y);
+            //This tribe meets other tribe when clearing view if other tribe's unit or city is visible
+            if( u !=null){
+                meetTribe(r,b.getTribes(),u.getTribeId());
+                //other tribe meets this tribe if moving into visible area
+                if(b.getTribe(u.tribeId).obsGrid[tile.x][tile.y]){
+                    meetTribe(r,b.getTribes(),this.tribeId);
                 }
             }
+            if(c !=null){
+                meetTribe(r,b.getTribes(),c.getTribeId());
+                //other tribe meets this tribe if moving into visible area
+                if(b.getTribe(c.tribeId).obsGrid[tile.x][tile.y]){
+                    meetTribe(r,b.getTribes(),this.tribeId);
+                }
+            }
+
         }
 
         //We may be clearing the last tiles of the board, which grants a monument
@@ -337,27 +349,27 @@ public class Tribe extends Actor {
                         techInMetTribe.add(tech);
                 }
                 ArrayList<Types.TECHNOLOGY> potentialTechForThisTribe = new ArrayList<>();
-                ArrayList<Types.TECHNOLOGY> potentialTechForMetTribe = new ArrayList<>();
+               // ArrayList<Types.TECHNOLOGY> potentialTechForMetTribe = new ArrayList<>();
 
                 for (int x = 0; x < techInMetTribe.size(); x++) {
                     if (!thisTribeTree.isResearched(techInMetTribe.get(x)))
                         potentialTechForThisTribe.add(techInMetTribe.get(x));
                 }
 
-                for (int x = 0; x < techInThisTribe.size(); x++) {
-                    if (!metTribeTree.isResearched(techInThisTribe.get(x)))
-                        potentialTechForMetTribe.add(techInThisTribe.get(x));
-                }
+//                for (int x = 0; x < techInThisTribe.size(); x++) {
+//                    if (!metTribeTree.isResearched(techInThisTribe.get(x)))
+//                        potentialTechForMetTribe.add(techInThisTribe.get(x));
+//                }
 
 
-                if (potentialTechForThisTribe.size() == 0 || potentialTechForMetTribe.size() == 0)
+                if (potentialTechForThisTribe.size() == 0)
                     return;
 
                 Types.TECHNOLOGY techToGet = potentialTechForThisTribe.get(r.nextInt(potentialTechForThisTribe.size()));
                 thisTribeTree.doResearch(techToGet);
 
-                techToGet = potentialTechForMetTribe.get(r.nextInt(potentialTechForMetTribe.size()));
-                metTribeTree.doResearch(techToGet);
+//                techToGet = potentialTechForMetTribe.get(r.nextInt(potentialTechForMetTribe.size()));
+//                metTribeTree.doResearch(techToGet);
 
         }
 

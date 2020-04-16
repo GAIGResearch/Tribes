@@ -29,16 +29,6 @@ class TradeNetwork
         this.networkTiles = new boolean[size][size];
     }
 
-    void setTradeNetworkValue(int x, int y, boolean trade)
-    {
-        this.networkTiles[x][y] = trade;
-    }
-
-    boolean getTradeNetworkValue(int x, int y)
-    {
-        return networkTiles[x][y];
-    }
-
     /**
      * Sets an element of the trade network to true or false, recomputes the network
      * @param board Board of the game
@@ -135,7 +125,13 @@ class TradeNetwork
         }
     }
 
+    void setTradeNetworkValue(int x, int y, boolean trade) {  this.networkTiles[x][y] = trade;  }
+    boolean getTradeNetworkValue(int x, int y) { return networkTiles[x][y]; }
 
+    /**
+     * Private class that is used by Pathfinding to determine water node connectivity in a graph, considering
+     * also distance between friendly ports.
+     */
     private class TradeWaterStep implements NeighbourHelper
     {
         private boolean [][]navigable;
@@ -145,10 +141,13 @@ class TradeNetwork
             this.navigable = navigable;
         }
 
+        /**
+         * Returns the neighbours of a given node in this data structure.
+         * @param from position from which we need neighbours
+         * @param costFrom is the total move cost computed up to "from"
+         * @return  all the adjacent neighbours to tile in position "from"
+         */
         @Override
-        // from: position from which we need neighbours
-        // costFrom: is the total move cost computed up to "from"
-        // Using this.board, this.tribe, from and costFrom, gets all the adjacent neighbours to tile in position "from"
         public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
 
             ArrayList<PathNode> neighbours = new ArrayList<>();
@@ -176,7 +175,10 @@ class TradeNetwork
         }
     }
 
-
+    /**
+     * Private class that is used by Pathfinding to determine city connectivity in a graph.
+     * Considers connection between ports for the connectivity between cities
+     */
     private class TradeNetworkStep implements NeighbourHelper
     {
         private boolean [][]connected;
@@ -188,10 +190,13 @@ class TradeNetwork
             this.jumpLinks = new HashMap<>();
         }
 
+        /**
+         * Returns the neighbours of a given node in this data structure.
+         * @param from position from which we need neighbours
+         * @param costFrom is the total move cost computed up to "from"
+         * @return  all the adjacent neighbours to tile in position "from"
+         */
         @Override
-        // from: position from which we need neighbours
-        // costFrom: is the total move cost computed up to "from"
-        // Using this.board, this.tribe, from and costFrom, gets all the adjacent neighbours to tile in position "from"
         public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
 
             ArrayList<PathNode> neighbours = new ArrayList<>();

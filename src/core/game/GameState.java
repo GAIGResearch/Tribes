@@ -1,6 +1,8 @@
 package core.game;
 
+import core.TechnologyTree;
 import core.TribesConfig;
+import core.Types;
 import core.actions.Action;
 import core.actions.cityactions.factory.CityActionBuilder;
 import core.actions.tribeactions.EndTurn;
@@ -412,7 +414,31 @@ public class GameState {
         return rnd;
     }
 
-    /* Return all the different available actions by city, unit or tribe */
+    public boolean isNative() {
+        return board.isNative();
+    }
+
+    /* AVAILABLE ACTIONS */
+
+    /**
+     * Gathers and returns all the available actions for the active tribe in a single ArrayList
+     * @return all available actions
+     */
+    public ArrayList<Action> getAllAvailableActions()
+    {
+        ArrayList<Action> allActions = new ArrayList<>(this.getTribeActions());
+        for (Integer cityId : this.getCityActions().keySet())
+        {
+            allActions.addAll(this.getCityActions(cityId));
+        }
+        for (Integer unitId : this.getUnitActions().keySet())
+        {
+            allActions.addAll(this.getUnitActions(unitId));
+        }
+        return allActions;
+    }
+
+
     public HashMap<Integer, ArrayList<Action>> getCityActions() {     return cityActions;  }
     public ArrayList<Action> getCityActions(City c) {  return cityActions.get(c.getActorId());  }
     public ArrayList<Action> getCityActions(int cityId) {  return cityActions.get(cityId);  }
@@ -423,10 +449,62 @@ public class GameState {
 
     public ArrayList<Action> getTribeActions() {  return tribeActions;  }
 
+    /* Potentially helpful methods for agents */
 
+    public int getTribeProduction()
+    {
+        return this.getActiveTribe().getMaxProduction(this);
+    }
 
+    public TechnologyTree getTribeTechTree()
+    {
+        return getActiveTribe().getTechTree();
+    }
 
+    public int getScore(int playerID)
+    {
+        return getTribe(playerID).getScore();
+    }
 
+    public boolean[][] getVisibilityMap() {
+        return getActiveTribe().getObsGrid();
+    }
 
+    public ArrayList<Integer> getTribesMet() {
+        return getActiveTribe().getTribesMet();
+    }
 
+    public ArrayList<City> getCities()
+    {
+        ArrayList<Integer> cities = getActiveTribe().getCitiesID();
+        ArrayList<City> cityActors = new ArrayList<>();
+        for(Integer cityId : cities)
+        {
+            cityActors.add((City)board.getActor(cityId));
+        }
+        return cityActors;
+    }
+
+    public ArrayList<Unit> getUnits()
+    {
+        ArrayList<Integer> cities = getActiveTribe().getCitiesID();
+        ArrayList<Unit> unitActors = new ArrayList<>();
+        for(Integer cityId : cities)
+        {
+            City c = (City)board.getActor(cityId);
+            for(Integer unitId : c.getUnitsID())
+            {
+                Unit unit = (Unit) board.getActor(unitId);
+                unitActors.add(unit);
+            }
+        }
+
+        for(Integer unitId : getActiveTribe().getExtraUnits())
+        {
+            Unit unit = (Unit) board.getActor(unitId);
+            unitActors.add(unit);
+        }
+
+        return unitActors;
+    }
 }

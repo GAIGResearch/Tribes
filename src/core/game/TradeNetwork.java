@@ -54,8 +54,11 @@ class TradeNetwork
         Tribe[] tribes = board.getTribes();
         for(Tribe t : tribes) {
 
-            if (t.controlsCapital()) {
+            //We only update the trade network of all tribes for the current tribe if this is not native
+            if(t.getTribeId() != board.getActiveTribeID() && !board.isNative())
+                continue;;
 
+            if (t.controlsCapital()) {
                 boolean[][] connectedTiles = new boolean[networkTiles.length][networkTiles[0].length];
                 boolean[][] navigable = new boolean[networkTiles.length][networkTiles[0].length];
 

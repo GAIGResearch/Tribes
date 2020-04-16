@@ -49,6 +49,9 @@ public class Board {
     //Trade Network of this board
     private TradeNetwork tradeNetwork;
 
+    //Indicate if this model is native (not a copy of the game one) or not.
+    private boolean isNative;
+
     // Constructor for board
     public Board() {
         this.gameActors = new HashMap<>();
@@ -68,6 +71,7 @@ public class Board {
         units = new int[size][size];
         tileCityId = new int[size][size];
         tradeNetwork = new TradeNetwork(size);
+        isNative = true;
 
         for(Tribe t : tribes)
             t.initObsGrid(size);
@@ -108,6 +112,7 @@ public class Board {
         copyBoard.activeTribeID = activeTribeID;
         copyBoard.actorIDcounter = actorIDcounter;
         copyBoard.tradeNetwork = new TradeNetwork(size);
+        copyBoard.isNative = false;
 
         // Copy board objects (they are all ids)
         for (int x = 0; x < this.size; x++) {
@@ -879,5 +884,5 @@ public class Board {
     public Types.BUILDING getBuildingAt(int x, int y){ return buildings[x][y]; }
     public void setUnits(int[][] u){ this.units = u; }
     public int getCityIdAt(int x, int y) { return tileCityId[x][y]; }
-
+    boolean isNative() { return isNative; }
 }

@@ -21,7 +21,7 @@ public abstract class Actor {
     protected Vector2d position;
 
 
-    public abstract Actor copy();
+    public abstract Actor copy(boolean hideInfo);
 
     public void setActorId(int actorID)
     {

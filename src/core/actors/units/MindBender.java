@@ -17,12 +17,12 @@ public class MindBender extends Unit
     }
 
     @Override
-    public MindBender copy() {
+    public MindBender copy(boolean hideInfo) {
         MindBender c = new MindBender(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         c.setKilled(isKilled());
-        return c;
+        return hideInfo ? (MindBender) c.hide() : c;
     }
 }

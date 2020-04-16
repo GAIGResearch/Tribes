@@ -132,7 +132,8 @@ public class Board {
 
         // Copy tribes
         for (int i = 0; i < tribes.length; i++) {
-            copyBoard.tribes[i] = tribes[i].copy();
+            boolean hideInfo = (i != playerId) && partialObs;
+            copyBoard.tribes[i] = tribes[i].copy(hideInfo);
         }
 
         //Deep copy of all actors in the board
@@ -143,7 +144,8 @@ public class Board {
             //When do we copy? if it's the tribe (id==playerId), full observable or actor visible if part. obs.
             if(id == playerId || !partialObs || tribes[playerId].isVisible(act.getPosition().x, act.getPosition().y))
             {
-                copyBoard.gameActors.put(id, act.copy());
+                boolean hideInfo = (id != playerId) && partialObs;
+                copyBoard.gameActors.put(id, act.copy(hideInfo));
             }
         }
 
@@ -619,7 +621,7 @@ public class Board {
      */
     private void moveAllFromCity(City fromCity, Tribe tribe, Random rnd)
     {
-        //Capital is special, we start taking unnits from there.
+        //Capital is special, we start taking units from there.
         boolean ownsCapital = tribe.controlsCapital();
         City capital = (City) getActor(tribe.getCapitalID());
 
@@ -646,7 +648,8 @@ public class Board {
                 for(Integer unitId: fromCity.getUnitsID())
                 {
                     Unit removedUnit = (Unit) gameActors.get(unitId);
-                    tribe.addExtraUnit(removedUnit);
+                    if(removedUnit != null)
+                        tribe.addExtraUnit(removedUnit);
                 }
             }
         }
@@ -727,7 +730,7 @@ public class Board {
      */
     public void removeUnitFromCity(Unit u, City city, Tribe tribe)
     {
-        if(u.getCityId() != -1) { //This happens when the unit belongs to the city
+        if(u.getCityId() != -1 && city != null) { //This happens when the unit belongs to the tribe
             city.removeUnit(u.getActorId());
         }else{
             tribe.removeExtraUnit(u);

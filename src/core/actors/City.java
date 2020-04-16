@@ -236,18 +236,18 @@ public class City extends Actor{
     }
 
 
-    public City copy(){
+    public City copy(boolean hideInfo){
         City c = new City(position.x, position.y, tribeId);
         c.level = level;
-        c.population = population;
+        c.population = hideInfo ? 0 : population;
         c.population_need = population_need;
         c.isCapital = isCapital;
-        c.production = production;
+        c.production = hideInfo ? 0 : production;
         c.hasWalls = hasWalls;
         c.bound = bound;
         c.actorId = actorId;
         c.setBuildings(copyBuildings());
-        c.setUnitsID(new ArrayList<>(unitsID));
+        c.setUnitsID(hideInfo ? new ArrayList<>(unitsID) : new ArrayList<>(unitsID));
         return c;
     }
 
@@ -310,5 +310,13 @@ public class City extends Actor{
     }
     public int getPointsWorth(){
         return pointsWorth;
+    }
+
+    public void setPopulation(int popValue) {
+        this.population = popValue;
+    }
+
+    public void setProduction(int prodValue) {
+        this.production = prodValue;
     }
 }

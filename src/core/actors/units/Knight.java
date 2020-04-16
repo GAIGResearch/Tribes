@@ -17,12 +17,12 @@ public class Knight extends Unit
     }
 
     @Override
-    public Knight copy() {
+    public Knight copy(boolean hideInfo) {
         Knight c = new Knight(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         c.setKilled(isKilled());
-        return c;
+        return hideInfo ? (Knight) c.hide() : c;
     }
 }

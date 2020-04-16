@@ -17,12 +17,12 @@ public class Defender extends Unit
     }
 
     @Override
-    public Defender copy() {
+    public Defender copy(boolean hideInfo) {
         Defender c = new Defender(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         c.setKilled(isKilled());
-        return c;
+        return hideInfo ? (Defender) c.hide() : c;
     }
 }

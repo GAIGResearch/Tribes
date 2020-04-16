@@ -149,6 +149,7 @@ public class Tribe extends Actor {
 
             Unit u = b.getUnitAt(tile.x,tile.y);
             City c = b.getCityInBorders(tile.x,tile.y);
+
             //This tribe meets other tribe when clearing view if other tribe's unit or city is visible
             if( u !=null){
                 meetTribe(r,b.getTribes(),u.getTribeId());
@@ -318,60 +319,37 @@ public class Tribe extends Actor {
         return tribesMet;
     }
 
-    public void meetTribe(Random r, Tribe[] tribes, int tribeID) {
+    private void meetTribe(Random r, Tribe[] tribes, int tribeID) {
 
-
-       // boolean[] inMetTribes = new boolean[tribes.length];
-
-
-        for (int i = 0; i < tribesMet.size(); i++) {
+        for (Integer tribeMetId : tribesMet) {
             // if tribes not in tribes met or tribe is itself then do nothing else add to tribesmet arraylist
-                if (tribeID == this.tribesMet.get(i) || tribeID == this.getTribeId()) {
-                    return;
+            if (tribeID == tribeMetId || tribeID == this.getTribeId()) {
+                return;
 
             }
         }
-                tribesMet.add(tribeID); // add to this tribe
-                tribes[tribeID].tribesMet.add(this.getTribeId()); // add to met tribe as well
 
-                //Pick a technology at random from the tribe to learn
-                TechnologyTree thisTribeTree = getTechTree();
-                TechnologyTree metTribeTree = tribes[tribeID].getTechTree();
-                ArrayList<Types.TECHNOLOGY> techInThisTribe = new ArrayList<>(); //Check which tech in this tribe
-                ArrayList<Types.TECHNOLOGY> techInMetTribe = new ArrayList<>(); // Check which tech in met tribe
-                //Check which technologies both research trees contain
+        tribesMet.add(tribeID); // add to this tribe
 
-                for (Types.TECHNOLOGY tech : Types.TECHNOLOGY.values()
-                ) {
-                    if (thisTribeTree.isResearched(tech))
-                        techInThisTribe.add(tech);
-                    if (metTribeTree.isResearched(tech))
-                        techInMetTribe.add(tech);
-                }
-                ArrayList<Types.TECHNOLOGY> potentialTechForThisTribe = new ArrayList<>();
-               // ArrayList<Types.TECHNOLOGY> potentialTechForMetTribe = new ArrayList<>();
+        //Pick a technology at random from the tribe to learn
+        TechnologyTree thisTribeTree = getTechTree();
+        TechnologyTree metTribeTree = tribes[tribeID].getTechTree();
+        ArrayList<Types.TECHNOLOGY> potentialTechForThisTribe = new ArrayList<>();
 
-                for (int x = 0; x < techInMetTribe.size(); x++) {
-                    if (!thisTribeTree.isResearched(techInMetTribe.get(x)))
-                        potentialTechForThisTribe.add(techInMetTribe.get(x));
-                }
-
-//                for (int x = 0; x < techInThisTribe.size(); x++) {
-//                    if (!metTribeTree.isResearched(techInThisTribe.get(x)))
-//                        potentialTechForMetTribe.add(techInThisTribe.get(x));
-//                }
-
-
-                if (potentialTechForThisTribe.size() == 0)
-                    return;
-
-                Types.TECHNOLOGY techToGet = potentialTechForThisTribe.get(r.nextInt(potentialTechForThisTribe.size()));
-                thisTribeTree.doResearch(techToGet);
-
-//                techToGet = potentialTechForMetTribe.get(r.nextInt(potentialTechForMetTribe.size()));
-//                metTribeTree.doResearch(techToGet);
-
+        for (Types.TECHNOLOGY tech : Types.TECHNOLOGY.values())
+        {
+            if (metTribeTree.isResearched(tech) && !thisTribeTree.isResearched(tech))
+            {
+                potentialTechForThisTribe.add(tech);
+            }
         }
+
+        if (potentialTechForThisTribe.size() == 0)
+            return;
+
+        Types.TECHNOLOGY techToGet = potentialTechForThisTribe.get(r.nextInt(potentialTechForThisTribe.size()));
+        thisTribeTree.doResearch(techToGet);
+    }
 
 
 
@@ -426,7 +404,6 @@ public class Tribe extends Actor {
                 }
             }
 
-
             //The capital gains 1 population for each city connected, -1 for each city disconnected
             int capitalGain = addedCities.size() - lostCities.size();
             capital.addPopulation(this, capitalGain);
@@ -440,12 +417,6 @@ public class Tribe extends Actor {
 
         //Population adjustments: they only happen if it's this tribe's turn
         if (thisTribesTurn) {
-
-            //All cities that lost connection with the capital lose 1 population
-//            for (int cityId : lostCities) {
-//                City nonCapitalCity = (City) b.getActor(cityId);
-//                nonCapitalCity.addPopulation(this, -1);
-//            }
 
             //All cities that gained connection with the capital gain 1 population.
             for (int cityId : addedCities) {

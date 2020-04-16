@@ -34,9 +34,6 @@ public class Board {
     // Array for id of the city that owns each tile. -1 if no city owns the tile.
     private int[][] tileCityId;
 
-    // Array that indicates presence of roads, cities, ports or naval links
-    private boolean[][] networkTiles;
-
     //Actors in the game
     private HashMap<Integer, Actor> gameActors;
 
@@ -48,6 +45,9 @@ public class Board {
 
     //Actor ID counter
     private int actorIDcounter;
+
+    //Trade Network of this board
+    private TradeNetwork tradeNetwork;
 
     // Constructor for board
     public Board() {
@@ -62,13 +62,12 @@ public class Board {
     void init(int size, Tribe[] tribes) {
 
         this.size = size;
-
         terrains = new Types.TERRAIN[size][size];
         resources = new Types.RESOURCE[size][size];
         buildings = new Types.BUILDING[size][size];
         units = new int[size][size];
-        this.tileCityId = new int[size][size];
-        this.networkTiles = new boolean[size][size];
+        tileCityId = new int[size][size];
+        tradeNetwork = new TradeNetwork(size);
 
         for(Tribe t : tribes)
             t.initObsGrid(size);
@@ -106,9 +105,9 @@ public class Board {
         copyBoard.buildings = new Types.BUILDING[size][size];
         copyBoard.units = new int[size][size];
         copyBoard.tileCityId = new int[size][size];
-        copyBoard.networkTiles = new boolean[size][size];
         copyBoard.activeTribeID = activeTribeID;
         copyBoard.actorIDcounter = actorIDcounter;
+        copyBoard.tradeNetwork = new TradeNetwork(size);
 
         // Copy board objects (they are all ids)
         for (int x = 0; x < this.size; x++) {
@@ -116,12 +115,12 @@ public class Board {
 
                 if(!partialObs || tribes[playerId].isVisible(x,y))
                 {
-                    copyBoard.setUnitIdAt(x, y, units[x][y]);
+                    copyBoard.units[x][y] = units[x][y];
                     copyBoard.setTerrainAt(x, y, terrains[x][y]);
                     copyBoard.setResourceAt(x, y, maskResource(playerId, x, y));
                     copyBoard.setBuildingAt(x, y, buildings[x][y]);
                     copyBoard.tileCityId[x][y] = tileCityId[x][y];
-                    copyBoard.networkTiles[x][y] = networkTiles[x][y];
+                    copyBoard.tradeNetwork.setTradeNetworkValue(x,y,tradeNetwork.getTradeNetworkValue(x,y));
                 }
             }
         }
@@ -492,7 +491,7 @@ public class Board {
      * @return if there's a road in that position.
      */
     public boolean isRoad(int x, int y) {
-        return networkTiles[x][y] && terrains[x][y] != SHALLOW_WATER && terrains[x][y] != DEEP_WATER && terrains[x][y] != CITY;
+        return tradeNetwork.getTradeNetworkValue(x,y) && terrains[x][y] != SHALLOW_WATER && terrains[x][y] != DEEP_WATER && terrains[x][y] != CITY;
     }
 
 
@@ -570,7 +569,7 @@ public class Board {
             return false;
         }
 
-        this.setTradeNetwork(x, y, true);
+        tradeNetwork.setTradeNetwork(this, x, y, true);
         return true;
     }
 
@@ -681,7 +680,7 @@ public class Board {
         tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, TribesConfig.NEW_CITY_CLEAR_RANGE, r, this.copy());
 
         //By default, cities are considered to be roads for trade network purposes.
-        networkTiles[c.getPosition().x][c.getPosition().y] = true;
+        tradeNetwork.setTradeNetwork(this, c.getPosition().x, c.getPosition().y, true);
     }
 
     /**
@@ -691,7 +690,7 @@ public class Board {
     public void removeUnitFromBoard(Unit u)
     {
         Vector2d pos = u.getPosition();
-        setUnitIdAt(pos.x, pos.y, 0);
+        units[pos.x][pos.y] = 0;
         removeActor(u.getActorId());
     }
 
@@ -707,7 +706,7 @@ public class Board {
 
         //Place it in the board
         Vector2d pos = u.getPosition();
-        setUnitIdAt(pos.x, pos.y, u);
+        units[pos.x][pos.y] = u.getActorId();
 
         //Finally, add the unit to the city that created it, unless it belongs to the tribe.
         if(u.getCityId() != -1)
@@ -747,7 +746,7 @@ public class Board {
      * @return the actor, null if the tileCityId doesn't correspond to an actor (note that it may have
      * been deleted if the actor was removed from the game).
      */
-    public core.actors.Actor getActor(int actorId)
+    public Actor getActor(int actorId)
     {
         return gameActors.get(actorId);
     }
@@ -783,99 +782,6 @@ public class Board {
         }
     }
 
-    /* TRADE NETWORK */
-
-    /**
-     * Sets an element of the trade network to true or false
-     * @param x x coordinate of the position to set.
-     * @param y y coordinate of the position to set.
-     * @param trade true if the position must belong to the trade network
-     */
-    public void setTradeNetwork(int x, int y, boolean trade)
-    {
-        networkTiles[x][y] = trade;
-        computeTradeNetwork();
-    }
-
-
-    /**
-     * Computes the trade network for all tribes. It builds to complementary graphs: connected tiles (via roads)
-     * and connected cities (via ports and water tiles). It updates the populations of the cities according to
-     * changes in the network.
-     */
-    private void computeTradeNetwork()
-    {
-        for(Tribe t : tribes) {
-
-            if (t.controlsCapital()) {
-
-                boolean[][] connectedTiles = new boolean[networkTiles.length][networkTiles[0].length];
-                boolean[][] navigable = new boolean[networkTiles.length][networkTiles[0].length];
-
-                ArrayList<Vector2d> ports = new ArrayList<>();
-
-                //First, set up the graph. Including all tiles that correspond to active trade points (roads, cities, ports)
-                for (int i = 0; i < networkTiles.length; ++i) {
-                    for (int j = 0; j < networkTiles[0].length; ++j) {
-                        //Only for this tribe
-                        int cityId = tileCityId[i][j];
-                        boolean myCity = t.controlsCity(cityId);
-                        boolean notEnemy = myCity || tileCityId[i][j] == -1;
-
-                        //cities and ports, must be within my city boundaries.
-                        if(myCity && (terrains[i][j] == CITY || buildings[i][j] == Types.BUILDING.PORT))
-                        {
-                            connectedTiles[i][j] = networkTiles[i][j];
-                            if(buildings[i][j] == Types.BUILDING.PORT)
-                                ports.add(new Vector2d(i, j));
-
-                            //Roads, must be within my city boundaries OR in a neutral tile.
-                        }else if (notEnemy && isRoad(i,j))
-                        {
-                            connectedTiles[i][j] = networkTiles[i][j];
-                        }
-
-                        //And navigable tiles: WATER, VISIBLE AND NOT ENEMY
-                        if ((terrains[i][j] == SHALLOW_WATER || terrains[i][j] == DEEP_WATER)
-                                && t.isVisible(i, j) && notEnemy) {
-                            navigable[i][j] = true;
-                        }
-                    }
-                }
-
-                TradeNetworkStep tns = new TradeNetworkStep(connectedTiles);
-
-                //Now, we need to add jump links. In this case, two ports are connected if
-                // separated by [0,TribesConfig.PORT_TRADE_DISTANCE] WATER, VISIBLE, NON-ENEMY tiles
-                int nPorts = ports.size();
-                for (int i = 0; i < nPorts - 1; ++i) {
-                    for (int j = i; j < nPorts; ++j) {
-                        if (i != j) {
-                            Vector2d portFrom = ports.get(i);
-                            Vector2d portTo = ports.get(j);
-
-                            Vector2d originPortPos = new Vector2d(portFrom.x, portFrom.y);
-                            Pathfinder tp = new Pathfinder(originPortPos, new TradeWaterStep(navigable));
-                            ArrayList<PathNode> path = tp.findPathTo(new Vector2d(portTo.x, portTo.y));
-
-                            if (path != null) //+1 because path includes destination
-                            {
-                                //We add this as a link between ports.
-                                tns.addJumpLink(portFrom, portTo, true);
-                            }
-
-                        }
-                    }
-                }
-
-                City capital = (City) getActor(t.getCapitalID());
-                t.updateNetwork(new Pathfinder(capital.getPosition(), tns), this, t.getTribeId() == this.activeTribeID);
-            }else {
-                t.updateNetwork(null, this, t.getTribeId() == this.activeTribeID);
-            }
-        }
-    }
-
     /**
      * Adds a road to the board at position x,y. It recalculates the trade network with
      * this new road.
@@ -884,7 +790,7 @@ public class Board {
      */
     public void addRoad(int x, int y)
     {
-        setTradeNetwork(x, y, true);
+        tradeNetwork.setTradeNetwork(this, x, y, true);
     }
 
     /**
@@ -906,13 +812,10 @@ public class Board {
                 if(cityId == -1 || tribes[tribeId].controlsCity(cityId))
                 {
                     //There should be no road already here
-                    if(!networkTiles[x][y])
+                    if(!tradeNetwork.getTradeNetworkValue(x,y))
                     {
                         //Finally, there should be no enemy unit at this position
-                        if(!enemyUnitAt(tribeId, x, y))
-                        {
-                            return true;
-                        }
+                        return !enemyUnitAt(tribeId, x, y);
                     }
                 }
             }
@@ -938,163 +841,43 @@ public class Board {
         return positions;
     }
 
+    /**
+     * Removes a port from the network at position x, y
+     * @param x x coordinate of the port destroyed.
+     * @param y y coordinate of the port destroyed.
+     */
+    public void destroyPort(int x, int y)
+    {
+        this.tradeNetwork.setTradeNetwork(this, x, y,false);
+    }
 
+    /**
+     * Adds a port to the network at position x, y
+     * @param x x coordinate of the port added.
+     * @param y y coordinate of the port added.
+     */
+    public void buildPort(int x, int y)
+    {
+        this.tradeNetwork.setTradeNetwork(this, x, y,true);
+    }
 
     // Simple getters and setters
-    public Tribe[] getTribes() {
-        return tribes;
-    }
-    public int getSize() {
-        return size;
-    }
-    public Tribe getTribe(int tribeId) {
-        return tribes[tribeId];
-    }
-    public int getActiveTribeID() {
-        return activeTribeID;
-    }
-    public void setActiveTribeID(int activeTribeID) {
-        this.activeTribeID = activeTribeID;
-    }
-    public void setTribes(Tribe[] t){
-        this.tribes = t;
-    }
-    boolean getNetworkTilesAt(int x, int y) {
-        return this.networkTiles[x][y];
-    }
+    public Tribe[] getTribes() { return tribes; }
+    public int getSize() { return size; }
+    public Tribe getTribe(int tribeId) { return tribes[tribeId]; }
+    public int getActiveTribeID() { return activeTribeID; }
+    public void setActiveTribeID(int activeTribeID) { this.activeTribeID = activeTribeID; }
+    public void setTribes(Tribe[] t){ this.tribes = t; }
+    boolean getNetworkTilesAt(int x, int y) { return this.tradeNetwork.getTradeNetworkValue(x,y); }
     public int[][] getUnits(){ return this.units; }
     public Types.TERRAIN getTerrainAt(int x, int y){ return terrains[x][y]; }
-    public int getUnitIDAt(int x, int y){ return units[x][y]; }
-    public void setResourceAt(int x, int y, Types.RESOURCE r){
-        resources[x][y] =  r;
-    }
-    public void setTerrainAt(int x, int y, Types.TERRAIN t){
-        terrains[x][y] =  t;
-    }
-    public void setUnitIdAt(int x, int y, int unitId){
-        units[x][y] = unitId;
-    }
-    public void setUnitIdAt(int x, int y, Unit unit){
-        units[x][y] = unit.getActorId();
-    }
-    public void setBuildingAt(int x, int y, Types.BUILDING b){
-        buildings[x][y] = b;
-    }
-    public Types.RESOURCE getResourceAt(int x, int y){
-        return resources[x][y];
-    }
-    public Types.BUILDING getBuildingAt(int x, int y){
-        return buildings[x][y];
-    }
-    public void setUnits(int[][] u){
-        this.units = u;
-    }
-    public int getCityIdAt(int x, int y)
-    {
-        return tileCityId[x][y];
-    }
-
-
-    private class TradeWaterStep implements NeighbourHelper
-    {
-        private boolean [][]navigable;
-
-        TradeWaterStep(boolean [][]navigable)
-        {
-            this.navigable = navigable;
-        }
-
-        @Override
-        // from: position from which we need neighbours
-        // costFrom: is the total move cost computed up to "from"
-        // Using this.board, this.tribe, from and costFrom, gets all the adjacent neighbours to tile in position "from"
-        public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
-
-            ArrayList<PathNode> neighbours = new ArrayList<>();
-            double stepCost = 1.0;
-
-            for(Vector2d tile : from.neighborhood(1, 0, size)) {
-                int x = tile.x;
-                int y = tile.y;
-                if(navigable[x][y] && costFrom+stepCost <= TribesConfig.PORT_TRADE_DISTANCE)
-                {
-                    neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
-                }
-//                else if(navigable[x][y])
-//                {
-//                    System.out.println("No jump link from " + from + " to " + tile + "; cost: " + (costFrom+stepCost));
-//                }
-            }
-
-            return neighbours;
-        }
-
-        @Override
-        public void addJumpLink(Vector2d from, Vector2d to, boolean reverse) {
-            //No jump links
-        }
-    }
-
-
-    private class TradeNetworkStep implements NeighbourHelper
-    {
-        private boolean [][]connected;
-        private HashMap<Vector2d, ArrayList<Vector2d>> jumpLinks;
-
-        TradeNetworkStep (boolean [][]connected)
-        {
-            this.connected = connected;
-            this.jumpLinks = new HashMap<>();
-        }
-
-        @Override
-        // from: position from which we need neighbours
-        // costFrom: is the total move cost computed up to "from"
-        // Using this.board, this.tribe, from and costFrom, gets all the adjacent neighbours to tile in position "from"
-        public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
-
-            ArrayList<PathNode> neighbours = new ArrayList<>();
-            double stepCost = 1.0;
-
-            for(Vector2d tile : from.neighborhood(1, 0, size)) {
-                int x = tile.x;
-                int y = tile.y;
-                if(connected[x][y])
-                {
-                    neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
-                }
-            }
-
-            //Now, add the jump link neighbours
-            if(jumpLinks.containsKey(from))
-            {
-                ArrayList<Vector2d> connected = jumpLinks.get(from);
-                for(Vector2d to: connected)
-                {
-                    neighbours.add(new PathNode(to, stepCost));
-                }
-            }
-
-
-            return neighbours;
-        }
-
-        @Override
-        public void addJumpLink(Vector2d from, Vector2d to, boolean reverse) {
-            addAtoB(from, to);
-            if(reverse) addAtoB(to, from);
-        }
-
-        private void addAtoB(Vector2d from, Vector2d to)
-        {
-            if(!jumpLinks.containsKey(from))
-                jumpLinks.put(from, new ArrayList<>());
-
-            ArrayList<Vector2d> connected = jumpLinks.get(from);
-            connected.add(to);
-        }
-    }
-
-
+    int getUnitIDAt(int x, int y){ return units[x][y]; }
+    public void setResourceAt(int x, int y, Types.RESOURCE r){ resources[x][y] =  r; }
+    public void setTerrainAt(int x, int y, Types.TERRAIN t){ terrains[x][y] =  t; }
+    public void setBuildingAt(int x, int y, Types.BUILDING b){ buildings[x][y] = b; }
+    public Types.RESOURCE getResourceAt(int x, int y){ return resources[x][y]; }
+    public Types.BUILDING getBuildingAt(int x, int y){ return buildings[x][y]; }
+    public void setUnits(int[][] u){ this.units = u; }
+    public int getCityIdAt(int x, int y) { return tileCityId[x][y]; }
 
 }

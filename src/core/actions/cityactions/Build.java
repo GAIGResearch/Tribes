@@ -88,7 +88,7 @@ public class Build extends CityAction
 
 
             if(buildingType == Types.BUILDING.PORT)
-                board.setTradeNetwork(targetPos.x, targetPos.y, true);
+                board.buildPort(targetPos.x, targetPos.y);
             if(buildingType.isMonument())
                 tribe.monumentIsBuilt(buildingType);
 

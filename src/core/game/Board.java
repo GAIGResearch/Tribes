@@ -54,7 +54,12 @@ public class Board {
         this.gameActors = new HashMap<>();
     }
 
-    public void init(int size, Tribe[] tribes) {
+    /**
+     * Inits the board given its size and array of playing tribes. Initializes all the data structures for the board
+     * @param size size of the board (MUST be square)
+     * @param tribes tribes to play this game.
+     */
+    void init(int size, Tribe[] tribes) {
 
         this.size = size;
 
@@ -78,12 +83,20 @@ public class Board {
         this.assignTribes(tribes);
     }
 
-    // Return deep copy of board
+    /**
+     * Deep copies the board and returns the copy. It's copied as full not hiding any information
+     * @return copy of the current board.
+     */
     public Board copy() {
         return copy(false, -1);
     }
 
-    // Return deep copy of board
+    /**
+     * Returns a copy of the board.
+     * @param partialObs indicates if the board should be copied at full or some information needs to be hid
+     * @param playerId if partialObs is true, id of the player who will receive this copy.
+     * @return a copy of the board
+     */
     public Board copy(boolean partialObs, int playerId) {
         Board copyBoard = new Board();
         copyBoard.size = this.size;
@@ -182,13 +195,12 @@ public class Board {
      * @param startY   y coordinate of the starting position of the unit to push
      * @return true if the unit could be pushed.
      */
-
-    public boolean pushUnit(Tribe tribe, Unit toPush, int startX, int startY, Random r) {
+    boolean pushUnit(Tribe tribe, Unit toPush, int startX, int startY, Random r) {
+        //xPush and yPush encode the order of tiles where the push may be tried.
         int[] xPush = {0, -1, 0, 1, -1, -1, 1, 1};
         int[] yPush = {1, 0, -1, 0, 1, -1, -1, 1};
         int idx = 0;
         boolean pushed = false;
-        int tribeId = tribe.getTribeId();
 
         while (!pushed && idx < xPush.length) {
             int x = startX + xPush[idx];
@@ -206,6 +218,17 @@ public class Board {
         return pushed;
     }
 
+    /**
+     * Attampts to push a unitt from one position to another.
+     * @param tribe tribe of the unit that is being pushed.
+     * @param toPush unit being pushed
+     * @param startX x coordinate of the position where the unit is being pushed from
+     * @param startY y coordinate of the position where the unit is being pushed from
+     * @param x x coordinate of the position where the unit is being pushed to
+     * @param y y coordinate of the position where the unit is being pushed to
+     * @param r random number generator, necessary to clear view if the pushed unit discovers new tiles.
+     * @return true if the unit could be pushed.
+     */
     public boolean tryPush(Tribe tribe, Unit toPush, int startX, int startY, int x, int y, Random r) {
         //there's no unit? (or killed)
         Unit u = getUnitAt(x, y);
@@ -249,7 +272,13 @@ public class Board {
         return true;
     }
 
-
+    /**
+     * Embarks a unit at position (x,y)
+     * @param unit unit to transform into a boat
+     * @param tribe tribe that the unit belongs to
+     * @param x x coordinate of the position where the unit is embarking
+     * @param y y coordinate of the position where the unit is embarking
+     */
     public void embark(Unit unit, Tribe tribe, int x, int y) {
         City city = (City) gameActors.get(unit.getCityId());
         removeUnitFromBoard(unit);
@@ -261,11 +290,15 @@ public class Board {
         boat.setCurrentHP(unit.getCurrentHP());
         ((Boat)boat).setBaseLandUnit(unit.getType());
         addUnit(city, boat);
-
-//        System.out.println("Embarking unit. From id: " + unit.getActorId() + " to " + boat.getActorId() + ". City " + unit.getCityId() + "/" + boat.getCityId() +
-//                 " has associated units: " + city.getUnitsID().toString());
     }
 
+    /**
+     * Disembarks a unit at position (x,y)
+     * @param unit unit to transform into a land unit, of the type defined in the unit's baseLandUnit
+     * @param tribe tribe that the unit belongs to
+     * @param x x coordinate of the position where the unit is disembarking
+     * @param y y coordinate of the position where the unit is disembarking
+     */
     public void disembark(Unit unit, Tribe tribe, int x, int y) {
         City city = (City) gameActors.get(unit.getCityId());
         removeUnitFromBoard(unit);
@@ -294,12 +327,17 @@ public class Board {
         Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), baseLandUnit);
         newUnit.setCurrentHP(unit.getCurrentHP());
         addUnit(city, newUnit);
-
-
-//        System.out.println("Disembarking unit. From id: " + unit.getActorId() + " to " + newUnit.getActorId() + ". City " + unit.getCityId() + "/" + newUnit.getCityId() +
-//                " has associated units: " + city.getUnitsID().toString());
     }
 
+    /**
+     * Moves a unit from x0,y0 to xF,yF
+     * @param unit unit to move.
+     * @param x0 x coordinate of the starting position
+     * @param y0 y coordinate of the starting position
+     * @param xF x coordinate of the ending position
+     * @param yF y coordinate of the ending position
+     * @param r random generator
+     */
     public void moveUnit(Unit unit, int x0, int y0, int xF, int yF, Random r) {
         units[x0][y0] = 0;
         units[xF][yF] = unit.getActorId();
@@ -313,28 +351,30 @@ public class Board {
         t.clearView(xF, yF, partialObsRangeClear, r, this);
     }
 
+    /**
+     * Launches a explorer to clear view in the game
+     * @param x0 x coordinate of the starting position
+     * @param y0 y coordinate of the starting position
+     * @param tribeId id of the tribe that launches the explorer.
+     * @param rnd random generator for the explorer's moves.
+     */
     public void launchExplorer(int x0, int y0, int tribeId, Random rnd) {
-        int xMove[] = {0, -1, 0, 1, -1, -1, 1, 1};
-        int yMove[] = {1, 0, -1, 0, 1, -1, -1, 1};
 
-        int curX = x0;
-        int curY = y0;
-
+        Vector2d currentPos = new Vector2d(x0, y0);
         for (int i = 0; i < TribesConfig.NUM_STEPS; ++i) {
             int j = 0;
             boolean moved = false;
 
             while (!moved && j < TribesConfig.NUM_STEPS * 3) {
-                //Pick a direction at random
-                int idx = rnd.nextInt(xMove.length);
-                int x = curX + xMove[idx];
-                int y = curY + yMove[idx];
+                //Pick a neighbour tile at random
+                LinkedList<Vector2d> neighs = currentPos.neighborhood(1,0, size);
+                Vector2d next = neighs.get(rnd.nextInt(neighs.size()));
 
-                if (traversable(x, y, tribeId)) {
+                if (traversable(next.x, next.y, tribeId)) {
                     moved = true;
-                    curX = x;
-                    curY = y;
-                    tribes[tribeId].clearView(x, y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this.copy());
+                    currentPos.x = next.x;
+                    currentPos.y = next.y;
+                    tribes[tribeId].clearView(currentPos.x, currentPos.y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this.copy());
                 }
 
                 j++;
@@ -349,38 +389,30 @@ public class Board {
 
     }
 
-
+    /**
+     * Checks if the position x, y is traversable for the given tribe.
+     * @param x x coordinate of the position to check
+     * @param y y coordinate of the position to check
+     * @param tribeId id of the tribe this tile may be or not traversable.
+     * @return true if a unit from tribeId can occupy position x,y in the board.
+     */
     public boolean traversable(int x, int y, int tribeId) {
-        if (x >= 0 && y >= 0 && x < size && y < size) {
-            //we rule out places we can't be.
-            TechnologyTree tt = tribes[tribeId].getTechTree();
 
-            //if mountain and climbing not researched
-            if (terrains[x][y] == Types.TERRAIN.MOUNTAIN && !tt.isResearched(Types.TECHNOLOGY.CLIMBING))
-                return false;
+        //we rule out places we can't be.
+        TechnologyTree tt = tribes[tribeId].getTechTree();
 
-            //Shallow water and no sailing
-            if (terrains[x][y] == SHALLOW_WATER && !tt.isResearched(Types.TECHNOLOGY.SAILING))
-                return false;
+        //if mountain and climbing not researched
+        if (terrains[x][y] == Types.TERRAIN.MOUNTAIN && !tt.isResearched(Types.TECHNOLOGY.CLIMBING))
+            return false;
 
-            //Deep water and no navigation
-            if (terrains[x][y] == DEEP_WATER && !tt.isResearched(Types.TECHNOLOGY.NAVIGATION))
-                return false;
+        //Shallow water and no sailing
+        if (terrains[x][y] == SHALLOW_WATER && !tt.isResearched(Types.TECHNOLOGY.SAILING))
+            return false;
 
-
-        } else return false; //Outside board bounds.
-
-        return true;
+        //Deep water and no navigation
+        return terrains[x][y] != DEEP_WATER || tt.isResearched(Types.TECHNOLOGY.NAVIGATION);
     }
 
-
-    public Tribe[] getTribes() {
-        return tribes;
-    }
-
-    public Tribe getTribe(int tribeId) {
-        return tribes[tribeId];
-    }
 
     /**
      * Sets the tribes that will play the game. The number of tribes must equal the number of players in Game.
@@ -397,33 +429,12 @@ public class Board {
         }
     }
 
-    // Get size of board
-    public int getSize() {
-        return size;
-    }
-
-    public void setTradeNetwork(int x, int y, boolean trade)
-    {
-        networkTiles[x][y] = trade;
-        computeTradeNetwork();
-    }
-
-    // Get units array
-    public int[][] getUnits(){
-        return this.units;
-    }
-
-    // Get Terrain at pos x,y
-    public Types.TERRAIN getTerrainAt(int x, int y){
-        return terrains[x][y];
-    }
-
-    // Get Unit at pos x,y
-    public int getUnitIDAt(int x, int y){
-        return units[x][y];
-    }
-
-    // Get Unit at pos x,y
+    /**
+     * Gets the unit at location x,y
+     * @param x x coordinate of the tile to check
+     * @param y y coordinate of the tile to check
+     * @return The unit at x,y, null if there isn't any unit there.
+     */
     public Unit getUnitAt(int x, int y){
 
         Actor act = gameActors.get(units[x][y]);
@@ -432,7 +443,12 @@ public class Board {
         return null;
     }
 
-    // Get CityID at pos x,y
+    /**
+     * Returns the city that owns the tile x,y
+     * @param x x coordinate of the tile to check
+     * @param y y coordinate of the tile to check
+     * @return the city with a tile within its borders. Null if x,y doesn't belong to any city.
+     */
     public City getCityInBorders(int x, int y){
         if(tileCityId[x][y] == -1)
             return null;
@@ -440,67 +456,15 @@ public class Board {
             return (City) gameActors.get(tileCityId[x][y]);
     }
 
-    // Set Resource at pos x,y
-    public void setResourceAt(int x, int y, Types.RESOURCE r){
-        resources[x][y] =  r;
-    }
-
-    // Set Terrain at pos x,y
-    public void setTerrainAt(int x, int y, Types.TERRAIN t){
-        terrains[x][y] =  t;
-    }
-
-    // Set unit id at pos x,y
-    public void setUnitIdAt(int x, int y, int unitId){
-        units[x][y] = unitId;
-    }
-
-    // Set Terrain at pos x,y
-    public void setUnitIdAt(int x, int y, Unit unit){
-        units[x][y] = unit.getActorId();
-    }
-
-
-    // Set Building at pos x,y
-    public void setBuildingAt(int x, int y, Types.BUILDING b){
-        buildings[x][y] = b;
-    }
-
-    // Get Resource at pos x,y
-    public Types.RESOURCE getResourceAt(int x, int y){
-        return resources[x][y];
-    }
-
-    // Get Resource at pos x,y
-    public Types.BUILDING getBuildingAt(int x, int y){
-        return buildings[x][y];
-    }
-
-    // Setter method for units array
-    public void setUnits(int[][] u){
-        this.units = u;
-    }
-
-
-    // Method to determine city borders, take city and x and y pos of city as params
-    void setCityBorders(){
-
-        for (Tribe tribe : tribes) {
-            ArrayList<Integer> tribe1Cities = tribe.getCitiesID();
-
-            for (int cityId : tribe1Cities) {
-                City c = (City) gameActors.get(cityId);
-                setBorderHelper(c, c.getBound());
-            }
-
-        }
-    }
-
-    // Set border helper method to set city bounds
-    private void setBorderHelper(City c, int bound){
+    /**
+     * Assigns board tiles to a given city, adding score to the tribe who adquired this terrain.
+     * @param c city that has tiles
+     * @param radius maximum distance from the city center where the city can adquire tiles.
+     */
+    void assignCityTiles(City c, int radius){
         Vector2d cityPos = c.getPosition();
         Tribe t = getTribe(c.getTribeId());
-        LinkedList<Vector2d> tiles = cityPos.neighborhood(bound, 0, size);
+        LinkedList<Vector2d> tiles = cityPos.neighborhood(radius, 0, size);
         tiles.add(new Vector2d(cityPos));
         for(Vector2d tile : tiles)
         {
@@ -512,23 +476,31 @@ public class Board {
         }
     }
 
-    // Method to expand city borders, take city as param
+    /**
+     * Expands the borders of a given city
+     * @param city city whose borders to expand.
+     */
     public void expandBorder(City city){
         city.setBound(city.getBound()+TribesConfig.CITY_EXPANSION_TILES);
-        setBorderHelper(city,city.getBound());
-//        setPointsForBorderExpansion(city);
+        assignCityTiles(city,city.getBound());
     }
 
+    /**
+     * Indicates if there's a road in position x,y
+     * @param x x coordinate of the position to check
+     * @param y y coordinate of the position to check
+     * @return if there's a road in that position.
+     */
     public boolean isRoad(int x, int y) {
         return networkTiles[x][y] && terrains[x][y] != SHALLOW_WATER && terrains[x][y] != DEEP_WATER && terrains[x][y] != CITY;
     }
 
-    public int getCityIdAt(int x, int y)
-    {
-        return tileCityId[x][y];
-    }
 
-    // Get all the tiles that belong to a city
+    /**
+     * Gets all the tiles that belong to a city
+     * @param cityID id of the city being queried.
+     * @return the list of positions of tiles belonging to this city.
+     */
     public LinkedList<Vector2d> getCityTiles(int cityID){
         LinkedList<Vector2d> tiles = new LinkedList<>();
         City targetCity = (City) gameActors.get(cityID);
@@ -569,7 +541,7 @@ public class Board {
 
             //Add city to board and set its borders
             addCityToTribe(newCity,gameState.getRandomGenerator());
-            setBorderHelper(newCity, newCity.getBound());
+            assignCityTiles(newCity, newCity.getBound());
 
             //This becomes a city.
             setTerrainAt(x, y, CITY);
@@ -602,6 +574,13 @@ public class Board {
         return true;
     }
 
+    /**
+     * Moves one unit to destCity from another one in the same tribe.
+     * @param destCity destination city.
+     * @param tribe tribe this unit belongs to.
+     * @param rnd random generator to determine which city to take the unit from if the capital has no
+     *            associated units or is not in control of this tribe.
+     */
     private void moveOneToNewCity(City destCity, Tribe tribe, Random rnd)
     {
         //Capital is special, we start taking unnits from there.
@@ -612,7 +591,7 @@ public class Board {
 
         // Move the unit from one city to village. Rank: capital -> cities -> None
         if(ownsCapital && capital.getUnitsID().size() > 0){
-            moveBelongingCity(capital, destCity);
+            moveLastUnitFromCity(capital, destCity);
         }else{
             boolean moved = false;
             //Capital is empty or not owned. Check the other cities at random
@@ -620,13 +599,20 @@ public class Board {
             while (!moved && cities.size() > 0){
                 City originalCity = (City)getActor(cities.removeFirst());
                 if (originalCity.getUnitsID().size() > 0){
-                    moveBelongingCity(originalCity, destCity);
+                    moveLastUnitFromCity(originalCity, destCity);
                     moved = true;
                 }
             }
         }
     }
 
+
+    /**
+     * Moves all the units from a given city to other cities in the tribe
+     * @param fromCity original city that the units belong to
+     * @param tribe of the units being moved.
+     * @param rnd random generator to choose destination cities if required
+     */
     private void moveAllFromCity(City fromCity, Tribe tribe, Random rnd)
     {
         //Capital is special, we start taking unnits from there.
@@ -635,7 +621,7 @@ public class Board {
 
         //First to capital
         if(ownsCapital) while (capital.canAddUnit() && fromCity.getNumUnits() > 0){
-            moveBelongingCity(fromCity, capital);
+            moveLastUnitFromCity(fromCity, capital);
         }
 
         //Then, to all the other cities, picked at random.
@@ -647,7 +633,7 @@ public class Board {
             while (cities.size() > 0 && fromCity.getNumUnits() > 0){
                 City destCity = (City)getActor(cities.removeFirst());
                 while (destCity.canAddUnit() && fromCity.getNumUnits() > 0){
-                    moveBelongingCity(fromCity, destCity);
+                    moveLastUnitFromCity(fromCity, destCity);
                 }
             }
 
@@ -662,7 +648,12 @@ public class Board {
         }
     }
 
-    private void moveBelongingCity(City originalCity, City targetCity){
+    /**
+     * Moves the last unit from a given city to another.
+     * @param originalCity original city that the units belong to
+     * @param targetCity new city
+     */
+    private void moveLastUnitFromCity(City originalCity, City targetCity){
         //Move the unit in the citys' unit lists.
         int index = originalCity.getUnitsID().size()-1;
         int actorID = originalCity.removeUnitByIndex(index);
@@ -672,7 +663,146 @@ public class Board {
         Unit removedUnit = (Unit) gameActors.get(actorID);
         removedUnit.setCityId(targetCity.getActorId());
     }
-  
+
+
+    /**
+     * Adds a city to a tribe
+     * @param c city to add
+     */
+    void addCityToTribe(City c, Random r)
+    {
+        addActor(c);
+        if (c.isCapital()){
+            tribes[c.getTribeId()].setCapitalID(c.getActorId());
+        }
+        tribes[c.getTribeId()].addCity(c.getActorId());
+
+        //cities provide visibility, which needs updating
+        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, TribesConfig.NEW_CITY_CLEAR_RANGE, r, this.copy());
+
+        //By default, cities are considered to be roads for trade network purposes.
+        networkTiles[c.getPosition().x][c.getPosition().y] = true;
+    }
+
+    /**
+     * Removes a unit from the board.
+     * @param u unit to remove.
+     */
+    public void removeUnitFromBoard(Unit u)
+    {
+        Vector2d pos = u.getPosition();
+        setUnitIdAt(pos.x, pos.y, 0);
+        removeActor(u.getActorId());
+    }
+
+    /**
+     * Adds a unit to a city, which created it.
+     * @param c city that created the unit
+     * @param u unit to add
+     */
+    public void addUnit(City c, Unit u)
+    {
+        //First, add the actor to the list of game state actors
+        addActor(u);
+
+        //Place it in the board
+        Vector2d pos = u.getPosition();
+        setUnitIdAt(pos.x, pos.y, u);
+
+        //Finally, add the unit to the city that created it, unless it belongs to the tribe.
+        if(u.getCityId() != -1)
+            c.addUnit(u.getActorId());
+    }
+
+    /**
+     * Removes a unit from the city that has it assigned. If no city has it assigned, it removes it
+     * for the Tribe's control.
+     * @param u unit to remove
+     * @param city City to remove the unit from
+     * @param tribe Tribe this unit belongs to.
+     */
+    public void removeUnitFromCity(Unit u, City city, Tribe tribe)
+    {
+        if(u.getCityId() != -1) { //This happens when the unit belongs to the city
+            city.removeUnit(u.getActorId());
+        }else{
+            tribe.removeExtraUnit(u);
+        }
+    }
+
+    /**
+     * Adds a new actor to the list of game actors
+     * @param actor the actor to add
+     */
+    private void addActor(core.actors.Actor actor)
+    {
+        actorIDcounter++;
+        gameActors.put(actorIDcounter, actor);
+        actor.setActorId(actorIDcounter);
+    }
+
+    /**
+     * Gets a game actor from its tileCityId.
+     * @param actorId the tileCityId of the actor to retrieve
+     * @return the actor, null if the tileCityId doesn't correspond to an actor (note that it may have
+     * been deleted if the actor was removed from the game).
+     */
+    public core.actors.Actor getActor(int actorId)
+    {
+        return gameActors.get(actorId);
+    }
+
+    /**
+     * Removes an actor from the list of actor
+     * @param actorId tileCityId of the actor to remove
+     * @return true if the actor was removed (false may indicate that it didn't exist).
+     */
+    private boolean removeActor(int actorId)
+    {
+        return gameActors.remove(actorId) != null;
+    }
+
+
+    /**
+     * Indicates if there's an enemy of tribeId unnit at x,y
+     * @param tribeId tribe which the unit at x,y could be an enemy of
+     * @param x x coordinate to check
+     * @param y y coordinate to check
+     * @return true if there's an enemy at x,y
+     */
+    private boolean enemyUnitAt(int tribeId, int x, int y)
+    {
+        //It may be that there's no unit here
+        if(units[x][y] == 0)
+            return false;
+        else
+        {
+            //Or it is from my tribe.
+            Unit u = (Unit) gameActors.get(units[x][y]);
+            return u.getTribeId() != tribeId;
+        }
+    }
+
+    /* TRADE NETWORK */
+
+    /**
+     * Sets an element of the trade network to true or false
+     * @param x x coordinate of the position to set.
+     * @param y y coordinate of the position to set.
+     * @param trade true if the position must belong to the trade network
+     */
+    public void setTradeNetwork(int x, int y, boolean trade)
+    {
+        networkTiles[x][y] = trade;
+        computeTradeNetwork();
+    }
+
+
+    /**
+     * Computes the trade network for all tribes. It builds to complementary graphs: connected tiles (via roads)
+     * and connected cities (via ports and water tiles). It updates the populations of the cities according to
+     * changes in the network.
+     */
     private void computeTradeNetwork()
     {
         for(Tribe t : tribes) {
@@ -699,10 +829,10 @@ public class Board {
                             if(buildings[i][j] == Types.BUILDING.PORT)
                                 ports.add(new Vector2d(i, j));
 
-                        //Roads, must be within my city boundaries OR in a neutral tile.
+                            //Roads, must be within my city boundaries OR in a neutral tile.
                         }else if (notEnemy && isRoad(i,j))
                         {
-                           connectedTiles[i][j] = networkTiles[i][j];
+                            connectedTiles[i][j] = networkTiles[i][j];
                         }
 
                         //And navigable tiles: WATER, VISIBLE AND NOT ENEMY
@@ -746,121 +876,15 @@ public class Board {
         }
     }
 
-    public int getActiveTribeID() {
-        return activeTribeID;
-    }
-
-    public void setActiveTribeID(int activeTribeID) {
-        this.activeTribeID = activeTribeID;
-    }
-
-    // Setter method for tribes array
-    public void setTribes(Tribe[] t){
-        this.tribes = t;
-    }
-
     /**
-     * Adds a city to a tribe
-     * @param c city to add
+     * Adds a road to the board at position x,y. It recalculates the trade network with
+     * this new road.
+     * @param x x coordinate of the road position
+     * @param y y coordinate of the road position
      */
-    public void addCityToTribe(City c, Random r)
+    public void addRoad(int x, int y)
     {
-        addActor(c);
-        if (c.isCapital()){
-            tribes[c.getTribeId()].setCapitalID(c.getActorId());
-        }
-        tribes[c.getTribeId()].addCity(c.getActorId());
-
-        //cities provide visibility, which needs updating
-        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, TribesConfig.NEW_CITY_CLEAR_RANGE, r, this.copy());
-
-        //By default, cities are considered to be roads for trade network purposes.
-        networkTiles[c.getPosition().x][c.getPosition().y] = true;
-    }
-
-
-    public void removeUnitFromBoard(Unit u)
-    {
-        Vector2d pos = u.getPosition();
-        setUnitIdAt(pos.x, pos.y, 0);
-        removeActor(u.getActorId());
-    }
-
-    /**
-     * Adds a unit to a city, which created it.
-     * @param c city that created the unit
-     * @param u unit to add
-     */
-    public void addUnit(City c, Unit u)
-    {
-        //First, add the actor to the list of game state actors
-        addActor(u);
-
-        //Place it in the board
-        Vector2d pos = u.getPosition();
-        setUnitIdAt(pos.x, pos.y, u);
-
-        //Finally, add the unit to the city that created it, unless it belongs to the tribe.
-        if(u.getCityId() != -1)
-            c.addUnit(u.getActorId());
-    }
-
-    public void removeUnitFromCity(Unit u, City city, Tribe tribe)
-    {
-        if(u.getCityId() != -1) { //This happens when the unit belongs to the city
-            city.removeUnit(u.getActorId());
-        }else{
-            tribe.removeExtraUnit(u);
-        }
-    }
-
-    /**
-     * Adds a new actor to the list of game actors
-     * @param actor the actor to add
-     */
-    void addActor(core.actors.Actor actor)
-    {
-        actorIDcounter++;
-        gameActors.put(actorIDcounter, actor);
-        actor.setActorId(actorIDcounter);
-    }
-
-    /**
-     * Gets a game actor from its tileCityId.
-     * @param actorId the tileCityId of the actor to retrieve
-     * @return the actor, null if the tileCityId doesn't correspond to an actor (note that it may have
-     * been deleted if the actor was removed from the game).
-     */
-    public core.actors.Actor getActor(int actorId)
-    {
-        return gameActors.get(actorId);
-    }
-
-    /**
-     * Removes an actor from the list of actor
-     * @param actorId tileCityId of the actor to remove
-     * @return true if the actor was removed (false may indicate that it didn't exist).
-     */
-    public boolean removeActor(int actorId)
-    {
-        return gameActors.remove(actorId) != null;
-    }
-
-    /**
-     * Returns a list of positions where roads can be built by a certain tribe.
-     * @param tribeId id of the tribe that could build roads
-     * @return the list of positions where a road could be build
-     */
-    public ArrayList<Vector2d> getBuildRoadPositions(int tribeId)
-    {
-        ArrayList<Vector2d> positions = new ArrayList<>();
-        for (int i=0; i<size; i++){
-            for (int j=0; j<size; j++){
-                if(canBuildRoadAt(tribeId, i, j))
-                    positions.add(new Vector2d(i,j));
-            }
-        }
-        return positions;
+        setTradeNetwork(x, y, true);
     }
 
     /**
@@ -896,31 +920,80 @@ public class Board {
         return false;
     }
 
-    public boolean enemyUnitAt(int tribeId, int x, int y)
+
+    /**
+     * Returns a list of positions where roads can be built by a certain tribe.
+     * @param tribeId id of the tribe that could build roads
+     * @return the list of positions where a road could be build
+     */
+    public ArrayList<Vector2d> getBuildRoadPositions(int tribeId)
     {
-        //It may be that there's no unit here
-        if(units[x][y] == 0)
-            return false;
-        else
-        {
-            //Or it is from my tribe.
-            Unit u = (Unit) gameActors.get(units[x][y]);
-            if(u.getTribeId() == tribeId)
-            {
-                return false;
+        ArrayList<Vector2d> positions = new ArrayList<>();
+        for (int i=0; i<size; i++){
+            for (int j=0; j<size; j++){
+                if(canBuildRoadAt(tribeId, i, j))
+                    positions.add(new Vector2d(i,j));
             }
         }
-        return true;
+        return positions;
     }
 
-    public void addRoad(int x, int y)
-    {
-        setTradeNetwork(x, y, true);
-    }
 
-    public boolean getNetworkTilesAt(int x, int y) {
+
+    // Simple getters and setters
+    public Tribe[] getTribes() {
+        return tribes;
+    }
+    public int getSize() {
+        return size;
+    }
+    public Tribe getTribe(int tribeId) {
+        return tribes[tribeId];
+    }
+    public int getActiveTribeID() {
+        return activeTribeID;
+    }
+    public void setActiveTribeID(int activeTribeID) {
+        this.activeTribeID = activeTribeID;
+    }
+    public void setTribes(Tribe[] t){
+        this.tribes = t;
+    }
+    boolean getNetworkTilesAt(int x, int y) {
         return this.networkTiles[x][y];
     }
+    public int[][] getUnits(){ return this.units; }
+    public Types.TERRAIN getTerrainAt(int x, int y){ return terrains[x][y]; }
+    public int getUnitIDAt(int x, int y){ return units[x][y]; }
+    public void setResourceAt(int x, int y, Types.RESOURCE r){
+        resources[x][y] =  r;
+    }
+    public void setTerrainAt(int x, int y, Types.TERRAIN t){
+        terrains[x][y] =  t;
+    }
+    public void setUnitIdAt(int x, int y, int unitId){
+        units[x][y] = unitId;
+    }
+    public void setUnitIdAt(int x, int y, Unit unit){
+        units[x][y] = unit.getActorId();
+    }
+    public void setBuildingAt(int x, int y, Types.BUILDING b){
+        buildings[x][y] = b;
+    }
+    public Types.RESOURCE getResourceAt(int x, int y){
+        return resources[x][y];
+    }
+    public Types.BUILDING getBuildingAt(int x, int y){
+        return buildings[x][y];
+    }
+    public void setUnits(int[][] u){
+        this.units = u;
+    }
+    public int getCityIdAt(int x, int y)
+    {
+        return tileCityId[x][y];
+    }
+
 
     private class TradeWaterStep implements NeighbourHelper
     {

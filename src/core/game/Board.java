@@ -140,11 +140,12 @@ public class Board {
         copyBoard.gameActors = new HashMap<>();
         for (Actor act : gameActors.values()) {
             int id = act.getActorId();
+            int actTribeId = act.getTribeId();
 
             //When do we copy? if it's the tribe (id==playerId), full observable or actor visible if part. obs.
-            if(id == playerId || !partialObs || tribes[playerId].isVisible(act.getPosition().x, act.getPosition().y))
+            if(actTribeId == playerId || !partialObs || tribes[playerId].isVisible(act.getPosition().x, act.getPosition().y))
             {
-                boolean hideInfo = (id != playerId) && partialObs;
+                boolean hideInfo = (actTribeId != playerId) && partialObs;
                 copyBoard.gameActors.put(id, act.copy(hideInfo));
             }
         }

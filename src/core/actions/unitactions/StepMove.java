@@ -28,7 +28,6 @@ public class StepMove implements NeighbourHelper
     //costFrom: is the total move cost computed up to "from"
     //Using this.gs, this.unit, from and costFrom, gets all the adjacent neighbours to tile in position "from"
     public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
-        TechnologyTree techTree = gs.getTribe(unit.getTribeId()).getTechTree();
         ArrayList<PathNode> neighbours = new ArrayList<>();
         Board board = gs.getBoard();
         boolean inZoneOfControl = false;

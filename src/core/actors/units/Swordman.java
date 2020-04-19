@@ -23,6 +23,6 @@ public class Swordman extends Unit
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         c.setKilled(isKilled());
-        return c;
+        return hideInfo ? (Swordman) c.hide() : c;
     }
 }

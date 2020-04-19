@@ -194,7 +194,7 @@ public class Tribe extends Actor {
                 return;
             }
         }
-        System.out.println("Error!! city ID " + id + " does not belong to this tribe");
+        //System.out.println("Error!! city ID " + id + " does not belong to this tribe"); //This is only a problem if it happens in the real game
     }
 
     public void setTechTree(TechnologyTree techTree) {

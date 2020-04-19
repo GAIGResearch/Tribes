@@ -573,7 +573,7 @@ public class Board {
 
         }else
         {
-            System.out.println("Warning: Tribe " + capturingTribe.getTribeId() + " trying to caputre a non-city.");
+            System.out.println("Warning: Tribe " + capturingTribe.getTribeId() + " trying to capture a non-city.");
             return false;
         }
 

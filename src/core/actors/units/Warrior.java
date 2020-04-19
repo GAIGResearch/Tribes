@@ -23,6 +23,6 @@ public class Warrior extends Unit
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         c.setKilled(isKilled());
-        return c;
+        return hideInfo ? (Warrior) c.hide() : c;
     }
 }

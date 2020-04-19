@@ -6,6 +6,8 @@ import core.Types;
 import core.actions.Action;
 import core.actors.City;
 import core.actors.Tribe;
+import core.actors.units.Battleship;
+import core.actors.units.Ship;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
@@ -49,6 +51,10 @@ public class Upgrade extends UnitAction
             //Create the new unit
             Unit newUnit = Types.UNIT.createUnit(unit.getPosition(), unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), nextType);
             newUnit.setCurrentHP(unit.getCurrentHP());
+            if(nextType == SHIP)
+                ((Ship)newUnit).setBaseLandUnit(unit.getType());
+            else
+                ((Battleship)newUnit).setBaseLandUnit(unit.getType());
 
             //adjustments in tribe and board.
             tribe.subtractStars(nextType.getCost());

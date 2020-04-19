@@ -646,11 +646,17 @@ public class Board {
 
             //If there are still units, they go to the tribe.
             if (fromCity.getNumUnits() > 0){
-                for(Integer unitId: fromCity.getUnitsID())
+                while(fromCity.getNumUnits() > 0)
+                //for(Integer unitId: fromCity.getUnitsID())
                 {
+                    int unitId = fromCity.getUnitsID().get(0);
                     Unit removedUnit = (Unit) gameActors.get(unitId);
-                    if(removedUnit != null)
+                    if(removedUnit != null) {
                         tribe.addExtraUnit(removedUnit);
+                        fromCity.removeUnit(unitId);
+                    }else{
+                        System.out.println("ERROR: Trying to move an extra unit that does not exist.");
+                    }
                 }
             }
         }

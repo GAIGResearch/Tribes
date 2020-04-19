@@ -14,6 +14,14 @@ public class UnitActionBuilder
     {
         ArrayList<Action> allActions = new ArrayList<>();
 
+        if(unit.getTribeId() != gs.getActiveTribeID())
+        {
+            System.out.println("ERROR: creating actions for unit " + unit.getActorId() + " that the current tribe (" + gs.getActiveTribeID() +
+                    ") does not control (" + unit.getTribeId() + ").");
+            return allActions;
+        }
+
+
         if(unit.isFinished())
             return allActions;
 

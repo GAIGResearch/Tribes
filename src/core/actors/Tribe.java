@@ -187,7 +187,7 @@ public class Tribe extends Actor {
         citiesID.add(id);
     }
 
-    public void removeCity(int id) {
+    private void removeCity(int id) {
         for (int i = 0; i < citiesID.size(); i++) {
             if (citiesID.get(i) == id) {
                 citiesID.remove(i);
@@ -502,7 +502,7 @@ public class Tribe extends Actor {
     public void capturedCity(GameState gameState, City captured)
     {
         this.addCity(captured.getActorId());
-        captured.setTribeId(actorId);
+        captured.setTribeId(this.tribeId);
 
         //manage production and population of this new city (and others!)
         for(Building building : captured.getBuildings())

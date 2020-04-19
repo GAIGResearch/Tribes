@@ -7,7 +7,10 @@ import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
 import utils.Vector2d;
+import utils.graph.PathNode;
 import utils.graph.Pathfinder;
+
+import java.util.ArrayList;
 
 public class Move extends UnitAction
 {
@@ -29,7 +32,8 @@ public class Move extends UnitAction
 
         //If the unit can move and the destination is vacant, try to reach it.
         if(unit.canMove() && gs.getBoard().getUnitAt(destination.x, destination.y) == null) {
-            return !tp.findPathTo(destination).isEmpty();
+            ArrayList<PathNode> path = tp.findPathTo(destination);
+            return !path.isEmpty();
         }
         return false;
     }

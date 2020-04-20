@@ -179,6 +179,15 @@ public class Types {
             return null;
         }
 
+        public static RESOURCE getTypeByKey(int key) {
+            for(RESOURCE t : RESOURCE.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
+        }
+
+
         public TECHNOLOGY getTechnologyRequirement() {
             return tech;
         }
@@ -547,6 +556,7 @@ public class Types {
             }
             return units;
         }
+
     }
 
 
@@ -645,6 +655,14 @@ public class Types {
             }
             String[] splitPath = imageFile.split("\\.");
             return ImageIO.GetInstance().getImage(splitPath[0] + "-" + suffix + "." + splitPath[1]);
+        }
+
+        public static TERRAIN getTypeByKey(int key) {
+            for(TERRAIN t : TERRAIN.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
         }
 
 

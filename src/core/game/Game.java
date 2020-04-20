@@ -251,6 +251,9 @@ public class Game {
             JSONArray city2D = new JSONArray();
             JSONArray cities;
 
+            JSONArray building2D = new JSONArray();
+            JSONArray JBuildings;
+
             JSONArray network2D = new JSONArray();
             JSONArray networks;
 
@@ -272,6 +275,7 @@ public class Game {
                 units = new JSONArray();
                 cities = new JSONArray();
                 networks = new JSONArray();
+                JBuildings = new JSONArray();
 
                 for(int j=0; j<getBoard().getSize(); j++){
                     // Save Terrain INFO
@@ -343,6 +347,9 @@ public class Game {
                         city.put(String.valueOf(unitINFO), cInfo);
                     }
 
+                    // Save Building INFO
+                    JBuildings.put(gs.getBoard().getBuildingAt(i, j)!= null? gs.getBoard().getBuildingAt(i, j).getKey():-1);
+
                     // Save network INFO
                     networks.put(gs.getBoard().getNetworkTilesAt(i, j));
 
@@ -353,6 +360,7 @@ public class Game {
                 unit2D.put(units);
                 city2D.put(cities);
                 network2D.put(networks);
+                building2D.put(JBuildings);
             }
 
             board.put("terrain", terrain2D);
@@ -360,6 +368,7 @@ public class Game {
             board.put("unitID", unit2D);
             board.put("cityID", city2D);
             board.put("network", network2D);
+            board.put("building", building2D);
 
             game.put("board", board);
             game.put("unit", unit);

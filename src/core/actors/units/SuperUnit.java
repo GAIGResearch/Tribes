@@ -22,7 +22,7 @@ public class SuperUnit extends Unit
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
-        c.setKilled(isKilled());
+      //  c.setKilled(isKilled());
         return hideInfo ? (SuperUnit) c.hide() : c;
     }
 }

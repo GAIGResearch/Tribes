@@ -22,7 +22,7 @@ public class Catapult extends Unit
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
-        c.setKilled(isKilled());
+       // c.setKilled(isKilled());
         return hideInfo ? (Catapult) c.hide() : c;
     }
 }

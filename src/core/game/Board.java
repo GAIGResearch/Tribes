@@ -140,11 +140,12 @@ public class Board {
         copyBoard.gameActors = new HashMap<>();
         for (Actor act : gameActors.values()) {
             int id = act.getActorId();
+            int actTribeId = act.getTribeId();
 
             //When do we copy? if it's the tribe (id==playerId), full observable or actor visible if part. obs.
-            if(id == playerId || !partialObs || tribes[playerId].isVisible(act.getPosition().x, act.getPosition().y))
+            if(actTribeId == playerId || !partialObs || tribes[playerId].isVisible(act.getPosition().x, act.getPosition().y))
             {
-                boolean hideInfo = (id != playerId) && partialObs;
+                boolean hideInfo = (actTribeId != playerId) && partialObs;
                 copyBoard.gameActors.put(id, act.copy(hideInfo));
             }
         }
@@ -572,7 +573,7 @@ public class Board {
 
         }else
         {
-            System.out.println("Warning: Tribe " + capturingTribe.getTribeId() + " trying to caputre a non-city.");
+            System.out.println("Warning: Tribe " + capturingTribe.getTribeId() + " trying to capture a non-city.");
             return false;
         }
 
@@ -645,11 +646,17 @@ public class Board {
 
             //If there are still units, they go to the tribe.
             if (fromCity.getNumUnits() > 0){
-                for(Integer unitId: fromCity.getUnitsID())
+                while(fromCity.getNumUnits() > 0)
+                //for(Integer unitId: fromCity.getUnitsID())
                 {
+                    int unitId = fromCity.getUnitsID().get(0);
                     Unit removedUnit = (Unit) gameActors.get(unitId);
-                    if(removedUnit != null)
+                    if(removedUnit != null) {
                         tribe.addExtraUnit(removedUnit);
+                        fromCity.removeUnit(unitId);
+                    }else{
+                        System.out.println("ERROR: Trying to move an extra unit that does not exist.");
+                    }
                 }
             }
         }

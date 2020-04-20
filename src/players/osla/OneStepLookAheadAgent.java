@@ -1,6 +1,8 @@
 package players.osla;
 
 import core.actions.Action;
+import core.actions.unitactions.Capture;
+import core.actions.unitactions.Move;
 import core.game.GameState;
 import players.Agent;
 import players.heuristics.TribesSimpleHeuristic;
@@ -28,7 +30,7 @@ public class OneStepLookAheadAgent extends Agent {
         ArrayList<Action> allActions = gs.getAllAvailableActions();
 
         //THIS IS JUST FOR DEBUG.
-        HashMap<Action, Double> scores = new HashMap<>();
+        //HashMap<Action, Double> scores = new HashMap<>();
 
         Action bestAction = null;
         double maxQ = Double.NEGATIVE_INFINITY;
@@ -40,8 +42,8 @@ public class OneStepLookAheadAgent extends Agent {
             double Q = heuristic.evaluateState(gsCopy);
             Q = noise(Q, this.epsilon, this.m_rnd.nextDouble());
 
-            scores.put(act, Q);
-            System.out.println(act + " : " + Q);
+            //scores.put(act, Q);
+            //System.out.println(act + " : " + Q);
 
             //System.out.println("Action:" + action + " score:" + Q);
             if (Q > maxQ) {
@@ -50,7 +52,7 @@ public class OneStepLookAheadAgent extends Agent {
             }
         }
 
-        System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + allActions.size() + ". Executing " + bestAction);
+        //System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + allActions.size() + ". Executing " + bestAction);
 
         return bestAction;
     }

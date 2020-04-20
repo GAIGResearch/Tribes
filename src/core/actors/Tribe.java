@@ -187,14 +187,14 @@ public class Tribe extends Actor {
         citiesID.add(id);
     }
 
-    public void removeCity(int id) {
+    private void removeCity(int id) {
         for (int i = 0; i < citiesID.size(); i++) {
             if (citiesID.get(i) == id) {
                 citiesID.remove(i);
                 return;
             }
         }
-        System.out.println("Error!! city ID " + id + " does not belong to this tribe");
+        //System.out.println("Error!! city ID " + id + " does not belong to this tribe"); //This is only a problem if it happens in the real game
     }
 
     public void setTechTree(TechnologyTree techTree) {
@@ -502,7 +502,7 @@ public class Tribe extends Actor {
     public void capturedCity(GameState gameState, City captured)
     {
         this.addCity(captured.getActorId());
-        captured.setTribeId(actorId);
+        captured.setTribeId(this.tribeId);
 
         //manage production and population of this new city (and others!)
         for(Building building : captured.getBuildings())

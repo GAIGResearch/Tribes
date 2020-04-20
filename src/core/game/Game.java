@@ -344,7 +344,7 @@ public class Game {
                             }
                         }
                         cInfo.put("buildings", buildingList);
-                        city.put(String.valueOf(unitINFO), cInfo);
+                        city.put(String.valueOf(cityINFO), cInfo);
                     }
 
                     // Save Building INFO

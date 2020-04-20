@@ -800,6 +800,13 @@ public class Board {
         actor.setActorId(actorIDcounter);
     }
 
+    public void addActor(core.actors.Actor actor, int actorID)
+    {
+        actorIDcounter++;
+        gameActors.put(actorID, actor);
+        actor.setActorId(actorID);
+    }
+
     /**
      * Gets a game actor from its tileCityId.
      * @param actorId the tileCityId of the actor to retrieve

@@ -3,6 +3,9 @@ package core.game;
 import core.Types;
 import core.actors.City;
 import core.actors.Tribe;
+import core.actors.units.Battleship;
+import core.actors.units.Boat;
+import core.actors.units.Ship;
 import core.actors.units.Unit;
 import jdk.nashorn.internal.parser.JSONParser;
 import org.json.JSONArray;
@@ -29,7 +32,6 @@ public class GameLoader
 
     private Board board;
     private Tribe[] tribes;
-    private Unit[] units;
     private City[] cities;
 
     public GameLoader(String fileName) {
@@ -53,6 +55,8 @@ public class GameLoader
 
         loadBoard();
 
+        loadUnits();
+
     }
 
     private void loadTribes(){
@@ -68,6 +72,27 @@ public class GameLoader
 
     private void loadBoard() {
         board = new Board(JBoard);
+    }
+
+    private void loadUnits(){
+        Iterator<String> keys = JUnit.keys();
+        while (keys.hasNext()){
+            String key = keys.next();
+            JSONObject unitINFO = JUnit.getJSONObject(key);
+            Types.UNIT unitType = Types.UNIT.getTypeByKey(unitINFO.getInt("type"));
+            Unit unit = Types.UNIT.createUnit(new Vector2d(unitINFO.getInt("x"),unitINFO.getInt("y")),
+                    unitINFO.getInt("kill"), unitINFO.getBoolean("isVeteran"),
+                    unitINFO.getInt("cityID"), unitINFO.getInt("tribeId"), unitType);
+            unit.setCurrentHP(unitINFO.getInt("currentHP"));
+            if (unitType == Types.UNIT.BOAT){
+                ((Boat)unit).setBaseLandUnit(Types.UNIT.getTypeByKey(unitINFO.getInt("baseLandType")));
+            }else if (unitType == Types.UNIT.SHIP){
+                ((Ship)unit).setBaseLandUnit(Types.UNIT.getTypeByKey(unitINFO.getInt("baseLandType")));
+            }else if (unitType == Types.UNIT.BATTLESHIP){
+                ((Battleship)unit).setBaseLandUnit(Types.UNIT.getTypeByKey(unitINFO.getInt("baseLandType")));
+            }
+            board.addActor(unit, Integer.parseInt(key));
+        }
     }
 
     public String readFile(String filename) {
@@ -105,10 +130,6 @@ public class GameLoader
 
     public Tribe[] getTribes() {
         return tribes;
-    }
-
-    public Unit[] getUnits() {
-        return units;
     }
 
     public City[] getCities() {

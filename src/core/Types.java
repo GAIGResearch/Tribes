@@ -542,6 +542,7 @@ public class Types {
             return null;
         }
 
+
         public boolean spawnable()
         {
             return !(this == BOAT || this == SHIP || this == BATTLESHIP || this == SUPERUNIT);
@@ -555,6 +556,14 @@ public class Types {
                 }
             }
             return units;
+        }
+
+        public static UNIT getTypeByKey(int key) {
+            for(UNIT t : UNIT.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
         }
 
     }

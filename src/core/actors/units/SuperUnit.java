@@ -17,12 +17,12 @@ public class SuperUnit extends Unit
     }
 
     @Override
-    public SuperUnit copy() {
+    public SuperUnit copy(boolean hideInfo) {
         SuperUnit c = new SuperUnit(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         c.setKilled(isKilled());
-        return c;
+        return hideInfo ? (SuperUnit) c.hide() : c;
     }
 }

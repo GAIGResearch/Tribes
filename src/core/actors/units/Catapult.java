@@ -17,12 +17,12 @@ public class Catapult extends Unit
     }
 
     @Override
-    public Catapult copy() {
+    public Catapult copy(boolean hideInfo) {
         Catapult c = new Catapult(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         c.setKilled(isKilled());
-        return c;
+        return hideInfo ? (Catapult) c.hide() : c;
     }
 }

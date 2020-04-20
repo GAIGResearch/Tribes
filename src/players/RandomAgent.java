@@ -20,16 +20,7 @@ public class RandomAgent extends Agent {
     @Override
     public Action act(GameState gs, ElapsedCpuTimer ect)
     {
-        ArrayList<Action> allActions = new ArrayList<>(gs.getTribeActions());
-        for (Integer cityId : gs.getCityActions().keySet())
-        {
-            allActions.addAll(gs.getCityActions(cityId));
-        }
-        for (Integer unitId : gs.getUnitActions().keySet())
-        {
-            allActions.addAll(gs.getUnitActions(unitId));
-        }
-
+        ArrayList<Action> allActions = gs.getAllAvailableActions();
         int nActions = allActions.size();
         Action toExecute = allActions.get(rnd.nextInt(nActions));
         System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + nActions + ". Executing " + toExecute);

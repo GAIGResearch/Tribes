@@ -17,12 +17,12 @@ public class Archer extends Unit
     }
 
     @Override
-    public Archer copy() {
+    public Archer copy(boolean hideInfo) {
         Archer c = new Archer(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         c.setKilled(isKilled());
-        return c;
+        return hideInfo ? (Archer) c.hide() : c;
     }
 }

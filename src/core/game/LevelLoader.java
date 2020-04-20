@@ -69,6 +69,9 @@ public class LevelLoader
                         Unit unit = Types.UNIT.createUnit(new Vector2d(i,j), 0, false, c.getActorId(), tribeID, unitType);
                         board.addUnit(c, unit);
 
+                        //City tiles
+                        board.assignCityTiles(c, c.getBound());
+
                         tribeID++;
                     }
                 }
@@ -83,7 +86,6 @@ public class LevelLoader
             }
         }
 
-        board.setCityBorders();
         return board;
     }
 

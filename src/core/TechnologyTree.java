@@ -13,7 +13,7 @@ public class TechnologyTree {
 
     public TechnologyTree(){
         researched = new boolean[Types.TECHNOLOGY.values().length];
-        Arrays.fill(researched, true);
+//        Arrays.fill(researched, true); //Buff for debug purposes, keep this commented for real games.
     }
 
     public TechnologyTree(boolean[] researched){
@@ -88,5 +88,16 @@ public class TechnologyTree {
 
     public boolean[] getResearched() {
         return researched;
+    }
+
+    public int getNumResearched()
+    {
+        int count = 0;
+        for(Types.TECHNOLOGY tech : Types.TECHNOLOGY.values())
+        {
+            if(isResearched(tech))
+                count++;
+        }
+        return count;
     }
 }

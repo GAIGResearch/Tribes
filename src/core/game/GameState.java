@@ -1,6 +1,8 @@
 package core.game;
 
+import core.TechnologyTree;
 import core.TribesConfig;
+import core.Types;
 import core.actions.Action;
 import core.actions.cityactions.factory.CityActionBuilder;
 import core.actions.tribeactions.EndTurn;
@@ -46,7 +48,8 @@ public class GameState {
      */
     private int computedActionTribeIdFlag;
 
-    private boolean levelingUp;  // Indicates if a city is leveling up, which reduces action list to only 2 options
+    // Indicates if a city is leveling up, which reduces action list to only 2 options
+    private boolean levelingUp;
 
     //Constructor.
     public GameState(Random rnd) {
@@ -92,17 +95,6 @@ public class GameState {
     }
 
     /**
-     * Removes an actor from the list of actor
-     * @param actorId id of the actor to remove
-     * @return true if the actor was removed (false may indicate that it didn't exist).
-     */
-    public boolean removeActor(int actorId)
-    {
-        return board.removeActor(actorId);
-    }
-
-
-    /**
      * Returns the current tick of the game. One tick encompasses a turn for all
      * players in the game.
      * @return current tick of the game.
@@ -125,7 +117,7 @@ public class GameState {
      * agent's decision time, but agents can use it on their forward models at real expense.
      * @param tribe Tribe for which actions are being computed.
      */
-    public void computePlayerActions(Tribe tribe)
+    void computePlayerActions(Tribe tribe)
     {
         board.setActiveTribeID(tribe.getTribeId());
 
@@ -208,7 +200,7 @@ public class GameState {
      * @return true if actions exist. False if no actions available
      * (that includes if this is not this tribe's turn)
      */
-    public boolean existAvailableActions(Tribe tribe)
+    boolean existAvailableActions(Tribe tribe)
     {
         int tribeId = tribe.getTribeId();
         if(board.getActiveTribeID() != tribeId) //Not sure if this is needed, actually.
@@ -236,7 +228,6 @@ public class GameState {
      */
     public void next(Action action)
     {
-        //At least it'll have these two things:
         if(action != null)
         {
             action.execute(this);
@@ -265,7 +256,7 @@ public class GameState {
     }
 
     /**
-     * Kills a unit from the game, removing it from the board, its original city and substracting game score.
+     * Kills a unit from the game, removing it from the board, its original city and subtracting game score.
      * @param toKill unit to Kill
      */
     public void killUnit(Unit toKill)
@@ -338,6 +329,11 @@ public class GameState {
         return copy;
     }
 
+    /**
+     * Indicates if a given tribe can end its turn. Tribes can't end their turn if a city upgrade is pending.
+     * @param tribeId id of the tribe to check
+     * @return true if turn can be ended.
+     */
     public boolean canEndTurn(int tribeId)
     {
         return canEndTurn[tribeId];
@@ -352,9 +348,21 @@ public class GameState {
         turnMustEnd = endTurn;
     }
 
-    public boolean isTurnEnding()
+    /**
+     * Indicates if the turn is ending to move to the next player.
+     * @return if the turn is ending.
+     */
+    boolean isTurnEnding()
     {
         return turnMustEnd;
+    }
+
+    /**
+     * Indicates if at present there's a city leveling up
+     * @return if there's a city leveling up
+     */
+    public boolean isLevelingUp() {
+        return levelingUp;
     }
 
     /**
@@ -387,6 +395,10 @@ public class GameState {
         return board.getTribes()[tribeID];
     }
 
+    /**
+     * Returns the tribe which turn it is now (the active tribe)
+     * @return Current tribe to move.
+     */
     public Tribe getActiveTribe() {
         int activeTribeID = board.getActiveTribeID();
         if (activeTribeID != -1) {
@@ -402,38 +414,97 @@ public class GameState {
         return rnd;
     }
 
-
-    public HashMap<Integer, ArrayList<Action>> getCityActions() {
-        return cityActions;
+    public boolean isNative() {
+        return board.isNative();
     }
 
-    public HashMap<Integer, ArrayList<Action>> getUnitActions() {
-        return unitActions;
-    }
+    /* AVAILABLE ACTIONS */
 
-    public ArrayList<Action> getTribeActions() {
-        return tribeActions;
-    }
-
-    public ArrayList<Action> getCityActions(City c) {
-        return cityActions.get(c.getActorId());
-    }
-
-    public ArrayList<Action> getUnitActions(Unit u) {
-        return unitActions.get(u.getActorId());
-    }
-
-
-    public ArrayList<Action> getCityActions(int cityId) {
-        return cityActions.get(cityId);
-    }
-
-    public ArrayList<Action> getUnitActions(int unitId) {
-        return unitActions.get(unitId);
+    /**
+     * Gathers and returns all the available actions for the active tribe in a single ArrayList
+     * @return all available actions
+     */
+    public ArrayList<Action> getAllAvailableActions()
+    {
+        ArrayList<Action> allActions = new ArrayList<>(this.getTribeActions());
+        for (Integer cityId : this.getCityActions().keySet())
+        {
+            allActions.addAll(this.getCityActions(cityId));
+        }
+        for (Integer unitId : this.getUnitActions().keySet())
+        {
+            allActions.addAll(this.getUnitActions(unitId));
+        }
+        return allActions;
     }
 
 
-    public boolean isLevelingUp() {
-        return levelingUp;
+    public HashMap<Integer, ArrayList<Action>> getCityActions() {     return cityActions;  }
+    public ArrayList<Action> getCityActions(City c) {  return cityActions.get(c.getActorId());  }
+    public ArrayList<Action> getCityActions(int cityId) {  return cityActions.get(cityId);  }
+
+    public HashMap<Integer, ArrayList<Action>> getUnitActions() {  return unitActions;  }
+    public ArrayList<Action> getUnitActions(int unitId) {  return unitActions.get(unitId);  }
+    public ArrayList<Action> getUnitActions(Unit u) {  return unitActions.get(u.getActorId());  }
+
+    public ArrayList<Action> getTribeActions() {  return tribeActions;  }
+
+    /* Potentially helpful methods for agents */
+
+    public int getTribeProduction()
+    {
+        return this.getActiveTribe().getMaxProduction(this);
+    }
+
+    public TechnologyTree getTribeTechTree()
+    {
+        return getActiveTribe().getTechTree();
+    }
+
+    public int getScore(int playerID)
+    {
+        return getTribe(playerID).getScore();
+    }
+
+    public boolean[][] getVisibilityMap() {
+        return getActiveTribe().getObsGrid();
+    }
+
+    public ArrayList<Integer> getTribesMet() {
+        return getActiveTribe().getTribesMet();
+    }
+
+    public ArrayList<City> getCities()
+    {
+        ArrayList<Integer> cities = getActiveTribe().getCitiesID();
+        ArrayList<City> cityActors = new ArrayList<>();
+        for(Integer cityId : cities)
+        {
+            cityActors.add((City)board.getActor(cityId));
+        }
+        return cityActors;
+    }
+
+    public ArrayList<Unit> getUnits()
+    {
+        ArrayList<Integer> cities = getActiveTribe().getCitiesID();
+        ArrayList<Unit> unitActors = new ArrayList<>();
+        for(Integer cityId : cities)
+        {
+            City c = (City)board.getActor(cityId);
+            for(Integer unitId : c.getUnitsID())
+            {
+                Unit unit = (Unit) board.getActor(unitId);
+                unitActors.add(unit);
+            }
+        }
+
+        for(Integer unitId : getActiveTribe().getExtraUnits())
+        {
+            Unit unit = (Unit) board.getActor(unitId);
+            unitActors.add(unit);
+        }
+
+        return unitActors;
     }
 }

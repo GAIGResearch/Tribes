@@ -9,6 +9,9 @@ import core.actors.Building;
 import core.actors.City;
 import core.actors.Temple;
 import core.actors.Tribe;
+import core.actors.units.Battleship;
+import core.actors.units.Boat;
+import core.actors.units.Ship;
 import core.actors.units.Unit;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -203,6 +206,9 @@ public class Game {
             // Save Game
             saveGame();
 
+
+            GameLoader gl = new GameLoader("save/" + this.seed + "/0_0/game.json");
+
             //it may be that this player won the game, no more playing.
             if(isEnded())
             {
@@ -280,6 +286,13 @@ public class Game {
                         Unit u = (Unit)gs.getActor(unitINFO);
                         JSONObject uInfo = new JSONObject();
                         uInfo.put("type", u.getType().getKey());
+                        if (u.getType() == Types.UNIT.BOAT){
+                            uInfo.put("baseLandType", ((Boat)u).getBaseLandUnit().getKey());
+                        }else if (u.getType() == Types.UNIT.SHIP){
+                            uInfo.put("baseLandType", ((Ship)u).getBaseLandUnit().getKey());
+                        }else if (u.getType() == Types.UNIT.BATTLESHIP){
+                            uInfo.put("baseLandType", ((Battleship)u).getBaseLandUnit().getKey());
+                        }
                         uInfo.put("x", i);
                         uInfo.put("y", j);
                         uInfo.put("kill", u.getKills());
@@ -394,22 +407,16 @@ public class Game {
             game.put("tick", gs.getTick());
             game.put("activeTribeID", gs.getActiveTribeID());
 
-
-//            JSONObject read = new JSONObject(game.toString());
-//            System.out.println(read.get("board"));
-//            System.out.println(read.get("board"));
-//
-//            JSONObject board_read = read.getJSONObject("board");
-//            System.out.println(board_read.get("resource"));
-
             FileWriter fw_game = new FileWriter(turnFile.getPath() + "/game.json");
-            fw_game.write(game.toString());
+            fw_game.write(game.toString(4));
             fw_game.close();
 
         } catch (IOException e){
             e.printStackTrace();
         }
     }
+
+
 
     /**
      * Process a turn for a given player. It queries the player for an action until no more

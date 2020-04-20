@@ -1,5 +1,8 @@
 package core;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -19,6 +22,15 @@ public class TechnologyTree {
     public TechnologyTree(boolean[] researched){
         this.researched = researched;
         checkEverythingResearched();
+    }
+
+    public TechnologyTree(JSONObject jTechnologyTree){
+        JSONArray jResearched = jTechnologyTree.getJSONArray("researched");
+        researched = new boolean[jResearched.length()];
+        for (int i=0; i<jResearched.length(); i++){
+            researched[i] = jResearched.getBoolean(i);
+        }
+        everythingResearched = jTechnologyTree.getBoolean("everythingResearched");
     }
 
     public boolean isResearched(Types.TECHNOLOGY target) {

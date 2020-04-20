@@ -77,7 +77,7 @@ public class StepMove implements NeighbourHelper
                     case VILLAGE:
                     case MOUNTAIN:
                         //Disembark takes a turn of movement.
-                        stepCost = unit.MOV;
+                        stepCost = costFrom < unit.MOV ? (unit.MOV - costFrom) : unit.MOV; //as much cost as needed to finished step here
                         break;
                     case DEEP_WATER:
                     case SHALLOW_WATER:
@@ -91,7 +91,7 @@ public class StepMove implements NeighbourHelper
                     case DEEP_WATER:
                         //Embarking takes a turn of movement.
                         if(board.getBuildingAt(tile.x, tile.y) == Types.BUILDING.PORT) {
-                            stepCost = unit.MOV;
+                            stepCost = costFrom < unit.MOV ? (unit.MOV - costFrom) : unit.MOV; //as much cost as needed to finished step here;
                         }else{ continue; }
                         break;
                     case PLAIN:
@@ -101,7 +101,7 @@ public class StepMove implements NeighbourHelper
                         break;
                     case FOREST:
                     case MOUNTAIN:
-                        stepCost = unit.MOV;
+                        stepCost = costFrom < unit.MOV ? (unit.MOV - costFrom) : unit.MOV; //as much cost as needed to finished step here
                         break;
 
                 }

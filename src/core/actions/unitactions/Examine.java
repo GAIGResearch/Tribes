@@ -94,4 +94,8 @@ public class Examine extends UnitAction
         copy.bonus = bonus;
         return copy;
     }
+
+    public String toString() {
+        return "EXAMINE by unit " + this.unitId + " of target " + this.bonus.toString();
+    }
 }

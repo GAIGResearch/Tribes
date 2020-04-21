@@ -51,4 +51,8 @@ public class BuildRoad extends TribeAction {
         buildRoad.setPosition(position);
         return buildRoad;
     }
+
+    public String toString() {
+        return "BUILD_ROAD by tribe " + this.tribeId + " at location " + position;
+    }
 }

@@ -79,7 +79,7 @@ public class Move extends UnitAction
 
     public String toString()
     {
-        return "MOVE unit " + this.unitId + " to " + destination;
+        return "MOVE by unit " + this.unitId + " to " + destination;
     }
 
 }

@@ -25,11 +25,11 @@ public class Upgrade extends UnitAction
     public boolean isFeasible(final GameState gs) {
         Unit unit = (Unit) gs.getActor(this.unitId);
         Tribe tribe = gs.getTribe(unit.getTribeId());
-        TechnologyTree ttree = tribe.getTechTree();
+        TechnologyTree tree = tribe.getTechTree();
 
         int stars = gs.getTribe(unit.getTribeId()).getStars();
-        return ((unit.getType() == BOAT && ttree.isResearched(Types.TECHNOLOGY.SAILING) && stars >= TribesConfig.SHIP_COST) ||
-                (unit.getType() == SHIP && ttree.isResearched(Types.TECHNOLOGY.NAVIGATION) && stars >= TribesConfig.BATTLESHIP_COST));
+        return ((unit.getType() == BOAT && tree.isResearched(Types.TECHNOLOGY.SAILING) && stars >= TribesConfig.SHIP_COST) ||
+                (unit.getType() == SHIP && tree.isResearched(Types.TECHNOLOGY.NAVIGATION) && stars >= TribesConfig.BATTLESHIP_COST));
     }
 
     @Override
@@ -71,5 +71,9 @@ public class Upgrade extends UnitAction
     @Override
     public Action copy() {
         return new Upgrade(this.unitId);
+    }
+
+    public String toString() {
+        return "UPGRADE by unit " + this.unitId;
     }
 }

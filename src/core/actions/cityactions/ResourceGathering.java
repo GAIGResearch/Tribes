@@ -80,4 +80,9 @@ public class ResourceGathering extends CityAction
         res.setTargetPos(targetPos.copy());
         return res;
     }
+
+    public String toString()
+    {
+        return "RESOURCE_GATHERED by city " + this.cityId+ " : " + resource.toString();
+    }
 }

@@ -45,4 +45,9 @@ public class ClearForest extends CityAction
         clear.setTargetPos(this.targetPos.copy());
         return clear;
     }
+
+    public String toString()
+    {
+        return "CLEAR_FOREST by city " + this.cityId+ " at " + targetPos;
+    }
 }

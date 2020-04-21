@@ -52,4 +52,9 @@ public class Destroy extends CityAction
         destroy.setTargetPos(this.targetPos.copy());
         return destroy;
     }
+
+    public String toString()
+    {
+        return "DESTROY by city " + this.cityId+ " at " + targetPos;
+    }
 }

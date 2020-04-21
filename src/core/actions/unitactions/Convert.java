@@ -69,4 +69,6 @@ public class Convert extends UnitAction
         convert.setTargetId(this.targetId);
         return convert;
     }
+
+    public String toString() { return "CONVERT by unit " + this.unitId + " to unit " + this.targetId;}
 }

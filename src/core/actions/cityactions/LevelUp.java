@@ -100,7 +100,8 @@ public class LevelUp extends CityAction {
     }
 
     @Override
-    public String toString() {
-        return bonus.toString();
+    public String toString()
+    {
+        return "LEVEL_UP by city " + this.cityId+ " with bonus " + bonus.toString();
     }
 }

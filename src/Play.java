@@ -23,16 +23,16 @@ public class Play {
     }
 
     public static void main(String[] args) {
-//        String filename = "SampleLevel2p.csv";
-        String filename = "SampleLevel.csv";
+        String filename = "SampleLevel2p.csv";
+//        String filename = "SampleLevel.csv";
 //        String filename = "MinimalLevel.csv";
 //        String filename = "MinimalLevel_water.csv";
 //        String filename = "MinimalLevel2.csv";
 
-        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI});
+//        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI});
 //        play(filename, new PlayerType[]{PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI});
 //        play(filename, new PlayerType[]{PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI});
-//        play(filename, new PlayerType[]{PlayerType.HUMAN, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, OUMAJI});
+        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI});
 //        play(filename, new PlayerType[]{PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI});
     }
 

@@ -49,87 +49,95 @@ class TradeNetwork
 
 
     /**
-     * Computes the trade network for all tribes. It builds to complementary graphs: connected tiles (via roads)
-     * and connected cities (via ports and water tiles). It updates the populations of the cities according to
-     * changes in the network.
+     * Computes the trade network for all tribes. Calls computeTradeNetworkTribe(...) on all tribes of the game.
      * @param board board of the game.
      */
     private void computeTradeNetwork(Board board)
     {
         Tribe[] tribes = board.getTribes();
-        for(Tribe t : tribes) {
+        for(Tribe tribe : tribes)
+            this.computeTradeNetworkTribe(board, tribe);
+    }
 
-            //We only update the trade network of all tribes for the current tribe if this is not native
-            if(t.getTribeId() != board.getActiveTribeID() && !board.isNative())
-                continue;;
+    /**
+     * Computes the trade network for one tribe. It builds to complementary graphs: connected tiles (via roads)
+     * and connected cities (via ports and water tiles). It updates the populations of the cities according to
+     * changes in the network.
+     * @param board board of the game.
+     * @param tribe tribe which network has to be computed.
+     */
+    public void computeTradeNetworkTribe(Board board, Tribe tribe)
+    {
+        //We only update the trade network of all tribes for the current tribe if this is not native
+        if(tribe.getTribeId() != board.getActiveTribeID() && !board.isNative())
+            return;
 
-            if (t.controlsCapital()) {
-                boolean[][] connectedTiles = new boolean[networkTiles.length][networkTiles[0].length];
-                boolean[][] navigable = new boolean[networkTiles.length][networkTiles[0].length];
+        if (tribe.controlsCapital()) {
+            boolean[][] connectedTiles = new boolean[networkTiles.length][networkTiles[0].length];
+            boolean[][] navigable = new boolean[networkTiles.length][networkTiles[0].length];
 
-                ArrayList<Vector2d> ports = new ArrayList<>();
+            ArrayList<Vector2d> ports = new ArrayList<>();
 
-                //First, set up the graph. Including all tiles that correspond to active trade points (roads, cities, ports)
-                for (int i = 0; i < networkTiles.length; ++i) {
-                    for (int j = 0; j < networkTiles[0].length; ++j) {
-                        //Only for this tribe
-                        int cityId = board.getCityIdAt(i,j);
-                        boolean myCity = t.controlsCity(cityId);
-                        boolean notEnemy = myCity || cityId == -1;
+            //First, set up the graph. Including all tiles that correspond to active trade points (roads, cities, ports)
+            for (int i = 0; i < networkTiles.length; ++i) {
+                for (int j = 0; j < networkTiles[0].length; ++j) {
+                    //Only for this tribe
+                    int cityId = board.getCityIdAt(i,j);
+                    boolean myCity = tribe.controlsCity(cityId);
+                    boolean notEnemy = myCity || cityId == -1;
 
-                        //cities and ports, must be within my city boundaries.
-                        Types.TERRAIN ter = board.getTerrainAt(i,j);
-                        Types.BUILDING build = board.getBuildingAt(i,j);
-                        if(myCity && (ter == CITY || build == Types.BUILDING.PORT))
-                        {
-                            connectedTiles[i][j] = networkTiles[i][j];
-                            if(build == Types.BUILDING.PORT)
-                                ports.add(new Vector2d(i, j));
+                    //cities and ports, must be within my city boundaries.
+                    Types.TERRAIN ter = board.getTerrainAt(i,j);
+                    Types.BUILDING build = board.getBuildingAt(i,j);
+                    if(myCity && (ter == CITY || build == Types.BUILDING.PORT))
+                    {
+                        connectedTiles[i][j] = networkTiles[i][j];
+                        if(build == Types.BUILDING.PORT)
+                            ports.add(new Vector2d(i, j));
 
-                            //Roads, must be within my city boundaries OR in a neutral tile.
-                        }else if (notEnemy && board.isRoad(i,j))
-                        {
-                            connectedTiles[i][j] = networkTiles[i][j];
-                        }
+                        //Roads, must be within my city boundaries OR in a neutral tile.
+                    }else if (notEnemy && board.isRoad(i,j))
+                    {
+                        connectedTiles[i][j] = networkTiles[i][j];
+                    }
 
-                        //And navigable tiles: WATER, VISIBLE AND NOT ENEMY
-                        if ((ter == SHALLOW_WATER || ter == DEEP_WATER)
-                                && t.isVisible(i, j) && notEnemy) {
-                            navigable[i][j] = true;
-                        }
+                    //And navigable tiles: WATER, VISIBLE AND NOT ENEMY
+                    if ((ter == SHALLOW_WATER || ter == DEEP_WATER)
+                            && tribe.isVisible(i, j) && notEnemy) {
+                        navigable[i][j] = true;
                     }
                 }
-
-                TradeNetworkStep tns = new TradeNetworkStep(connectedTiles);
-
-                //Now, we need to add jump links. In this case, two ports are connected if
-                // separated by [0,TribesConfig.PORT_TRADE_DISTANCE] WATER, VISIBLE, NON-ENEMY tiles
-                int nPorts = ports.size();
-                for (int i = 0; i < nPorts - 1; ++i) {
-                    for (int j = i; j < nPorts; ++j) {
-                        if (i != j) {
-                            Vector2d portFrom = ports.get(i);
-                            Vector2d portTo = ports.get(j);
-
-                            Vector2d originPortPos = new Vector2d(portFrom.x, portFrom.y);
-                            Pathfinder tp = new Pathfinder(originPortPos, new TradeWaterStep(navigable));
-                            ArrayList<PathNode> path = tp.findPathTo(new Vector2d(portTo.x, portTo.y));
-
-                            if (path != null) //+1 because path includes destination
-                            {
-                                //We add this as a link between ports.
-                                tns.addJumpLink(portFrom, portTo, true);
-                            }
-
-                        }
-                    }
-                }
-
-                City capital = (City) board.getActor(t.getCapitalID());
-                t.updateNetwork(new Pathfinder(capital.getPosition(), tns), board, t.getTribeId() == board.getActiveTribeID());
-            }else {
-                t.updateNetwork(null, board, t.getTribeId() == board.getActiveTribeID());
             }
+
+            TradeNetworkStep tns = new TradeNetworkStep(connectedTiles);
+
+            //Now, we need to add jump links. In this case, two ports are connected if
+            // separated by [0,TribesConfig.PORT_TRADE_DISTANCE] WATER, VISIBLE, NON-ENEMY tiles
+            int nPorts = ports.size();
+            for (int i = 0; i < nPorts - 1; ++i) {
+                for (int j = i; j < nPorts; ++j) {
+                    if (i != j) {
+                        Vector2d portFrom = ports.get(i);
+                        Vector2d portTo = ports.get(j);
+
+                        Vector2d originPortPos = new Vector2d(portFrom.x, portFrom.y);
+                        Pathfinder tp = new Pathfinder(originPortPos, new TradeWaterStep(navigable));
+                        ArrayList<PathNode> path = tp.findPathTo(new Vector2d(portTo.x, portTo.y));
+
+                        if (path != null) //+1 because path includes destination
+                        {
+                            //We add this as a link between ports.
+                            tns.addJumpLink(portFrom, portTo, true);
+                        }
+
+                    }
+                }
+            }
+
+            City capital = (City) board.getActor(tribe.getCapitalID());
+            tribe.updateNetwork(new Pathfinder(capital.getPosition(), tns), board, tribe.getTribeId() == board.getActiveTribeID());
+        }else {
+            tribe.updateNetwork(null, board, tribe.getTribeId() == board.getActiveTribeID());
         }
     }
 

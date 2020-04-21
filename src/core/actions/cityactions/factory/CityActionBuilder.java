@@ -19,6 +19,13 @@ public class CityActionBuilder
     {
         ArrayList<Action> allActions = new ArrayList<>();
 
+        if(city.getTribeId() != gs.getActiveTribeID())
+        {
+            System.out.println("ERROR: creating actions for a city this tribe does not control.");
+            return allActions;
+        }
+
+
         //Level Up
         allActions.addAll(new LevelUpFactory().computeActionVariants(city, gs));
 

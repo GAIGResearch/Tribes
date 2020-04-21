@@ -28,7 +28,6 @@ public class StepMove implements NeighbourHelper
     //costFrom: is the total move cost computed up to "from"
     //Using this.gs, this.unit, from and costFrom, gets all the adjacent neighbours to tile in position "from"
     public ArrayList<PathNode> getNeighbours(Vector2d from, double costFrom) {
-        TechnologyTree techTree = gs.getTribe(unit.getTribeId()).getTechTree();
         ArrayList<PathNode> neighbours = new ArrayList<>();
         Board board = gs.getBoard();
         boolean inZoneOfControl = false;
@@ -69,7 +68,7 @@ public class StepMove implements NeighbourHelper
             }
 
             //Unit is a water unit
-            if(unit.getType() == Types.UNIT.BOAT || unit.getType() == Types.UNIT.SHIP || unit.getType() == Types.UNIT.BATTLESHIP) {
+            if(unit.getType().isWaterUnit()){
                 switch (terrain)
                 {
                     case CITY:
@@ -78,7 +77,7 @@ public class StepMove implements NeighbourHelper
                     case VILLAGE:
                     case MOUNTAIN:
                         //Disembark takes a turn of movement.
-                        stepCost = unit.MOV;
+                        stepCost = costFrom < unit.MOV ? (unit.MOV - costFrom) : unit.MOV; //as much cost as needed to finished step here
                         break;
                     case DEEP_WATER:
                     case SHALLOW_WATER:
@@ -92,7 +91,7 @@ public class StepMove implements NeighbourHelper
                     case DEEP_WATER:
                         //Embarking takes a turn of movement.
                         if(board.getBuildingAt(tile.x, tile.y) == Types.BUILDING.PORT) {
-                            stepCost = unit.MOV;
+                            stepCost = costFrom < unit.MOV ? (unit.MOV - costFrom) : unit.MOV; //as much cost as needed to finished step here;
                         }else{ continue; }
                         break;
                     case PLAIN:
@@ -102,7 +101,7 @@ public class StepMove implements NeighbourHelper
                         break;
                     case FOREST:
                     case MOUNTAIN:
-                        stepCost = unit.MOV;
+                        stepCost = costFrom < unit.MOV ? (unit.MOV - costFrom) : unit.MOV; //as much cost as needed to finished step here
                         break;
 
                 }

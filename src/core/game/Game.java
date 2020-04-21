@@ -3,6 +3,7 @@ package core.game;
 import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
+import core.actions.unitactions.Convert;
 import core.actions.unitactions.Recover;
 import core.actions.unitactions.factory.RecoverFactory;
 import core.actors.Building;
@@ -445,11 +446,15 @@ public class Game {
         ElapsedCpuTimer ect = new ElapsedCpuTimer();
         ect.setMaxTimeMillis(TURN_TIME_MILLIS);
         boolean continueTurn = true;
+        int curActionCounter = 0;
 
         while(continueTurn)
         {
             //get one action from the player
             Action action = ag.act(gameStateObservations[playerID], ect);
+
+//            System.out.println(gs.getTick() + " " + curActionCounter + " " + action + "; stars: " + gs.getBoard().getTribe(playerID).getStars());
+            curActionCounter++;
 
             //note down the remaining time to use it for the next iteration
             long remaining = ect.remainingTimeMillis();
@@ -528,6 +533,7 @@ public class Game {
             tribe.setScore(tribe.getType().getInitialScore());
             tribe.setStars(TribesConfig.INITIAL_STARS);
         }else{
+            acumProd = Math.max(0, acumProd); //Never have a negative amount of stars.
             tribe.addStars(acumProd);
         }
 
@@ -562,7 +568,6 @@ public class Game {
         //For all units that didn't execute any action, a Recover action is executed.
         ArrayList<Integer> allTribeUnits = new ArrayList<>();
         ArrayList<Integer> tribeCities = tribe.getCitiesID();
-        GameState gs = gameStateObservations[tribe.getActorId()];
 
         //1. Get all units
         for(int cityId : tribeCities)

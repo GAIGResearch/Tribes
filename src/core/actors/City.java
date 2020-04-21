@@ -280,7 +280,7 @@ public class City extends Actor{
         c.bound = bound;
         c.actorId = actorId;
         c.setBuildings(copyBuildings());
-        c.setUnitsID(hideInfo ? new ArrayList<>(unitsID) : new ArrayList<>(unitsID));
+        c.setUnitsID(hideInfo ? new ArrayList<>() : new ArrayList<>(unitsID));
         return c;
     }
 

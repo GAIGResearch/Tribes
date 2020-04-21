@@ -1,9 +1,9 @@
 package core.actions.unitactions.factory;
 
 import core.actions.Action;
-import core.actions.unitactions.factory.*;
-import core.actors.units.Unit;
+import core.actors.units.*;
 import core.game.GameState;
+import core.Types;
 
 import java.util.ArrayList;
 
@@ -13,6 +13,13 @@ public class UnitActionBuilder
     public ArrayList<Action> getActions(GameState gs, Unit unit)
     {
         ArrayList<Action> allActions = new ArrayList<>();
+
+        if(unit.getTribeId() != gs.getActiveTribeID())
+        {
+            System.out.println("ERROR: creating actions for unit " + unit.getActorId() + " that the current tribe (" + gs.getActiveTribeID() +
+                    ") does not control (" + unit.getTribeId() + ").");
+            return allActions;
+        }
 
         if(unit.isFinished())
             return allActions;

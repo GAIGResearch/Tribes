@@ -192,11 +192,12 @@ public class Board {
         copyBoard.gameActors = new HashMap<>();
         for (Actor act : gameActors.values()) {
             int id = act.getActorId();
+            int actTribeId = act.getTribeId();
 
             //When do we copy? if it's the tribe (id==playerId), full observable or actor visible if part. obs.
-            if(id == playerId || !partialObs || tribes[playerId].isVisible(act.getPosition().x, act.getPosition().y))
+            if(actTribeId == playerId || !partialObs || tribes[playerId].isVisible(act.getPosition().x, act.getPosition().y))
             {
-                boolean hideInfo = (id != playerId) && partialObs;
+                boolean hideInfo = (actTribeId != playerId) && partialObs;
                 copyBoard.gameActors.put(id, act.copy(hideInfo));
             }
         }
@@ -346,6 +347,7 @@ public class Board {
         Vector2d newPos = new Vector2d(x, y);
         Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), Types.UNIT.BOAT);
         boat.setCurrentHP(unit.getCurrentHP());
+        boat.setMaxHP(unit.getMaxHP());
         ((Boat)boat).setBaseLandUnit(unit.getType());
         addUnit(city, boat);
     }
@@ -384,6 +386,7 @@ public class Board {
         Vector2d newPos = new Vector2d(x, y);
         Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), baseLandUnit);
         newUnit.setCurrentHP(unit.getCurrentHP());
+        newUnit.setMaxHP(unit.getMaxHP());
         addUnit(city, newUnit);
     }
 
@@ -406,7 +409,9 @@ public class Board {
         if (getTerrainAt(xF, yF) == Types.TERRAIN.MOUNTAIN) {
             partialObsRangeClear += 1;
         }
-        t.clearView(xF, yF, partialObsRangeClear, r, this);
+        boolean networkUpdate = t.clearView(xF, yF, partialObsRangeClear, r, this);
+        if(networkUpdate)
+            tradeNetwork.computeTradeNetworkTribe(this, t);
     }
 
     /**
@@ -432,7 +437,9 @@ public class Board {
                     moved = true;
                     currentPos.x = next.x;
                     currentPos.y = next.y;
-                    tribes[tribeId].clearView(currentPos.x, currentPos.y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this.copy());
+                    boolean updateNetwork = tribes[tribeId].clearView(currentPos.x, currentPos.y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this.copy());
+                    if(updateNetwork)
+                        tradeNetwork.computeTradeNetworkTribe(this, tribes[tribeId]);
                 }
 
                 j++;
@@ -624,7 +631,7 @@ public class Board {
 
         }else
         {
-            System.out.println("Warning: Tribe " + capturingTribe.getTribeId() + " trying to caputre a non-city.");
+            System.out.println("Warning: Tribe " + capturingTribe.getTribeId() + " trying to capture a non-city.");
             return false;
         }
 
@@ -697,11 +704,17 @@ public class Board {
 
             //If there are still units, they go to the tribe.
             if (fromCity.getNumUnits() > 0){
-                for(Integer unitId: fromCity.getUnitsID())
+                while(fromCity.getNumUnits() > 0)
+                //for(Integer unitId: fromCity.getUnitsID())
                 {
+                    int unitId = fromCity.getUnitsID().get(0);
                     Unit removedUnit = (Unit) gameActors.get(unitId);
-                    if(removedUnit != null)
+                    if(removedUnit != null) {
                         tribe.addExtraUnit(removedUnit);
+                        fromCity.removeUnit(unitId);
+                    }else{
+                        System.out.println("ERROR: Trying to move an extra unit that does not exist.");
+                    }
                 }
             }
         }
@@ -771,6 +784,8 @@ public class Board {
         //Finally, add the unit to the city that created it, unless it belongs to the tribe.
         if(u.getCityId() != -1)
             c.addUnit(u.getActorId());
+        else if(!tribes[u.getTribeId()].getExtraUnits().contains(u.getActorId()))
+            tribes[u.getTribeId()].addExtraUnit(u);
     }
 
     /**

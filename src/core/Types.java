@@ -473,7 +473,7 @@ public class Types {
         KNIGHT (6,"img/unit/knight/", KNIGHT_COST, CHIVALRY, KNIGHT_POINTS), //+40
         MIND_BENDER(7,"img/unit/mind_bender/", MINDBENDER_COST, PHILOSOPHY, MINDBENDER_POINTS), //+25
         BOAT(8,"img/unit/boat/", BOAT_COST, SAILING, BOAT_POINTS), //+0
-        SHIP(9,"img/unit/ship/", BATTLESHIP_COST, SAILING, SHIP_POINTS),//+0
+        SHIP(9,"img/unit/ship/", SHIP_COST, SAILING, SHIP_POINTS),//+0
         BATTLESHIP(10,"img/unit/battleship/", BATTLESHIP_COST, NAVIGATION, BATTLESHIP_POINTS),//+0
         SUPERUNIT(11, "img/unit/superunit/", SUPERUNIT_COST, null, SUPERUNIT_POINTS); //+50
 
@@ -546,6 +546,11 @@ public class Types {
         public boolean spawnable()
         {
             return !(this == BOAT || this == SHIP || this == BATTLESHIP || this == SUPERUNIT);
+        }
+
+        public boolean isWaterUnit()
+        {
+            return this == BOAT || this == SHIP || this == BATTLESHIP;
         }
 
         public static ArrayList<UNIT> getSpawnableTypes() {
@@ -666,6 +671,7 @@ public class Types {
             return ImageIO.GetInstance().getImage(splitPath[0] + "-" + suffix + "." + splitPath[1]);
         }
 
+
         public static TERRAIN getTypeByKey(int key) {
             for(TERRAIN t : TERRAIN.values()){
                 if(t.key == key)
@@ -673,6 +679,8 @@ public class Types {
             }
             return null;
         }
+
+        public boolean isWater() {return this == SHALLOW_WATER || this == DEEP_WATER;}
 
 
         /**

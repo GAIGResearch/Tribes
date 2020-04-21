@@ -286,8 +286,8 @@ public class GameState {
      */
     public GameState copy(int playerIdx)
     {
-        GameState copy = new GameState(this.rnd); //use this for a 100% repetition of the game based on random seed and game seed.
-//        GameState copy = new GameState(new Random()); //copies of the game state can't have the same random generator.
+//        GameState copy = new GameState(this.rnd); //use this for a 100% repetition of the game based on random seed and game seed.
+        GameState copy = new GameState(new Random()); //copies of the game state can't have the same random generator.
         copy.board = board.copy(playerIdx!=-1, playerIdx);
         copy.tick = this.tick;
         copy.turnMustEnd = turnMustEnd;

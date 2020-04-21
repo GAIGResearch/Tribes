@@ -41,8 +41,8 @@ public class Play {
         KeyController ki = new KeyController(true);
         ActionController ac = new ActionController();
 
-        long seed = 1587462619163L; //System.currentTimeMillis();
-        long randomSeed = 1587462619163L; //System.currentTimeMillis();
+        long seed = System.currentTimeMillis();
+        long randomSeed = System.currentTimeMillis();
         System.out.println("Game seed: " + seed + ", random seed: " + randomSeed);
 
         ArrayList<Agent> players = new ArrayList<>();

@@ -728,6 +728,8 @@ public class Board {
         //Finally, add the unit to the city that created it, unless it belongs to the tribe.
         if(u.getCityId() != -1)
             c.addUnit(u.getActorId());
+        else if(!tribes[u.getTribeId()].getExtraUnits().contains(u.getActorId()))
+            tribes[u.getTribeId()].addExtraUnit(u);
     }
 
     /**
@@ -753,12 +755,6 @@ public class Board {
     private void addActor(core.actors.Actor actor)
     {
         actorIDcounter++;
-
-        if(actorIDcounter == 93)
-        {
-            int a = 0;
-        }
-
         gameActors.put(actorIDcounter, actor);
         actor.setActorId(actorIDcounter);
     }

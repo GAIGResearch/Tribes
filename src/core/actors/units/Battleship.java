@@ -18,10 +18,6 @@ public class Battleship extends Unit
     }
 
     public void setBaseLandUnit(Types.UNIT baseLandUnit) {
-        if(baseLandUnit == Types.UNIT.BOAT)
-        {
-            int a = 0;
-        }
         this.baseLandUnit = baseLandUnit;
     }
 

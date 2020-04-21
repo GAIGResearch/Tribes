@@ -357,7 +357,9 @@ public class Board {
         if (getTerrainAt(xF, yF) == Types.TERRAIN.MOUNTAIN) {
             partialObsRangeClear += 1;
         }
-        t.clearView(xF, yF, partialObsRangeClear, r, this);
+        boolean networkUpdate = t.clearView(xF, yF, partialObsRangeClear, r, this);
+        if(networkUpdate)
+            tradeNetwork.computeTradeNetworkTribe(this, t);
     }
 
     /**
@@ -383,7 +385,9 @@ public class Board {
                     moved = true;
                     currentPos.x = next.x;
                     currentPos.y = next.y;
-                    tribes[tribeId].clearView(currentPos.x, currentPos.y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this.copy());
+                    boolean updateNetwork = tribes[tribeId].clearView(currentPos.x, currentPos.y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this.copy());
+                    if(updateNetwork)
+                        tradeNetwork.computeTradeNetworkTribe(this, tribes[tribeId]);
                 }
 
                 j++;

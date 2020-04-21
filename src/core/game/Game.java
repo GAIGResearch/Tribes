@@ -437,7 +437,7 @@ public class Game {
             //get one action from the player
             Action action = ag.act(gameStateObservations[playerID], ect);
 
-//            System.out.println(gs.getTick() + " " + curActionCounter + " " + action);
+//            System.out.println(gs.getTick() + " " + curActionCounter + " " + action + "; stars: " + gs.getBoard().getTribe(playerID).getStars());
             curActionCounter++;
 
             //note down the remaining time to use it for the next iteration
@@ -517,6 +517,7 @@ public class Game {
             tribe.setScore(tribe.getType().getInitialScore());
             tribe.setStars(TribesConfig.INITIAL_STARS);
         }else{
+            acumProd = Math.max(0, acumProd); //Never have a negative amount of stars.
             tribe.addStars(acumProd);
         }
 

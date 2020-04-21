@@ -427,7 +427,7 @@ public class Types {
         KNIGHT (6,"img/unit/knight/", KNIGHT_COST, CHIVALRY, KNIGHT_POINTS), //+40
         MIND_BENDER(7,"img/unit/mind_bender/", MINDBENDER_COST, PHILOSOPHY, MINDBENDER_POINTS), //+25
         BOAT(8,"img/unit/boat/", BOAT_COST, SAILING, BOAT_POINTS), //+0
-        SHIP(9,"img/unit/ship/", BATTLESHIP_COST, SAILING, SHIP_POINTS),//+0
+        SHIP(9,"img/unit/ship/", SHIP_COST, SAILING, SHIP_POINTS),//+0
         BATTLESHIP(10,"img/unit/battleship/", BATTLESHIP_COST, NAVIGATION, BATTLESHIP_POINTS),//+0
         SUPERUNIT(11, "img/unit/superunit/", SUPERUNIT_COST, null, SUPERUNIT_POINTS); //+50
 

@@ -245,6 +245,24 @@ public class GameState {
     }
 
     /**
+     * Advances the game state applying a single action received.
+     * It may also compute the actions available for the next step.
+     * @param action to be executed in the current game state.
+     * @param computeActions true if actions available after action has been executed should be computed.
+     */
+    public void next(Action action, boolean computeActions)
+    {
+        if(action != null)
+        {
+            action.execute(this);
+            computedActionTribeIdFlag = -1;
+
+            if(computeActions)
+                this.computePlayerActions(getTribe(board.getActiveTribeID()));
+        }
+    }
+
+    /**
      * Pushes a unit following the game rules. If the unit can't be pushed, destroys it.
      * @param toPush unit to push
      * @param startX initial x position

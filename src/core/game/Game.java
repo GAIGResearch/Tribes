@@ -174,7 +174,6 @@ public class Game {
         }
 
         terminate();
-        terminate();
     }
 
     /**

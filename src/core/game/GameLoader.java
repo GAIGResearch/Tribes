@@ -7,16 +7,11 @@ import core.actors.units.Battleship;
 import core.actors.units.Boat;
 import core.actors.units.Ship;
 import core.actors.units.Unit;
-import jdk.nashorn.internal.parser.JSONParser;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import utils.Vector2d;
 
-import java.awt.*;
 import java.io.*;
-import java.net.URL;
 import java.util.Iterator;
-import java.util.Random;
 
 public class GameLoader
 {
@@ -32,7 +27,6 @@ public class GameLoader
 
     private Board board;
     private Tribe[] tribes;
-    private City[] cities;
 
     public GameLoader(String fileName) {
 
@@ -56,6 +50,8 @@ public class GameLoader
         loadBoard();
 
         loadUnits();
+
+        loadCities();
 
     }
 
@@ -92,6 +88,16 @@ public class GameLoader
                 ((Battleship)unit).setBaseLandUnit(Types.UNIT.getTypeByKey(unitINFO.getInt("baseLandType")));
             }
             board.addActor(unit, Integer.parseInt(key));
+        }
+    }
+
+    private void loadCities(){
+        Iterator<String> keys = JCity.keys();
+        while (keys.hasNext()){
+            String key = keys.next();
+            JSONObject cityINFO = JCity.getJSONObject(key);
+            City city = new City(cityINFO, Integer.parseInt(key));
+            board.addActor(city, Integer.parseInt(key));
         }
     }
 
@@ -132,7 +138,4 @@ public class GameLoader
         return tribes;
     }
 
-    public City[] getCities() {
-        return cities;
-    }
 }

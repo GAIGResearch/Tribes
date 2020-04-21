@@ -207,7 +207,7 @@ public class Game {
             saveGame();
 
 
-            GameLoader gl = new GameLoader("save/" + this.seed + "/0_0/game.json");
+            GameLoader gl = new GameLoader("save/" + this.seed + "/"+ gs.getTick() + "_" + gs.getActiveTribeID() +"/game.json");
 
             //it may be that this player won the game, no more playing.
             if(isEnded())
@@ -334,7 +334,6 @@ public class Game {
                                 bInfo.put("x", b.position.x);
                                 bInfo.put("y", b.position.y);
                                 bInfo.put("type", b.type.getKey());
-                                bInfo.put("bonus", b.getBonus());
                                 if (b.type == Types.BUILDING.TEMPLE || b.type == Types.BUILDING.WATER_TEMPLE || b.type == Types.BUILDING.FOREST_TEMPLE) {
                                     Temple t = (Temple) b;
                                     bInfo.put("level", t.getLevel());
@@ -344,6 +343,7 @@ public class Game {
                             }
                         }
                         cInfo.put("buildings", buildingList);
+                        cInfo.put("units", c.getUnitsID());
                         city.put(String.valueOf(cityINFO), cInfo);
                     }
 

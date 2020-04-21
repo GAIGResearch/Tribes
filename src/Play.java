@@ -7,6 +7,7 @@ import players.osla.OneStepLookAheadAgent;
 
 import java.util.ArrayList;
 
+import static core.Types.GAME_MODE.CAPITALS;
 import static core.Types.TRIBE.*;
 import static core.Types.TRIBE.OUMAJI;
 
@@ -23,20 +24,23 @@ public class Play {
     }
 
     public static void main(String[] args) {
-        String filename = "SampleLevel2p.csv";
-//        String filename = "SampleLevel.csv";
+
+        Types.GAME_MODE gameMode = CAPITALS;
+
+//        String filename = "SampleLevel2p.csv";
+        String filename = "SampleLevel.csv";
 //        String filename = "MinimalLevel.csv";
 //        String filename = "MinimalLevel_water.csv";
 //        String filename = "MinimalLevel2.csv";
 
-//        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI});
-//        play(filename, new PlayerType[]{PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI});
-//        play(filename, new PlayerType[]{PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI});
-        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI});
-//        play(filename, new PlayerType[]{PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI});
+        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
+//        play(filename, new PlayerType[]{PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
+//        play(filename, new PlayerType[]{PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI}, gameMode);
+//        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode);
+//        play(filename, new PlayerType[]{PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
     }
 
-    private static void play(String filename, PlayerType[] playerTypes, Types.TRIBE[] tribes)
+    private static void play(String filename, PlayerType[] playerTypes, Types.TRIBE[] tribes, Types.GAME_MODE gameMode)
     {
         KeyController ki = new KeyController(true);
         ActionController ac = new ActionController();
@@ -57,10 +61,17 @@ public class Play {
         }
 
         Game game = new Game();
-        game.init(players, tribes_list, filename, seed);
+        game.init(players, tribes_list, filename, seed, gameMode);
 
         Run.runGame(game, ki, ac);
-        System.out.println("Running Tribes...");
+
+        Types.RESULT[] results = game.getWinnerStatus();
+        int[] scores = game.getScores();
+        System.out.println("Tribes game over.");
+        for(int i = 0; i < playerTypes.length; ++i)
+        {
+            System.out.println("Tribe " + i + " (" + tribes[i] + "): " + results[i] + ", " + scores[i] + " points.");
+        }
     }
 
     private static Agent getAgent(PlayerType playerType, long randomSeed, ActionController ac)

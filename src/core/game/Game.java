@@ -3,7 +3,6 @@ package core.game;
 import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
-import core.actions.unitactions.Convert;
 import core.actions.unitactions.Recover;
 import core.actions.unitactions.factory.RecoverFactory;
 import core.actors.Building;
@@ -69,13 +68,14 @@ public class Game {
      * @param tribes Tribes to play the game with. Players and tribes related by position in array lists.
      * @param filename Name of the file with the level information.
      * @param seed Seed for the game (used only for board generation)
+     * @param gameMode Game Mode for this game.
      */
-    public void init(ArrayList<Agent> players, ArrayList<Tribe> tribes, String filename, long seed) {
+    public void init(ArrayList<Agent> players, ArrayList<Tribe> tribes, String filename, long seed, Types.GAME_MODE gameMode) {
 
         //Initiate the bare bones of the main game classes
         this.seed = seed;
         this.rnd = new Random(seed);
-        this.gs = new GameState(rnd);
+        this.gs = new GameState(rnd, gameMode);
 
         if(players.size() != tribes.size())
         {
@@ -147,43 +147,31 @@ public class Game {
      * Runs a game once. Receives frame and window input. If any is null, forces a run with no visuals.
      * @param frame window to draw the game
      * @param wi input for the window.
-     * @return the results of the game, per player.
      */
-    public Types.RESULT[] run(GUI frame, WindowInput wi)
+    public void run(GUI frame, WindowInput wi)
     {
         if (frame == null || wi == null)
             VISUALS = false;
-
         boolean firstEnd = true;
-        Types.RESULT[] results = null;
 
-        while(!isEnded() || VISUALS && wi != null && !wi.windowClosed && !isEnded()) {
+        while(!gameOver()) {
+            // Loop while window is still open, even if the game ended.
+            // If not playing with visuals, loop while the game's not ended.
+            tick(frame);
 
             // Check end of game
-            if (firstEnd && isEnded()) {
+            if (firstEnd && gameOver()) {
                 firstEnd = false;
-                results = terminate();
 
                 if (!VISUALS) {
                     // The game has ended, end the loop if we're running without visuals.
                     break;
                 }
             }
-
-//            System.out.println(gs.getTick());
-
-            // Loop while window is still open, even if the game ended.
-            // If not playing with visuals, loop while the game's not ended.
-            tick(frame);
-
         }
 
-        // The loop may have been broken out of before the game ended. Handle end-of-game:
-        if (firstEnd) {
-            results = terminate();
-        }
-
-        return results;
+        terminate();
+        terminate();
     }
 
     /**
@@ -205,7 +193,7 @@ public class Game {
             saveGame();
 
             //it may be that this player won the game, no more playing.
-            if(isEnded())
+            if(gameOver())
             {
                 return;
             }
@@ -578,27 +566,48 @@ public class Game {
     }
 
     /**
-     * This method terminates the game, assigning the winner/result state to all players.
-     * @return an array of result states for all players.
+     * This method call all agents' end-of-game method for post-processing.
+     * Agents receive their final game state and reward
      */
     @SuppressWarnings("UnusedReturnValue")
-    private Types.RESULT[] terminate() {
+    private void terminate() {
 
+        Tribe[] tribes = gs.getTribes();
+        for (int i = 0; i < numPlayers; i++) {
+            Agent ag = players[i];
+            ag.result(gs.copy(), tribes[i].getScore());
+        }
+    }
+
+    /**
+     * Returns the winning status of all players.
+     * @return the winning status of all players.
+     */
+    public Types.RESULT[] getWinnerStatus()
+    {
         //Build the results array
         Tribe[] tribes = gs.getTribes();
         Types.RESULT[] results = new Types.RESULT[numPlayers];
         for (int i = 0; i < numPlayers; i++) {
-            Tribe tribe = (Tribe) tribes[i];
+            Tribe tribe = tribes[i];
             results[i] = tribe.getWinner();
         }
-
-        // Call all agents' end-of-game method for post-processing. Agents receive their final reward.
-        for (int i = 0; i < numPlayers; i++) {
-            Agent ag = players[i];
-            ag.result(tribes[i].getScore());
-        }
-
         return results;
+    }
+
+    /**
+     * Returns the current scores of all players.
+     * @return the current scores of all players.
+     */
+    public int[] getScores()
+    {
+        //Build the results array
+        Tribe[] tribes = gs.getTribes();
+        int[] scores = new int[numPlayers];
+        for (int i = 0; i < numPlayers; i++) {
+            scores[i] = tribes[i].getScore();
+        }
+        return scores;
     }
 
     /**
@@ -636,14 +645,12 @@ public class Game {
     }
 
     /**
-     * Method to identify the end of the game.
+     * Method to identify the end of the game. If the game is over, the winner is decided.
+     * The winner of a game is determined by TribesConfig.GAME_MODE and TribesConfig.MAX_TURNS
      * @return true if the game has ended, false otherwise.
      */
-    boolean isEnded() {
-
-        //TODO: Analyze the game state to find out if the game is over.
-
-        return false;
+    boolean gameOver() {
+        return gs.gameOver();
     }
 
 }

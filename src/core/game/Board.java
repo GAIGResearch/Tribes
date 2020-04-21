@@ -7,6 +7,8 @@ import core.actors.Actor;
 import core.actors.City;
 import core.actors.Tribe;
 import core.actors.units.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import utils.Vector2d;
 import utils.graph.*;
 
@@ -59,6 +61,56 @@ public class Board {
     public Board() {
         this.gameActors = new HashMap<>();
     }
+
+    public Board(JSONObject JBoard){
+        this.gameActors = new HashMap<>();
+        JSONArray JResource = JBoard.getJSONArray("resource");
+        JSONArray JTerrain = JBoard.getJSONArray("terrain");
+        JSONArray JUnit = JBoard.getJSONArray("unitID");
+        JSONArray JCityID = JBoard.getJSONArray("cityID");
+        JSONArray JNetwork = JBoard.getJSONArray("network");
+        JSONArray JBuilding = JBoard.getJSONArray("building");
+
+        size = JResource.length();
+        terrains = new Types.TERRAIN[size][size];
+        resources = new Types.RESOURCE[size][size];
+        buildings = new Types.BUILDING[size][size];
+        units = new int[size][size];
+        tileCityId = new int[size][size];
+        boolean[][] networkTiles = new boolean[size][size];
+        for (int i=0; i<size; i++){
+            JSONArray resourceItem = JResource.getJSONArray(i);
+            JSONArray terrainItem = JTerrain.getJSONArray(i);
+            JSONArray unitIDItem = JUnit.getJSONArray(i);
+            JSONArray cityIDItem = JCityID.getJSONArray(i);
+            JSONArray networkItem = JNetwork.getJSONArray(i);
+            JSONArray buildingItem = JBuilding.getJSONArray(i);
+            for (int j=0; j<size; j++){
+                terrains[i][j] = Types.TERRAIN.getTypeByKey(terrainItem.getInt(j));
+                if (resourceItem.getInt(j) != -1) {
+                    resources[i][j] = Types.RESOURCE.getTypeByKey(resourceItem.getInt(j));
+                }
+                units[i][j] = unitIDItem.getInt(j);
+                tileCityId[i][j] = cityIDItem.getInt(j);
+                networkTiles[i][j] = networkItem.getBoolean(j);
+                if(buildingItem.getInt(j) != -1) {
+                    buildings[i][j] = Types.BUILDING.getTypeByKey(buildingItem.getInt(j));
+                }
+            }
+
+        }
+
+        tradeNetwork = new TradeNetwork(size, networkTiles);
+
+//        TODO: testing
+//        System.out.println(Arrays.deepToString(terrains));
+//        System.out.println(Arrays.deepToString(resources));
+//        System.out.println(Arrays.deepToString(buildings));
+//        System.out.println(Arrays.deepToString(units));
+//        System.out.println(Arrays.deepToString(tileCityId));
+//        System.out.println(tradeNetwork);
+    }
+
 
     /**
      * Inits the board given its size and array of playing tribes. Initializes all the data structures for the board
@@ -779,6 +831,13 @@ public class Board {
         actorIDcounter++;
         gameActors.put(actorIDcounter, actor);
         actor.setActorId(actorIDcounter);
+    }
+
+    public void addActor(core.actors.Actor actor, int actorID)
+    {
+        actorIDcounter++;
+        gameActors.put(actorID, actor);
+        actor.setActorId(actorID);
     }
 
     /**

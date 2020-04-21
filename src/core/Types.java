@@ -3,6 +3,7 @@ package core;
 import core.actions.Action;
 import core.actions.unitactions.*;
 import core.actors.units.*;
+import org.json.JSONObject;
 import utils.ImageIO;
 import utils.Vector2d;
 
@@ -94,6 +95,15 @@ public class Types {
             this.color_light = color_light;
             this.color_dark = color_dark;
         }
+
+        public static TRIBE getTypeByKey(int key) {
+            for(TRIBE t : Types.TRIBE.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
+        }
+
         public int getKey() {  return key; }
         public String getName() { return name; }
         public TECHNOLOGY getInitialTech() {
@@ -169,6 +179,15 @@ public class Types {
             return null;
         }
 
+        public static RESOURCE getTypeByKey(int key) {
+            for(RESOURCE t : RESOURCE.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
+        }
+
+
         public TECHNOLOGY getTechnologyRequirement() {
             return tech;
         }
@@ -236,6 +255,14 @@ public class Types {
 
             public int getKey() {
                 return key;
+            }
+
+            public static MONUMENT_STATUS getTypeByKey(int key) {
+                for(MONUMENT_STATUS t : Types.BUILDING.MONUMENT_STATUS.values()){
+                    if(t.key == key)
+                        return t;
+                }
+                return null;
             }
         }
 
@@ -321,6 +348,25 @@ public class Types {
             monuments.put(TOWER_OF_WISDOM, UNAVAILABLE);
             monuments.put(GRAND_BAZAR, UNAVAILABLE);
             return monuments;
+        }
+
+        public static HashMap<BUILDING, MONUMENT_STATUS> initMonuments(JSONObject JMonuments)
+        {
+            HashMap<BUILDING, MONUMENT_STATUS> monuments = new HashMap<>();
+            Iterator<String> keys = JMonuments.keys();
+            while (keys.hasNext()){
+                String key = keys.next();
+                monuments.put(BUILDING.getTypeByKey(Integer.parseInt(key)), BUILDING.MONUMENT_STATUS.getTypeByKey(JMonuments.getInt(key)));
+            }
+            return monuments;
+        }
+
+        public static BUILDING getTypeByKey(int key) {
+            for(BUILDING t : Types.BUILDING.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
         }
     }
 
@@ -496,6 +542,7 @@ public class Types {
             return null;
         }
 
+
         public boolean spawnable()
         {
             return !(this == BOAT || this == SHIP || this == BATTLESHIP || this == SUPERUNIT);
@@ -515,6 +562,15 @@ public class Types {
             }
             return units;
         }
+
+        public static UNIT getTypeByKey(int key) {
+            for(UNIT t : UNIT.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
+        }
+
     }
 
 
@@ -582,6 +638,14 @@ public class Types {
             if (key == LOSS.key) return Color.red;
             return null;
         }
+
+        public static RESULT getTypeByKey(int key) {
+            for(RESULT t : RESULT.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
+        }
     }
 
     /**
@@ -622,6 +686,15 @@ public class Types {
             }
             String[] splitPath = imageFile.split("\\.");
             return ImageIO.GetInstance().getImage(splitPath[0] + "-" + suffix + "." + splitPath[1]);
+        }
+
+
+        public static TERRAIN getTypeByKey(int key) {
+            for(TERRAIN t : TERRAIN.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
         }
 
         public boolean isWater() {return this == SHALLOW_WATER || this == DEEP_WATER;}

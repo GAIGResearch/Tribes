@@ -133,9 +133,10 @@ public class Tribe extends Actor {
         return tribeCopy;
     }
 
-    public void clearView(int x, int y, int range, Random r, Board b) {
+    public boolean clearView(int x, int y, int range, Random r, Board b) {
         int size = obsGrid.length;
         Vector2d center = new Vector2d(x, y);
+        boolean requiresNetworkUpdate = false;
 
         LinkedList<Vector2d> tiles = center.neighborhood(range, 0, size);
         tiles.add(center);
@@ -143,10 +144,17 @@ public class Tribe extends Actor {
         for(Vector2d tile : tiles)
         {
             if (!obsGrid[tile.x][tile.y]) {
+                //Points and visibility.
                 obsGrid[tile.x][tile.y] = true;
                 this.score += TribesConfig.CLEAR_VIEW_POINTS;
+
+                //Network updates for this tribe, only if a road or a water tile has been revealed.
+                Types.TERRAIN terr = b.getTerrainAt(tile.x, tile.y);
+                if(b.isRoad(tile.x, tile.y) || ((terr != null) && terr.isWater()))
+                    requiresNetworkUpdate = true;
             }
 
+            //Meeting other tribes
             Unit u = b.getUnitAt(tile.x,tile.y);
             City c = b.getCityInBorders(tile.x,tile.y);
 
@@ -165,21 +173,22 @@ public class Tribe extends Actor {
                     meetTribe(r,b.getTribes(),this.tribeId);
                 }
             }
-
         }
 
         //We may be clearing the last tiles of the board, which grants a monument
         if(monuments.get(EYE_OF_GOD) == MONUMENT_STATUS.UNAVAILABLE)
         {
-            for(int i = 0; i < obsGrid.length; ++i)
-                for(int j = 0; j < obsGrid[0].length; ++j)
-                {
-                    if(!obsGrid[i][j]) return;
+            for (boolean[] booleans : obsGrid)
+                for (int j = 0; j < obsGrid[0].length; ++j) {
+                    if (!booleans[j]) //end and out
+                        return requiresNetworkUpdate;
                 }
 
             //All clear and we couldn't buy monument before. Now we can.
             monuments.put(EYE_OF_GOD, MONUMENT_STATUS.AVAILABLE);
         }
+
+        return requiresNetworkUpdate;
     }
 
 

@@ -599,6 +599,23 @@ public class Types {
         public int y() {return y;}
     }
 
+    /**
+     *  Game Mode to be played
+     */
+    public enum GAME_MODE {
+        CAPITALS(0),
+        SCORE(1);
+
+        private int key;
+        GAME_MODE(int numVal) { this.key = numVal; }
+        public int getKey() { return this.key; }
+
+        public int getMaxTurns() {
+            if (this == CAPITALS)
+                return Integer.MAX_VALUE;
+            else return TribesConfig.MAX_TURNS;
+        }
+    }
 
     /**
      * Results of the game.

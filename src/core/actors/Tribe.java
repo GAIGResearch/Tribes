@@ -291,6 +291,10 @@ public class Tribe extends Actor {
         return winner;
     }
 
+    public void setWinner(Types.RESULT winner) {
+        this.winner = winner;
+    }
+
     public int getScore() {
         return score;
     }

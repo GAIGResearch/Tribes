@@ -33,6 +33,9 @@ public class Board {
     // Array for tribes
     private Tribe[] tribes;
 
+    // Array for capital IDs
+    private int[] capitalIDs;
+
     // Array for id of the city that owns each tile. -1 if no city owns the tile.
     private int[][] tileCityId;
 
@@ -117,6 +120,7 @@ public class Board {
     void init(int size, Tribe[] tribes) {
 
         this.size = size;
+        this.capitalIDs = new int[tribes.length];
         terrains = new Types.TERRAIN[size][size];
         resources = new Types.RESOURCE[size][size];
         buildings = new Types.BUILDING[size][size];
@@ -165,6 +169,10 @@ public class Board {
         copyBoard.actorIDcounter = actorIDcounter;
         copyBoard.tradeNetwork = new TradeNetwork(size);
         copyBoard.isNative = false;
+        copyBoard.capitalIDs = new int[tribes.length];
+
+        //copy capital IDs
+        System.arraycopy(capitalIDs, 0, copyBoard.capitalIDs, 0, tribes.length);
 
         // Copy board objects (they are all ids)
         for (int x = 0; x < this.size; x++) {
@@ -736,6 +744,16 @@ public class Board {
         removedUnit.setCityId(targetCity.getActorId());
     }
 
+    /**
+     * Sets a capitalId for the given tribe.
+     * @param tribeId id of the tribe to set the capital
+     * @param capitalId id of the capital city to set.
+     */
+    void setCapitalId(int tribeId, int capitalId)
+    {
+        tribes[tribeId].setCapitalID(capitalId);
+        capitalIDs[tribeId] = capitalId;
+    }
 
     /**
      * Adds a city to a tribe
@@ -745,7 +763,7 @@ public class Board {
     {
         addActor(c);
         if (c.isCapital()){
-            tribes[c.getTribeId()].setCapitalID(c.getActorId());
+            setCapitalId(c.getTribeId(), c.getActorId());
         }
         tribes[c.getTribeId()].addCity(c.getActorId());
 
@@ -961,5 +979,6 @@ public class Board {
     public Types.BUILDING getBuildingAt(int x, int y){ return buildings[x][y]; }
     public void setUnits(int[][] u){ this.units = u; }
     public int getCityIdAt(int x, int y) { return tileCityId[x][y]; }
+    public int[] getCapitalIDs() {return capitalIDs;}
     boolean isNative() { return isNative; }
 }

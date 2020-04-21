@@ -295,6 +295,7 @@ public class Board {
         Vector2d newPos = new Vector2d(x, y);
         Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), Types.UNIT.BOAT);
         boat.setCurrentHP(unit.getCurrentHP());
+        boat.setMaxHP(unit.getMaxHP());
         ((Boat)boat).setBaseLandUnit(unit.getType());
         addUnit(city, boat);
     }
@@ -333,6 +334,7 @@ public class Board {
         Vector2d newPos = new Vector2d(x, y);
         Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), baseLandUnit);
         newUnit.setCurrentHP(unit.getCurrentHP());
+        newUnit.setMaxHP(unit.getMaxHP());
         addUnit(city, newUnit);
     }
 
@@ -726,6 +728,8 @@ public class Board {
         //Finally, add the unit to the city that created it, unless it belongs to the tribe.
         if(u.getCityId() != -1)
             c.addUnit(u.getActorId());
+        else if(!tribes[u.getTribeId()].getExtraUnits().contains(u.getActorId()))
+            tribes[u.getTribeId()].addExtraUnit(u);
     }
 
     /**

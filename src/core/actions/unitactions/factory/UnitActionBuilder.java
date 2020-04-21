@@ -1,9 +1,9 @@
 package core.actions.unitactions.factory;
 
 import core.actions.Action;
-import core.actions.unitactions.factory.*;
-import core.actors.units.Unit;
+import core.actors.units.*;
 import core.game.GameState;
+import core.Types;
 
 import java.util.ArrayList;
 
@@ -20,7 +20,6 @@ public class UnitActionBuilder
                     ") does not control (" + unit.getTribeId() + ").");
             return allActions;
         }
-
 
         if(unit.isFinished())
             return allActions;

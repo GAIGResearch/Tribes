@@ -5,6 +5,7 @@ import core.Types;
 import core.actions.Action;
 import core.actors.City;
 import core.actors.Tribe;
+import core.actors.units.Battleship;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
@@ -49,13 +50,27 @@ public class Examine extends UnitAction
             switch (bonus) {
                 case SUPERUNIT:
                     Board board = gs.getBoard();
-                    Vector2d cityPos = gs.getActor(capital).getPosition();
-                    Unit unitInCity = board.getUnitAt(cityPos.x, cityPos.y);
-                    if(unitInCity != null)
-                        gs.pushUnit(unitInCity, cityPos.x, cityPos.y);
 
-                    Unit superUnit = Types.UNIT.createUnit(cityPos, 0, false, capital, unit.getTribeId(), Types.UNIT.SUPERUNIT);
-                    board.addUnit((City)gs.getActor(capital), superUnit);
+                    Types.TERRAIN terr = board.getTerrainAt(unit.getPosition().x, unit.getPosition().y);
+                    Unit newUnit;
+                    Vector2d spawnPos;
+                    if(terr.isWater())
+                    {
+                        //instead of a super unit, in the water we create a Battleship of out a warrior
+                        spawnPos = unit.getPosition().copy();
+                        newUnit = Types.UNIT.createUnit(spawnPos, 0, false, -1, unit.getTribeId(), Types.UNIT.BATTLESHIP);
+                        ((Battleship)newUnit).setBaseLandUnit(Types.UNIT.WARRIOR);
+                    }
+                    else
+                    {
+                        spawnPos = gs.getActor(capital).getPosition().copy();
+                        newUnit = Types.UNIT.createUnit(spawnPos, 0, false, capital, unit.getTribeId(), Types.UNIT.SUPERUNIT);
+                    }
+
+                    Unit unitInCity = board.getUnitAt(spawnPos.x, spawnPos.y);
+                    if(unitInCity != null)
+                        gs.pushUnit(unitInCity, spawnPos.x, spawnPos.y);
+                    board.addUnit((City)gs.getActor(capital), newUnit);
                     break;
 
                 case RESEARCH:
@@ -68,7 +83,7 @@ public class Examine extends UnitAction
                     break;
 
                 case EXPLORER:
-                    cityPos = gs.getActor(capital).getPosition();
+                    Vector2d cityPos = gs.getActor(capital).getPosition().copy();
                     gs.getBoard().launchExplorer(cityPos.x, cityPos.y, unit.getTribeId(), rnd);
                     break;
 

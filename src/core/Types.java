@@ -501,6 +501,11 @@ public class Types {
             return !(this == BOAT || this == SHIP || this == BATTLESHIP || this == SUPERUNIT);
         }
 
+        public boolean isWaterUnit()
+        {
+            return this == BOAT || this == SHIP || this == BATTLESHIP;
+        }
+
         public static ArrayList<UNIT> getSpawnableTypes() {
             ArrayList<UNIT> units = new ArrayList<>();
             for (UNIT u: UNIT.values()) {
@@ -601,6 +606,8 @@ public class Types {
             String[] splitPath = imageFile.split("\\.");
             return ImageIO.GetInstance().getImage(splitPath[0] + "-" + suffix + "." + splitPath[1]);
         }
+
+        public boolean isWater() {return this == SHALLOW_WATER || this == DEEP_WATER;}
 
 
         /**

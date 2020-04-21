@@ -1,9 +1,9 @@
 package core.actions.unitactions.factory;
 
 import core.actions.Action;
-import core.actions.unitactions.factory.*;
-import core.actors.units.Unit;
+import core.actors.units.*;
 import core.game.GameState;
+import core.Types;
 
 import java.util.ArrayList;
 
@@ -19,6 +19,13 @@ public class UnitActionBuilder
             System.out.println("ERROR: creating actions for unit " + unit.getActorId() + " that the current tribe (" + gs.getActiveTribeID() +
                     ") does not control (" + unit.getTribeId() + ").");
             return allActions;
+        }
+
+        if(unit.getType().isWaterUnit())
+        {
+            Types.UNIT baseType = (unit instanceof Boat) ? ((Boat)unit).getBaseLandUnit() :
+                    ((unit instanceof Ship) ? ((Ship)unit).getBaseLandUnit() : ((Battleship)unit).getBaseLandUnit());
+            System.out.println(gs.getTick() + "; water unit " + unit.getActorId() + " with base unit: " + baseType);
         }
 
 

@@ -7,14 +7,13 @@ import core.actors.units.Unit;
 import core.game.Board;
 import core.game.Game;
 import core.game.GameState;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import utils.Vector2d;
 import utils.graph.PathNode;
 import utils.graph.Pathfinder;
-import java.util.ArrayList;
 
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 import static core.Types.BUILDING.*;
 
@@ -74,6 +73,48 @@ public class Tribe extends Actor {
         citiesID.add(cityID);
         this.tribe = tribe;
         init();
+    }
+
+    public Tribe(int id, JSONObject obj){
+        tribeId = id;
+        citiesID = new ArrayList<>();
+        JSONArray JCitiesID = obj.getJSONArray("citiesID");
+        for (int i=0; i<JCitiesID.length(); i++){
+            citiesID.add(JCitiesID.getInt(i));
+        }
+        this.tribe = Types.TRIBE.getTypeByKey(obj.getInt("type"));
+        this.nKills = obj.getInt("nKills");
+        JSONArray JTribesMet = obj.getJSONArray("tribesMet");
+        tribesMet = new ArrayList<>();
+        for (int i=0; i<JTribesMet.length(); i++){
+            tribesMet.add(JTribesMet.getInt(i));
+        }
+        this.capitalID = obj.getInt("capitalID");
+        JSONArray JObsGrids = obj.getJSONArray("obsGrid");
+        initObsGrid(JObsGrids.length());
+        for (int i=0; i<JObsGrids.length(); i++){
+            JSONArray JObsGrid = JObsGrids.getJSONArray(i);
+            for (int j=0; j<JObsGrid.length(); j++){
+                obsGrid[i][j] = JObsGrid.getBoolean(j);
+            }
+        }
+        stars = obj.getInt("star");
+        monuments = Types.BUILDING.initMonuments(obj.getJSONObject("monuments"));
+        nPacifistCount = obj.getInt("nPacifistCount");
+        techTree = new TechnologyTree(obj.getJSONObject("technology"));
+        connectedCities = new ArrayList<>();
+        JSONArray JConnectedCities = obj.getJSONArray("connectedCities");
+        for (int i=0; i<JConnectedCities.length(); i++){
+            connectedCities.add(JConnectedCities.getInt(i));
+        }
+        score = obj.getInt("score");
+        winner = Types.RESULT.getTypeByKey(obj.getInt("winner"));
+        extraUnits = new ArrayList<>();
+        JSONArray JExtraUnits = obj.getJSONArray("extraUnits");
+        for (int i=0; i<JExtraUnits.length(); i++){
+            extraUnits.add(JExtraUnits.getInt(i));
+        }
+
     }
 
     private void init() {

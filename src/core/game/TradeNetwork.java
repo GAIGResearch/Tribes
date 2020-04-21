@@ -29,6 +29,11 @@ class TradeNetwork
         this.networkTiles = new boolean[size][size];
     }
 
+    TradeNetwork(int size, boolean[][] networkTiles){
+        this.size = size;
+        this.networkTiles = networkTiles;
+    }
+
     /**
      * Sets an element of the trade network to true or false, recomputes the network
      * @param board Board of the game

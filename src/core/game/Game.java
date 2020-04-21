@@ -10,6 +10,9 @@ import core.actors.Building;
 import core.actors.City;
 import core.actors.Temple;
 import core.actors.Tribe;
+import core.actors.units.Battleship;
+import core.actors.units.Boat;
+import core.actors.units.Ship;
 import core.actors.units.Unit;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -204,6 +207,9 @@ public class Game {
             // Save Game
             saveGame();
 
+
+            GameLoader gl = new GameLoader("save/" + this.seed + "/"+ gs.getTick() + "_" + gs.getActiveTribeID() +"/game.json");
+
             //it may be that this player won the game, no more playing.
             if(isEnded())
             {
@@ -246,6 +252,9 @@ public class Game {
             JSONArray city2D = new JSONArray();
             JSONArray cities;
 
+            JSONArray building2D = new JSONArray();
+            JSONArray JBuildings;
+
             JSONArray network2D = new JSONArray();
             JSONArray networks;
 
@@ -267,6 +276,7 @@ public class Game {
                 units = new JSONArray();
                 cities = new JSONArray();
                 networks = new JSONArray();
+                JBuildings = new JSONArray();
 
                 for(int j=0; j<getBoard().getSize(); j++){
                     // Save Terrain INFO
@@ -281,6 +291,13 @@ public class Game {
                         Unit u = (Unit)gs.getActor(unitINFO);
                         JSONObject uInfo = new JSONObject();
                         uInfo.put("type", u.getType().getKey());
+                        if (u.getType() == Types.UNIT.BOAT){
+                            uInfo.put("baseLandType", ((Boat)u).getBaseLandUnit().getKey());
+                        }else if (u.getType() == Types.UNIT.SHIP){
+                            uInfo.put("baseLandType", ((Ship)u).getBaseLandUnit().getKey());
+                        }else if (u.getType() == Types.UNIT.BATTLESHIP){
+                            uInfo.put("baseLandType", ((Battleship)u).getBaseLandUnit().getKey());
+                        }
                         uInfo.put("x", i);
                         uInfo.put("y", j);
                         uInfo.put("kill", u.getKills());
@@ -318,7 +335,6 @@ public class Game {
                                 bInfo.put("x", b.position.x);
                                 bInfo.put("y", b.position.y);
                                 bInfo.put("type", b.type.getKey());
-                                bInfo.put("bonus", b.getBonus());
                                 if (b.type == Types.BUILDING.TEMPLE || b.type == Types.BUILDING.WATER_TEMPLE || b.type == Types.BUILDING.FOREST_TEMPLE) {
                                     Temple t = (Temple) b;
                                     bInfo.put("level", t.getLevel());
@@ -328,8 +344,12 @@ public class Game {
                             }
                         }
                         cInfo.put("buildings", buildingList);
-                        city.put(String.valueOf(unitINFO), cInfo);
+                        cInfo.put("units", c.getUnitsID());
+                        city.put(String.valueOf(cityINFO), cInfo);
                     }
+
+                    // Save Building INFO
+                    JBuildings.put(gs.getBoard().getBuildingAt(i, j)!= null? gs.getBoard().getBuildingAt(i, j).getKey():-1);
 
                     // Save network INFO
                     networks.put(gs.getBoard().getNetworkTilesAt(i, j));
@@ -341,6 +361,7 @@ public class Game {
                 unit2D.put(units);
                 city2D.put(cities);
                 network2D.put(networks);
+                building2D.put(JBuildings);
             }
 
             board.put("terrain", terrain2D);
@@ -348,6 +369,7 @@ public class Game {
             board.put("unitID", unit2D);
             board.put("cityID", city2D);
             board.put("network", network2D);
+            board.put("building", building2D);
 
             game.put("board", board);
             game.put("unit", unit);
@@ -395,22 +417,16 @@ public class Game {
             game.put("tick", gs.getTick());
             game.put("activeTribeID", gs.getActiveTribeID());
 
-
-//            JSONObject read = new JSONObject(game.toString());
-//            System.out.println(read.get("board"));
-//            System.out.println(read.get("board"));
-//
-//            JSONObject board_read = read.getJSONObject("board");
-//            System.out.println(board_read.get("resource"));
-
             FileWriter fw_game = new FileWriter(turnFile.getPath() + "/game.json");
-            fw_game.write(game.toString());
+            fw_game.write(game.toString(4));
             fw_game.close();
 
         } catch (IOException e){
             e.printStackTrace();
         }
     }
+
+
 
     /**
      * Process a turn for a given player. It queries the player for an action until no more

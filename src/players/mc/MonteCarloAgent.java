@@ -53,7 +53,7 @@ public class MonteCarloAgent extends Agent {
 
             double score = rollout(gs, act);
 
-            System.out.println("Rollout " + i + " scores " + score);
+            //System.out.println("Rollout " + i + " scores " + score);
 
             scores[rootActionIndex].add(score);
 
@@ -64,7 +64,7 @@ public class MonteCarloAgent extends Agent {
             }
         }
 
-        System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + allActions.size() + ". Executing " + bestAction);
+        //System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + allActions.size() + ". Executing " + bestAction);
 
         return bestAction;
     }
@@ -83,7 +83,7 @@ public class MonteCarloAgent extends Agent {
             end = (step == ROLLOUT_LENGTH);
             if(!end)
             {
-                ArrayList<Action> allActions = gs.getAllAvailableActions();
+                ArrayList<Action> allActions = gsCopy.getAllAvailableActions();
                 int numActions = allActions.size();
                 act = allActions.get(m_rnd.nextInt(numActions));
                 if(act instanceof EndTurn)

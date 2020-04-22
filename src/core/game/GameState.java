@@ -21,6 +21,9 @@ import java.util.Random;
 
 public class GameState {
 
+    //Game mode
+    private Types.GAME_MODE gameMode;
+
     // Random generator for the game state.
     private Random rnd;
 
@@ -41,6 +44,7 @@ public class GameState {
     //Flags the state to indicate that the turn must end
     private boolean turnMustEnd;
 
+
     /**
      * This variable indicates if the computed actions in this class are updated.
      * It will take the value of the tribeId for which the actions are computed, and -1 if they are
@@ -52,8 +56,9 @@ public class GameState {
     private boolean levelingUp;
 
     //Constructor.
-    public GameState(Random rnd) {
+    public GameState(Random rnd, Types.GAME_MODE gameMode) {
         this.rnd = rnd;
+        this.gameMode = gameMode;
         computedActionTribeIdFlag = -1;
         this.cityActions = new HashMap<>();
         this.unitActions = new HashMap<>();
@@ -286,8 +291,8 @@ public class GameState {
      */
     public GameState copy(int playerIdx)
     {
-        //GameState copy = new GameState(this.rnd); //use this for a 100% repetition of the game based on random seed and game seed.
-        GameState copy = new GameState(new Random()); //copies of the game state can't have the same random generator.
+//        GameState copy = new GameState(this.rnd, this.gameMode); //use this for a 100% repetition of the game based on random seed and game seed.
+        GameState copy = new GameState(new Random(), this.gameMode); //copies of the game state can't have the same random generator.
         copy.board = board.copy(playerIdx!=-1, playerIdx);
         copy.tick = this.tick;
         copy.turnMustEnd = turnMustEnd;
@@ -329,6 +334,77 @@ public class GameState {
 
         return copy;
     }
+
+
+    /**
+     * Method to identify the end of the game. If the game is over, the winner is decided.
+     * The winner of a game is determined by TribesConfig.GAME_MODE and TribesConfig.MAX_TURNS
+     * @return true if the game has ended, false otherwise.
+     */
+    boolean gameOver() {
+        int maxTurns = gameMode.getMaxTurns();
+        boolean isEnded = false;
+        int[] capitals = board.getCapitalIDs();
+        int bestTribe = -1;
+
+        if(gameMode == Types.GAME_MODE.CAPITALS)
+        {
+            //Game over if one tribe controls all capitals
+            for(int i = 0; i < canEndTurn.length; ++i) {
+                Tribe t = board.getTribe(i);
+
+                int numControlledCities = t.getCitiesID().size();
+                if(numControlledCities == 0)
+                {
+                    //In this mode, this tribe automatically loses.
+                    t.setWinner(Types.RESULT.LOSS);
+                }else {
+                    boolean winner = true;
+                    for (int cap : capitals) {
+                        if (!t.getCitiesID().contains(cap)) {
+                            winner = false;
+                            break;
+                        }
+                    }
+                    if (winner) {
+                        //we have a winner: tribe t.
+                        bestTribe = i;
+                        isEnded = true;
+                        break; //no need to go further, all the others have lost the game.
+                    }
+                }
+            }
+
+
+        }else if(gameMode == Types.GAME_MODE.SCORE && tick > maxTurns)
+        {
+            isEnded = true;
+            int maxScore = Integer.MIN_VALUE;
+            for(int i = 0; i < canEndTurn.length; ++i)
+            {
+                Tribe t = board.getTribe(i);
+                if(t.getScore() > maxScore)
+                {
+                    maxScore = t.getScore();
+                    bestTribe = i;
+                }
+                //TODO: Manage ties in the score.
+            }
+
+        }
+
+        if(isEnded)
+        {
+            //We need to set all the winning conditions for the tribes.
+            for(int i = 0; i < canEndTurn.length; ++i)
+            {
+                board.getTribe(i).setWinner ( (bestTribe == i)? Types.RESULT.WIN : Types.RESULT.LOSS);
+            }
+        }
+
+        return isEnded;
+    }
+
 
     /**
      * Indicates if a given tribe can end its turn. Tribes can't end their turn if a city upgrade is pending.

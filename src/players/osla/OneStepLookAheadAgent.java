@@ -29,6 +29,8 @@ public class OneStepLookAheadAgent extends Agent {
         //Gather all available actions:
         ArrayList<Action> allActions = gs.getAllAvailableActions();
 
+//        System.out.println("tick: " + gs.getTick() + ", player: " + playerID + ", action space: " + allActions.size());
+
         //THIS IS JUST FOR DEBUG.
         //HashMap<Action, Double> scores = new HashMap<>();
 

@@ -5,6 +5,7 @@ import core.Types;
 import core.actions.Action;
 import core.actors.City;
 import core.actors.Tribe;
+import core.actors.units.Battleship;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
@@ -38,7 +39,10 @@ public class Examine extends UnitAction
             Tribe t = gs.getTribe(unit.getTribeId());
             Random rnd = gs.getRandomGenerator();
             TechnologyTree technologyTree = t.getTechTree();
-            int capital = t.getCapitalID();
+
+            int handlerCityId = t.getCitiesID().get(0);
+            if(t.controlsCapital())
+                handlerCityId = t.getCapitalID();
 
             boolean allTech = technologyTree.isEverythingResearched();
             bonus = Types.EXAMINE_BONUS.random(rnd);
@@ -49,13 +53,23 @@ public class Examine extends UnitAction
             switch (bonus) {
                 case SUPERUNIT:
                     Board board = gs.getBoard();
-                    Vector2d cityPos = gs.getActor(capital).getPosition();
-                    Unit unitInCity = board.getUnitAt(cityPos.x, cityPos.y);
-                    if(unitInCity != null)
-                        gs.pushUnit(unitInCity, cityPos.x, cityPos.y);
 
-                    Unit superUnit = Types.UNIT.createUnit(cityPos, 0, false, capital, unit.getTribeId(), Types.UNIT.SUPERUNIT);
-                    board.addUnit((City)gs.getActor(capital), superUnit);
+                    Vector2d spawnPos = unit.getPosition().copy();
+                    Types.TERRAIN terr = board.getTerrainAt(spawnPos.x, spawnPos.y);
+
+                    //instead of a super unit, in the water we create a Battleship of out a warrior
+                    Types.UNIT unitType = terr.isWater() ? Types.UNIT.BATTLESHIP : Types.UNIT.SUPERUNIT;
+                    Unit newUnit = Types.UNIT.createUnit(spawnPos, 0, false, -1, unit.getTribeId(), unitType);
+                    if(terr.isWater())
+                    {
+                        ((Battleship)newUnit).setBaseLandUnit(Types.UNIT.WARRIOR);
+                    }
+
+                    Unit unitInCity = board.getUnitAt(spawnPos.x, spawnPos.y);
+                    if(unitInCity != null)
+                        gs.pushUnit(unitInCity, spawnPos.x, spawnPos.y);
+
+                    board.addUnit((City)gs.getActor(handlerCityId), newUnit);
                     break;
 
                 case RESEARCH:
@@ -63,13 +77,13 @@ public class Examine extends UnitAction
                     break;
 
                 case POP_GROWTH:
-                    City c = (City) gs.getActor(capital);
+                    City c = (City) gs.getActor(handlerCityId);
                     c.addPopulation(t, bonus.getBonus());
                     break;
 
                 case EXPLORER:
-                    cityPos = gs.getActor(capital).getPosition();
-                    gs.getBoard().launchExplorer(cityPos.x, cityPos.y, unit.getTribeId(), rnd);
+                    spawnPos = unit.getPosition().copy();
+                    gs.getBoard().launchExplorer(spawnPos.x, spawnPos.y, unit.getTribeId(), rnd);
                     break;
 
                 case RESOURCES:

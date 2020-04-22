@@ -29,7 +29,7 @@ public abstract class Agent {
      * Function called at the end of the game. May be used by agents for final analysis.
      * @param reward - final reward for this agent.
      */
-    public void result(double reward) {}
+    public void result(GameState gs, double reward) {}
 
     /**
      * Getter for player ID field.

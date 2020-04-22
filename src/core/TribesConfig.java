@@ -211,4 +211,6 @@ public class TribesConfig
     public static final int BURN_FOREST_COST = 5;
     public static final int CLEAR_VIEW_POINTS = 5;
 
+    //Maximum number of turns to be played
+    public static final int MAX_TURNS = 30;
 }

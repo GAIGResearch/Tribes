@@ -68,7 +68,7 @@ public class StepMove implements NeighbourHelper
             }
 
             //Unit is a water unit
-            if(unit.getType() == Types.UNIT.BOAT || unit.getType() == Types.UNIT.SHIP || unit.getType() == Types.UNIT.BATTLESHIP) {
+            if(unit.getType().isWaterUnit()){
                 switch (terrain)
                 {
                     case CITY:

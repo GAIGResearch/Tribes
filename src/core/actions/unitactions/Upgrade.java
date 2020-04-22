@@ -7,6 +7,7 @@ import core.actions.Action;
 import core.actors.City;
 import core.actors.Tribe;
 import core.actors.units.Battleship;
+import core.actors.units.Boat;
 import core.actors.units.Ship;
 import core.game.Board;
 import core.game.GameState;
@@ -25,11 +26,11 @@ public class Upgrade extends UnitAction
     public boolean isFeasible(final GameState gs) {
         Unit unit = (Unit) gs.getActor(this.unitId);
         Tribe tribe = gs.getTribe(unit.getTribeId());
-        TechnologyTree tree = tribe.getTechTree();
+        TechnologyTree ttree = tribe.getTechTree();
 
         int stars = gs.getTribe(unit.getTribeId()).getStars();
-        return ((unit.getType() == BOAT && tree.isResearched(Types.TECHNOLOGY.SAILING) && stars >= TribesConfig.SHIP_COST) ||
-                (unit.getType() == SHIP && tree.isResearched(Types.TECHNOLOGY.NAVIGATION) && stars >= TribesConfig.BATTLESHIP_COST));
+        return ((unit.getType() == BOAT && ttree.isResearched(Types.TECHNOLOGY.SAILING) && stars >= SHIP.getCost()) ||
+                (unit.getType() == SHIP && ttree.isResearched(Types.TECHNOLOGY.NAVIGATION) && stars >= BATTLESHIP.getCost()));
     }
 
     @Override
@@ -52,9 +53,9 @@ public class Upgrade extends UnitAction
             Unit newUnit = Types.UNIT.createUnit(unit.getPosition(), unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), nextType);
             newUnit.setCurrentHP(unit.getCurrentHP());
             if(nextType == SHIP)
-                ((Ship)newUnit).setBaseLandUnit(unit.getType());
+                ((Ship)newUnit).setBaseLandUnit(((Boat)unit).getBaseLandUnit());
             else
-                ((Battleship)newUnit).setBaseLandUnit(unit.getType());
+                ((Battleship)newUnit).setBaseLandUnit(((Ship)unit).getBaseLandUnit());
 
             //adjustments in tribe and board.
             tribe.subtractStars(nextType.getCost());
@@ -71,9 +72,5 @@ public class Upgrade extends UnitAction
     @Override
     public Action copy() {
         return new Upgrade(this.unitId);
-    }
-
-    public String toString() {
-        return "UPGRADE by unit " + this.unitId;
     }
 }

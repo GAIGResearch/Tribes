@@ -4,8 +4,11 @@ import core.TribesConfig;
 import core.Types;
 import core.game.Board;
 import core.game.GameState;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import utils.Vector2d;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -31,6 +34,36 @@ public class City extends Actor{
         bound = 1; //cities start with 1 tile around it for territory
         level = 1; //and starting level is 1
         isCapital = false;
+    }
+
+    public City(JSONObject obj, int cityID){
+        level = obj.getInt("level");
+        population = obj.getInt("population");
+        population_need = obj.getInt("population_need");
+        isCapital = obj.getBoolean("isCapital");
+        production = obj.getInt("production");
+        hasWalls = obj.getBoolean("hasWalls");
+        bound = obj.getInt("bound");
+        this.position = new Vector2d(obj.getInt("x"),obj.getInt("y"));
+        this.tribeId = obj.getInt("tribeID");
+        pointsWorth = obj.getInt("pointsWorth");
+        JSONArray jUnits = obj.getJSONArray("units");
+        for (int i=0; i<jUnits.length(); i++){
+            unitsID.add(jUnits.getInt(i));
+        }
+
+        JSONArray jBuildings = obj.getJSONArray("buildings");
+        for (int i=0; i<jBuildings.length(); i++){
+            JSONObject buildingINFO = jBuildings.getJSONObject(i);
+            Types.BUILDING type = Types.BUILDING.getTypeByKey(buildingINFO.getInt("type"));
+            if (type.isTemple()){
+                buildings.add(new Temple(buildingINFO, type, cityID));
+            }else{
+                buildings.add(new Building(buildingINFO, type, cityID));
+            }
+        }
+
+
     }
 
     // Increase population
@@ -319,4 +352,6 @@ public class City extends Actor{
     public void setProduction(int prodValue) {
         this.production = prodValue;
     }
+
+
 }

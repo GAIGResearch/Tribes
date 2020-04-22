@@ -323,7 +323,7 @@ public class Game {
                                 bInfo.put("x", b.position.x);
                                 bInfo.put("y", b.position.y);
                                 bInfo.put("type", b.type.getKey());
-                                if (b.type == Types.BUILDING.TEMPLE || b.type == Types.BUILDING.WATER_TEMPLE || b.type == Types.BUILDING.FOREST_TEMPLE) {
+                                if (b.type.isTemple()) {
                                     Temple t = (Temple) b;
                                     bInfo.put("level", t.getLevel());
                                     bInfo.put("turnsToScore", t.getTurnsToScore());

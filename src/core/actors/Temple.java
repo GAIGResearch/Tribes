@@ -2,6 +2,9 @@ package core.actors;
 
 import core.TribesConfig;
 import core.Types;
+import org.json.JSONObject;
+
+import java.lang.reflect.Type;
 
 public class Temple extends Building
 {
@@ -11,6 +14,12 @@ public class Temple extends Building
     public Temple(int x, int y, Types.BUILDING type, int cityId) {
         super(x, y, type, cityId);
         levelUp();
+    }
+
+    public Temple(JSONObject obj, Types.BUILDING type, int cityID){
+        super(obj.getInt("x"), obj.getInt("y"), type, cityID);
+        level = obj.getInt("level");
+        turnsToScore = obj.getInt("turnsToScore");
     }
 
     private void levelUp()

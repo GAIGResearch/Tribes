@@ -7,6 +7,8 @@ import core.actors.Actor;
 import core.actors.City;
 import core.actors.Tribe;
 import core.actors.units.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import utils.Vector2d;
 import utils.graph.*;
 
@@ -30,6 +32,9 @@ public class Board {
 
     // Array for tribes
     private Tribe[] tribes;
+
+    // Array for capital IDs
+    private int[] capitalIDs;
 
     // Array for id of the city that owns each tile. -1 if no city owns the tile.
     private int[][] tileCityId;
@@ -57,6 +62,56 @@ public class Board {
         this.gameActors = new HashMap<>();
     }
 
+    public Board(JSONObject JBoard){
+        this.gameActors = new HashMap<>();
+        JSONArray JResource = JBoard.getJSONArray("resource");
+        JSONArray JTerrain = JBoard.getJSONArray("terrain");
+        JSONArray JUnit = JBoard.getJSONArray("unitID");
+        JSONArray JCityID = JBoard.getJSONArray("cityID");
+        JSONArray JNetwork = JBoard.getJSONArray("network");
+        JSONArray JBuilding = JBoard.getJSONArray("building");
+
+        size = JResource.length();
+        terrains = new Types.TERRAIN[size][size];
+        resources = new Types.RESOURCE[size][size];
+        buildings = new Types.BUILDING[size][size];
+        units = new int[size][size];
+        tileCityId = new int[size][size];
+        boolean[][] networkTiles = new boolean[size][size];
+        for (int i=0; i<size; i++){
+            JSONArray resourceItem = JResource.getJSONArray(i);
+            JSONArray terrainItem = JTerrain.getJSONArray(i);
+            JSONArray unitIDItem = JUnit.getJSONArray(i);
+            JSONArray cityIDItem = JCityID.getJSONArray(i);
+            JSONArray networkItem = JNetwork.getJSONArray(i);
+            JSONArray buildingItem = JBuilding.getJSONArray(i);
+            for (int j=0; j<size; j++){
+                terrains[i][j] = Types.TERRAIN.getTypeByKey(terrainItem.getInt(j));
+                if (resourceItem.getInt(j) != -1) {
+                    resources[i][j] = Types.RESOURCE.getTypeByKey(resourceItem.getInt(j));
+                }
+                units[i][j] = unitIDItem.getInt(j);
+                tileCityId[i][j] = cityIDItem.getInt(j);
+                networkTiles[i][j] = networkItem.getBoolean(j);
+                if(buildingItem.getInt(j) != -1) {
+                    buildings[i][j] = Types.BUILDING.getTypeByKey(buildingItem.getInt(j));
+                }
+            }
+
+        }
+
+        tradeNetwork = new TradeNetwork(size, networkTiles);
+
+//        TODO: testing
+//        System.out.println(Arrays.deepToString(terrains));
+//        System.out.println(Arrays.deepToString(resources));
+//        System.out.println(Arrays.deepToString(buildings));
+//        System.out.println(Arrays.deepToString(units));
+//        System.out.println(Arrays.deepToString(tileCityId));
+//        System.out.println(tradeNetwork);
+    }
+
+
     /**
      * Inits the board given its size and array of playing tribes. Initializes all the data structures for the board
      * @param size size of the board (MUST be square)
@@ -65,6 +120,7 @@ public class Board {
     void init(int size, Tribe[] tribes) {
 
         this.size = size;
+        this.capitalIDs = new int[tribes.length];
         terrains = new Types.TERRAIN[size][size];
         resources = new Types.RESOURCE[size][size];
         buildings = new Types.BUILDING[size][size];
@@ -113,6 +169,10 @@ public class Board {
         copyBoard.actorIDcounter = actorIDcounter;
         copyBoard.tradeNetwork = new TradeNetwork(size);
         copyBoard.isNative = false;
+        copyBoard.capitalIDs = new int[tribes.length];
+
+        //copy capital IDs
+        System.arraycopy(capitalIDs, 0, copyBoard.capitalIDs, 0, tribes.length);
 
         // Copy board objects (they are all ids)
         for (int x = 0; x < this.size; x++) {
@@ -140,11 +200,12 @@ public class Board {
         copyBoard.gameActors = new HashMap<>();
         for (Actor act : gameActors.values()) {
             int id = act.getActorId();
+            int actTribeId = act.getTribeId();
 
             //When do we copy? if it's the tribe (id==playerId), full observable or actor visible if part. obs.
-            if(id == playerId || !partialObs || tribes[playerId].isVisible(act.getPosition().x, act.getPosition().y))
+            if(actTribeId == playerId || !partialObs || tribes[playerId].isVisible(act.getPosition().x, act.getPosition().y))
             {
-                boolean hideInfo = (id != playerId) && partialObs;
+                boolean hideInfo = (actTribeId != playerId) && partialObs;
                 copyBoard.gameActors.put(id, act.copy(hideInfo));
             }
         }
@@ -294,6 +355,7 @@ public class Board {
         Vector2d newPos = new Vector2d(x, y);
         Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), Types.UNIT.BOAT);
         boat.setCurrentHP(unit.getCurrentHP());
+        boat.setMaxHP(unit.getMaxHP());
         ((Boat)boat).setBaseLandUnit(unit.getType());
         addUnit(city, boat);
     }
@@ -332,6 +394,7 @@ public class Board {
         Vector2d newPos = new Vector2d(x, y);
         Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), baseLandUnit);
         newUnit.setCurrentHP(unit.getCurrentHP());
+        newUnit.setMaxHP(unit.getMaxHP());
         addUnit(city, newUnit);
     }
 
@@ -354,7 +417,9 @@ public class Board {
         if (getTerrainAt(xF, yF) == Types.TERRAIN.MOUNTAIN) {
             partialObsRangeClear += 1;
         }
-        t.clearView(xF, yF, partialObsRangeClear, r, this);
+        boolean networkUpdate = t.clearView(xF, yF, partialObsRangeClear, r, this);
+        if(networkUpdate)
+            tradeNetwork.computeTradeNetworkTribe(this, t);
     }
 
     /**
@@ -380,7 +445,9 @@ public class Board {
                     moved = true;
                     currentPos.x = next.x;
                     currentPos.y = next.y;
-                    tribes[tribeId].clearView(currentPos.x, currentPos.y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this.copy());
+                    boolean updateNetwork = tribes[tribeId].clearView(currentPos.x, currentPos.y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this.copy());
+                    if(updateNetwork)
+                        tradeNetwork.computeTradeNetworkTribe(this, tribes[tribeId]);
                 }
 
                 j++;
@@ -572,7 +639,7 @@ public class Board {
 
         }else
         {
-            System.out.println("Warning: Tribe " + capturingTribe.getTribeId() + " trying to caputre a non-city.");
+            System.out.println("Warning: Tribe " + capturingTribe.getTribeId() + " trying to capture a non-city.");
             return false;
         }
 
@@ -645,11 +712,17 @@ public class Board {
 
             //If there are still units, they go to the tribe.
             if (fromCity.getNumUnits() > 0){
-                for(Integer unitId: fromCity.getUnitsID())
+                while(fromCity.getNumUnits() > 0)
+                //for(Integer unitId: fromCity.getUnitsID())
                 {
+                    int unitId = fromCity.getUnitsID().get(0);
                     Unit removedUnit = (Unit) gameActors.get(unitId);
-                    if(removedUnit != null)
+                    if(removedUnit != null) {
                         tribe.addExtraUnit(removedUnit);
+                        fromCity.removeUnit(unitId);
+                    }else{
+                        System.out.println("ERROR: Trying to move an extra unit that does not exist.");
+                    }
                 }
             }
         }
@@ -671,6 +744,16 @@ public class Board {
         removedUnit.setCityId(targetCity.getActorId());
     }
 
+    /**
+     * Sets a capitalId for the given tribe.
+     * @param tribeId id of the tribe to set the capital
+     * @param capitalId id of the capital city to set.
+     */
+    void setCapitalId(int tribeId, int capitalId)
+    {
+        tribes[tribeId].setCapitalID(capitalId);
+        capitalIDs[tribeId] = capitalId;
+    }
 
     /**
      * Adds a city to a tribe
@@ -680,7 +763,7 @@ public class Board {
     {
         addActor(c);
         if (c.isCapital()){
-            tribes[c.getTribeId()].setCapitalID(c.getActorId());
+            setCapitalId(c.getTribeId(), c.getActorId());
         }
         tribes[c.getTribeId()].addCity(c.getActorId());
 
@@ -719,6 +802,8 @@ public class Board {
         //Finally, add the unit to the city that created it, unless it belongs to the tribe.
         if(u.getCityId() != -1)
             c.addUnit(u.getActorId());
+        else if(!tribes[u.getTribeId()].getExtraUnits().contains(u.getActorId()))
+            tribes[u.getTribeId()].addExtraUnit(u);
     }
 
     /**
@@ -746,6 +831,13 @@ public class Board {
         actorIDcounter++;
         gameActors.put(actorIDcounter, actor);
         actor.setActorId(actorIDcounter);
+    }
+
+    public void addActor(core.actors.Actor actor, int actorID)
+    {
+        actorIDcounter++;
+        gameActors.put(actorID, actor);
+        actor.setActorId(actorID);
     }
 
     /**
@@ -887,5 +979,6 @@ public class Board {
     public Types.BUILDING getBuildingAt(int x, int y){ return buildings[x][y]; }
     public void setUnits(int[][] u){ this.units = u; }
     public int getCityIdAt(int x, int y) { return tileCityId[x][y]; }
+    public int[] getCapitalIDs() {return capitalIDs;}
     boolean isNative() { return isNative; }
 }

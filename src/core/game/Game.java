@@ -9,6 +9,9 @@ import core.actors.Building;
 import core.actors.City;
 import core.actors.Temple;
 import core.actors.Tribe;
+import core.actors.units.Battleship;
+import core.actors.units.Boat;
+import core.actors.units.Ship;
 import core.actors.units.Unit;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -68,13 +71,14 @@ public class Game {
      * @param tribes Tribes to play the game with. Players and tribes related by position in array lists.
      * @param filename Name of the file with the level information.
      * @param seed Seed for the game (used only for board generation)
+     * @param gameMode Game Mode for this game.
      */
-    public void init(ArrayList<Agent> players, ArrayList<Tribe> tribes, String filename, long seed) {
+    public void init(ArrayList<Agent> players, ArrayList<Tribe> tribes, String filename, long seed, Types.GAME_MODE gameMode) {
 
         //Initiate the bare bones of the main game classes
         this.seed = seed;
         this.rnd = new Random(seed);
-        this.gs = new GameState(rnd);
+        this.gs = new GameState(rnd, gameMode);
 
         if(players.size() != tribes.size())
         {
@@ -146,43 +150,31 @@ public class Game {
      * Runs a game once. Receives frame and window input. If any is null, forces a run with no visuals.
      * @param frame window to draw the game
      * @param wi input for the window.
-     * @return the results of the game, per player.
      */
-    public Types.RESULT[] run(GUI frame, WindowInput wi)
+    public void run(GUI frame, WindowInput wi)
     {
         if (frame == null || wi == null)
             VISUALS = false;
-
         boolean firstEnd = true;
-        Types.RESULT[] results = null;
 
-        while(!isEnded() || VISUALS && wi != null && !wi.windowClosed && !isEnded()) {
+        while(!gameOver()) {
+            // Loop while window is still open, even if the game ended.
+            // If not playing with visuals, loop while the game's not ended.
+            tick(frame);
 
             // Check end of game
-            if (firstEnd && isEnded()) {
+            if (firstEnd && gameOver()) {
                 firstEnd = false;
-                results = terminate();
 
                 if (!VISUALS) {
                     // The game has ended, end the loop if we're running without visuals.
                     break;
                 }
             }
-
-//            System.out.println(gs.getTick());
-
-            // Loop while window is still open, even if the game ended.
-            // If not playing with visuals, loop while the game's not ended.
-            tick(frame);
-
         }
 
-        // The loop may have been broken out of before the game ended. Handle end-of-game:
-        if (firstEnd) {
-            results = terminate();
-        }
-
-        return results;
+        terminate();
+        terminate();
     }
 
     /**
@@ -203,8 +195,11 @@ public class Game {
             // Save Game
             saveGame();
 
+
+            GameLoader gl = new GameLoader("save/" + this.seed + "/"+ gs.getTick() + "_" + gs.getActiveTribeID() +"/game.json");
+
             //it may be that this player won the game, no more playing.
-            if(isEnded())
+            if(gameOver())
             {
                 return;
             }
@@ -245,6 +240,9 @@ public class Game {
             JSONArray city2D = new JSONArray();
             JSONArray cities;
 
+            JSONArray building2D = new JSONArray();
+            JSONArray JBuildings;
+
             JSONArray network2D = new JSONArray();
             JSONArray networks;
 
@@ -266,6 +264,7 @@ public class Game {
                 units = new JSONArray();
                 cities = new JSONArray();
                 networks = new JSONArray();
+                JBuildings = new JSONArray();
 
                 for(int j=0; j<getBoard().getSize(); j++){
                     // Save Terrain INFO
@@ -280,6 +279,13 @@ public class Game {
                         Unit u = (Unit)gs.getActor(unitINFO);
                         JSONObject uInfo = new JSONObject();
                         uInfo.put("type", u.getType().getKey());
+                        if (u.getType() == Types.UNIT.BOAT){
+                            uInfo.put("baseLandType", ((Boat)u).getBaseLandUnit().getKey());
+                        }else if (u.getType() == Types.UNIT.SHIP){
+                            uInfo.put("baseLandType", ((Ship)u).getBaseLandUnit().getKey());
+                        }else if (u.getType() == Types.UNIT.BATTLESHIP){
+                            uInfo.put("baseLandType", ((Battleship)u).getBaseLandUnit().getKey());
+                        }
                         uInfo.put("x", i);
                         uInfo.put("y", j);
                         uInfo.put("kill", u.getKills());
@@ -317,7 +323,6 @@ public class Game {
                                 bInfo.put("x", b.position.x);
                                 bInfo.put("y", b.position.y);
                                 bInfo.put("type", b.type.getKey());
-                                bInfo.put("bonus", b.getBonus());
                                 if (b.type == Types.BUILDING.TEMPLE || b.type == Types.BUILDING.WATER_TEMPLE || b.type == Types.BUILDING.FOREST_TEMPLE) {
                                     Temple t = (Temple) b;
                                     bInfo.put("level", t.getLevel());
@@ -327,8 +332,12 @@ public class Game {
                             }
                         }
                         cInfo.put("buildings", buildingList);
-                        city.put(String.valueOf(unitINFO), cInfo);
+                        cInfo.put("units", c.getUnitsID());
+                        city.put(String.valueOf(cityINFO), cInfo);
                     }
+
+                    // Save Building INFO
+                    JBuildings.put(gs.getBoard().getBuildingAt(i, j)!= null? gs.getBoard().getBuildingAt(i, j).getKey():-1);
 
                     // Save network INFO
                     networks.put(gs.getBoard().getNetworkTilesAt(i, j));
@@ -340,6 +349,7 @@ public class Game {
                 unit2D.put(units);
                 city2D.put(cities);
                 network2D.put(networks);
+                building2D.put(JBuildings);
             }
 
             board.put("terrain", terrain2D);
@@ -347,6 +357,7 @@ public class Game {
             board.put("unitID", unit2D);
             board.put("cityID", city2D);
             board.put("network", network2D);
+            board.put("building", building2D);
 
             game.put("board", board);
             game.put("unit", unit);
@@ -394,22 +405,16 @@ public class Game {
             game.put("tick", gs.getTick());
             game.put("activeTribeID", gs.getActiveTribeID());
 
-
-//            JSONObject read = new JSONObject(game.toString());
-//            System.out.println(read.get("board"));
-//            System.out.println(read.get("board"));
-//
-//            JSONObject board_read = read.getJSONObject("board");
-//            System.out.println(board_read.get("resource"));
-
             FileWriter fw_game = new FileWriter(turnFile.getPath() + "/game.json");
-            fw_game.write(game.toString());
+            fw_game.write(game.toString(4));
             fw_game.close();
 
         } catch (IOException e){
             e.printStackTrace();
         }
     }
+
+
 
     /**
      * Process a turn for a given player. It queries the player for an action until no more
@@ -429,11 +434,15 @@ public class Game {
         ElapsedCpuTimer ect = new ElapsedCpuTimer();
         ect.setMaxTimeMillis(TURN_TIME_MILLIS);
         boolean continueTurn = true;
+        int curActionCounter = 0;
 
         while(continueTurn)
         {
             //get one action from the player
             Action action = ag.act(gameStateObservations[playerID], ect);
+
+//            System.out.println(gs.getTick() + " " + curActionCounter + " " + action + "; stars: " + gs.getBoard().getTribe(playerID).getStars());
+            curActionCounter++;
 
             //note down the remaining time to use it for the next iteration
             long remaining = ect.remainingTimeMillis();
@@ -512,6 +521,7 @@ public class Game {
             tribe.setScore(tribe.getType().getInitialScore());
             tribe.setStars(TribesConfig.INITIAL_STARS);
         }else{
+            acumProd = Math.max(0, acumProd); //Never have a negative amount of stars.
             tribe.addStars(acumProd);
         }
 
@@ -546,7 +556,6 @@ public class Game {
         //For all units that didn't execute any action, a Recover action is executed.
         ArrayList<Integer> allTribeUnits = new ArrayList<>();
         ArrayList<Integer> tribeCities = tribe.getCitiesID();
-        GameState gs = gameStateObservations[tribe.getActorId()];
 
         //1. Get all units
         for(int cityId : tribeCities)
@@ -573,27 +582,48 @@ public class Game {
     }
 
     /**
-     * This method terminates the game, assigning the winner/result state to all players.
-     * @return an array of result states for all players.
+     * This method call all agents' end-of-game method for post-processing.
+     * Agents receive their final game state and reward
      */
     @SuppressWarnings("UnusedReturnValue")
-    private Types.RESULT[] terminate() {
+    private void terminate() {
 
+        Tribe[] tribes = gs.getTribes();
+        for (int i = 0; i < numPlayers; i++) {
+            Agent ag = players[i];
+            ag.result(gs.copy(), tribes[i].getScore());
+        }
+    }
+
+    /**
+     * Returns the winning status of all players.
+     * @return the winning status of all players.
+     */
+    public Types.RESULT[] getWinnerStatus()
+    {
         //Build the results array
         Tribe[] tribes = gs.getTribes();
         Types.RESULT[] results = new Types.RESULT[numPlayers];
         for (int i = 0; i < numPlayers; i++) {
-            Tribe tribe = (Tribe) tribes[i];
+            Tribe tribe = tribes[i];
             results[i] = tribe.getWinner();
         }
-
-        // Call all agents' end-of-game method for post-processing. Agents receive their final reward.
-        for (int i = 0; i < numPlayers; i++) {
-            Agent ag = players[i];
-            ag.result(tribes[i].getScore());
-        }
-
         return results;
+    }
+
+    /**
+     * Returns the current scores of all players.
+     * @return the current scores of all players.
+     */
+    public int[] getScores()
+    {
+        //Build the results array
+        Tribe[] tribes = gs.getTribes();
+        int[] scores = new int[numPlayers];
+        for (int i = 0; i < numPlayers; i++) {
+            scores[i] = tribes[i].getScore();
+        }
+        return scores;
     }
 
     /**
@@ -631,14 +661,12 @@ public class Game {
     }
 
     /**
-     * Method to identify the end of the game.
+     * Method to identify the end of the game. If the game is over, the winner is decided.
+     * The winner of a game is determined by TribesConfig.GAME_MODE and TribesConfig.MAX_TURNS
      * @return true if the game has ended, false otherwise.
      */
-    boolean isEnded() {
-
-        //TODO: Analyze the game state to find out if the game is over.
-
-        return false;
+    boolean gameOver() {
+        return gs.gameOver();
     }
 
 }

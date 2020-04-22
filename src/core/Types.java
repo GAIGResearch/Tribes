@@ -3,6 +3,7 @@ package core;
 import core.actions.Action;
 import core.actions.unitactions.*;
 import core.actors.units.*;
+import org.json.JSONObject;
 import utils.ImageIO;
 import utils.Vector2d;
 
@@ -94,6 +95,15 @@ public class Types {
             this.color_light = color_light;
             this.color_dark = color_dark;
         }
+
+        public static TRIBE getTypeByKey(int key) {
+            for(TRIBE t : Types.TRIBE.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
+        }
+
         public int getKey() {  return key; }
         public String getName() { return name; }
         public TECHNOLOGY getInitialTech() {
@@ -169,6 +179,15 @@ public class Types {
             return null;
         }
 
+        public static RESOURCE getTypeByKey(int key) {
+            for(RESOURCE t : RESOURCE.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
+        }
+
+
         public TECHNOLOGY getTechnologyRequirement() {
             return tech;
         }
@@ -236,6 +255,14 @@ public class Types {
 
             public int getKey() {
                 return key;
+            }
+
+            public static MONUMENT_STATUS getTypeByKey(int key) {
+                for(MONUMENT_STATUS t : Types.BUILDING.MONUMENT_STATUS.values()){
+                    if(t.key == key)
+                        return t;
+                }
+                return null;
             }
         }
 
@@ -321,6 +348,25 @@ public class Types {
             monuments.put(TOWER_OF_WISDOM, UNAVAILABLE);
             monuments.put(GRAND_BAZAR, UNAVAILABLE);
             return monuments;
+        }
+
+        public static HashMap<BUILDING, MONUMENT_STATUS> initMonuments(JSONObject JMonuments)
+        {
+            HashMap<BUILDING, MONUMENT_STATUS> monuments = new HashMap<>();
+            Iterator<String> keys = JMonuments.keys();
+            while (keys.hasNext()){
+                String key = keys.next();
+                monuments.put(BUILDING.getTypeByKey(Integer.parseInt(key)), BUILDING.MONUMENT_STATUS.getTypeByKey(JMonuments.getInt(key)));
+            }
+            return monuments;
+        }
+
+        public static BUILDING getTypeByKey(int key) {
+            for(BUILDING t : Types.BUILDING.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
         }
     }
 
@@ -427,7 +473,7 @@ public class Types {
         KNIGHT (6,"img/unit/knight/", KNIGHT_COST, CHIVALRY, KNIGHT_POINTS), //+40
         MIND_BENDER(7,"img/unit/mind_bender/", MINDBENDER_COST, PHILOSOPHY, MINDBENDER_POINTS), //+25
         BOAT(8,"img/unit/boat/", BOAT_COST, SAILING, BOAT_POINTS), //+0
-        SHIP(9,"img/unit/ship/", BATTLESHIP_COST, SAILING, SHIP_POINTS),//+0
+        SHIP(9,"img/unit/ship/", SHIP_COST, SAILING, SHIP_POINTS),//+0
         BATTLESHIP(10,"img/unit/battleship/", BATTLESHIP_COST, NAVIGATION, BATTLESHIP_POINTS),//+0
         SUPERUNIT(11, "img/unit/superunit/", SUPERUNIT_COST, null, SUPERUNIT_POINTS); //+50
 
@@ -496,9 +542,15 @@ public class Types {
             return null;
         }
 
+
         public boolean spawnable()
         {
             return !(this == BOAT || this == SHIP || this == BATTLESHIP || this == SUPERUNIT);
+        }
+
+        public boolean isWaterUnit()
+        {
+            return this == BOAT || this == SHIP || this == BATTLESHIP;
         }
 
         public static ArrayList<UNIT> getSpawnableTypes() {
@@ -510,6 +562,15 @@ public class Types {
             }
             return units;
         }
+
+        public static UNIT getTypeByKey(int key) {
+            for(UNIT t : UNIT.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
+        }
+
     }
 
 
@@ -538,6 +599,23 @@ public class Types {
         public int y() {return y;}
     }
 
+    /**
+     *  Game Mode to be played
+     */
+    public enum GAME_MODE {
+        CAPITALS(0),
+        SCORE(1);
+
+        private int key;
+        GAME_MODE(int numVal) { this.key = numVal; }
+        public int getKey() { return this.key; }
+
+        public int getMaxTurns() {
+            if (this == CAPITALS)
+                return Integer.MAX_VALUE;
+            else return TribesConfig.MAX_TURNS;
+        }
+    }
 
     /**
      * Results of the game.
@@ -558,6 +636,14 @@ public class Types {
         public Color getColor() {
             if (key == WIN.key) return Color.green;
             if (key == LOSS.key) return Color.red;
+            return null;
+        }
+
+        public static RESULT getTypeByKey(int key) {
+            for(RESULT t : RESULT.values()){
+                if(t.key == key)
+                    return t;
+            }
             return null;
         }
     }
@@ -601,6 +687,17 @@ public class Types {
             String[] splitPath = imageFile.split("\\.");
             return ImageIO.GetInstance().getImage(splitPath[0] + "-" + suffix + "." + splitPath[1]);
         }
+
+
+        public static TERRAIN getTypeByKey(int key) {
+            for(TERRAIN t : TERRAIN.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
+        }
+
+        public boolean isWater() {return this == SHALLOW_WATER || this == DEEP_WATER;}
 
 
         /**

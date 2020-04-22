@@ -16,6 +16,12 @@ public class TribeActionBuilder
     {
         ArrayList<Action> allActions = new ArrayList<>();
 
+        if(tribe.getTribeId() != gs.getActiveTribeID())
+        {
+            System.out.println("ERROR: creating actions for a tribe that is not the active one.");
+            return allActions;
+        }
+
         //Build Road
         allActions.addAll(new BuildRoadFactory().computeActionVariants(tribe, gs));
 

@@ -49,7 +49,7 @@ public class Convert extends UnitAction
             //remove the unit from its original city.
             int cityId = target.getCityId();
             City c = (City) gs.getActor(cityId);
-            gs.getBoard().removeUnitFromCity(unit, c, targetTribe);
+            gs.getBoard().removeUnitFromCity(target, c, targetTribe);
 
             //add tribe to converted unit
             target.setTribeId(unit.getTribeId());

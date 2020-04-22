@@ -6,6 +6,9 @@ import core.Types;
 import core.actions.Action;
 import core.actors.City;
 import core.actors.Tribe;
+import core.actors.units.Battleship;
+import core.actors.units.Boat;
+import core.actors.units.Ship;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
@@ -26,8 +29,8 @@ public class Upgrade extends UnitAction
         TechnologyTree ttree = tribe.getTechTree();
 
         int stars = gs.getTribe(unit.getTribeId()).getStars();
-        return ((unit.getType() == BOAT && ttree.isResearched(Types.TECHNOLOGY.SAILING) && stars >= TribesConfig.SHIP_COST) ||
-                (unit.getType() == SHIP && ttree.isResearched(Types.TECHNOLOGY.NAVIGATION) && stars >= TribesConfig.BATTLESHIP_COST));
+        return ((unit.getType() == BOAT && ttree.isResearched(Types.TECHNOLOGY.SAILING) && stars >= SHIP.getCost()) ||
+                (unit.getType() == SHIP && ttree.isResearched(Types.TECHNOLOGY.NAVIGATION) && stars >= BATTLESHIP.getCost()));
     }
 
     @Override
@@ -49,6 +52,10 @@ public class Upgrade extends UnitAction
             //Create the new unit
             Unit newUnit = Types.UNIT.createUnit(unit.getPosition(), unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), nextType);
             newUnit.setCurrentHP(unit.getCurrentHP());
+            if(nextType == SHIP)
+                ((Ship)newUnit).setBaseLandUnit(((Boat)unit).getBaseLandUnit());
+            else
+                ((Battleship)newUnit).setBaseLandUnit(((Ship)unit).getBaseLandUnit());
 
             //adjustments in tribe and board.
             tribe.subtractStars(nextType.getCost());

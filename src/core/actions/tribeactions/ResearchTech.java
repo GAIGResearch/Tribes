@@ -59,6 +59,6 @@ public class ResearchTech extends TribeAction {
 
     public String toString()
     {
-        return "Action to research " + tech.toString();
+        return "RESEARCH_TECH by tribe " + this.tribeId+ " : " + tech.toString();
     }
 }

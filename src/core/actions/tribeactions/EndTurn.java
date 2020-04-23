@@ -33,4 +33,8 @@ public class EndTurn extends TribeAction {
     public Action copy() {
         return new EndTurn(this.tribeId);
     }
+
+    public String toString() {
+        return "END_TURN by tribe " + this.tribeId;
+    }
 }

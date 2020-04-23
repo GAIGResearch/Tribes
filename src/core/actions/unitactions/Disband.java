@@ -51,6 +51,6 @@ public class Disband extends UnitAction
 
     @Override
     public String toString() {
-        return "Disband{unitID=" + unitId + "}";
+        return "DISBAND of unit " + this.unitId;
     }
 }

@@ -110,7 +110,7 @@ public class Capture extends UnitAction
 
     public String toString()
     {
-        return "CAPTURE by unit " + unitId + " of target " + captureType + ": " + targetCityId;
+        return "CAPTURE by unit " + unitId + " of target " + captureType.toString() + ": " + targetCityId;
     }
 
 }

@@ -30,6 +30,7 @@ public class Ship extends Unit
     public Ship copy(boolean hideInfo) {
         Ship c = new Ship(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
+        c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         c.setBaseLandUnit(getBaseLandUnit());

@@ -20,7 +20,8 @@ public class TechnologyTree {
     }
 
     public TechnologyTree(boolean[] researched){
-        this.researched = researched;
+        this.researched = new boolean[researched.length];
+        System.arraycopy(researched, 0, this.researched, 0, researched.length);
         checkEverythingResearched();
     }
 

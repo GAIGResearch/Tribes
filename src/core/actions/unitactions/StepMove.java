@@ -79,6 +79,7 @@ public class StepMove implements NeighbourHelper
                         //Disembark takes a turn of movement.
                         stepCost = costFrom < unit.MOV ? (unit.MOV - costFrom) : unit.MOV; //as much cost as needed to finished step here
                         break;
+                    case FOG:
                     case DEEP_WATER:
                     case SHALLOW_WATER:
                         stepCost = 1.0;
@@ -94,6 +95,7 @@ public class StepMove implements NeighbourHelper
                             stepCost = costFrom < unit.MOV ? (unit.MOV - costFrom) : unit.MOV; //as much cost as needed to finished step here;
                         }else{ continue; }
                         break;
+                    case FOG:
                     case PLAIN:
                     case CITY:
                     case VILLAGE:

@@ -186,6 +186,8 @@ public class Board {
                     copyBoard.setBuildingAt(x, y, buildings[x][y]);
                     copyBoard.tileCityId[x][y] = tileCityId[x][y];
                     copyBoard.tradeNetwork.setTradeNetworkValue(x,y,tradeNetwork.getTradeNetworkValue(x,y));
+                }else{
+                    copyBoard.setTerrainAt(x, y, FOG);
                 }
             }
         }

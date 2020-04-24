@@ -34,7 +34,6 @@ public class Battleship extends Unit
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         c.setBaseLandUnit(getBaseLandUnit());
-        c.setKilled(isKilled());
         return hideInfo ? (Battleship) c.hide() : c;
     }
 }

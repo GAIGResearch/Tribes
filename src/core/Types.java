@@ -615,6 +615,14 @@ public class Types {
                 return Integer.MAX_VALUE;
             else return TribesConfig.MAX_TURNS;
         }
+
+        public static GAME_MODE getTypeByKey(int key) {
+            for(GAME_MODE t : GAME_MODE.values()){
+                if(t.key == key)
+                    return t;
+            }
+            return null;
+        }
     }
 
     /**

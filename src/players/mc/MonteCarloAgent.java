@@ -17,6 +17,7 @@ public class MonteCarloAgent extends Agent {
     private Random m_rnd;
     private int ROLLOUT_LENGTH = 20;
     private int N_ROLLOUT_MULT = 3;
+    private int FORCE_TURN_END = 5;
 
     public MonteCarloAgent(long seed)
     {
@@ -74,30 +75,52 @@ public class MonteCarloAgent extends Agent {
         GameState gsCopy = gs.copy();
         boolean end = false;
         int step = 0;
-        boolean turnEnded = false;
+        int turnEndCountDown = FORCE_TURN_END;
+        boolean run = true;
 
         while(!end)
         {
-            gsCopy.next(act, true);
-            step++;
+            run = true;
 
+            //If it's time to force a turn end, do it
+            if(turnEndCountDown == 0)
+            {
+                EndTurn endTurn = new EndTurn(this.playerID);
+                boolean canEndTurn = endTurn.isFeasible(gsCopy);
+
+                if(canEndTurn) //check if we can actually end the turn.
+                {
+                    gsCopy.next(endTurn, true);
+                    turnEndCountDown = FORCE_TURN_END;
+                    run = false;
+                }
+            }
+
+            if(run)
+            {
+                gsCopy.next(act, true);
+                turnEndCountDown--;
+            }
+
+            step++;
             end = (step == ROLLOUT_LENGTH);
             if(!end)
             {
                 ArrayList<Action> allActions = gsCopy.getAllAvailableActions();
-
-                if(turnEnded)
-                {
-                    int a = 0;
-                }
-
                 int numActions = allActions.size();
-                act = allActions.get(m_rnd.nextInt(numActions));
+                if(numActions == 1) {
+                    act = allActions.get(m_rnd.nextInt(numActions));
 
-                if(act instanceof EndTurn) {
-//                    System.out.println("End Turn in rollout, step " + step);
-                    //end = true;
-                    turnEnded = true;
+                    if(act instanceof EndTurn)
+                        turnEndCountDown = FORCE_TURN_END + 1;
+
+                }else
+                {
+                    do {
+                        int actIdx = m_rnd.nextInt(numActions);
+                        act = allActions.get(actIdx);
+
+                    }  while(act instanceof EndTurn);
                 }
             }
         }

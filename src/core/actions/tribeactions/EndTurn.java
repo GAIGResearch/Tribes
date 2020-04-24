@@ -4,8 +4,6 @@ import core.actions.Action;
 import core.actors.Tribe;
 import core.game.GameState;
 
-import java.util.LinkedList;
-
 public class EndTurn extends TribeAction {
 
     public EndTurn(){}
@@ -24,7 +22,8 @@ public class EndTurn extends TribeAction {
     public boolean execute(GameState gs) {
         if(isFeasible(gs))
         {
-            gs.endTurn(true);
+            gs.setEndTurn(true);
+            return true;
         }
         return false;
     }

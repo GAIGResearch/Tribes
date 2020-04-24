@@ -40,7 +40,7 @@ public class OneStepLookAheadAgent extends Agent {
         for(Action act : allActions)
         {
             GameState gsCopy = gs.copy();
-            gsCopy.next(act);
+            gsCopy.advance(act, false);
             double Q = heuristic.evaluateState(gsCopy);
             Q = noise(Q, this.epsilon, this.m_rnd.nextDouble());
 

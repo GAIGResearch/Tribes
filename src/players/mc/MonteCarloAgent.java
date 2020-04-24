@@ -90,7 +90,7 @@ public class MonteCarloAgent extends Agent {
 
                 if(canEndTurn) //check if we can actually end the turn.
                 {
-                    gsCopy.next(endTurn, true);
+                    gsCopy.advance(endTurn, true);
                     turnEndCountDown = FORCE_TURN_END;
                     run = false;
                 }
@@ -98,12 +98,13 @@ public class MonteCarloAgent extends Agent {
 
             if(run)
             {
-                gsCopy.next(act, true);
+                gsCopy.advance(act, true);
                 turnEndCountDown--;
             }
 
             step++;
-            end = (step == ROLLOUT_LENGTH);
+            end = gsCopy.isGameOver() || (step == ROLLOUT_LENGTH);
+
             if(!end)
             {
                 ArrayList<Action> allActions = gsCopy.getAllAvailableActions();

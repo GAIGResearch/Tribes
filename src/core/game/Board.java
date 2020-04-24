@@ -637,6 +637,12 @@ public class Board {
             // TRIBE that captured this city. One unit moves there.
             moveOneToNewCity(capturedCity, capturingTribe, rnd);
 
+            // If this tribe has lost all its cities, the tribe has lost.
+            if(previousOwner.getNumCities() == 0)
+            {
+                previousOwner.manageLoss(gameState);
+            }
+
         }else
         {
             System.out.println("Warning: Tribe " + capturingTribe.getTribeId() + " trying to capture a non-city.");

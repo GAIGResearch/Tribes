@@ -581,6 +581,32 @@ public class Tribe extends Actor {
 
     }
 
+    public void manageLoss(GameState gs) {
+
+        this.setWinner(Types.RESULT.LOSS);
+
+        //All units must disappear.
+        for(int cityId : citiesID)
+        {
+            City c = (City) gs.getActor(cityId);
+            for(int unitId : c.getUnitsID())
+            {
+                Unit u = (Unit) gs.getActor(unitId);
+                gs.getBoard().removeUnitFromBoard(u);
+            }
+            c.clearUnits();
+        }
+
+        //Also extra units
+        for(int unitId : this.extraUnits)
+        {
+            Unit u = (Unit) gs.getActor(unitId);
+            gs.getBoard().removeUnitFromBoard(u);
+        }
+        extraUnits.clear();
+
+    }
+
     public ArrayList<Integer> getExtraUnits() {
         return extraUnits;
     }

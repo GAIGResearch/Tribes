@@ -15,8 +15,8 @@ public class MonteCarloAgent extends Agent {
 
     public double epsilon = 1e-6;
     private Random m_rnd;
-    private int ROLLOUT_LENGTH = 10;
-    private int N_ROLLOUT_MULT = 5;
+    private int ROLLOUT_LENGTH = 20;
+    private int N_ROLLOUT_MULT = 3;
 
     public MonteCarloAgent(long seed)
     {
@@ -74,6 +74,7 @@ public class MonteCarloAgent extends Agent {
         GameState gsCopy = gs.copy();
         boolean end = false;
         int step = 0;
+        boolean turnEnded = false;
 
         while(!end)
         {
@@ -84,10 +85,20 @@ public class MonteCarloAgent extends Agent {
             if(!end)
             {
                 ArrayList<Action> allActions = gsCopy.getAllAvailableActions();
+
+                if(turnEnded)
+                {
+                    int a = 0;
+                }
+
                 int numActions = allActions.size();
                 act = allActions.get(m_rnd.nextInt(numActions));
-                if(act instanceof EndTurn)
-                    end = true;
+
+                if(act instanceof EndTurn) {
+//                    System.out.println("End Turn in rollout, step " + step);
+                    //end = true;
+                    turnEnded = true;
+                }
             }
         }
 

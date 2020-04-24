@@ -22,6 +22,6 @@ public class Warrior extends Unit
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
-        return c;
+        return hideInfo ? (Warrior) c.hide() : c;
     }
 }

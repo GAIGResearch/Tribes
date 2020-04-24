@@ -21,7 +21,6 @@ public abstract class Unit extends Actor
     private int kills;
     private boolean isVeteran;
     private int cityId;
-    private boolean isKilled; //TODO: This flag can probably be removed altogether. Check if dying by retaliation attack works fine before doing so.
 
     private Types.TURN_STATUS status;
 
@@ -40,7 +39,6 @@ public abstract class Unit extends Actor
         this.isVeteran = isVeteran;
         this.cityId = cityId;
         this.tribeId = tribeID;
-        this.isKilled = false;
         this.status = FINISHED;
     }
 
@@ -199,15 +197,6 @@ public abstract class Unit extends Actor
 
     public abstract Unit copy(boolean hideInfo);
 
-    public void setKilled(boolean isKilled){
-        this.isKilled = isKilled;
-        if(isKilled)
-            this.setStatus(FINISHED);
-    }
-
-    public boolean isKilled(){
-        return isKilled;
-    }
 
     Unit hide()
     {

@@ -30,10 +30,10 @@ public class Boat extends Unit
     public Boat copy(boolean hideInfo) {
         Boat c = new Boat(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
+        c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         c.setBaseLandUnit(getBaseLandUnit());
-        c.setKilled(isKilled());
         return hideInfo ? (Boat) c.hide() : c;
     }
 }

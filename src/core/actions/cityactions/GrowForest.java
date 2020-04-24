@@ -51,4 +51,9 @@ public class GrowForest extends CityAction
         grow.setTargetPos(this.targetPos.copy());
         return grow;
     }
+
+    public String toString()
+    {
+        return "GROW_FOREST by city " + this.cityId+ " at " + targetPos;
+    }
 }

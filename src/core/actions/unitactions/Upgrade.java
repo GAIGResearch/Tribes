@@ -73,4 +73,8 @@ public class Upgrade extends UnitAction
     public Action copy() {
         return new Upgrade(this.unitId);
     }
+
+    public String toString() {
+        return "UPGRADE by unit " + this.unitId;
+    }
 }

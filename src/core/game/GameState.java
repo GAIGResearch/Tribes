@@ -371,26 +371,25 @@ public class GameState {
             for(int i = 0; i < canEndTurn.length; ++i) {
                 Tribe t = board.getTribe(i);
 
-                int numControlledCities = t.getCitiesID().size();
-                if(numControlledCities == 0)
-                {
-                    //In this mode, this tribe automatically loses.
-                    t.setWinner(Types.RESULT.LOSS);
-                }else {
-                    boolean winner = true;
-                    for (int cap : capitals) {
-                        if (!t.getCitiesID().contains(cap)) {
-                            winner = false;
-                            break;
-                        }
-                    }
-                    if (winner) {
-                        //we have a winner: tribe t.
-                        bestTribe = i;
-                        isEnded = true;
-                        break; //no need to go further, all the others have lost the game.
+                //Already lost?
+                if(t.getWinner() == Types.RESULT.LOSS)
+                    continue;
+
+                boolean winner = true;
+                for (int cap : capitals) {
+                    if (!t.getCitiesID().contains(cap)) {
+                        winner = false;
+                        break;
                     }
                 }
+
+                if (winner) {
+                    //we have a winner: tribe t.
+                    bestTribe = i;
+                    isEnded = true;
+                    break; //no need to go further, all the others have lost the game.
+                }
+
             }
 
 
@@ -401,6 +400,11 @@ public class GameState {
             for(int i = 0; i < canEndTurn.length; ++i)
             {
                 Tribe t = board.getTribe(i);
+
+                //Already lost?
+                if(t.getWinner() == Types.RESULT.LOSS)
+                    continue;
+
                 if(t.getScore() > maxScore)
                 {
                     maxScore = t.getScore();

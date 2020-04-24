@@ -51,4 +51,8 @@ public class Recover extends UnitAction
     public Action copy() {
         return new Recover(this.unitId);
     }
+
+    public String toString() {
+        return "RECOVER by unit " + this.unitId;
+    }
 }

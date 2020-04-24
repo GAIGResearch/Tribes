@@ -38,4 +38,8 @@ public class MakeVeteran extends UnitAction
     public Action copy() {
         return new MakeVeteran(this.unitId);
     }
+
+    public String toString() {
+        return "MAKE_VETERAN by unit " + this.unitId;
+    }
 }

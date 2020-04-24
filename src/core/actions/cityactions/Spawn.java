@@ -68,4 +68,9 @@ public class Spawn extends CityAction
         spawn.setTargetPos(this.targetPos.copy());
         return spawn;
     }
+
+    public String toString()
+    {
+        return "SPAWN by city " + this.cityId+ " : " + unit_type.toString();
+    }
 }

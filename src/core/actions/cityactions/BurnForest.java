@@ -50,4 +50,9 @@ public class BurnForest extends CityAction
         burn.setTargetPos(this.targetPos.copy());
         return burn;
     }
+
+    public String toString()
+    {
+        return "BURN_FOREST by city " + this.cityId+ " at " + targetPos;
+    }
 }

@@ -22,7 +22,6 @@ public class Knight extends Unit
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
-        c.setKilled(isKilled());
         return hideInfo ? (Knight) c.hide() : c;
     }
 }

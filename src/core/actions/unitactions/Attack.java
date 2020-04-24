@@ -125,4 +125,6 @@ public class Attack extends UnitAction
         attack.setTargetId(this.targetId);
         return attack;
     }
+
+    public String toString() { return "ATTACK by unit " + this.unitId + " to unit " + this.targetId;}
 }

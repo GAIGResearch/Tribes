@@ -22,7 +22,6 @@ public class Archer extends Unit
         c.setCurrentHP(getCurrentHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
-        c.setKilled(isKilled());
         return hideInfo ? (Archer) c.hide() : c;
     }
 }

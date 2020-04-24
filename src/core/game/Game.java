@@ -188,6 +188,10 @@ public class Game {
         for (int i = 0; i < numPlayers; i++) {
             Tribe tribe = tribes[i];
 
+            if(tribe.getWinner() == Types.RESULT.LOSS)
+                continue; //We don't do anything for tribes that have already lost.
+
+
             //play the full turn for this player
             processTurn(i, tribe, frame);
 

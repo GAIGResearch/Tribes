@@ -70,4 +70,8 @@ public class HealOthers extends UnitAction
         }
         return false;
     }
+
+    public String toString() {
+        return "HEAL by unit " + this.unitId;
+    }
 }

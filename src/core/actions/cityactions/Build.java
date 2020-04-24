@@ -159,7 +159,8 @@ public class Build extends CityAction
         return true;
     }
 
-
-
-
+    public String toString()
+    {
+        return "BUILD by city " + this.cityId+ " at " + targetPos + " : " + buildingType.toString();
+    }
 }

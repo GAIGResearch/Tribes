@@ -197,15 +197,6 @@ public abstract class Unit extends Actor
 
     public abstract Unit copy(boolean hideInfo);
 
-//    public void setKilled(boolean isKilled){
-//        this.isKilled = isKilled;
-//        if(isKilled)
-//            this.setStatus(FINISHED);
-//    }
-
-//    public boolean isKilled(){
-//        return isKilled;
-//    }
 
     Unit hide()
     {

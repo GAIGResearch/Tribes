@@ -186,6 +186,8 @@ public class Board {
                     copyBoard.setBuildingAt(x, y, buildings[x][y]);
                     copyBoard.tileCityId[x][y] = tileCityId[x][y];
                     copyBoard.tradeNetwork.setTradeNetworkValue(x,y,tradeNetwork.getTradeNetworkValue(x,y));
+                }else{
+                    copyBoard.setTerrainAt(x, y, FOG);
                 }
             }
         }
@@ -636,6 +638,14 @@ public class Board {
 
             // TRIBE that captured this city. One unit moves there.
             moveOneToNewCity(capturedCity, capturingTribe, rnd);
+
+            // If this tribe has lost all its cities, the tribe has lost.
+            if(previousOwner.getNumCities() == 0 && gameState.isNative())
+            {
+                // If it's not native, the player who owns this game state does not
+                // necessarily need to know that this other player is defeated if this city is lost.
+                previousOwner.manageLoss(gameState);
+            }
 
         }else
         {

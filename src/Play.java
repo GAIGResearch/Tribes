@@ -3,6 +3,7 @@ import core.actions.Action;
 import core.game.Game;
 import core.actors.Tribe;
 import players.*;
+import players.mc.MonteCarloAgent;
 import players.osla.OneStepLookAheadAgent;
 
 import java.util.ArrayList;
@@ -20,23 +21,24 @@ public class Play {
     {
         HUMAN,
         RANDOM,
-        OSLA
+        OSLA,
+        MC
     }
 
     public static void main(String[] args) {
 
         Types.GAME_MODE gameMode = CAPITALS;
 
-//        String filename = "SampleLevel2p.csv";
-        String filename = "SampleLevel.csv";
+        String filename = "SampleLevel2p.csv";
+//        String filename = "SampleLevel.csv";
 //        String filename = "MinimalLevel.csv";
 //        String filename = "MinimalLevel_water.csv";
 //        String filename = "MinimalLevel2.csv";
 
-        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
+//        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
 //        play(filename, new PlayerType[]{PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
 //        play(filename, new PlayerType[]{PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI}, gameMode);
-//        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode);
+        play(filename, new PlayerType[]{PlayerType.MC, PlayerType.MC}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode);
 //        play(filename, new PlayerType[]{PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
     }
 
@@ -81,6 +83,7 @@ public class Play {
             case HUMAN: return new HumanAgent(ac);
             case RANDOM: return new RandomAgent(randomSeed);
             case OSLA: return new OneStepLookAheadAgent(randomSeed);
+            case MC: return new MonteCarloAgent(randomSeed);
         }
         return null;
     }

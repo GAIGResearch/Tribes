@@ -354,4 +354,7 @@ public class City extends Actor{
     }
 
 
+    public void clearUnits() {
+        unitsID.clear();
+    }
 }

@@ -1,5 +1,6 @@
 package utils;
 
+import core.Types;
 import core.actors.Tribe;
 import core.game.GameState;
 
@@ -56,7 +57,10 @@ public class TribeView extends JComponent {
             // TODO: make sure this doesn't mess up assumptions of tribe order, it shouldn't since array cloned
             Arrays.sort(tribes, Comparator.comparing(Tribe::getReverseScore));
             for (Tribe t : tribes) {
-                s += "<p><b>" + t.getName() + "</b>  ...........  " + t.getScore() + " points</p>";
+                Types.RESULT winState = t.getWinner();
+                String w = "";
+                if (winState != Types.RESULT.INCOMPLETE) w = " (" + winState.toString() + ")";
+                s += "<p><b>" + t.getName() + "</b>  ...........  " + t.getScore() + " points" + w + "</p>";
             }
 
             if (!textArea.getText().equals(s)) {

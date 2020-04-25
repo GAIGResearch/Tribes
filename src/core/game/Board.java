@@ -62,7 +62,7 @@ public class Board {
         this.gameActors = new HashMap<>();
     }
 
-    public Board(JSONObject JBoard, int[] capitalIDs, int activeTribeID){
+    public Board(JSONObject JBoard, int[] capitalIDs, int activeTribeID, Tribe[] tribes){
         this.gameActors = new HashMap<>();
         this.capitalIDs = capitalIDs;
         JSONArray JResource = JBoard.getJSONArray("resource");
@@ -80,6 +80,7 @@ public class Board {
         tileCityId = new int[size][size];
         isNative = true;
         this.activeTribeID = activeTribeID;
+        this.assignTribes(tribes);
 
         boolean[][] networkTiles = new boolean[size][size];
         for (int i=0; i<size; i++){

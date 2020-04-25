@@ -69,7 +69,7 @@ public class GameLoader
     }
 
     private void loadBoard() {
-        board = new Board(JBoard, allCapitalIds, activeTribeID);
+        board = new Board(JBoard, allCapitalIds, activeTribeID, tribes);
     }
 
     private void loadUnits(){

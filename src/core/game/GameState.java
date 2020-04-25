@@ -79,6 +79,8 @@ public class GameState {
         if (board.getActiveTribeID() == tribes.length-1){
             this.tick++;
             board.setActiveTribeID(0);
+        }else{
+            board.setActiveTribeID(board.getActiveTribeID() + 1);
         }
 
         canEndTurn = new boolean[tribes.length];

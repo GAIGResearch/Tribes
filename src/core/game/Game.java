@@ -3,6 +3,7 @@ package core.game;
 import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
+import core.actions.tribeactions.EndTurn;
 import core.actions.unitactions.Recover;
 import core.actions.unitactions.factory.RecoverFactory;
 import core.actors.Building;
@@ -157,23 +158,24 @@ public class Game {
             VISUALS = false;
         boolean firstEnd = true;
 
-        while(!gameOver()) {
+        while(frame == null || !frame.isClosed()) {
             // Loop while window is still open, even if the game ended.
-            // If not playing with visuals, loop while the game's not ended.
+            // If not playing with visuals, loop is broken when game's ended.
             tick(frame);
 
             // Check end of game
             if (firstEnd && gameOver()) {
+                terminate();
                 firstEnd = false;
 
-                if (!VISUALS) {
+                if (!VISUALS || frame == null) {
                     // The game has ended, end the loop if we're running without visuals.
                     break;
+                } else {
+                    frame.update(getGameState(-1)); // One last update with full observation
                 }
             }
         }
-
-        terminate();
     }
 
     /**
@@ -440,45 +442,80 @@ public class Game {
         //start the timer to the max duration
         ElapsedCpuTimer ect = new ElapsedCpuTimer();
         ect.setMaxTimeMillis(TURN_TIME_MILLIS);
+
+        // Keep track of time remaining for turn thinking
+        long remainingECT = TURN_TIME_MILLIS;
+
         boolean continueTurn = true;
         int curActionCounter = 0;
 
-        while(continueTurn)
-        {
-            //get one action from the player
-            Action action = ag.act(gameStateObservations[playerID], ect);
-
-//            System.out.println(gs.getTick() + " " + curActionCounter + " " + action + "; stars: " + gs.getBoard().getTribe(playerID).getStars());
-            curActionCounter++;
-
-            //note down the remaining time to use it for the next iteration
-            long remaining = ect.remainingTimeMillis();
-
-            //play the action in the game and update the available actions list
-            gs.next(action);
-            gs.computePlayerActions(tribe);
-
-            updateAssignedGameStates();
-
-            // Update GUI after every action
-            // Paint game state
-            if (VISUALS && frame != null) {
-                if(FORCE_FULL_OBSERVABILITY)
-                    frame.update(getGameState(-1));
-                else
-                    frame.update(gameStateObservations[gs.getActiveTribeID()]);        //Partial Obs
-            }
-
-            //the timer needs to be updated to the remaining time, not counting action computation.
-            ect.setMaxTimeMillis(remaining);
-
-            //Continue this turn if there are still available actions. If the agent is human, let him play for now.
-            continueTurn = !gs.isTurnEnding();
-            if(!(ag instanceof HumanAgent))
-                continueTurn &= gs.existAvailableActions(tribe) && !ect.exceededMaxTime();
+        // Timer for action execution, delay introduced from GUI. Another delay is added at the end of the turn to
+        // make sure all updates are executed and displayed to humans.
+        ElapsedCpuTimer actionDelayTimer = null;
+        ElapsedCpuTimer endTurnDelay = null;
+        if (VISUALS && frame != null) {
+            actionDelayTimer = new ElapsedCpuTimer();
+            actionDelayTimer.setMaxTimeMillis(FRAME_DELAY);
         }
 
-        //Ends the turn for this tribe (units that didn't move heal).
+        while (true) {
+            // Keep track of action played in this loop, null if no action.
+            Action action = null;
+
+            // Check GUI end of turn timer
+            if (endTurnDelay != null && endTurnDelay.remainingTimeMillis() <= 0) break;
+
+            // Action request and execution if turn should be continued
+            if (continueTurn) {
+                //noinspection ConstantConditions
+                if ((!VISUALS || frame == null) || actionDelayTimer.remainingTimeMillis() <= 0) {
+                    // Get one action from the player
+                    ect.setMaxTimeMillis(remainingECT);  // Reset timer ignoring all other timers or updates
+                    action = ag.act(gameStateObservations[playerID], ect);
+                    remainingECT = ect.remainingTimeMillis(); // Note down the remaining time to use it for the next iteration
+
+//            System.out.println(gs.getTick() + " " + curActionCounter + " " + action + "; stars: " + gs.getBoard().getTribe(playerID).getStars());
+                    curActionCounter++;
+
+                    // Play the action in the game and update the available actions list and observations
+                    gs.next(action);
+                    gs.computePlayerActions(tribe);
+                    updateAssignedGameStates();
+
+                    if (actionDelayTimer != null) {  // Reset action delay timer for next action request
+                        actionDelayTimer = new ElapsedCpuTimer();
+                        actionDelayTimer.setMaxTimeMillis(FRAME_DELAY);
+                    }
+
+                    // Continue this turn if there are still available actions and end turn was not requested.
+                    // If the agent is human, let him play for now.
+                    continueTurn = !gs.isTurnEnding();
+                    if (!(ag instanceof HumanAgent)) {
+                        ect.setMaxTimeMillis(remainingECT);
+                        continueTurn &= gs.existAvailableActions(tribe) && !ect.exceededMaxTime();
+                    }
+                }
+            } else if (endTurnDelay == null) {
+                // If turn should be ending (and we've not already triggered end turn), the action is automatically EndTurn
+                action = new EndTurn(gs.getActiveTribeID());
+            }
+
+            // Update GUI after every iteration
+            if (VISUALS && frame != null) {
+                if (FORCE_FULL_OBSERVABILITY) frame.update(getGameState(-1));  // Full Obs
+                else frame.update(gameStateObservations[gs.getActiveTribeID()]);        // Partial Obs
+
+                // Turn should be ending, start timer for delay of next action and show all updates
+                if (action instanceof EndTurn) {
+                    endTurnDelay = new ElapsedCpuTimer();
+                    endTurnDelay.setMaxTimeMillis(FRAME_DELAY);
+                }
+            } else if (action instanceof EndTurn) { // If no visuals and we should end the turn, just break out of loop here
+                break;
+            }
+        }
+
+        // Ends the turn for this tribe (units that didn't move heal).
         gs.endTurn(tribe);
     }
 

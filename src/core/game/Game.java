@@ -108,7 +108,7 @@ public class Game {
         Tribe[] tribes = gameLoader.getTribes();
 
         this.gs = new GameState(rnd, gameLoader.getGame_mode(), tribes, gameLoader.getBoard(), gameLoader.getTick());
-
+        this.gs.setGameIsOver(gameLoader.getGameIsOver());
 
         if(players.size() != tribes.length)
         {
@@ -219,7 +219,7 @@ public class Game {
             // Save Game
             GameSaver.writeTurnFile(gs, getBoard(), seed);
 
-            GameLoader gl = new GameLoader("save/" + this.seed + "/"+ gs.getTick() + "_" + gs.getActiveTribeID() +"/game.json");
+            //GameLoader gl = new GameLoader("save/" + this.seed + "/"+ gs.getTick() + "_" + gs.getActiveTribeID() +"/game.json");
 
             //it may be that this player won the game, no more playing.
             if(gameOver())

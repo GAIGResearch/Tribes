@@ -18,6 +18,7 @@ public class GameLoader
 
     private int tick;
     private long seed;
+    private boolean gameIsOver;
     private int activeTribeID;
 
     private JSONObject JBoard;
@@ -38,6 +39,7 @@ public class GameLoader
         this.JBoard = (JSONObject) gameINFO.get("board");
         this.JTribe = gameINFO.getJSONObject("tribes");
         this.tick = gameINFO.getInt("tick");
+        this.gameIsOver = gameINFO.getBoolean("gameIsOver");
         this.seed = gameINFO.getLong("seed");
         this.activeTribeID = gameINFO.getInt("activeTribeID");
         this.JUnit = gameINFO.getJSONObject("unit");
@@ -142,5 +144,9 @@ public class GameLoader
 
     public Types.GAME_MODE getGame_mode() {
         return game_mode;
+    }
+
+    public boolean getGameIsOver() {
+        return gameIsOver;
     }
 }

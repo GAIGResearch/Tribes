@@ -696,6 +696,10 @@ public class GameState {
         return gameIsOver;
     }
 
+    void setGameIsOver(boolean gameIsOver) {
+        this.gameIsOver = gameIsOver;
+    }
+
     /**
      * Gathers and returns all the available actions for the active tribe in a single ArrayList
      * @return all available actions
@@ -791,4 +795,5 @@ public class GameState {
     public Types.RESULT getTribeWinStatus() {
         return getActiveTribe().getWinner();
     }
+
 }

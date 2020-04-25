@@ -213,6 +213,7 @@ public class GameSaver {
             game.put("tribes", tribesINFO);
             game.put("seed", seed);
             game.put("tick", gs.getTick());
+            game.put("gameIsOver", gs.isGameOver());
             game.put("activeTribeID", gs.getActiveTribeID());
             game.put("gameMode", gs.getGameMode().getKey());
 

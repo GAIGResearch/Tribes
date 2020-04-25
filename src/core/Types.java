@@ -672,7 +672,7 @@ public class Types {
         VILLAGE(4, "img/terrain/village2.png", 'v'),
         CITY(5, "img/terrain/city2.png", 'c'),
         FOREST(6, "img/terrain/forest2.png", 'f'),
-        FOG(7, "null", ' ');
+        FOG(7, "img/fog.png", ' ');
 
         private String imageFile;
         private int key;

@@ -7,16 +7,17 @@ import core.actions.Action;
 import core.actions.cityactions.factory.CityActionBuilder;
 import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.factory.TribeActionBuilder;
+import core.actions.unitactions.Recover;
+import core.actions.unitactions.factory.RecoverFactory;
 import core.actions.unitactions.factory.UnitActionBuilder;
-import core.actors.Actor;
-import core.actors.City;
-import core.actors.Tribe;
+import core.actors.*;
 import core.actors.units.Unit;
 import utils.IO;
 import utils.Vector2d;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Random;
 
 public class GameState {
@@ -44,6 +45,8 @@ public class GameState {
     //Flags the state to indicate that the turn must end
     private boolean turnMustEnd;
 
+    //Indicates if the game is over.
+    private boolean gameIsOver;
 
     /**
      * This variable indicates if the computed actions in this class are updated.
@@ -64,6 +67,7 @@ public class GameState {
         this.unitActions = new HashMap<>();
         this.tribeActions = new ArrayList<>();
         this.turnMustEnd = false;
+        this.gameIsOver = false;
     }
 
     public GameState(Random rnd, Types.GAME_MODE gameMode, Tribe[] tribes, Board board, int tick){
@@ -152,6 +156,10 @@ public class GameState {
         this.cityActions = new HashMap<>();
         this.unitActions = new HashMap<>();
         this.tribeActions = new ArrayList<>();
+
+        if(gameIsOver)
+            return; // no actions available if the game is over
+
 
         ArrayList<Integer> cities = tribe.getCitiesID();
         ArrayList<Integer> allUnits = new ArrayList<>();
@@ -247,11 +255,15 @@ public class GameState {
      * Advances the game state applying a single action received.
      * @param action to be executed in the current game state.
      */
-    public void next(Action action)
+    void next(Action action)
     {
         if(action != null)
         {
-            action.execute(this);
+            boolean executed =action.execute(this);
+
+            if(!executed) {
+                System.out.println("Action [" + action + "] couldn't execute?");
+            }
 
             //Post-action execution matters:
 
@@ -263,20 +275,163 @@ public class GameState {
     /**
      * Advances the game state applying a single action received.
      * It may also compute the actions available for the next step.
+     * It handles turn change if 'action' is an EndTurn action that can be executed.
      * @param action to be executed in the current game state.
      * @param computeActions true if actions available after action has been executed should be computed.
      */
-    public void next(Action action, boolean computeActions)
+    public void advance(Action action, boolean computeActions)
     {
         if(action != null)
         {
-            action.execute(this);
-            computedActionTribeIdFlag = -1;
+            boolean executed = action.execute(this);
 
-            if(computeActions)
-                this.computePlayerActions(getTribe(board.getActiveTribeID()));
+            if(!executed) {
+                System.out.println("Action [" + action + "] couldn't execute?");
+            }
+
+            if(executed) {
+
+                //it's an end turn
+                if(action instanceof EndTurn)
+                {
+                    //manage the end of this turn.
+                    this.endTurn(getActiveTribe());
+
+                    //the game may be over
+                    gameOver();
+
+                    //Advance player
+                    if(!gameIsOver)
+                    {
+                        int curActiveTribeId = board.getActiveTribeID();
+                        boolean playerFound = false;
+                        while(!playerFound)
+                        {
+                            curActiveTribeId = (curActiveTribeId + 1) % canEndTurn.length;
+                            if(board.getTribe(curActiveTribeId).getWinner() != Types.RESULT.LOSS)
+                                playerFound = true;
+
+                            if(curActiveTribeId == board.getActiveTribeID())
+                                System.out.println("ForwardModel ERROR: this shouldn't happen (all players but " +
+                                        board.getActiveTribeID() + " lost, but it's not game over?)");
+                        }
+
+                        board.setActiveTribeID(curActiveTribeId);
+
+                        //Start the turn for the next tribe
+                        this.initTurn(getActiveTribe());
+                    }
+
+                }
+
+                computedActionTribeIdFlag = -1;
+                if (computeActions)
+                    this.computePlayerActions(getActiveTribe());
+            }
         }
     }
+
+    /**
+     * Ends this turn. Executes a Recover action on all the units that are not fresh
+     * @param tribe tribe whose turn is ending.
+     */
+    void endTurn(Tribe tribe)
+    {
+        //For all units that didn't execute any action, a Recover action is executed.
+        ArrayList<Integer> allTribeUnits = new ArrayList<>();
+        ArrayList<Integer> tribeCities = tribe.getCitiesID();
+
+        //1. Get all units
+        for(int cityId : tribeCities)
+        {
+            City city = (City) getActor(cityId);
+            allTribeUnits.addAll(city.getUnitsID());
+        }
+
+        //Heal the ones that were in a FRESH state.
+        allTribeUnits.addAll(tribe.getExtraUnits());    //Add the extra units that don't belong to a city.
+        for(int unitId : allTribeUnits)
+        {
+            Unit unit = (Unit) getActor(unitId);
+            if(unit.getStatus() == Types.TURN_STATUS.FRESH)
+            {
+                LinkedList<Action> recoverActions = new RecoverFactory().computeActionVariants(unit, this);
+                if(recoverActions.size() > 0)
+                {
+                    Recover recoverAction = (Recover)recoverActions.get(0);
+                    recoverAction.execute(this);
+                }
+            }
+        }
+    }
+
+    /**
+     * Inits the turn for this player
+     * @param tribe whose turn is starting
+     */
+    void initTurn(Tribe tribe)
+    {
+        //Get all cities of this tribe
+        ArrayList<Integer> tribeCities = tribe.getCitiesID();
+        ArrayList<Integer> allTribeUnits = new ArrayList<>();
+        this.setEndTurn(false);
+
+        //1. Compute stars per turn.
+        int acumProd = 0;
+        for (int cityId : tribeCities) {
+            City city = (City) getActor(cityId);
+
+            //Cities with an enemy unit in the city's tile don't generate production.
+            boolean produces = true;
+            Vector2d cityPos = city.getPosition();
+            int unitIDAt = board.getUnitIDAt(cityPos.x, cityPos.y);
+            if (unitIDAt > 0) {
+                Unit u = (Unit) getActor(unitIDAt);
+                produces = (u.getTribeId() == tribe.getTribeId());
+            }
+
+            if (produces)
+                acumProd += city.getProduction();
+
+            allTribeUnits.addAll(city.getUnitsID());
+
+            //All temples grow;
+            for(Building b : city.getBuildings())
+            {
+                if(b.type.isTemple()) {
+                    int templePoints = ((Temple) b).score();
+                    tribe.addScore(templePoints);
+                    city.addPointsWorth(templePoints);
+                }
+            }
+        }
+
+        if(tick == 0)
+        {
+            tribe.setScore(tribe.getType().getInitialScore());
+            tribe.setStars(TribesConfig.INITIAL_STARS);
+        }else{
+            acumProd = Math.max(0, acumProd); //Never have a negative amount of stars.
+            tribe.addStars(acumProd);
+        }
+
+        //2. Units: all become available. This needs to be done here as some units may have become
+        // pushed during other player's turn.
+        allTribeUnits.addAll(tribe.getExtraUnits());    //Add the extra units that don't belong to a city.
+        for(int unitId : allTribeUnits)
+        {
+            Unit unit = (Unit) getActor(unitId);
+            if(unit.getStatus() == Types.TURN_STATUS.PUSHED)
+                //Pushed units in the previous turn start as if they moved already.
+                unit.setStatus(Types.TURN_STATUS.MOVED);
+            else
+                unit.setStatus(Types.TURN_STATUS.FRESH);
+        }
+
+        //3. Update tribe pacifist counter
+        tribe.addPacifistCount();
+    }
+
 
     /**
      * Pushes a unit following the game rules. If the unit can't be pushed, destroys it.
@@ -330,6 +485,7 @@ public class GameState {
         copy.board = board.copy(playerIdx!=-1, playerIdx);
         copy.tick = this.tick;
         copy.turnMustEnd = turnMustEnd;
+        copy.gameIsOver = gameIsOver;
 
         int numTribes = getTribes().length;
         copy.canEndTurn = new boolean[numTribes];
@@ -440,6 +596,7 @@ public class GameState {
             }
         }
 
+        gameIsOver = isEnded;
         return isEnded;
     }
 
@@ -458,7 +615,7 @@ public class GameState {
      * Sets the flag for turning ending to 'endTurn'
      * @param endTurn true if the turn must end
      */
-    public void endTurn(boolean endTurn)
+    public void setEndTurn(boolean endTurn)
     {
         turnMustEnd = endTurn;
     }
@@ -534,6 +691,10 @@ public class GameState {
     }
 
     /* AVAILABLE ACTIONS */
+
+    public boolean isGameOver() {
+        return gameIsOver;
+    }
 
     /**
      * Gathers and returns all the available actions for the active tribe in a single ArrayList
@@ -625,5 +786,9 @@ public class GameState {
 
     public Types.GAME_MODE getGameMode() {
         return gameMode;
+    }
+
+    public Types.RESULT getTribeWinStatus() {
+        return getActiveTribe().getWinner();
     }
 }

@@ -23,9 +23,11 @@ public class MoveFactory implements ActionFactory {
         //If a units turn is FINISHED don't do unnecessary calculations.
         if(unit.canMove()) {
             for(PathNode tile : tp.findPaths()) {
-                Move action = new Move(unit.getActorId());
-                action.setDestination(tile.getPosition());
-                moves.add(action);
+                if(gs.getBoard().getUnitAt(tile.getX(), tile.getY()) == null) {
+                    Move action = new Move(unit.getActorId());
+                    action.setDestination(tile.getPosition());
+                    moves.add(action);
+                }
             }
         }
         return moves;

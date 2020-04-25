@@ -11,6 +11,8 @@ import java.util.ArrayList;
 public class TribesSimpleHeuristic implements StateHeuristic{
 
     private int playerID;
+    private int WIN_BOOST = 100000;
+    private int LOSE_BOOST = 100000;
 
     public TribesSimpleHeuristic(int playerID)
     {
@@ -30,9 +32,14 @@ public class TribesSimpleHeuristic implements StateHeuristic{
         boolean [][] visibility = gameState.getVisibilityMap();
         int visCount = 0;
         for (boolean[] booleans : visibility)
-            for (int j = 0; j < booleans.length; ++j)
-                visCount += booleans[j] ? 1 : 0;
+            for (boolean aBoolean : booleans) visCount += aBoolean ? 1 : 0;
 
-        return numAvailableActions + availableProduction + tt.getNumResearched() + score + tribesMet.size() + cities.size() + units.size() + visCount;
+        int boost = 0;
+        if(gameState.isGameOver())
+            if(gameState.getTribeWinStatus() == Types.RESULT.WIN)
+                boost = WIN_BOOST;
+            else if (gameState.getTribeWinStatus() == Types.RESULT.LOSS) boost = LOSE_BOOST;
+
+        return boost + numAvailableActions + availableProduction + tt.getNumResearched() + score + tribesMet.size() + cities.size() + units.size() + visCount;
     }
 }

@@ -644,8 +644,10 @@ public class Board {
             moveOneToNewCity(capturedCity, capturingTribe, rnd);
 
             // If this tribe has lost all its cities, the tribe has lost.
-            if(previousOwner.getNumCities() == 0)
+            if(previousOwner.getNumCities() == 0 && gameState.isNative())
             {
+                // If it's not native, the player who owns this game state does not
+                // necessarily need to know that this other player is defeated if this city is lost.
                 previousOwner.manageLoss(gameState);
             }
 

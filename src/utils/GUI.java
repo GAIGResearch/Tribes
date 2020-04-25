@@ -2,6 +2,7 @@ package utils;
 
 import core.Types;
 import core.actions.tribeactions.EndTurn;
+import core.actions.tribeactions.TribeAction;
 import core.actions.unitactions.*;
 import core.actors.units.Unit;
 import core.game.Game;
@@ -29,6 +30,13 @@ public class GUI extends JFrame {
 
     private Game game;
     private GameState gs;
+
+    private ArrayList<HashMap<Integer,ArrayList<Action>>> actionHistory;
+    private ArrayList<GameState> stateHistory;
+    private ActionController replayer;
+    private boolean pauseAfterTurn = false;  // If game should automatically pause after one turn (of one tribe) is played
+    private boolean pauseAfterTick = false;  // If game should automatically pause after one tick (all tribes) is played
+
 //    private KeyController ki;
     private WindowInput wi;
     private ActionController ac;
@@ -76,6 +84,10 @@ public class GUI extends JFrame {
         this.ac = ac;
         this.wi = wi;
         this.game = game;
+
+        this.actionHistory = new ArrayList<>();
+        this.stateHistory = new ArrayList<>();
+        this.replayer = new ActionController();
 
         infoView = new InfoView(ac);
         panTranslate = new Point2D.Double(0,0);
@@ -141,6 +153,9 @@ public class GUI extends JFrame {
                                 "Are you sure?",
                                 JOptionPane.YES_NO_OPTION,
                                 JOptionPane.QUESTION_MESSAGE);
+                    }
+                    if (candidate instanceof TribeAction) {
+                        ((TribeAction) candidate).setTribeId(gs.getActiveTribeID());
                     }
                     if (n == 0) {
                         ac.addAction(candidate, gs);
@@ -279,9 +294,29 @@ public class GUI extends JFrame {
         sidePanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
 
         c.gridy++;
+        JPanel buttons = new JPanel();
         JButton endTurn = new JButton("End Turn");
-        endTurn.addActionListener(e -> ac.addAction(new EndTurn(), gs));
-        sidePanel.add(endTurn, c);
+        endTurn.addActionListener(e -> ac.addAction(new EndTurn(gs.getActiveTribeID()), gs));
+        JButton playTurn = new JButton("Play Turn");
+        playTurn.addActionListener(e -> { pauseAfterTurn = true; game.setPaused(false); });
+        JButton playTick = new JButton("Play Tick");
+        playTick.addActionListener(e -> { pauseAfterTick = true; game.setPaused(false); });
+        JButton pause = new JButton("Pause");
+        pause.addActionListener(e -> {
+            if (game.isPaused()) {
+                game.setPaused(false);
+                pause.setText("Pause");
+            } else {
+                game.setPaused(true);
+                pause.setText("Resume");
+            }
+        });
+
+        buttons.add(endTurn);
+        buttons.add(playTurn);
+        buttons.add(playTick);
+        buttons.add(pause);
+        sidePanel.add(buttons, c);
 
         c.gridy++;
         sidePanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
@@ -293,21 +328,34 @@ public class GUI extends JFrame {
     /**
      * Paints the GUI, to be called at every game tick.
      */
-    public void update(GameState gs) {
+    public void update(GameState gs, Action a) {
+//        if (this.gs == null || this.gs.getTick() != gs.getTick()) {
+//            // Tick change
+//            HashMap<Integer, ArrayList<Action>> tick = new HashMap<>();
+//            for (int i = 0; i < game.getPlayers().length; i++) {
+//                tick.put(i, new ArrayList<>());
+//            }
+//            actionHistory.add(tick);
+//        }
         if (this.gs == null || this.gs.getActiveTribeID() != gs.getActiveTribeID()) {
-            infoView.resetHighlight();  // Reset highlights on turn change
-            view.setPanToTribe(gs);  // Pan camera to tribe capital on turn change
-            ac.reset();  // Clear action queue on turn change
-            otherInfo.setText("");  // Reset info on turn change
+            // Tribe change
+            infoView.resetHighlight();  // Reset highlights
+            view.setPanToTribe(gs);  // Pan camera to tribe capital
+            ac.reset();  // Clear action queue
+            otherInfo.setText("");  // Reset info
         }
 
         // Display result of Examine action
-        Action a = ac.getLastActionPlayed();
         if (a instanceof Examine) {
-            lastExamineAction = (Examine)a;
-            ac.setLastActionPlayed(null);
+            lastExamineAction = (Examine) a;
         }
 
+//        if (this.gs != null) {
+//            if (a != null) {
+//                actionHistory.get(this.gs.getTick()).get(this.gs.getActiveTribeID()).add(a);
+//            }
+//            stateHistory.add(this.gs);
+//        }
         this.gs = gs;
         performUpdate();
 
@@ -366,7 +414,7 @@ public class GUI extends JFrame {
         tribeView.paint(gs);
         techView.paint(gs);
         infoView.paint(gs);
-        appTurn.setText("Turn: " + gs.getTick());
+        appTurn.setText("Turn: " + gs.getTick() + (game.isPaused()? " [PAUSED]" : ""));
         if (gs.getActiveTribe() != null) {
             activeTribe.setText("Tribe acting: " + gs.getActiveTribe().getName());
             activeTribeInfo.setText("stars: " + gs.getActiveTribe().getStars() + " (+" + gs.getActiveTribe().getMaxProduction(gs) + ")");
@@ -406,5 +454,21 @@ public class GUI extends JFrame {
 
     public boolean isClosed() {
         return wi.windowClosed;
+    }
+
+    public boolean pauseAfterTurn() {
+        return pauseAfterTurn;
+    }
+
+    public void setPauseAfterTurn(boolean p) {
+        pauseAfterTurn = p;
+    }
+
+    public boolean pauseAfterTick() {
+        return pauseAfterTick;
+    }
+
+    public void setPauseAfterTick(boolean p) {
+        pauseAfterTick = p;
     }
 }

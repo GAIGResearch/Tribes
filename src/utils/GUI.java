@@ -104,6 +104,7 @@ public class GUI extends JFrame {
         // Main panel definition
         JPanel mainPanel = createGamePanel();
         JPanel sidePanel = createSidePanel();
+        JPanel frameworkPanel = createFrameworkPanel();
 
         gbc.gridx = 0;
         getContentPane().add(Box.createRigidArea(new Dimension(GUI_COMP_SPACING, 0)), gbc);
@@ -116,6 +117,12 @@ public class GUI extends JFrame {
 
         gbc.gridx++;
         getContentPane().add(sidePanel, gbc);
+
+        gbc.gridx++;
+        getContentPane().add(Box.createRigidArea(new Dimension(GUI_COMP_SPACING, 0)), gbc);
+
+        gbc.gridx++;
+        getContentPane().add(frameworkPanel, gbc);
 
         gbc.gridx++;
         getContentPane().add(Box.createRigidArea(new Dimension(GUI_COMP_SPACING, 0)), gbc);
@@ -144,27 +151,31 @@ public class GUI extends JFrame {
                 Point2D p = GameView.rotatePointReverse((int)ep.getX(), (int)ep.getY());
 
                 // If unit highlighted and action at new click valid for unit, execute action
-                Action candidate = getActionAt((int)p.getX(), (int)p.getY(), infoView.getHighlightX(), infoView.getHighlightY());
-                if (candidate != null) {
-                    int n = 0;
-                    if (candidate instanceof Disband) {  // These actions needs confirmation before executing
-                        n = JOptionPane.showConfirmDialog(mainPanel,
-                                "Confirm action " + candidate.toString(),
-                                "Are you sure?",
-                                JOptionPane.YES_NO_OPTION,
-                                JOptionPane.QUESTION_MESSAGE);
-                    }
-                    if (candidate instanceof TribeAction) {
-                        ((TribeAction) candidate).setTribeId(gs.getActiveTribeID());
-                    }
-                    if (n == 0) {
-                        ac.addAction(candidate, gs);
-                    }
-                    infoView.resetHighlight();
-                } else {
-                    // Otherwise highlight new cell
-                    infoView.setHighlight((int)p.getX(), (int)p.getY());
+                if (game.getPlayers()[gs.getActiveTribeID()] instanceof HumanAgent ||
+                        !DISABLE_NON_HUMAN_GRID_HIGHLIGHT) {
+                    // Only do this if actions should be executed, or it is human agent playing
+                    Action candidate = getActionAt((int) p.getX(), (int) p.getY(), infoView.getHighlightX(), infoView.getHighlightY());
+                    if (candidate != null) {
+                        int n = 0;
+                        if (candidate instanceof Disband) {  // These actions needs confirmation before executing
+                            n = JOptionPane.showConfirmDialog(mainPanel,
+                                    "Confirm action " + candidate.toString(),
+                                    "Are you sure?",
+                                    JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE);
+                        }
+                        if (candidate instanceof TribeAction) {
+                            ((TribeAction) candidate).setTribeId(gs.getActiveTribeID());
+                        }
+                        if (n == 0) {
+                            ac.addAction(candidate, gs);
+                        }
+                        infoView.resetHighlight();
+                    } else {
+                        // Otherwise highlight new cell
+                        infoView.setHighlight((int) p.getX(), (int) p.getY());
 //                    System.out.println("Highlighting: " + (int)p.getX() + " " + (int)p.getY());
+                    }
                 }
             }
 
@@ -229,6 +240,20 @@ public class GUI extends JFrame {
         return mainPanel;
     }
 
+    /**
+     * Creates side panel supplement for game view, containing:
+     * - turn info
+     * - active tribe info
+     * - other info (Examine action / tribe win status),
+     * - info on game grid highlights (units, terrain etc.) or research in tech tree highlights
+     * - actions available for grid highlight
+     * - all tribes points ranking
+     * - tech tree view
+     * - buttons to "End Turn", "Play Turn" (game paused after tribe's turn), "Play Tick" (game paused after all tribe's
+     *      turns in current tick), "Pause/Resume" (to pause/resume game at any point), all keeping GUI responsive
+     * - quick select buttons (all units / units of type / cities of a tribe) for info display TODO
+     * @return JPanel containing all the sub components
+     */
     private JPanel createSidePanel()
     {
         JPanel sidePanel = new JPanel();
@@ -324,6 +349,33 @@ public class GUI extends JFrame {
         return sidePanel;
     }
 
+    /**
+     * Panel containing functionality for interacting with the framework and getting high-level information, including:
+     * - Game setup:
+     *      - Choosing which players should play in the next game TODO
+     *      - Choosing which tribe should be associated with each player in the next game TODO
+     *      - Choosing and editing map for next game (text view) TODO
+     *      - Choosing game seed for next game TODO
+     *      - Start/Restart/End game buttons TODO
+     * - Debugging:
+     *      - observability toggle TODO
+     *      - visuals on/off TODO
+     *      - results printout for all games in the same run (if multiple) TODO
+     *      - save game toggle TODO
+     *      - add comments to saved game files TODO
+     *      - action history display TODO
+     *      - change game configuration? TODO
+     * @return
+     */
+    private JPanel createFrameworkPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.SOUTH;
+        c.weighty = 0;
+        return panel;
+    }
+
 
     /**
      * Paints the GUI, to be called at every game tick.
@@ -394,7 +446,6 @@ public class GUI extends JFrame {
             HashMap<Integer, ArrayList<Action>> possibleActions = gs.getUnitActions();
             for (Map.Entry<Integer, ArrayList<Action>> e : possibleActions.entrySet()) {
                 Unit u = (Unit) gs.getActor(e.getKey());
-
                 for (Action a : e.getValue()) {
                     Vector2d pos = getActionPosition(gs, a);
                     if (pos != null && pos.x == actionY && pos.y == actionX) {

@@ -84,6 +84,7 @@ public class GameLoader
                     unitINFO.getInt("kill"), unitINFO.getBoolean("isVeteran"),
                     unitINFO.getInt("cityID"), unitINFO.getInt("tribeId"), unitType);
             unit.setCurrentHP(unitINFO.getInt("currentHP"));
+            unit.setStatus(Types.TURN_STATUS.FRESH);
             if (unitType == Types.UNIT.BOAT){
                 ((Boat)unit).setBaseLandUnit(Types.UNIT.getTypeByKey(unitINFO.getInt("baseLandType")));
             }else if (unitType == Types.UNIT.SHIP){

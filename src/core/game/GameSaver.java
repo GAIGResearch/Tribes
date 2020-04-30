@@ -96,8 +96,8 @@ public class GameSaver {
                         }else if (u.getType() == Types.UNIT.BATTLESHIP){
                             uInfo.put("baseLandType", ((Battleship)u).getBaseLandUnit().getKey());
                         }
-                        uInfo.put("x", i);
-                        uInfo.put("y", j);
+                        uInfo.put("x", u.getPosition().x);
+                        uInfo.put("y", u.getPosition().y);
                         uInfo.put("kill", u.getKills());
                         uInfo.put("isVeteran", u.isVeteran());
                         uInfo.put("cityID", u.getCityId());
@@ -113,8 +113,8 @@ public class GameSaver {
                         // City INFO: id:{x, y, tribeId, population_need, bound, level, isCapital, population,
                         //                production, hasWalls, pointsWorth, building(array)}
                         JSONObject cInfo = new JSONObject();
-                        cInfo.put("x", i);
-                        cInfo.put("y", j);
+                        cInfo.put("x", c.getPosition().x);
+                        cInfo.put("y", c.getPosition().y);
                         cInfo.put("tribeID", c.getTribeId());
                         cInfo.put("population_need", c.getPopulation_need());
                         cInfo.put("bound", c.getBound());

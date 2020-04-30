@@ -1,5 +1,6 @@
 package utils;
 
+import core.Types;
 import core.actions.tribeactions.EndTurn;
 import core.actions.unitactions.*;
 import core.actors.units.Unit;
@@ -29,6 +30,7 @@ public class GUI extends JFrame {
     private Game game;
     private GameState gs;
 //    private KeyController ki;
+    private WindowInput wi;
     private ActionController ac;
     private Examine lastExamineAction;
 
@@ -47,7 +49,7 @@ public class GUI extends JFrame {
      * Constructor
      * @param title Title of the window.
      */
-    public GUI(Game game, String title, KeyController ki, ActionController ac, boolean closeAppOnClosingWindow) {
+    public GUI(Game game, String title, KeyController ki, WindowInput wi, ActionController ac, boolean closeAppOnClosingWindow) {
         super(title);
 
         try {
@@ -72,6 +74,7 @@ public class GUI extends JFrame {
 
 //        this.ki = ki;
         this.ac = ac;
+        this.wi = wi;
         this.game = game;
 
         infoView = new InfoView(ac);
@@ -295,6 +298,7 @@ public class GUI extends JFrame {
             infoView.resetHighlight();  // Reset highlights on turn change
             view.setPanToTribe(gs);  // Pan camera to tribe capital on turn change
             ac.reset();  // Clear action queue on turn change
+            otherInfo.setText("");  // Reset info on turn change
         }
 
         // Display result of Examine action
@@ -366,7 +370,10 @@ public class GUI extends JFrame {
         if (gs.getActiveTribe() != null) {
             activeTribe.setText("Tribe acting: " + gs.getActiveTribe().getName());
             activeTribeInfo.setText("stars: " + gs.getActiveTribe().getStars() + " (+" + gs.getActiveTribe().getMaxProduction(gs) + ")");
-            if (lastExamineAction != null) {
+            Types.RESULT winStatus = gs.getActiveTribe().getWinner();
+            if (winStatus != Types.RESULT.INCOMPLETE) {
+                otherInfo.setText("Game result: " + winStatus.toString());
+            } else if (lastExamineAction != null) {
                 otherInfo.setText("Ruins: " + lastExamineAction.getBonus().toString());
                 otherInfoDelay--;
                 if (otherInfoDelay == 0) {
@@ -395,5 +402,9 @@ public class GUI extends JFrame {
             pos = new Vector2d(u.getPosition().x-1, u.getPosition().y);
         }
         return pos;
+    }
+
+    public boolean isClosed() {
+        return wi.windowClosed;
     }
 }

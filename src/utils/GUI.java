@@ -27,6 +27,7 @@ public class GUI extends JFrame {
     private JLabel appTurn;
     private JLabel activeTribe, activeTribeInfo, otherInfo;
     private int otherInfoDelay = GUI_INFO_DELAY;
+    private int levelingUp = 0;
 
     private Game game;
     private GameState gs;
@@ -409,10 +410,12 @@ public class GUI extends JFrame {
 //            stateHistory.add(this.gs);
 //        }
         this.gs = gs;
+        if (gs.isLevelingUp()) this.levelingUp++;
+        else this.levelingUp = 0;
         performUpdate();
 
         // Check if city is levelling up, pop up dialogue to choose options if human agent
-        if (gs.isLevelingUp() && game.getPlayers()[gs.getActiveTribeID()] instanceof HumanAgent) {
+        if (this.levelingUp == 1 && game.getPlayers()[gs.getActiveTribeID()] instanceof HumanAgent) {
             int n = -1;
             Object[] options = new String[2];
             Action[] optionsA = new Action[2];

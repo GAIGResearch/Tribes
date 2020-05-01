@@ -357,10 +357,6 @@ public class Tribe extends Actor {
         monuments.put(building, MONUMENT_STATUS.BUILT);
     }
 
-    public int getnumKills() {
-        return nKills;
-    }
-
     public void addKill() {
         this.nKills++;
 

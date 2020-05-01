@@ -474,7 +474,7 @@ public class Game {
                     action = ag.act(gameStateObservations[playerID], ect);
                     remainingECT = ect.remainingTimeMillis(); // Note down the remaining time to use it for the next iteration
 
-//            System.out.println(gs.getTick() + " " + curActionCounter + " " + action + "; stars: " + gs.getBoard().getTribe(playerID).getStars());
+//                    System.out.println(gs.getTick() + " " + curActionCounter + " " + action.toString() + "; stars: " + gs.getBoard().getTribe(playerID).getStars());
                     curActionCounter++;
 
                     // Play the action in the game and update the available actions list and observations

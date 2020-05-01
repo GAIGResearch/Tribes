@@ -294,7 +294,7 @@ public class Game {
                 // Action request and execution if turn should be continued
                 if (continueTurn) {
                     //noinspection ConstantConditions
-                    if ((!VISUALS || frame == null) || actionDelayTimer.remainingTimeMillis() <= 0) {
+                    if ((!VISUALS || frame == null) || actionDelayTimer.remainingTimeMillis() <= 0 || ag instanceof HumanAgent) {
                         // Get one action from the player
                         ect.setMaxTimeMillis(remainingECT);  // Reset timer ignoring all other timers or updates
                         action = ag.act(gameStateObservations[playerID], ect);

@@ -485,7 +485,6 @@ public class GUI extends JFrame {
         repaint();
     }
 
-
     public static Vector2d getActionPosition(GameState gs, Action a) {
         Vector2d pos = null;
         if (a instanceof Move) {
@@ -493,7 +492,7 @@ public class GUI extends JFrame {
         } else if (a instanceof Attack) {
             Unit target = (Unit) gs.getActor(((Attack) a).getTargetId());
             pos = target.getPosition();
-        } else if (a instanceof Recover || a instanceof HealOthers || a instanceof Disband) {
+        } else if (a instanceof Recover) {
             Unit u = (Unit) gs.getActor(((UnitAction) a).getUnitId());
             pos = u.getPosition();
         } else if (a instanceof Capture || a instanceof Convert || a instanceof Examine) {

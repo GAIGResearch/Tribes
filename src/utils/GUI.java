@@ -2,6 +2,7 @@ package utils;
 
 import core.Types;
 import core.actions.tribeactions.EndTurn;
+import core.actions.tribeactions.TribeAction;
 import core.actions.unitactions.*;
 import core.actors.units.Unit;
 import core.game.Game;
@@ -29,6 +30,13 @@ public class GUI extends JFrame {
 
     private Game game;
     private GameState gs;
+
+    private ArrayList<HashMap<Integer,ArrayList<Action>>> actionHistory;
+    private ArrayList<GameState> stateHistory;
+    private ActionController replayer;
+    private boolean pauseAfterTurn = false;  // If game should automatically pause after one turn (of one tribe) is played
+    private boolean pauseAfterTick = false;  // If game should automatically pause after one tick (all tribes) is played
+
 //    private KeyController ki;
     private WindowInput wi;
     private ActionController ac;
@@ -77,6 +85,10 @@ public class GUI extends JFrame {
         this.wi = wi;
         this.game = game;
 
+        this.actionHistory = new ArrayList<>();
+        this.stateHistory = new ArrayList<>();
+        this.replayer = new ActionController();
+
         infoView = new InfoView(ac);
         panTranslate = new Point2D.Double(0,0);
         view = new GameView(game.getBoard(), infoView, panTranslate);
@@ -92,6 +104,7 @@ public class GUI extends JFrame {
         // Main panel definition
         JPanel mainPanel = createGamePanel();
         JPanel sidePanel = createSidePanel();
+        JPanel frameworkPanel = createFrameworkPanel();
 
         gbc.gridx = 0;
         getContentPane().add(Box.createRigidArea(new Dimension(GUI_COMP_SPACING, 0)), gbc);
@@ -104,6 +117,12 @@ public class GUI extends JFrame {
 
         gbc.gridx++;
         getContentPane().add(sidePanel, gbc);
+
+        gbc.gridx++;
+        getContentPane().add(Box.createRigidArea(new Dimension(GUI_COMP_SPACING, 0)), gbc);
+
+        gbc.gridx++;
+        getContentPane().add(frameworkPanel, gbc);
 
         gbc.gridx++;
         getContentPane().add(Box.createRigidArea(new Dimension(GUI_COMP_SPACING, 0)), gbc);
@@ -132,24 +151,31 @@ public class GUI extends JFrame {
                 Point2D p = GameView.rotatePointReverse((int)ep.getX(), (int)ep.getY());
 
                 // If unit highlighted and action at new click valid for unit, execute action
-                Action candidate = getActionAt((int)p.getX(), (int)p.getY(), infoView.getHighlightX(), infoView.getHighlightY());
-                if (candidate != null) {
-                    int n = 0;
-                    if (candidate instanceof Disband) {  // These actions needs confirmation before executing
-                        n = JOptionPane.showConfirmDialog(mainPanel,
-                                "Confirm action " + candidate.toString(),
-                                "Are you sure?",
-                                JOptionPane.YES_NO_OPTION,
-                                JOptionPane.QUESTION_MESSAGE);
-                    }
-                    if (n == 0) {
-                        ac.addAction(candidate, gs);
-                    }
-                    infoView.resetHighlight();
-                } else {
-                    // Otherwise highlight new cell
-                    infoView.setHighlight((int)p.getX(), (int)p.getY());
+                if (game.getPlayers()[gs.getActiveTribeID()] instanceof HumanAgent ||
+                        !DISABLE_NON_HUMAN_GRID_HIGHLIGHT) {
+                    // Only do this if actions should be executed, or it is human agent playing
+                    Action candidate = getActionAt((int) p.getX(), (int) p.getY(), infoView.getHighlightX(), infoView.getHighlightY());
+                    if (candidate != null) {
+                        int n = 0;
+                        if (candidate instanceof Disband) {  // These actions needs confirmation before executing
+                            n = JOptionPane.showConfirmDialog(mainPanel,
+                                    "Confirm action " + candidate.toString(),
+                                    "Are you sure?",
+                                    JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE);
+                        }
+                        if (candidate instanceof TribeAction) {
+                            ((TribeAction) candidate).setTribeId(gs.getActiveTribeID());
+                        }
+                        if (n == 0) {
+                            ac.addAction(candidate, gs);
+                        }
+                        infoView.resetHighlight();
+                    } else {
+                        // Otherwise highlight new cell
+                        infoView.setHighlight((int) p.getX(), (int) p.getY());
 //                    System.out.println("Highlighting: " + (int)p.getX() + " " + (int)p.getY());
+                    }
                 }
             }
 
@@ -214,6 +240,20 @@ public class GUI extends JFrame {
         return mainPanel;
     }
 
+    /**
+     * Creates side panel supplement for game view, containing:
+     * - turn info
+     * - active tribe info
+     * - other info (Examine action / tribe win status),
+     * - info on game grid highlights (units, terrain etc.) or research in tech tree highlights
+     * - actions available for grid highlight
+     * - all tribes points ranking
+     * - tech tree view
+     * - buttons to "End Turn", "Play Turn" (game paused after tribe's turn), "Play Tick" (game paused after all tribe's
+     *      turns in current tick), "Pause/Resume" (to pause/resume game at any point), all keeping GUI responsive
+     * - quick select buttons (all units / units of type / cities of a tribe) for info display TODO
+     * @return JPanel containing all the sub components
+     */
     private JPanel createSidePanel()
     {
         JPanel sidePanel = new JPanel();
@@ -279,9 +319,29 @@ public class GUI extends JFrame {
         sidePanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
 
         c.gridy++;
+        JPanel buttons = new JPanel();
         JButton endTurn = new JButton("End Turn");
-        endTurn.addActionListener(e -> ac.addAction(new EndTurn(), gs));
-        sidePanel.add(endTurn, c);
+        endTurn.addActionListener(e -> ac.addAction(new EndTurn(gs.getActiveTribeID()), gs));
+        JButton playTurn = new JButton("Play Turn");
+        playTurn.addActionListener(e -> { pauseAfterTurn = true; game.setPaused(false); });
+        JButton playTick = new JButton("Play Tick");
+        playTick.addActionListener(e -> { pauseAfterTick = true; game.setPaused(false); });
+        JButton pause = new JButton("Pause");
+        pause.addActionListener(e -> {
+            if (game.isPaused()) {
+                game.setPaused(false);
+                pause.setText("Pause");
+            } else {
+                game.setPaused(true);
+                pause.setText("Resume");
+            }
+        });
+
+        buttons.add(endTurn);
+        buttons.add(playTurn);
+        buttons.add(playTick);
+        buttons.add(pause);
+        sidePanel.add(buttons, c);
 
         c.gridy++;
         sidePanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
@@ -289,25 +349,65 @@ public class GUI extends JFrame {
         return sidePanel;
     }
 
+    /**
+     * Panel containing functionality for interacting with the framework and getting high-level information, including:
+     * - Game setup:
+     *      - Choosing which players should play in the next game TODO
+     *      - Choosing which tribe should be associated with each player in the next game TODO
+     *      - Choosing and editing map for next game (text view) TODO
+     *      - Choosing game seed for next game TODO
+     *      - Start/Restart/End game buttons TODO
+     * - Debugging:
+     *      - observability toggle TODO
+     *      - visuals on/off TODO
+     *      - results printout for all games in the same run (if multiple) TODO
+     *      - save game toggle TODO
+     *      - add comments to saved game files TODO
+     *      - action history display TODO
+     *      - change game configuration? TODO
+     * @return
+     */
+    private JPanel createFrameworkPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.SOUTH;
+        c.weighty = 0;
+        return panel;
+    }
+
 
     /**
      * Paints the GUI, to be called at every game tick.
      */
-    public void update(GameState gs) {
+    public void update(GameState gs, Action a) {
+//        if (this.gs == null || this.gs.getTick() != gs.getTick()) {
+//            // Tick change
+//            HashMap<Integer, ArrayList<Action>> tick = new HashMap<>();
+//            for (int i = 0; i < game.getPlayers().length; i++) {
+//                tick.put(i, new ArrayList<>());
+//            }
+//            actionHistory.add(tick);
+//        }
         if (this.gs == null || this.gs.getActiveTribeID() != gs.getActiveTribeID()) {
-            infoView.resetHighlight();  // Reset highlights on turn change
-            view.setPanToTribe(gs);  // Pan camera to tribe capital on turn change
-            ac.reset();  // Clear action queue on turn change
-            otherInfo.setText("");  // Reset info on turn change
+            // Tribe change
+            infoView.resetHighlight();  // Reset highlights
+            view.setPanToTribe(gs);  // Pan camera to tribe capital
+            ac.reset();  // Clear action queue
+            otherInfo.setText("");  // Reset info
         }
 
         // Display result of Examine action
-        Action a = ac.getLastActionPlayed();
         if (a instanceof Examine) {
-            lastExamineAction = (Examine)a;
-            ac.setLastActionPlayed(null);
+            lastExamineAction = (Examine) a;
         }
 
+//        if (this.gs != null) {
+//            if (a != null) {
+//                actionHistory.get(this.gs.getTick()).get(this.gs.getActiveTribeID()).add(a);
+//            }
+//            stateHistory.add(this.gs);
+//        }
         this.gs = gs;
         performUpdate();
 
@@ -346,7 +446,6 @@ public class GUI extends JFrame {
             HashMap<Integer, ArrayList<Action>> possibleActions = gs.getUnitActions();
             for (Map.Entry<Integer, ArrayList<Action>> e : possibleActions.entrySet()) {
                 Unit u = (Unit) gs.getActor(e.getKey());
-
                 for (Action a : e.getValue()) {
                     Vector2d pos = getActionPosition(gs, a);
                     if (pos != null && pos.x == actionY && pos.y == actionX) {
@@ -366,7 +465,7 @@ public class GUI extends JFrame {
         tribeView.paint(gs);
         techView.paint(gs);
         infoView.paint(gs);
-        appTurn.setText("Turn: " + gs.getTick());
+        appTurn.setText("Turn: " + gs.getTick() + (game.isPaused()? " [PAUSED]" : ""));
         if (gs.getActiveTribe() != null) {
             activeTribe.setText("Tribe acting: " + gs.getActiveTribe().getName());
             activeTribeInfo.setText("stars: " + gs.getActiveTribe().getStars() + " (+" + gs.getActiveTribe().getMaxProduction(gs) + ")");
@@ -386,7 +485,6 @@ public class GUI extends JFrame {
         repaint();
     }
 
-
     public static Vector2d getActionPosition(GameState gs, Action a) {
         Vector2d pos = null;
         if (a instanceof Move) {
@@ -394,7 +492,7 @@ public class GUI extends JFrame {
         } else if (a instanceof Attack) {
             Unit target = (Unit) gs.getActor(((Attack) a).getTargetId());
             pos = target.getPosition();
-        } else if (a instanceof Recover || a instanceof HealOthers || a instanceof Disband) {
+        } else if (a instanceof Recover) {
             Unit u = (Unit) gs.getActor(((UnitAction) a).getUnitId());
             pos = u.getPosition();
         } else if (a instanceof Capture || a instanceof Convert || a instanceof Examine) {
@@ -406,5 +504,21 @@ public class GUI extends JFrame {
 
     public boolean isClosed() {
         return wi.windowClosed;
+    }
+
+    public boolean pauseAfterTurn() {
+        return pauseAfterTurn;
+    }
+
+    public void setPauseAfterTurn(boolean p) {
+        pauseAfterTurn = p;
+    }
+
+    public boolean pauseAfterTick() {
+        return pauseAfterTick;
+    }
+
+    public void setPauseAfterTick(boolean p) {
+        pauseAfterTick = p;
     }
 }

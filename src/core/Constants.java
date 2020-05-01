@@ -3,7 +3,8 @@ package core;
 public class Constants {
     public static boolean VERBOSE = true;
     public static boolean VISUALS = true;
-    public static int FRAME_DELAY = 2000; //100;
+    public static boolean DISABLE_NON_HUMAN_GRID_HIGHLIGHT = false;  // If true, human observing/playing can't highlight units of non-human players
+    public static int FRAME_DELAY = 1000; //100;
     public static long TURN_TIME_MILLIS = 10000000; //10000; //10 seconds.
     public static int GUI_INFO_DELAY = 250;
 

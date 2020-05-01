@@ -17,7 +17,8 @@ public class GameLoader
 {
 
     private int tick;
-    private double seed;
+    private long seed;
+    private boolean gameIsOver;
     private int activeTribeID;
 
     private JSONObject JBoard;
@@ -27,6 +28,8 @@ public class GameLoader
 
     private Board board;
     private Tribe[] tribes;
+    private int[] allCapitalIds;
+    private Types.GAME_MODE game_mode;
 
     public GameLoader(String fileName) {
 
@@ -36,16 +39,14 @@ public class GameLoader
         this.JBoard = (JSONObject) gameINFO.get("board");
         this.JTribe = gameINFO.getJSONObject("tribes");
         this.tick = gameINFO.getInt("tick");
-        this.seed = gameINFO.getDouble("seed");
+        this.gameIsOver = gameINFO.getBoolean("gameIsOver");
+        this.seed = gameINFO.getLong("seed");
         this.activeTribeID = gameINFO.getInt("activeTribeID");
         this.JUnit = gameINFO.getJSONObject("unit");
         this.JCity = gameINFO.getJSONObject("city");
+        this.game_mode = Types.GAME_MODE.getTypeByKey(gameINFO.getInt("gameMode"));
 
         loadTribes();
-//        TODO: Testing
-//        for (Tribe t: tribes){
-//            System.out.println(t);
-//        }
 
         loadBoard();
 
@@ -58,16 +59,19 @@ public class GameLoader
     private void loadTribes(){
         Iterator<String> keys = JTribe.keys();
         tribes = new Tribe[JTribe.length()];
+        allCapitalIds = new int[JTribe.length()];
         int index = 0;
         while (keys.hasNext()){
             String key = keys.next();
             JSONObject tribeINFO = JTribe.getJSONObject(key);
-            tribes[index++] = new Tribe(Integer.parseInt(key), tribeINFO);
+            tribes[index] = new Tribe(Integer.parseInt(key), tribeINFO);
+            allCapitalIds[index] = tribes[index].getCapitalID();
+            index++;
         }
     }
 
     private void loadBoard() {
-        board = new Board(JBoard);
+        board = new Board(JBoard, allCapitalIds, activeTribeID, tribes);
     }
 
     private void loadUnits(){
@@ -80,6 +84,7 @@ public class GameLoader
                     unitINFO.getInt("kill"), unitINFO.getBoolean("isVeteran"),
                     unitINFO.getInt("cityID"), unitINFO.getInt("tribeId"), unitType);
             unit.setCurrentHP(unitINFO.getInt("currentHP"));
+            unit.setStatus(Types.TURN_STATUS.FRESH);
             if (unitType == Types.UNIT.BOAT){
                 ((Boat)unit).setBaseLandUnit(Types.UNIT.getTypeByKey(unitINFO.getInt("baseLandType")));
             }else if (unitType == Types.UNIT.SHIP){
@@ -122,7 +127,7 @@ public class GameLoader
         return tick;
     }
 
-    public double getSeed() {
+    public long getSeed() {
         return seed;
     }
 
@@ -138,4 +143,11 @@ public class GameLoader
         return tribes;
     }
 
+    public Types.GAME_MODE getGame_mode() {
+        return game_mode;
+    }
+
+    public boolean getGameIsOver() {
+        return gameIsOver;
+    }
 }

@@ -38,7 +38,7 @@ public class Play {
 //        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
 //        play(filename, new PlayerType[]{PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
 //        play(filename, new PlayerType[]{PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI}, gameMode);
-        play(filename, new PlayerType[]{PlayerType.MC, PlayerType.MC}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode);
+        play(filename, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode);
 //        play(filename, new PlayerType[]{PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
     }
 
@@ -63,7 +63,10 @@ public class Play {
         }
 
         Game game = new Game();
-        game.init(players, tribes_list, filename, seed, gameMode);
+//        game.init(players, tribes_list, filename, seed, gameMode);
+
+        //game init by file
+        game.init(players, "save/1587755460735/0_1/game.json");
 
         Run.runGame(game, ki, ac);
 

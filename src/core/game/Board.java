@@ -62,8 +62,9 @@ public class Board {
         this.gameActors = new HashMap<>();
     }
 
-    public Board(JSONObject JBoard){
+    public Board(JSONObject JBoard, int[] capitalIDs, int activeTribeID, Tribe[] tribes){
         this.gameActors = new HashMap<>();
+        this.capitalIDs = capitalIDs;
         JSONArray JResource = JBoard.getJSONArray("resource");
         JSONArray JTerrain = JBoard.getJSONArray("terrain");
         JSONArray JUnit = JBoard.getJSONArray("unitID");
@@ -77,6 +78,10 @@ public class Board {
         buildings = new Types.BUILDING[size][size];
         units = new int[size][size];
         tileCityId = new int[size][size];
+        isNative = true;
+        this.activeTribeID = activeTribeID;
+        this.assignTribes(tribes);
+
         boolean[][] networkTiles = new boolean[size][size];
         for (int i=0; i<size; i++){
             JSONArray resourceItem = JResource.getJSONArray(i);
@@ -991,4 +996,5 @@ public class Board {
     public int getCityIdAt(int x, int y) { return tileCityId[x][y]; }
     public int[] getCapitalIDs() {return capitalIDs;}
     boolean isNative() { return isNative; }
+
 }

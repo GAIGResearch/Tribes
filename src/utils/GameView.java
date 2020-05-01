@@ -126,7 +126,7 @@ public class GameView extends JComponent {
         for(int i = 0; i < gridSize; ++i) {
             for(int j = 0; j < gridSize; ++j) {
                 Types.TERRAIN t = board.getTerrainAt(i,j);
-                if(t == null) {
+                if(t == null || t == FOG) {
                     paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, fogImg, CELL_SIZE, panTranslate);
                 } else {
                     Image toPaint = getContextImg(i, j, t);

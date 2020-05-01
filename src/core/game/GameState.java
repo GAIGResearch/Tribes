@@ -70,6 +70,24 @@ public class GameState {
         this.gameIsOver = false;
     }
 
+    public GameState(Random rnd, Types.GAME_MODE gameMode, Tribe[] tribes, Board board, int tick){
+        this(rnd, gameMode);
+        this.tick = tick;
+        this.board = board;
+        board.setTribes(tribes);
+
+        if (board.getActiveTribeID() == tribes.length-1){
+            this.tick++;
+            board.setActiveTribeID(0);
+        }else{
+            board.setActiveTribeID(board.getActiveTribeID() + 1);
+        }
+
+        canEndTurn = new boolean[tribes.length];
+
+        computePlayerActions(tribes[board.getActiveTribeID()]);
+    }
+
     /**
      * Initializes the GameState.
      * The level is only generated when this initialization method is called.
@@ -680,6 +698,10 @@ public class GameState {
         return gameIsOver;
     }
 
+    void setGameIsOver(boolean gameIsOver) {
+        this.gameIsOver = gameIsOver;
+    }
+
     /**
      * Gathers and returns all the available actions for the active tribe in a single ArrayList
      * @return all available actions
@@ -768,8 +790,12 @@ public class GameState {
         return unitActors;
     }
 
+    public Types.GAME_MODE getGameMode() {
+        return gameMode;
+    }
 
     public Types.RESULT getTribeWinStatus() {
         return getActiveTribe().getWinner();
     }
+
 }

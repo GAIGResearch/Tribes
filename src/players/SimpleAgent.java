@@ -55,8 +55,6 @@ public class SimpleAgent extends Agent {
                 bestActionScore = actionScore;
             }
         }
-//        System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + nActions + ". Executing " + bestAction);
-
 
         return bestAction;
     }
@@ -121,7 +119,6 @@ public class SimpleAgent extends Agent {
         }
         if(a instanceof Destroy){
             //TODO
-
         }
         if(a instanceof GrowForest){
             //TODO
@@ -162,11 +159,9 @@ public class SimpleAgent extends Agent {
                 int noOfFarms = 0;
                 for (Building b : buildings
                 ) {
-
                     if (b.type == Types.BUILDING.FARM) {
                         noOfFarms += 1;
                     }
-
                 }
                 if (thisTribe.getMaxProduction(gs) > 5 && noOfFarms < 2) {
                     score = 3;
@@ -238,11 +233,11 @@ public class SimpleAgent extends Agent {
                         if (enemy.getTribeId() != thisTribe.getTribeId()) { // We are in the range of an enemy
                             if (enemy.DEF < thisUnit.ATK && thisUnit.getCurrentHP()>=enemy.getCurrentHP()) { //Incentive to attack weaker enemy
                                 if (Vector2d.chebychevDistance(dest, enemy.getPosition()) < Vector2d.chebychevDistance(currentPos, enemy.getPosition())) {
-                                    score += 3;
+                                    score = 3;
                                 }
                             }else{ // Incentive to move away from enemy
                                 if (Vector2d.chebychevDistance(dest, enemy.getPosition()) > Vector2d.chebychevDistance(currentPos, enemy.getPosition())) {
-                                    score += 3;
+                                    score = 3;
                                 }
                             }
                         }
@@ -271,15 +266,18 @@ public class SimpleAgent extends Agent {
         if (!(attacker instanceof Archer) || !(attacker instanceof Catapult)) {
             if (attacker.getCurrentHP() >= defender.getCurrentHP()) {
                 if (attacker.ATK > defender.DEF) {
-                    score += 2;
+                    score = 2;
                 } else {
-                    score += 1;
+                    score = 1;
                 }
             } else if (attacker.getCurrentHP() < defender.getCurrentHP()) {
                 if (attacker.ATK > defender.DEF) {
-                    score += 1;
+                    score = 1;
                 }//else don't add anything to the score.
             }
+        }else{
+            //TODO ranged unit cases
+            //score = 2;
         }
         return score;
     }

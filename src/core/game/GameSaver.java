@@ -83,68 +83,10 @@ public class GameSaver {
                     resource.put(gs.getBoard().getResourceAt(i, j) != null? gs.getBoard().getResourceAt(i, j).getKey():-1);
 
                     // Save unit INFO
-                    int unitINFO = gs.getBoard().getUnitIDAt(i, j);
-                    units.put(unitINFO);
-                    if (unitINFO != 0){
-                        Unit u = (Unit)gs.getActor(unitINFO);
-                        JSONObject uInfo = new JSONObject();
-                        uInfo.put("type", u.getType().getKey());
-                        if (u.getType() == Types.UNIT.BOAT){
-                            uInfo.put("baseLandType", ((Boat)u).getBaseLandUnit().getKey());
-                        }else if (u.getType() == Types.UNIT.SHIP){
-                            uInfo.put("baseLandType", ((Ship)u).getBaseLandUnit().getKey());
-                        }else if (u.getType() == Types.UNIT.BATTLESHIP){
-                            uInfo.put("baseLandType", ((Battleship)u).getBaseLandUnit().getKey());
-                        }
-                        uInfo.put("x", u.getPosition().x);
-                        uInfo.put("y", u.getPosition().y);
-                        uInfo.put("kill", u.getKills());
-                        uInfo.put("isVeteran", u.isVeteran());
-                        uInfo.put("cityID", u.getCityId());
-                        uInfo.put("tribeId", u.getTribeId());
-                        uInfo.put("currentHP", u.getCurrentHP());
-                        unit.put(String.valueOf(unitINFO), uInfo);
-                    }
-                    // Save city INFO
-                    int cityINFO = gs.getBoard().getCityIdAt(i, j);
-                    cities.put(cityINFO);
-                    if (cityINFO != -1){
-                        City c = (City)gs.getActor(cityINFO);
-                        // City INFO: id:{x, y, tribeId, population_need, bound, level, isCapital, population,
-                        //                production, hasWalls, pointsWorth, building(array)}
-                        JSONObject cInfo = new JSONObject();
-                        cInfo.put("x", c.getPosition().x);
-                        cInfo.put("y", c.getPosition().y);
-                        cInfo.put("tribeID", c.getTribeId());
-                        cInfo.put("population_need", c.getPopulation_need());
-                        cInfo.put("bound", c.getBound());
-                        cInfo.put("level", c.getLevel());
-                        cInfo.put("isCapital", c.isCapital());
-                        cInfo.put("population", c.getPopulation());
-                        cInfo.put("production", c.getProduction());
-                        cInfo.put("hasWalls", c.hasWalls());
-                        cInfo.put("pointsWorth", c.getPointsWorth());
-                        // Save Buildings INFO
-                        JSONArray buildingList = new JSONArray();
-                        LinkedList<Building> buildings = c.getBuildings();
-                        if (buildings != null) {
-                            for (Building b : buildings) {
-                                JSONObject bInfo = new JSONObject();
-                                bInfo.put("x", b.position.x);
-                                bInfo.put("y", b.position.y);
-                                bInfo.put("type", b.type.getKey());
-                                if (b.type.isTemple()) {
-                                    Temple t = (Temple) b;
-                                    bInfo.put("level", t.getLevel());
-                                    bInfo.put("turnsToScore", t.getTurnsToScore());
-                                }
-                                buildingList.put(bInfo);
-                            }
-                        }
-                        cInfo.put("buildings", buildingList);
-                        cInfo.put("units", c.getUnitsID());
-                        city.put(String.valueOf(cityINFO), cInfo);
-                    }
+                    units.put(gs.getBoard().getUnitIDAt(i, j));
+
+                    // Save cityTile INFO
+                    cities.put(gs.getBoard().getCityIdAt(i, j));
 
                     // Save Building INFO
                     JBuildings.put(gs.getBoard().getBuildingAt(i, j)!= null? gs.getBoard().getBuildingAt(i, j).getKey():-1);
@@ -162,12 +104,72 @@ public class GameSaver {
                 building2D.put(JBuildings);
             }
 
+            ArrayList<Unit> unitList = getAllUnits(gameBoard);
+            for(Unit u: unitList){
+                JSONObject uInfo = new JSONObject();
+                uInfo.put("type", u.getType().getKey());
+                if (u.getType() == Types.UNIT.BOAT){
+                    uInfo.put("baseLandType", ((Boat)u).getBaseLandUnit().getKey());
+                }else if (u.getType() == Types.UNIT.SHIP){
+                    uInfo.put("baseLandType", ((Ship)u).getBaseLandUnit().getKey());
+                }else if (u.getType() == Types.UNIT.BATTLESHIP){
+                    uInfo.put("baseLandType", ((Battleship)u).getBaseLandUnit().getKey());
+                }
+                uInfo.put("x", u.getPosition().x);
+                uInfo.put("y", u.getPosition().y);
+                uInfo.put("kill", u.getKills());
+                uInfo.put("isVeteran", u.isVeteran());
+                uInfo.put("cityID", u.getCityId());
+                uInfo.put("tribeId", u.getTribeId());
+                uInfo.put("currentHP", u.getCurrentHP());
+                unit.put(String.valueOf(u.getActorId()), uInfo);
+            }
+
+            ArrayList<City> citiesList = getAllCities(gameBoard);
+            for(City c: citiesList){
+                // City INFO: id:{x, y, tribeId, population_need, bound, level, isCapital, population,
+                //                production, hasWalls, pointsWorth, building(array)}
+                JSONObject cInfo = new JSONObject();
+                cInfo.put("x", c.getPosition().x);
+                cInfo.put("y", c.getPosition().y);
+                cInfo.put("tribeID", c.getTribeId());
+                cInfo.put("population_need", c.getPopulation_need());
+                cInfo.put("bound", c.getBound());
+                cInfo.put("level", c.getLevel());
+                cInfo.put("isCapital", c.isCapital());
+                cInfo.put("population", c.getPopulation());
+                cInfo.put("production", c.getProduction());
+                cInfo.put("hasWalls", c.hasWalls());
+                cInfo.put("pointsWorth", c.getPointsWorth());
+                // Save Buildings INFO
+                JSONArray buildingList = new JSONArray();
+                LinkedList<Building> buildings = c.getBuildings();
+                if (buildings != null) {
+                    for (Building b : buildings) {
+                        JSONObject bInfo = new JSONObject();
+                        bInfo.put("x", b.position.x);
+                        bInfo.put("y", b.position.y);
+                        bInfo.put("type", b.type.getKey());
+                        if (b.type.isTemple()) {
+                            Temple t = (Temple) b;
+                            bInfo.put("level", t.getLevel());
+                            bInfo.put("turnsToScore", t.getTurnsToScore());
+                        }
+                        buildingList.put(bInfo);
+                    }
+                }
+                cInfo.put("buildings", buildingList);
+                cInfo.put("units", c.getUnitsID());
+                city.put(String.valueOf(c.getActorId()), cInfo);
+            }
+
             board.put("terrain", terrain2D);
             board.put("resource", resource2D);
             board.put("unitID", unit2D);
             board.put("cityID", city2D);
             board.put("network", network2D);
             board.put("building", building2D);
+            board.put("actorIDcounter", gameBoard.getActorIDcounter());
 
             game.put("board", board);
             game.put("unit", unit);
@@ -224,5 +226,46 @@ public class GameSaver {
         } catch (IOException e){
             e.printStackTrace();
         }
+    }
+
+    private static ArrayList<City> getAllCities(Board board)
+    {
+        Tribe[] tribes = board.getTribes();
+        ArrayList<City> cityActors = new ArrayList<>();
+        for(Tribe t: tribes){
+            ArrayList<Integer> cities = t.getCitiesID();
+            for(Integer cityId : cities)
+            {
+                cityActors.add((City)board.getActor(cityId));
+            }
+        }
+
+        return cityActors;
+    }
+
+    public static ArrayList<Unit> getAllUnits(Board board)
+    {
+        Tribe[] tribes = board.getTribes();
+        ArrayList<Unit> unitActors = new ArrayList<>();
+        for(Tribe t: tribes){
+            ArrayList<Integer> cities = t.getCitiesID();
+            for(Integer cityId : cities)
+            {
+                City c = (City)board.getActor(cityId);
+                for(Integer unitId : c.getUnitsID())
+                {
+                    Unit unit = (Unit) board.getActor(unitId);
+                    unitActors.add(unit);
+                }
+            }
+
+            for(Integer unitId : t.getExtraUnits())
+            {
+                Unit unit = (Unit) board.getActor(unitId);
+                unitActors.add(unit);
+            }
+        }
+
+        return unitActors;
     }
 }

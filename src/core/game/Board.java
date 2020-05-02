@@ -79,6 +79,7 @@ public class Board {
         units = new int[size][size];
         tileCityId = new int[size][size];
         isNative = true;
+        actorIDcounter = JBoard.getInt("actorIDcounter");
         this.activeTribeID = activeTribeID;
         this.assignTribes(tribes);
 
@@ -850,7 +851,6 @@ public class Board {
 
     public void addActor(core.actors.Actor actor, int actorID)
     {
-        actorIDcounter++;
         gameActors.put(actorID, actor);
         actor.setActorId(actorID);
     }
@@ -996,5 +996,7 @@ public class Board {
     public int getCityIdAt(int x, int y) { return tileCityId[x][y]; }
     public int[] getCapitalIDs() {return capitalIDs;}
     boolean isNative() { return isNative; }
-
+    public int getActorIDcounter() {
+        return actorIDcounter;
+    }
 }

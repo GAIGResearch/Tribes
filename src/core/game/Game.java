@@ -334,6 +334,7 @@ public class Game {
 
                 // Turn should be ending, start timer for delay of next action and show all updates
                 if (action instanceof EndTurn) {
+                    if (ag instanceof HumanAgent) break;
                     endTurnDelay = new ElapsedCpuTimer();
                     endTurnDelay.setMaxTimeMillis(FRAME_DELAY);
                 }

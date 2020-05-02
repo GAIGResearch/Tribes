@@ -288,7 +288,7 @@ public class GameState {
             boolean executed = action.execute(this);
 
             if(!executed) {
-                System.out.println("Action [" + action + "] couldn't execute?");
+                System.out.println("FM: Action [" + action + "] couldn't execute?");
             }
 
             if(executed) {

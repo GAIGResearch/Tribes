@@ -583,10 +583,14 @@ public class GameState {
                 {
                     maxScore = t.getScore();
                     bestTribe = i;
+                }else if(t.getScore() == maxScore)
+                {
+                    if(tribeTieCompareTo(t, board.getTribe(bestTribe)) == -1)
+                    {
+                        bestTribe = i;
+                    }
                 }
-                //TODO: Manage ties in the score.
             }
-
         }
 
         if(isEnded)
@@ -600,6 +604,37 @@ public class GameState {
 
         gameIsOver = isEnded;
         return isEnded;
+    }
+
+    /**
+     * Policy for deciding which tribe is ahead in case of a tie in score.
+     * @param one one tribe
+     * @param two another tribe
+     * @return -1 if tribe one is better, +1 if tribe 2 is better. No 0, winner determined at random
+     * if all tiebreakers are equal.
+     */
+    private int tribeTieCompareTo(Tribe one, Tribe two)
+    {
+        //Tie breaker 1: num tech researched
+        if(one.getTechTree().getNumResearched() > two.getTechTree().getNumResearched())
+            return -1;
+        else if (one.getTechTree().getNumResearched() < two.getTechTree().getNumResearched())
+            return 1;
+
+        //Tie breaker 2: num cities owned
+        if(one.getNumCities() > two.getNumCities())
+            return -1;
+        else if(one.getNumCities() < two.getNumCities())
+            return 1;
+
+        //Tie breaker 3: production
+        if(one.getMaxProduction(this) > two.getMaxProduction(this))
+            return -1;
+        else if(one.getMaxProduction(this) < two.getMaxProduction(this))
+            return 1;
+
+        //If here, all is the same. Choose at random.
+        return rnd.nextBoolean() ? -1 : 1;
     }
 
 

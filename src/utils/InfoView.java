@@ -5,6 +5,9 @@ import core.Types;
 import core.actions.cityactions.*;
 import core.actions.tribeactions.BuildRoad;
 import core.actions.tribeactions.ResearchTech;
+import core.actions.unitactions.Disband;
+import core.actions.unitactions.HealOthers;
+import core.actions.unitactions.Upgrade;
 import core.actors.City;
 import core.actors.Tribe;
 import core.actors.units.Unit;
@@ -35,10 +38,12 @@ public class InfoView extends JComponent {
     private JButton[] actionB, actionS;
     private JButton actionRoad;
     private JButton actionResearch;
+    private JButton actionHealOthers, actionDisband, actionUpgrade;
     private TribesActionListener listenerBF, listenerCF, listenerD, listenerGF, listenerRG;
     private TribesActionListener listenerS, listenerB;
     private TribesActionListener listenerResearch;
     private TribesActionListener listenerRoad;
+    private TribesActionListener listenerHealOthers, listenerDisband, listenerUpgrade;
     private ActionController ac;
 
     private int highlightX, highlightY;
@@ -119,17 +124,36 @@ public class InfoView extends JComponent {
             actionPanel.add(actionS[i]);
         }
 
+        // Research action
         actionResearch = new JButton("Research");
         actionResearch.setVisible(false);
         listenerResearch = new TribesActionListener("Research");
         actionResearch.addActionListener(listenerResearch);
         actionPanel.add(actionResearch);
 
+        // Build road action
         actionRoad = new JButton("Build Road");
         actionRoad.setVisible(false);
         listenerRoad = new TribesActionListener("BuildRoad");
         actionRoad.addActionListener(listenerRoad);
         actionPanel.add(actionRoad);
+
+        // Unit actions
+        actionHealOthers = new JButton("Heal Others");
+        actionHealOthers.setVisible(false);
+        listenerHealOthers = new TribesActionListener("HealOthers");
+        actionHealOthers.addActionListener(listenerHealOthers);
+        actionPanel.add(actionHealOthers);
+        actionDisband = new JButton("Disband");
+        actionDisband.setVisible(false);
+        listenerDisband = new TribesActionListener("Disband");
+        actionDisband.addActionListener(listenerDisband);
+        actionPanel.add(actionDisband);
+        actionUpgrade = new JButton("Upgrade");
+        actionUpgrade.setVisible(false);
+        listenerUpgrade = new TribesActionListener("Upgrade");
+        actionUpgrade.addActionListener(listenerUpgrade);
+        actionPanel.add(actionUpgrade);
 
         this.setLayout(new FlowLayout());
         JScrollPane scrollPane1 = new JScrollPane(textArea);
@@ -262,6 +286,7 @@ public class InfoView extends JComponent {
         int cityID = board.getCityIdAt(highlightY, highlightX);
         Types.RESOURCE r = board.getResourceAt(highlightY, highlightX);
         Vector2d position = new Vector2d(highlightY, highlightX);
+        Unit u = board.getUnitAt(highlightY, highlightX);
         resetButtonVisibility();
 
         if (board.getTribe(board.getActiveTribeID()).getTechTree().isResearched(Types.TECHNOLOGY.ROADS)) {
@@ -288,7 +313,7 @@ public class InfoView extends JComponent {
                 boolean[] foundB = new boolean[actionB.length];
                 if (acts != null && acts.size() > 0) {
                     for (Action a : acts) {
-                        if (a != null && ((CityAction) a).getTargetPos() != null && // TODO: why are these suddenly null?
+                        if (a != null && ((CityAction) a).getTargetPos() != null &&
                                 ((CityAction) a).getTargetPos().equals(position)) {
                             if (a instanceof ResourceGathering) {
                                 if (((ResourceGathering) a).getResource().equals(r)) {
@@ -334,6 +359,30 @@ public class InfoView extends JComponent {
                 for (int i = 0; i < actionB.length; i++) {
                     actionB[i].setVisible(foundB[i]);
                 }
+            }
+        }
+
+        if (u != null) {
+            ArrayList<Action> unitActions = gs.getUnitActions(u);
+            if (unitActions != null && unitActions.size() > 0) {
+                boolean foundHO = false;
+                boolean foundD = false;
+                boolean foundU = false;
+                for (Action a : unitActions) {
+                    if (a instanceof HealOthers) {
+                        foundHO = true;
+                        listenerHealOthers.update(u.getActorId(), ac, gs);
+                    } else if (a instanceof Disband) {
+                        foundD = true;
+                        listenerDisband.update(u.getActorId(), ac, gs);
+                    } else if (a instanceof Upgrade) {
+                        foundU = true;
+                        listenerUpgrade.update(u.getActorId(), ac, gs);
+                    }
+                }
+                actionHealOthers.setVisible(foundHO);
+                actionDisband.setVisible(foundD);
+                actionUpgrade.setVisible(foundU);
             }
         }
     }
@@ -393,6 +442,9 @@ public class InfoView extends JComponent {
         actionRG.setVisible(false);
         actionRoad.setVisible(false);
         actionResearch.setVisible(false);
+        actionUpgrade.setVisible(false);
+        actionHealOthers.setVisible(false);
+        actionDisband.setVisible(false);
         for (JButton jb: actionB) {
             jb.setVisible(false);
         }
@@ -444,6 +496,7 @@ public class InfoView extends JComponent {
 
     public int getHighlightX() {return highlightX;}
     public int getHighlightY() {return highlightY;}
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean clickedTwice() {
         return highlightX != -1 && highlightX == highlightXprev && highlightY == highlightYprev;
     }
@@ -470,6 +523,7 @@ public class InfoView extends JComponent {
         String actionType;
         Types.RESOURCE resource;
         Types.TECHNOLOGY tech;
+        int unitID;
 
         TribesActionListener(String type) {
             this.actionType = type;
@@ -484,6 +538,12 @@ public class InfoView extends JComponent {
 
         public void update(Types.TECHNOLOGY t, ActionController ac, GameState gs) {
             this.tech = t;
+            this.ac = ac;
+            this.gs = gs;
+        }
+
+        public void update(int unitID, ActionController ac, GameState gs) {
+            this.unitID = unitID;
             this.ac = ac;
             this.gs = gs;
         }
@@ -543,6 +603,21 @@ public class InfoView extends JComponent {
                     if (e.getSource() instanceof JButton) {
                         a = new ResearchTech(gs.getActiveTribeID());
                         ((ResearchTech)a).setTech(tech);
+                    }
+                    break;
+                case "HealOthers":
+                    if (e.getSource() instanceof JButton) {
+                        a = new HealOthers(unitID);
+                    }
+                    break;
+                case "Disband":
+                    if (e.getSource() instanceof JButton) {
+                        a = new Disband(unitID);
+                    }
+                    break;
+                case "Upgrade":
+                    if (e.getSource() instanceof JButton) {
+                        a = new Upgrade(unitID);
                     }
                     break;
             }

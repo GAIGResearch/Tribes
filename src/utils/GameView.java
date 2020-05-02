@@ -126,7 +126,7 @@ public class GameView extends JComponent {
         for(int i = 0; i < gridSize; ++i) {
             for(int j = 0; j < gridSize; ++j) {
                 Types.TERRAIN t = board.getTerrainAt(i,j);
-                if(t == null) {
+                if(t == null || t == FOG) {
                     paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, fogImg, CELL_SIZE, panTranslate);
                 } else {
                     Image toPaint = getContextImg(i, j, t);
@@ -156,7 +156,8 @@ public class GameView extends JComponent {
                 paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, (r == null) ? null : r.getImage(t), imgSize, panTranslate);
 
                 Types.BUILDING b = board.getBuildingAt(i,j);
-                paintImageRotated(g, j*CELL_SIZE, i*CELL_SIZE, (b == null) ? null : b.getImage(), CELL_SIZE, panTranslate);
+                if (b != null && b != Types.BUILDING.CUSTOM_HOUSE && !(b.isTemple())) imgSize = CELL_SIZE;
+                paintImageRotated(g, j*CELL_SIZE, i*CELL_SIZE, (b == null) ? null : b.getImage(), imgSize, panTranslate);
             }
         }
     }

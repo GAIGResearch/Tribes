@@ -17,13 +17,13 @@ public class TechView extends JComponent {
 
     private Dimension size;
     JButton[] techs;
-    String[] techEffects;
     private GameState gs;
     ActionController ac;
     TechnologyNode[] technologies;
     ArrayList<TechnologyNode> roots, leaves;
     InfoView infoView;
 
+    // TODO: search functionality (i.e. "custom house -> Trade research")
     TechView(ActionController ac, InfoView infoView)
     {
         this.setLayout(new FlowLayout());

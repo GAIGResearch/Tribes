@@ -1,13 +1,10 @@
 package core.game;
 
+import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actions.tribeactions.EndTurn;
-import core.actors.Building;
-import core.actors.City;
-import core.actors.Temple;
 import core.actors.Tribe;
-import core.actors.units.Unit;
 import players.Agent;
 import players.HumanAgent;
 import utils.ElapsedCpuTimer;
@@ -15,14 +12,11 @@ import utils.GUI;
 import utils.WindowInput;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Random;
 
 import static core.Constants.*;
 
 public class Game {
-
-    private boolean FORCE_FULL_OBSERVABILITY = false;
 
     // State of the game (objects, ticks, etc).
     private GameState gs;
@@ -329,7 +323,9 @@ public class Game {
 
             // Update GUI after every iteration
             if (VISUALS && frame != null) {
-                if (FORCE_FULL_OBSERVABILITY) frame.update(getGameState(-1), action);  // Full Obs
+                boolean showAllBoard = TribesConfig.GUI_FORCE_FULL_OBS || TribesConfig.PLAY_WITH_FULL_OBS;
+
+                if (showAllBoard) frame.update(getGameState(-1), action);  // Full Obs
                 else frame.update(gameStateObservations[gs.getActiveTribeID()], action);        // Partial Obs
 
                 // Turn should be ending, start timer for delay of next action and show all updates

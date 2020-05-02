@@ -421,7 +421,7 @@ public class Board {
         Tribe t = tribes[unit.getTribeId()];
 
         int partialObsRangeClear = 1;
-        if (getTerrainAt(xF, yF) == Types.TERRAIN.MOUNTAIN) {
+        if (getTerrainAt(xF, yF) == Types.TERRAIN.MOUNTAIN || unit.getType() == Types.UNIT.BATTLESHIP) {
             partialObsRangeClear += 1;
         }
         boolean networkUpdate = t.clearView(xF, yF, partialObsRangeClear, r, this);

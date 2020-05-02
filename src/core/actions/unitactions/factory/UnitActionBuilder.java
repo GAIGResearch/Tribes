@@ -21,6 +21,9 @@ public class UnitActionBuilder
             return allActions;
         }
 
+        //Upgrade (always possible)
+        allActions.addAll(new UpgradeFactory().computeActionVariants(unit, gs));
+
         if(unit.isFinished())
             return allActions;
 
@@ -50,9 +53,6 @@ public class UnitActionBuilder
 
         //Recover
         allActions.addAll(new RecoverFactory().computeActionVariants(unit, gs));
-
-        //Upgrade
-        allActions.addAll(new UpgradeFactory().computeActionVariants(unit, gs));
 
         return allActions;
     }

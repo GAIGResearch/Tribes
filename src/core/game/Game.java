@@ -118,10 +118,12 @@ public class Game {
         //Create the players and agents to control them
         numPlayers = players.size();
         this.players = new Agent[numPlayers];
+        this.aiStats = new AIStats[numPlayers];
         for(int i = 0; i < numPlayers; ++i)
         {
             this.players[i] = players.get(i);
             this.players[i].setPlayerID(i);
+            this.aiStats[i] = new AIStats(i);
         }
 
         this.gameStateObservations = new GameState[numPlayers];
@@ -356,8 +358,6 @@ public class Game {
                 break;
             }
         }
-
-        //aiStats[playerID].print();
 
         // Ends the turn for this tribe (units that didn't move heal).
         gs.endTurn(tribe);

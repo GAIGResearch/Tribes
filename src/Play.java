@@ -28,6 +28,7 @@ public class Play {
     public static void main(String[] args) {
 
         Types.GAME_MODE gameMode = CAPITALS;
+        String saveGameFile = null;
 
         String filename = "SampleLevel2p.csv";
 //        String filename = "SampleLevel.csv";
@@ -35,14 +36,17 @@ public class Play {
 //        String filename = "MinimalLevel_water.csv";
 //        String filename = "MinimalLevel2.csv";
 
-//        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
-//        play(filename, new PlayerType[]{PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
-//        play(filename, new PlayerType[]{PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI}, gameMode);
-        play(filename, new PlayerType[]{PlayerType.MC, PlayerType.MC}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode);
-//        play(filename, new PlayerType[]{PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
+        String f = "save/1588441574160/27_0/game.json";
+//        saveGameFile= f;
+
+//        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode, saveGameFile);
+//        play(filename, new PlayerType[]{PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode, saveGameFile);
+//        play(filename, new PlayerType[]{PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI}, gameMode, saveGameFile);
+        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode, saveGameFile);
+//        play(filename, new PlayerType[]{PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode, saveGameFile);
     }
 
-    private static void play(String filename, PlayerType[] playerTypes, Types.TRIBE[] tribes, Types.GAME_MODE gameMode)
+    private static void play(String filename, PlayerType[] playerTypes, Types.TRIBE[] tribes, Types.GAME_MODE gameMode, String saveGameFile)
     {
         KeyController ki = new KeyController(true);
         ActionController ac = new ActionController();
@@ -63,10 +67,12 @@ public class Play {
         }
 
         Game game = new Game();
-        game.init(players, tribes_list, filename, seed, gameMode);
 
-        //game init by file
-//        game.init(players, "save/1587755460735/0_1/game.json");
+        if(saveGameFile != null){
+            game.init(players, saveGameFile);
+        }else{
+            game.init(players, tribes_list, filename, seed, gameMode);
+        }
 
         Run.runGame(game, ki, ac);
 

@@ -65,7 +65,7 @@ public class MonteCarloAgent extends Agent {
             }
         }
 
-        System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + allActions.size() + ". Executing " + bestAction.toString());
+//        System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + allActions.size() + ". Executing " + bestAction.toString());
 
         return bestAction;
     }

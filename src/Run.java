@@ -20,7 +20,7 @@ class Run {
         if (VISUALS) {
             wi = new WindowInput();
             wi.windowClosed = false;
-            frame = new GUI(g, "Tribes", ki, wi, ac, true);
+            frame = new GUI(g, "Tribes", ki, wi, ac, false);
             frame.addWindowListener(wi);
             frame.addKeyListener(ki);
         }

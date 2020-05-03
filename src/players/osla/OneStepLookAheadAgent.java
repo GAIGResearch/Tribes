@@ -1,6 +1,7 @@
 package players.osla;
 
 import core.actions.Action;
+import core.actions.tribeactions.EndTurn;
 import core.actions.unitactions.Capture;
 import core.actions.unitactions.Move;
 import core.game.GameState;
@@ -29,6 +30,9 @@ public class OneStepLookAheadAgent extends Agent {
         //Gather all available actions:
         ArrayList<Action> allActions = gs.getAllAvailableActions();
 
+        if(allActions.size() == 1)
+            return allActions.get(0); //EndTurn
+
 //        System.out.println("tick: " + gs.getTick() + ", player: " + playerID + ", action space: " + allActions.size());
 
         //THIS IS JUST FOR DEBUG.
@@ -39,6 +43,8 @@ public class OneStepLookAheadAgent extends Agent {
         TribesSimpleHeuristic heuristic = new TribesSimpleHeuristic(this.getPlayerID());
         for(Action act : allActions)
         {
+            if(act instanceof EndTurn) continue;
+
             GameState gsCopy = gs.copy();
             gsCopy.advance(act, false);
             double Q = heuristic.evaluateState(gsCopy);

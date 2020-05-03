@@ -50,7 +50,6 @@ public class Attack extends UnitAction
             double attackForce = attacker.ATK*((double) attacker.getCurrentHP()/ attacker.getMaxHP());
             double defenceForce =target.DEF*((double)target.getCurrentHP()/target.getMaxHP());
             double accelerator = TribesConfig.ATTACK_MODIFIER;
-            double totalDamage =attackForce+defenceForce;
 
             //If target unit in city border increase defence force by 300% if city has walls or 50% if city does not have walls
 
@@ -62,6 +61,7 @@ public class Attack extends UnitAction
                     defenceForce *= c.hasWalls() ? TribesConfig.DEFENCE_IN_WALLS : TribesConfig.DEFENCE;
                 }
             }
+            double totalDamage =attackForce+defenceForce;
 
             attacker.transitionToStatus(Types.TURN_STATUS.ATTACKED);
 

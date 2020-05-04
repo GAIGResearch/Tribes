@@ -22,7 +22,8 @@ public class Play {
         HUMAN,
         RANDOM,
         OSLA,
-        MC
+        MC,
+        SIMPLE
     }
 
     public static void main(String[] args) {
@@ -93,6 +94,7 @@ public class Play {
             case RANDOM: return new RandomAgent(randomSeed);
             case OSLA: return new OneStepLookAheadAgent(randomSeed);
             case MC: return new MonteCarloAgent(randomSeed);
+            case SIMPLE: return new SimpleAgent(randomSeed);
         }
         return null;
     }

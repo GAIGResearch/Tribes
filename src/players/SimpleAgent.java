@@ -1,5 +1,6 @@
 package players;
 
+import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actions.cityactions.*;
@@ -20,6 +21,9 @@ import utils.Vector2d;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+/**
+ * This is the Simple agent for the game.
+ */
 public class SimpleAgent extends Agent {
 
     private ArrayList<Vector2d> recentlyVisitedPositions;
@@ -59,16 +63,17 @@ public class SimpleAgent extends Agent {
         return bestAction;
     }
 
-
-
-
+    /**
+     * Each action is evaluated individually and given a score representing a priority from 0-5
+     * 0 is the lowest priority and 5 is the highest priority
+    */
     int evalAction(GameState gs, Action a){
 
         int score = 0;
         Tribe thisTribe = gs.getActiveTribe();
 
         if(a instanceof Attack) {
-            score = evalAttack(a,gs);
+            score = evalAttack(a,gs, thisTribe);
         }
 
         if(a instanceof Move){
@@ -114,13 +119,13 @@ public class SimpleAgent extends Agent {
         }
 
         if(a instanceof ClearForest){
-            //TODO
-
+            score = evalClear(a,gs,thisTribe);
         }
         if(a instanceof Destroy){
-            //TODO
+            score = evalDestroy(a,gs,thisTribe);
         }
         if(a instanceof GrowForest){
+            score = evalGrow(a,gs,thisTribe);
             //TODO
 
         }
@@ -149,13 +154,35 @@ public class SimpleAgent extends Agent {
 
     }
 
+    private int evalGrow(Action a, GameState gs, Tribe thisTribe) {
+
+        return 0;
+    }
+
+
+    //Evaluate a clear action
+    private int evalClear(Action a, GameState gs, Tribe thisTribe) {
+        //This is the least desirable action for a forest as it only gives a default tile
+        //So this action is scored lowest
+        return 0;
+    }
+
+    //Evaluate a destroy action
+    private int evalDestroy(Action a, GameState gs, Tribe thisTribe) {
+        //Ideally we don't want to destroy anything so this action is scored lowest
+        return 0;
+    }
+
+
+    //Evaluate the burn forest action
     private int evalBurn(Action a, GameState gs, Tribe thisTribe) {
         int score = 0;
+        //Check if we have a good amount of stars left
         if(thisTribe.getStars() > 5) {
-            score = 1;
             City c = gs.getBoard().getCityInBorders(((BurnForest) a).getTargetPos().x, ((BurnForest) a).getTargetPos().y);
             if (c != null) {
                 LinkedList<Building> buildings = c.getBuildings();
+                score = 1;
                 int noOfFarms = 0;
                 for (Building b : buildings
                 ) {
@@ -163,6 +190,7 @@ public class SimpleAgent extends Agent {
                         noOfFarms += 1;
                     }
                 }
+                //We want a good amount of farms so that the city gets more population and levels up
                 if (thisTribe.getMaxProduction(gs) > 5 && noOfFarms < 2) {
                     score = 3;
                 }
@@ -171,9 +199,37 @@ public class SimpleAgent extends Agent {
         return score;
     }
 
+    //Evaluate each building based on its worth and possible production value
     private int evalBuild(Action a, GameState gs, Tribe thisTribe) {
-        //TODO
-        return 0;
+
+        Types.BUILDING b = ((Build) a).getBuildingType();
+        int score = 0;
+        switch (b){
+            case PORT:
+                score = 3;
+            case FARM:
+                score = 3;
+            case MINE:
+                score = 3;
+            case EYE_OF_GOD:
+            case LUMBER_HUT:
+            case GRAND_BAZAR:
+            case CUSTOM_HOUSE:
+            case EMPERORS_TOMB:
+            case GATE_OF_POWER:
+            case PARK_OF_FORTUNE:
+            case TOWER_OF_WISDOM:
+            case FORGE:
+            case SAWMILL:
+            case WINDMILL:
+            case ALTAR_OF_PEACE:
+            case TEMPLE:
+            case WATER_TEMPLE:
+            case FOREST_TEMPLE:
+            case MOUNTAIN_TEMPLE:
+        }
+
+        return score;
     }
 
     private int evalUpgrade(Action a, GameState gs, Tribe thisTribe) {
@@ -188,41 +244,71 @@ public class SimpleAgent extends Agent {
     }
 
 
+    //Evaluate a healing action
     private int evalHeal(Action a, GameState gs, Tribe thisTribe) {
-        //TODO
-        return 0;
+        Unit thisUnit = (Unit) gs.getActor(((HealOthers) a).getUnitId());
+        Board b = gs.getBoard();
+        int score = 0;
+        int potentialHeals = 0;
+
+        for(Vector2d tile : thisUnit.getPosition().neighborhood(thisUnit.RANGE, 0, b.getSize())){
+            Unit target  = b.getUnitAt(tile.x, tile.y);
+            if(target.getCurrentHP() < target.getMaxHP())
+            {
+                //Check if unit is in any potential danger
+                for(Vector2d t : thisUnit.getPosition().neighborhood(target.RANGE, 0, b.getSize())){
+                    Unit enemy = b.getUnitAt(t.x,t.y);
+                    if (enemy.getTribeId() == target.getTribeId())
+                        continue;
+                    else if(enemy.getCurrentHP() > target.getCurrentHP()){
+                        potentialHeals +=1;
+                    }
+                }
+            }
+        }
+        if(potentialHeals ==0){
+            return 0;
+        }else if(potentialHeals >= 1 && potentialHeals<5){
+            score = 3;
+        }else{
+            score = 5;
+        }
+
+
+        return score;
     }
 
+    //Evaluate the convert action, lesser units such as Warriors, riders are prioritised far less than more expensive ones.
     private int evalConvert(Action a, GameState gs, Tribe thisTribe) {
         Unit defender = (Unit) gs.getActor(((Convert) a).getTargetId());
         switch (defender.getType()){
-            case WARRIOR:
             case RIDER:
             case ARCHER:
-            case DEFENDER:
                 return 2;
             case SUPERUNIT:
-                return 6; //heavily weight superunit capture
+                return 5; //heavily weight superunit capture
             case SWORDMAN:
             case BATTLESHIP:
-                return 4;
             case KNIGHT:
-                return 5;
+                return 4;
             case MIND_BENDER:
             case BOAT:
+            case WARRIOR:
                 return 1;
+            case DEFENDER:
             case SHIP:
                 return 3;
         }
         return 0;
     }
 
-
+    //Evaluate the move action
     public int evalMove(Action a, GameState gs, Tribe thisTribe){
         Vector2d dest = ((Move) a).getDestination();
         Unit thisUnit = (Unit) gs.getActor(((Move) a).getUnitId());
         Vector2d currentPos = thisUnit.getPosition();
         Board b = gs.getBoard();
+        boolean inRange = false;
         int score = 0;
         boolean[][] obsGrid = thisTribe.getObsGrid();
         for (int x =0; x<obsGrid.length; x++){
@@ -231,13 +317,19 @@ public class SimpleAgent extends Agent {
                     Unit enemy = b.getUnitAt(x, y);
                     if (enemy != null) {
                         if (enemy.getTribeId() != thisTribe.getTribeId()) { // We are in the range of an enemy
-                            if (enemy.DEF < thisUnit.ATK && thisUnit.getCurrentHP()>=enemy.getCurrentHP()) { //Incentive to attack weaker enemy
+                            for(Vector2d t : enemy.getPosition().neighborhood(enemy.RANGE, 0, b.getSize())) {
+                                Unit u = b.getUnitAt(x, y);
+                                if(u.equals(thisUnit)){
+                                    inRange = true;
+                                }
+                            }
+                                if (enemy.DEF < thisUnit.ATK && thisUnit.getCurrentHP()>=enemy.getCurrentHP()) { //Incentive to attack weaker enemy
                                 if (Vector2d.chebychevDistance(dest, enemy.getPosition()) < Vector2d.chebychevDistance(currentPos, enemy.getPosition())) {
                                     score = 3;
                                 }
-                            }else{ // Incentive to move away from enemy
-                                if (Vector2d.chebychevDistance(dest, enemy.getPosition()) > Vector2d.chebychevDistance(currentPos, enemy.getPosition())) {
-                                    score = 3;
+                            }else{ //Higher Incentive to move away from enemy if the enemy is stronger
+                                if (Vector2d.chebychevDistance(dest, enemy.getPosition()) > Vector2d.chebychevDistance(currentPos, enemy.getPosition()) && inRange) {
+                                   return 4;
                                 }
                             }
                         }
@@ -259,15 +351,16 @@ public class SimpleAgent extends Agent {
         return score;
     }
 
-    public int evalAttack(Action a, GameState gs){
+    public int evalAttack(Action a, GameState gs, Tribe thisTribe){
         int score = 0;
         Unit attacker = (Unit) gs.getActor(((Attack) a).getUnitId());
         Unit defender = (Unit) gs.getActor(((Attack) a).getTargetId());
+        Board b = gs.getBoard();
         if (!(attacker instanceof Archer) || !(attacker instanceof Catapult)) {
             if (attacker.getCurrentHP() >= defender.getCurrentHP()) {
                 if (attacker.ATK > defender.DEF) {
-                    score = 2;
-                } else {
+                    score = 5;
+                } else { // Less priortiy given to
                     score = 1;
                 }
             } else if (attacker.getCurrentHP() < defender.getCurrentHP()) {
@@ -275,11 +368,33 @@ public class SimpleAgent extends Agent {
                     score = 1;
                 }//else don't add anything to the score.
             }
-        }else{
-            //TODO ranged unit cases
-            //score = 2;
+        }else {
+            //Check if we are in defenders range or any other attackers range, make sure all is safe before attacking
+            boolean[][] obsGrid = thisTribe.getObsGrid();
+            for (int x = 0; x < obsGrid.length; x++) {
+                for (int y = 0; y < obsGrid.length; y++) {
+                    if (obsGrid[x][y]) {
+                        Unit enemy = b.getUnitAt(x, y);
+                        if (enemy != null) {
+                                if (enemy.getTribeId() != thisTribe.getTribeId()) {
+                                    //Check if we are in range of enemy
+                                    for(Vector2d t : enemy.getPosition().neighborhood(enemy.RANGE, 0, b.getSize())) {
+                                        Unit u = b.getUnitAt(x, y);
+                                        if(u.equals(attacker)){
+                                            return 0;
+                                        }
+                                    }
+                                if (enemy.DEF < attacker.ATK && attacker.getCurrentHP() >= enemy.getCurrentHP()) { //Incentive to attack weaker enemy
+                                    score += 4; // Incentive to stay and attack target
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         return score;
+
     }
 
 }

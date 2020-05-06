@@ -31,7 +31,7 @@ public class GameLoader
     private int[] allCapitalIds;
     private Types.GAME_MODE game_mode;
 
-    public GameLoader(String fileName) {
+    GameLoader(String fileName) {
 
         String jsonData = readFile(fileName);
         JSONObject gameINFO = new JSONObject(jsonData);
@@ -106,7 +106,7 @@ public class GameLoader
         }
     }
 
-    public String readFile(String filename) {
+    private String readFile(String filename) {
         String result = "";
         try {
             BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -143,7 +143,7 @@ public class GameLoader
         return tribes;
     }
 
-    public Types.GAME_MODE getGame_mode() {
+    Types.GAME_MODE getGame_mode() {
         return game_mode;
     }
 

@@ -401,7 +401,7 @@ public class GameState {
             for(Building b : city.getBuildings())
             {
                 if(b.type.isTemple()) {
-                    int templePoints = ((Temple) b).score();
+                    int templePoints = ((Temple) b).newTurn();
                     tribe.addScore(templePoints);
                     city.addPointsWorth(templePoints);
                 }
@@ -688,7 +688,7 @@ public class GameState {
         return rnd;
     }
 
-    public boolean isNative() {
+    boolean isNative() {
         return board.isNative();
     }
 

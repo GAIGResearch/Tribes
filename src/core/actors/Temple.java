@@ -4,31 +4,51 @@ import core.TribesConfig;
 import core.Types;
 import org.json.JSONObject;
 
-import java.lang.reflect.Type;
-
 public class Temple extends Building
 {
+    //Level of this Temple
     private int level = 0;
+
+    //Number of turns require to produce score for the tribe that owns this temple.
     private int turnsToScore;
 
+    /**
+     * Creates a new temple
+     * @param x x position for this temple
+     * @param y y position for this temple.
+     * @param type type of temple
+     * @param cityId id of the city that owns this temple.
+     */
     public Temple(int x, int y, Types.BUILDING type, int cityId) {
         super(x, y, type, cityId);
         levelUp();
     }
 
-    public Temple(JSONObject obj, Types.BUILDING type, int cityID){
-        super(obj.getInt("x"), obj.getInt("y"), type, cityID);
+    /**
+     * Creates a temple from a JSON object.
+     * @param obj JSON object to read the temple details from.
+     * @param cityID id of the city this temple belongs to.
+     */
+    public Temple(JSONObject obj, int cityID){
+        super(obj.getInt("x"), obj.getInt("y"), Types.BUILDING.getTypeByKey(obj.getInt("type")), cityID);
         level = obj.getInt("level");
         turnsToScore = obj.getInt("turnsToScore");
     }
 
+    /**
+     * Levels the temple up, also resetting how many turns are needed for the next score up.
+     */
     private void levelUp()
     {
         level++;
         turnsToScore = TribesConfig.TEMPLE_TURNS_TO_SCORE;
     }
 
-    public int score()
+    /**
+     * Advances the turn and returns the score that this temple produces in its current state.
+     * @return the score that this temple produces in its current state.
+     */
+    public int newTurn()
     {
         if (level < 5)
         {
@@ -42,7 +62,11 @@ public class Temple extends Building
         return 0;
     }
 
-    public int getPoints()
+    /**
+     * Indicates how many points this temple is worth.
+     * @return the points this temple is worth.
+     */
+    int getPoints()
     {
         int totPoints = 0;
         for(int i = 0; i < level; ++i)
@@ -50,6 +74,19 @@ public class Temple extends Building
         return totPoints;
     }
 
+    /**
+     * Returns a copy of this temple
+     * @return a copy of this temple
+     */
+    public Temple copy()
+    {
+        Temple t = new Temple(position.x, position.y, type, cityId);
+        t.turnsToScore = this.turnsToScore;
+        t.level = this.level;
+        return t;
+    }
+
+    /* Getters */
     public int getLevel() {
         return level;
     }
@@ -58,11 +95,4 @@ public class Temple extends Building
         return turnsToScore;
     }
 
-    public Building copy()
-    {
-        Temple t = new Temple(position.x, position.y, type, cityId);
-        t.turnsToScore = this.turnsToScore;
-        t.level = this.level;
-        return t;
-    }
 }

@@ -23,14 +23,22 @@ class TradeNetwork
     //Size of this trade network.
     private int size;
 
+    /**
+     * Creates a trade network for a size by size board
+     * @param size side of the board
+     */
     TradeNetwork(int size)
     {
         this.size = size;
         this.networkTiles = new boolean[size][size];
     }
 
-    TradeNetwork(int size, boolean[][] networkTiles){
-        this.size = size;
+    /**
+     * Creates a size network for trade given a connectivity grid
+     * @param networkTiles connectivity grid that determines the trade network
+     */
+    TradeNetwork(boolean[][] networkTiles){
+        this.size = networkTiles.length;
         this.networkTiles = networkTiles;
     }
 
@@ -66,7 +74,7 @@ class TradeNetwork
      * @param board board of the game.
      * @param tribe tribe which network has to be computed.
      */
-    public void computeTradeNetworkTribe(Board board, Tribe tribe)
+    void computeTradeNetworkTribe(Board board, Tribe tribe)
     {
         //We only update the trade network of all tribes for the current tribe if this is not native
         if(tribe.getTribeId() != board.getActiveTribeID() && !board.isNative())
@@ -141,8 +149,10 @@ class TradeNetwork
         }
     }
 
+
     void setTradeNetworkValue(int x, int y, boolean trade) {  this.networkTiles[x][y] = trade;  }
     boolean getTradeNetworkValue(int x, int y) { return networkTiles[x][y]; }
+
 
     /**
      * Private class that is used by Pathfinding to determine water node connectivity in a graph, considering
@@ -150,6 +160,8 @@ class TradeNetwork
      */
     private class TradeWaterStep implements NeighbourHelper
     {
+        //Indicates which positions in the grid can be navigated (depends on terrain type,
+        // technology and visibility).
         private boolean [][]navigable;
 
         TradeWaterStep(boolean [][]navigable)
@@ -176,10 +188,6 @@ class TradeNetwork
                 {
                     neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
                 }
-//                else if(navigable[x][y])
-//                {
-//                    System.out.println("No jump link from " + from + " to " + tile + "; cost: " + (costFrom+stepCost));
-//                }
             }
 
             return neighbours;
@@ -197,9 +205,16 @@ class TradeNetwork
      */
     private class TradeNetworkStep implements NeighbourHelper
     {
+        //Grid that determines which position belong to the trade network. Adjacent points are connected
         private boolean [][]connected;
+
+        //List of network links between non-adjacent tiles.
         private HashMap<Vector2d, ArrayList<Vector2d>> jumpLinks;
 
+        /**
+         * Creates a trade network step helper
+         * @param connected list of connected tiles.
+         */
         TradeNetworkStep (boolean [][]connected)
         {
             this.connected = connected;
@@ -207,7 +222,8 @@ class TradeNetwork
         }
 
         /**
-         * Returns the neighbours of a given node in this data structure.
+         * Returns the neighbours of a given node in this data structure. Considers the jump links between
+         * non-adjacent node.
          * @param from position from which we need neighbours
          * @param costFrom is the total move cost computed up to "from"
          * @return  all the adjacent neighbours to tile in position "from"
@@ -241,12 +257,24 @@ class TradeNetwork
             return neighbours;
         }
 
+
+        /**
+         * Adds a jump link between two positions
+         * @param from one end of the link
+         * @param to the other end of the link
+         * @param reverse true if another link from 'to' to 'from' must also be created
+         */
         @Override
         public void addJumpLink(Vector2d from, Vector2d to, boolean reverse) {
             addAtoB(from, to);
             if(reverse) addAtoB(to, from);
         }
 
+        /**
+         * Adds a jump link from 'from' to 'to' to the list of jump links.
+         * @param from one end of the link
+         * @param to the other end of the link
+         */
         private void addAtoB(Vector2d from, Vector2d to)
         {
             if(!jumpLinks.containsKey(from))

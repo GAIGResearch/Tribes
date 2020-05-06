@@ -40,7 +40,7 @@ public class Game {
     // Is the game paused from the GUI?
     private boolean paused = false;
 
-    //
+    // AI stats for each player.
     private AIStats[] aiStats;
 
     /**
@@ -69,50 +69,45 @@ public class Game {
         this.rnd = new Random(seed);
         this.gs = new GameState(rnd, gameMode);
 
-        if(players.size() != tribes.size())
-        {
-            System.out.println("ERROR: Number of tribes must equal the number of players.");
-        }
-
         Tribe[] tribesArray = new Tribe[tribes.size()];
         for (int i = 0; i < tribesArray.length; ++i)
         {
             tribesArray[i] = tribes.get(i);
         }
 
-        //Create the players and agents to control them
-        numPlayers = players.size();
-        this.players = new Agent[numPlayers];
-        this.aiStats = new AIStats[numPlayers];
-        for(int i = 0; i < numPlayers; ++i)
-        {
-            this.players[i] = players.get(i);
-            this.players[i].setPlayerID(i);
-            this.aiStats[i] = new AIStats(i);
-        }
-        this.gameStateObservations = new GameState[numPlayers];
-
-        //Assign the tribes to the players
-//        this.gs.assignTribes(tribes);
-
+        initGameStructures(players, tribes.size());
         this.gs.init(filename, tribesArray);
-
         updateAssignedGameStates();
     }
 
+    /**
+     * Initializes the game from a savegame file
+     * @param players Players who will play this game.
+     * @param fileName savegame
+     */
     public void init(ArrayList<Agent> players, String fileName){
 
         GameLoader gameLoader = new GameLoader(fileName);
         this.seed = gameLoader.getSeed();
         this.rnd = new Random(seed);
         Tribe[] tribes = gameLoader.getTribes();
-
         this.gs = new GameState(rnd, gameLoader.getGame_mode(), tribes, gameLoader.getBoard(), gameLoader.getTick());
         this.gs.setGameIsOver(gameLoader.getGameIsOver());
+        initGameStructures(players, tribes.length);
+        updateAssignedGameStates();
+    }
 
-        if(players.size() != tribes.length)
+    /**
+     * Initializes game structures depending on number of players and tribes
+     * @param players Players to play this game
+     * @param nTribes number of tribes the game is set up to start with. Should be the same as players.size().
+     */
+    private void initGameStructures(ArrayList<Agent> players, int nTribes)
+    {
+        if(players.size() != nTribes)
         {
-            System.out.println("ERROR: Number of tribes must equal the number of players. The file only has " + tribes.length + " players.");
+            System.out.println("ERROR: Number of tribes must equal the number of players.");
+            System.exit(-1);
         }
 
         //Create the players and agents to control them
@@ -127,10 +122,9 @@ public class Game {
         }
 
         this.gameStateObservations = new GameState[numPlayers];
-
-        updateAssignedGameStates();
-
     }
+
+
 
 
 //    /**
@@ -207,11 +201,9 @@ public class Game {
 
     /**
      * Ticks the game forward. Asks agents for actions and applies returned actions to obtain the next game state.
+     * @param frame GUI of the game
      */
     private void tick (GUI frame) {
-        if (VERBOSE) {
-            //System.out.println("tick: " + gs.getTick());
-        }
 
         Tribe[] tribes = gs.getTribes();
         for (int i = 0; i < numPlayers; i++) {
@@ -226,8 +218,6 @@ public class Game {
 
             // Save Game
             GameSaver.writeTurnFile(gs, getBoard(), seed);
-
-            //GameLoader gl = new GameLoader("save/" + this.seed + "/"+ gs.getTick() + "_" + gs.getActiveTribeID() +"/game.json");
 
             //it may be that this player won the game, no more playing.
             if(gameOver())

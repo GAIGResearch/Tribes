@@ -11,7 +11,7 @@ public class TribesConfig
     public static final int WARRIOR_MAX_HP = 10;
     public static final int WARRIOR_RANGE = 1;
     public static final int WARRIOR_COST = 2;
-    public static final int WARRIOR_POINTS = 10;
+    static final int WARRIOR_POINTS = 10;
 
     //Archer
     public static final int ARCHER_ATTACK = 2;
@@ -20,7 +20,7 @@ public class TribesConfig
     public static final int ARCHER_MAX_HP = 10;
     public static final int ARCHER_RANGE = 2;
     public static final int ARCHER_COST = 3;
-    public static final int ARCHER_POINTS = 15;
+    static final int ARCHER_POINTS = 15;
 
     //Catapult
     public static final int CATAPULT_ATTACK = 4;
@@ -29,7 +29,7 @@ public class TribesConfig
     public static final int CATAPULT_MAX_HP = 10;
     public static final int CATAPULT_RANGE = 3;
     public static final int CATAPULT_COST = 8;
-    public static final int CATAPULT_POINTS = 40;
+    static final int CATAPULT_POINTS = 40;
 
     //Swordman
     public static final int SWORDMAN_ATTACK = 3;
@@ -38,7 +38,7 @@ public class TribesConfig
     public static final int SWORDMAN_MAX_HP = 15;
     public static final int SWORDMAN_RANGE = 1;
     public static final int SWORDMAN_COST = 5;
-    public static final int SWORDMAN_POINTS = 25;
+    static final int SWORDMAN_POINTS = 25;
 
     //MindBender
     public static final int MINDBENDER_ATTACK = 0;
@@ -47,8 +47,8 @@ public class TribesConfig
     public static final int MINDBENDER_MAX_HP = 10;
     public static final int MINDBENDER_RANGE = 1;
     public static final int MINDBENDER_COST = 5;
-    public static final int MINDBENDER_POINTS = 25;
     public static final int MINDBENDER_HEAL = 4;
+    static final int MINDBENDER_POINTS = 25;
 
     //Defender
     public static final int DEFENDER_ATTACK = 1;
@@ -57,7 +57,7 @@ public class TribesConfig
     public static final int DEFENDER_MAX_HP = 15;
     public static final int DEFENDER_RANGE = 1;
     public static final int DEFENDER_COST = 3;
-    public static final int DEFENDER_POINTS = 15;
+    static final int DEFENDER_POINTS = 15;
 
     //Knight
     public static final int KNIGHT_ATTACK = 4;
@@ -66,7 +66,7 @@ public class TribesConfig
     public static final int KNIGHT_MAX_HP = 15;
     public static final int KNIGHT_RANGE = 1;
     public static final int KNIGHT_COST = 8;
-    public static final int KNIGHT_POINTS = 40;
+    static final int KNIGHT_POINTS = 40;
 
     //Rider
     public static final int RIDER_ATTACK = 2;
@@ -75,7 +75,7 @@ public class TribesConfig
     public static final int RIDER_MAX_HP = 10;
     public static final int RIDER_RANGE = 1;
     public static final int RIDER_COST = 3;
-    public static final int RIDER_POINTS = 15;
+    static final int RIDER_POINTS = 15;
 
     // Boat
     public static final int BOAT_ATTACK = 1;
@@ -83,7 +83,7 @@ public class TribesConfig
     public static final int BOAT_MOVEMENT = 2;
     public static final int BOAT_RANGE = 2;
     public static final int BOAT_COST = 0;
-    public static final int BOAT_POINTS = 0;
+    static final int BOAT_POINTS = 0;
 
     // Ship
     public static final int SHIP_ATTACK = 2;
@@ -91,7 +91,7 @@ public class TribesConfig
     public static final int SHIP_MOVEMENT = 3;
     public static final int SHIP_RANGE = 2;
     public static final int SHIP_COST = 5;
-    public static final int SHIP_POINTS = 0;
+    static final int SHIP_POINTS = 0;
 
     // Battleship
     public static final int BATTLESHIP_ATTACK = 4;
@@ -99,7 +99,7 @@ public class TribesConfig
     public static final int BATTLESHIP_MOVEMENT = 3;
     public static final int BATTLESHIP_RANGE = 2;
     public static final int BATTLESHIP_COST = 15;
-    public static final int BATTLESHIP_POINTS = 0;
+    static final int BATTLESHIP_POINTS = 0;
 
     //Superunit
     public static final int SUPERUNIT_ATTACK = 5;
@@ -108,7 +108,7 @@ public class TribesConfig
     public static final int SUPERUNIT_MAX_HP = 40;
     public static final int SUPERUNIT_RANGE = 1;
     public static final int SUPERUNIT_COST = 10; //Useful for when unit is disbanded.
-    public static final int SUPERUNIT_POINTS = 50;
+    static final int SUPERUNIT_POINTS = 50;
 
     //Explorer
     public static final int NUM_STEPS = 15;
@@ -125,42 +125,42 @@ public class TribesConfig
     /* BUILDINGS */
 
     // Farm
-    public static final int FARM_COST = 5;
-    public static final int FARM_BONUS = 2;
-    public static final Types.RESOURCE FARM_RES_CONSTRAINT = Types.RESOURCE.CROPS;
+    static final int FARM_COST = 5;
+    static final int FARM_BONUS = 2;
+    static final Types.RESOURCE FARM_RES_CONSTRAINT = Types.RESOURCE.CROPS;
 
     //WindMill
-    public static final int WIND_MILL_COST = 5;
-    public static final int WIND_MILL_BONUS = 1;
+    static final int WIND_MILL_COST = 5;
+    static final int WIND_MILL_BONUS = 1;
 
     // LumberHut
-    public static final int LUMBER_HUT_COST = 2;
-    public static final int LUMBER_HUT_BONUS = 1;
+    static final int LUMBER_HUT_COST = 2;
+    static final int LUMBER_HUT_BONUS = 1;
 
     // SawMill
-    public static final int SAW_MILL_COST = 5;
-    public static final int SAW_MILL_BONUS = 1;
+    static final int SAW_MILL_COST = 5;
+    static final int SAW_MILL_BONUS = 1;
 
     //Mine
-    public static final int MINE_COST = 5;
-    public static final int MINE_BONUS = 2;
-    public static final Types.RESOURCE MINE_RES_CONSTRAINT = Types.RESOURCE.ORE;
+    static final int MINE_COST = 5;
+    static final int MINE_BONUS = 2;
+    static final Types.RESOURCE MINE_RES_CONSTRAINT = Types.RESOURCE.ORE;
 
     // Forge
-    public static final int FORGE_COST = 5;
-    public static final int FORGE_BONUS = 2;
+    static final int FORGE_COST = 5;
+    static final int FORGE_BONUS = 2;
 
     // Port
-    public static final int PORT_COST = 10;
-    public static final int PORT_BONUS = 2;
+    static final int PORT_COST = 10;
+    static final int PORT_BONUS = 2;
     public static final int PORT_TRADE_DISTANCE = 4; //Count includes destination port.
 
     // Custom House
-    public static final int CUSTOM_COST = 5;
-    public static final int CUSTOM_BONUS = 2;
+    static final int CUSTOM_COST = 5;
+    static final int CUSTOM_BONUS = 2;
 
     //Monuments
-    public static final int MONUMENT_BONUS = 3;
+    static final int MONUMENT_BONUS = 3;
     public static final int MONUMENT_POINTS = 400;
     public static final int EMPERORS_TOMB_STARS = 100;
     public static final int GATE_OF_POWER_KILLS = 10;
@@ -169,21 +169,21 @@ public class TribesConfig
 
 
     // Temple
-    public static final int TEMPLE_COST = 20;
-    public static final int TEMPLE_FOREST_COST = 15;
-    public static final int TEMPLE_BONUS = 1;
+    static final int TEMPLE_COST = 20;
+    static final int TEMPLE_FOREST_COST = 15;
+    static final int TEMPLE_BONUS = 1;
     public static final int TEMPLE_TURNS_TO_SCORE = 3;
     public static final int[] TEMPLE_POINTS = new int[]{100, 50, 50, 50, 150};
 
     //Resources
-    public static final int ANIMAL_COST = 2;
-    public static final int FISH_COST = 2;
-    public static final int WHALES_COST = 0;
-    public static final int FRUIT_COST = 2;
-    public static final int ANIMAL_POP = 1;
-    public static final int FISH_POP = 1;
-    public static final int WHALES_STARS = 10;
-    public static final int FRUIT_POP = 1;
+    static final int ANIMAL_COST = 2;
+    static final int FISH_COST = 2;
+    static final int WHALES_COST = 0;
+    static final int FRUIT_COST = 2;
+    static final int ANIMAL_POP = 1;
+    static final int FISH_POP = 1;
+    static final int WHALES_STARS = 10;
+    static final int FRUIT_POP = 1;
 
 
     // ROAD
@@ -212,7 +212,7 @@ public class TribesConfig
     public static final int CLEAR_VIEW_POINTS = 5;
 
     //Maximum number of turns to be played
-    public static final int MAX_TURNS = 30;
+    static final int MAX_TURNS = 30;
     public static final boolean PLAY_WITH_FULL_OBS = true; //This is for agents
     public static final boolean GUI_FORCE_FULL_OBS = false; //This is for display
 

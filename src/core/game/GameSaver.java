@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-public class GameSaver {
+class GameSaver {
 
 
-    public static void writeTurnFile(GameState gs, Board gameBoard, long seed) {
+    static void writeTurnFile(GameState gs, Board gameBoard, long seed) {
         try{
             File rootFileLoc = new File("save/" + seed);
             File turnFile = new File(rootFileLoc, gs.getTick() + "_" + gs.getBoard().getActiveTribeID());
@@ -243,7 +243,7 @@ public class GameSaver {
         return cityActors;
     }
 
-    public static ArrayList<Unit> getAllUnits(Board board)
+    private static ArrayList<Unit> getAllUnits(Board board)
     {
         Tribe[] tribes = board.getTribes();
         ArrayList<Unit> unitActors = new ArrayList<>();

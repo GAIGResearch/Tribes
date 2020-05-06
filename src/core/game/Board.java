@@ -62,6 +62,13 @@ public class Board {
         this.gameActors = new HashMap<>();
     }
 
+    /**
+     * Loads a board from a JSON object
+     * @param JBoard JSON object to load the board from
+     * @param capitalIDs IDs of the cities that are capiral
+     * @param activeTribeID id of the tribe that is next ot move
+     * @param tribes All tribes in the game
+     */
     public Board(JSONObject JBoard, int[] capitalIDs, int activeTribeID, Tribe[] tribes){
         this.gameActors = new HashMap<>();
         this.capitalIDs = capitalIDs;
@@ -106,15 +113,7 @@ public class Board {
 
         }
 
-        tradeNetwork = new TradeNetwork(size, networkTiles);
-
-//        TODO: testing
-//        System.out.println(Arrays.deepToString(terrains));
-//        System.out.println(Arrays.deepToString(resources));
-//        System.out.println(Arrays.deepToString(buildings));
-//        System.out.println(Arrays.deepToString(units));
-//        System.out.println(Arrays.deepToString(tileCityId));
-//        System.out.println(tradeNetwork);
+        tradeNetwork = new TradeNetwork(networkTiles);
     }
 
 
@@ -765,7 +764,7 @@ public class Board {
      * @param tribeId id of the tribe to set the capital
      * @param capitalId id of the capital city to set.
      */
-    void setCapitalId(int tribeId, int capitalId)
+    private void setCapitalId(int tribeId, int capitalId)
     {
         tribes[tribeId].setCapitalID(capitalId);
         capitalIDs[tribeId] = capitalId;
@@ -849,7 +848,12 @@ public class Board {
         actor.setActorId(actorIDcounter);
     }
 
-    public void addActor(core.actors.Actor actor, int actorID)
+    /**
+     * Adds an actor to the set of game actors with the supplied id
+     * @param actor actor to add
+     * @param actorID id of the actor, which is set in actor and as key in gameActors hash
+     */
+    void addActor(core.actors.Actor actor, int actorID)
     {
         gameActors.put(actorID, actor);
         actor.setActorId(actorID);

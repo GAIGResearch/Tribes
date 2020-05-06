@@ -31,11 +31,11 @@ public class Play {
         Types.GAME_MODE gameMode = CAPITALS;
         String saveGameFile = null;
 
-        String filename = "SampleLevel2p.csv";
-//        String filename = "SampleLevel.csv";
-//        String filename = "MinimalLevel.csv";
-//        String filename = "MinimalLevel_water.csv";
-//        String filename = "MinimalLevel2.csv";
+        String filename = "levels/SampleLevel2p.csv";
+//        String filename = "levels/SampleLevel.csv";
+//        String filename = "levels/MinimalLevel.csv";
+//        String filename = "levels/MinimalLevel_water.csv";
+//        String filename = "levels/MinimalLevel2.csv";
 
         String f = "save/1588441574160/27_0/game.json";
 //        saveGameFile= f;

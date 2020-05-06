@@ -7,7 +7,7 @@ public abstract class Actor {
     /**
      * Unique ID of this actor. It won't repeat through the game for any other.
      */
-    protected int actorId = -1;
+    int actorId = -1;
 
     /**
      * Id of the tribe this actor belongs to.
@@ -16,11 +16,15 @@ public abstract class Actor {
 
     /**
      * Position of this actor in the board
-     * @return
      */
     protected Vector2d position;
 
-
+    /**
+     * Method to provide a copy of this actor.
+     * @param hideInfo indicates if information of this actor should be copied or hidden for
+     *                 partial observability.
+     * @return new copy fo the Actor
+     */
     public abstract Actor copy(boolean hideInfo);
 
     public void setActorId(int actorID)

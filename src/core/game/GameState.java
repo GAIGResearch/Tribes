@@ -688,7 +688,7 @@ public class GameState {
         return rnd;
     }
 
-    public boolean isNative() {
+    boolean isNative() {
         return board.isNative();
     }
 

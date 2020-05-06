@@ -111,8 +111,6 @@ public class Types {
         }
         public UNIT getStartingUnit() {return startingUnit;}
         public int getInitialScore() { return startingScore; }
-        public Color getColor() {return color;}
-        public Color getColorLight() {return color_light;}
         public Color getColorDark() {return color_dark;}
     }
 
@@ -381,7 +379,6 @@ public class Types {
         private int bonus, key;
         EXAMINE_BONUS(int key, int bonus) {this.key = key; this.bonus = bonus;}
         public int getBonus() { return bonus;  }
-        public int getKey() {return key;}
 
         public static EXAMINE_BONUS random(Random r)
         {
@@ -445,8 +442,7 @@ public class Types {
             if(cityLevel == 1 && (this == WORKSHOP || this == EXPLORER)) return true;
             if(cityLevel == 2 && (this == CITY_WALL || this == RESOURCES)) return true;
             if(cityLevel == 3 && (this == POP_GROWTH || this == BORDER_GROWTH)) return true;
-            if(cityLevel >= 4 && (this == PARK || this == SUPERUNIT)) return true;
-            return false;
+            return cityLevel >= 4 && (this == PARK || this == SUPERUNIT);
         }
 
         public int getLevelUpPoints(){
@@ -589,10 +585,6 @@ public class Types {
         DIRECTIONS(int x, int y) {
             this.x = x;
             this.y = y;
-        }
-
-        public Vector2d toVec() {
-            return new Vector2d(x, y);
         }
 
         public int x() {return x;}

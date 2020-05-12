@@ -1,5 +1,6 @@
 package players;
 
+import com.sun.javafx.scene.traversal.Hueristic2D;
 import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
@@ -16,6 +17,7 @@ import core.actors.units.Catapult;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
+import players.heuristics.TribesSimpleHeuristic;
 import utils.ElapsedCpuTimer;
 import utils.Vector2d;
 
@@ -54,6 +56,7 @@ public class SimpleAgent extends Agent {
         Action bestAction = allActions.get(gs.getRandomGenerator().nextInt(nActions));
         int bestActionScore = evalAction(gs,bestAction);
         int zeroActions = 0;
+        TribesSimpleHeuristic heuristic = new TribesSimpleHeuristic(this.playerID);
 
         if(bestActionScore == 0)
             zeroActions++;
@@ -67,12 +70,17 @@ public class SimpleAgent extends Agent {
                 bestActionScore = actionScore;
             }
             //If the agent has lot of actions worth 0 then the agent probably has run out of worthwhile actions
-            if(zeroActions >6){
-                //Find the endturn action
-                if(a instanceof EndTurn)
-                    bestAction = a;
+//            if(zeroActions >allActions.size() -1){
+//                //Find the endturn action
+//                for (Action ac : allActions
+//                ) {
+//                    if (ac instanceof EndTurn)
+//                        bestAction = ac;
+//                }
+//            }
 
-            }
+
+
         }
 
 
@@ -182,12 +190,43 @@ public class SimpleAgent extends Agent {
 
     }
 
+
+    //Evaluate an action for building a road
     private int evalRoad(Action a, GameState gs, Tribe thisTribe){
         Vector2d pos = ((BuildRoad) a).getPosition();
+        ArrayList<Integer> citiesID = thisTribe.getCitiesID();
+        for(int x =pos.x-1; x<pos.x+1; x++){
+            for (int y =pos.y-1; y<pos.y+1; y++){
+                try {
+                    City c = gs.getBoard().getCityInBorders(x,y);
+                    //Check if there is a city behind us
+                    if (c!=null){
+
+                        if(c.getTribeId() == thisTribe.getTribeId()){
+                            if(x == c.getPosition().x && y == c.getPosition().y){
+                                if(thisTribe.getMaxProduction(gs) > 5 && thisTribe.getStars() > 4){
+                                    return 3;
+                                }
+                            }else{
+                                if(gs.getBoard().isRoad(x,y)){
+                                    return 3;
+                                }
+                            }
+                        }
+
+                    }else if(gs.getBoard().isRoad(x,y)){
+                        if(thisTribe.getMaxProduction(gs) > 5 && thisTribe.getStars() > 4){
+                            return 3;
+                        }
+                        return 1;
+                    }
+                }catch (IndexOutOfBoundsException e){
+                    continue;
+                }
+            }
+        }
 
         //if(pos.x)
-
-
 
         return 0;
     }
@@ -200,15 +239,18 @@ public class SimpleAgent extends Agent {
         Types.UNIT u = ((Spawn) a).getUnitType();
         int cityID = ((Spawn) a).getCityId();
         boolean[][] obsGrid = thisTribe.getObsGrid();
-        //Check ig enemy in city
+        //Check if enemy in city
         outer:
         for(int i = 0; i<obsGrid.length; i++){
             for(int j =0; j<obsGrid.length; j++){
                 if(obsGrid[i][j]){
                     if(gs.getBoard().getCityIdAt(i,j) == cityID){
-                        if(gs.getBoard().getUnitAt(i,j).getTribeId() !=thisTribe.getTribeId()){
-                            enemyInCity = true;
-                            break outer;
+                        Unit unit = gs.getBoard().getUnitAt(i,j);
+                        if(unit!=null) {
+                            if (gs.getBoard().getUnitAt(i, j).getTribeId() != thisTribe.getTribeId()) {
+                                enemyInCity = true;
+                                break outer;
+                            }
                         }
                     }
                 }
@@ -237,7 +279,7 @@ public class SimpleAgent extends Agent {
                 score = 3;
         }
         //Higher priority if enemies in city.
-        if(enemyInCity )
+        if(enemyInCity)
             score +=1;
 
         return score;
@@ -339,26 +381,28 @@ public class SimpleAgent extends Agent {
         Types.BUILDING b = ((Build) a).getBuildingType();
         int score = 0;
         switch (b) {
-            case PORT:
             case FARM:
             case MINE:
-                score = 3;
-            case EYE_OF_GOD:
+            case FORGE:
+            case WINDMILL:
+                score = 4; //These increase population in a while costing less to build so these cases are weighted higher
+            case PORT:
+            case SAWMILL:
             case LUMBER_HUT:
+                score = 3; // These increase population less and cost more so are of less priority
             case GRAND_BAZAR:
             case CUSTOM_HOUSE:
             case EMPERORS_TOMB:
             case GATE_OF_POWER:
+            case EYE_OF_GOD:
             case PARK_OF_FORTUNE:
             case TOWER_OF_WISDOM:
-            case FORGE:
-            case SAWMILL:
-            case WINDMILL:
             case ALTAR_OF_PEACE:
+                score= 5; //These are for after a task in finished and don't cost anything and increase population so pick these randomly
             case TEMPLE:
             case WATER_TEMPLE:
-            case FOREST_TEMPLE:
             case MOUNTAIN_TEMPLE:
+                score = 2; // These cost a lot and don't offer a lot of population incrase so are of less priority
         }
 
         return score;
@@ -366,11 +410,11 @@ public class SimpleAgent extends Agent {
 
     //Evaluate an upgrade action on a boat/ship
     private int evalUpgrade(Action a, GameState gs, Tribe thisTribe) {
-        //If the agent has a good amount of stars and good production then
         Unit u = (Unit) gs.getActor(((Upgrade) a).getUnitId());
 
         if (u.getType() == Types.UNIT.BATTLESHIP) { // It's a ship to a battleship
-            if (thisTribe.getMaxProduction(gs) > 5 && thisTribe.getStars() > 8) {
+            if (thisTribe.getMaxProduction(gs) > 5 && thisTribe.getStars() > 8) { //If the agent has a good amount of stars and good production then its worth an upgrade
+
                 return 3;
             }
         } else { // It's a boat to a ship

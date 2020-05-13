@@ -72,9 +72,9 @@ public class Play {
         KeyController ki = new KeyController(true);
         ActionController ac = new ActionController();
 
-        long randomSeed = System.currentTimeMillis();
+        long agentSeed = System.currentTimeMillis();
 
-        Game game = _loadGame(playerTypes, saveGameFile, randomSeed);
+        Game game = _loadGame(playerTypes, saveGameFile, agentSeed);
         Run.runGame(game, ki, ac);
 
         _manageGameResults(game, tribes, null, null);
@@ -103,15 +103,15 @@ public class Play {
     {
 
         long gameSeed = System.currentTimeMillis();
-        long randomSeed = System.currentTimeMillis() + new Random().nextInt();
-        System.out.println("Game seed: " + gameSeed + ", random seed: " + randomSeed);
+        long agentSeed = System.currentTimeMillis() + new Random().nextInt();
+        System.out.println("Game seed: " + gameSeed + ", agent random seed: " + agentSeed);
 
         ArrayList<Agent> players = new ArrayList<>();
         ArrayList<Tribe> tribesList = new ArrayList<>();
 
         for(int i = 0; i < playerTypes.length; ++i)
         {
-            Agent ag = _getAgent(playerTypes[i], randomSeed, ac);
+            Agent ag = _getAgent(playerTypes[i], agentSeed, ac);
             ag.setPlayerID(i);
             players.add(ag);
             tribesList.add(new Tribe(tribes[i]));
@@ -122,13 +122,13 @@ public class Play {
         return game;
     }
 
-    private static Game _loadGame(PlayerType[] playerTypes, String saveGameFile, long randomSeed)
+    private static Game _loadGame(PlayerType[] playerTypes, String saveGameFile, long agentSeed)
     {
         ArrayList<Agent> players = new ArrayList<>();
 
         for(int i = 0; i < playerTypes.length; ++i)
         {
-            Agent ag = _getAgent(playerTypes[i], randomSeed, null);
+            Agent ag = _getAgent(playerTypes[i], agentSeed, null);
             ag.setPlayerID(i);
             players.add(ag);
         }
@@ -163,15 +163,15 @@ public class Play {
 
     }
 
-    private static Agent _getAgent(PlayerType playerType, long randomSeed, ActionController ac)
+    private static Agent _getAgent(PlayerType playerType, long agentSeed, ActionController ac)
     {
         switch (playerType)
         {
             case HUMAN: return new HumanAgent(ac);
-            case RANDOM: return new RandomAgent(randomSeed);
-            case OSLA: return new OneStepLookAheadAgent(randomSeed);
-            case MC: return new MonteCarloAgent(randomSeed);
-            case SIMPLE: return new SimpleAgent(randomSeed);
+            case RANDOM: return new RandomAgent(agentSeed);
+            case OSLA: return new OneStepLookAheadAgent(agentSeed);
+            case MC: return new MonteCarloAgent(agentSeed);
+            case SIMPLE: return new SimpleAgent(agentSeed);
         }
         return null;
     }

@@ -8,6 +8,7 @@ import players.osla.OneStepLookAheadAgent;
 import utils.StatSummary;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import static core.Types.GAME_MODE.CAPITALS;
 import static core.Types.TRIBE.*;
@@ -102,7 +103,7 @@ public class Play {
     {
 
         long gameSeed = System.currentTimeMillis();
-        long randomSeed = System.currentTimeMillis();
+        long randomSeed = System.currentTimeMillis() + new Random().nextInt();
         System.out.println("Game seed: " + gameSeed + ", random seed: " + randomSeed);
 
         ArrayList<Agent> players = new ArrayList<>();

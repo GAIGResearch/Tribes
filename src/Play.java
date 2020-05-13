@@ -10,9 +10,8 @@ import utils.StatSummary;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static core.Types.GAME_MODE.CAPITALS;
+import static core.Types.GAME_MODE.*;
 import static core.Types.TRIBE.*;
-import static core.Types.TRIBE.OUMAJI;
 
 /**
  * Entry point of the framework.

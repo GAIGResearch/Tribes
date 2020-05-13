@@ -20,6 +20,7 @@ public class Rider extends Unit
     public Rider copy(boolean hideInfo) {
         Rider c = new Rider(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
+        c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         return hideInfo ? (Rider) c.hide() : c;

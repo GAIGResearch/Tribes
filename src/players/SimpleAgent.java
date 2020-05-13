@@ -176,7 +176,6 @@ public class SimpleAgent extends Agent {
 
         if (a instanceof BuildRoad) {
             score = evalRoad(a,gs,thisTribe);
-            //TODO
 
         }
 
@@ -327,8 +326,27 @@ public class SimpleAgent extends Agent {
         return 4;
     }
 
+    //Evaluate a grow forest action
     private int evalGrow(Action a, GameState gs, Tribe thisTribe) {
-        //TODO
+        int cityID = ((GrowForest) a).getCityId();
+        LinkedList<Vector2d> cityTiles = gs.getBoard().getCityTiles(cityID);
+        int noOfForests = 0;
+        int noOfLumberHuts = 0;
+        for (Vector2d t: cityTiles
+             ) {
+
+            Types.TERRAIN type = gs.getBoard().getTerrainAt(t.x,t.y);
+            Types.BUILDING b = gs.getBoard().getBuildingAt(t.x,t.y);
+            if(type == Types.TERRAIN.FOREST)
+                noOfForests++;
+
+            if(b == Types.BUILDING.LUMBER_HUT)
+                noOfLumberHuts++;
+        }
+
+        if(noOfForests < 2 && noOfLumberHuts <2){ //We want more forests to build more lumber huts providing we have less than what we want
+            return 2;
+        }
         return 0;
     }
 
@@ -528,6 +546,8 @@ public class SimpleAgent extends Agent {
             for (int y = 0; y < obsGrid.length; y++) {
                 if (obsGrid[x][y]) {
                     Unit enemy = b.getUnitAt(x, y);
+                    City c = b.getCityInBorders(x,y);
+                    Types.TERRAIN t = b.getTerrainAt(x,y);
                     if (enemy != null) {
                         if (enemy.getTribeId() != thisTribe.getTribeId()) {
                             // Check if we are in the range of an enemy
@@ -542,6 +562,14 @@ public class SimpleAgent extends Agent {
                                 }
                             }
                         }
+                    }else if(c!=null){
+                        if (c.getTribeId() != thisTribe.getTribeId()){ // High incentive to move towards enemy city to capture
+                            if(Vector2d.chebychevDistance(dest,c.getPosition()) < Vector2d.chebychevDistance(thisUnit.getPosition(),c.getPosition()))
+                                return 5;
+                            }
+                    }else if(t == Types.TERRAIN.VILLAGE){ // High incentive to move to village to capture
+                        if(Vector2d.chebychevDistance(dest,new Vector2d(x,y)) < Vector2d.chebychevDistance(thisUnit.getPosition(),new Vector2d(x,y)))
+                            return 5;
                     }
                 }
             }

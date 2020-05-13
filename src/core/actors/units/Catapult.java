@@ -20,6 +20,7 @@ public class Catapult extends Unit
     public Catapult copy(boolean hideInfo) {
         Catapult c = new Catapult(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
+        c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         return hideInfo ? (Catapult) c.hide() : c;

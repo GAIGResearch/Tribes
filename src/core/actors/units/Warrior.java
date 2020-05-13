@@ -20,6 +20,7 @@ public class Warrior extends Unit
     public Warrior copy(boolean hideInfo) {
         Warrior c = new Warrior(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
+        c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         return hideInfo ? (Warrior) c.hide() : c;

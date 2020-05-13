@@ -20,6 +20,7 @@ public class Knight extends Unit
     public Knight copy(boolean hideInfo) {
         Knight c = new Knight(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
+        c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         return hideInfo ? (Knight) c.hide() : c;

@@ -6,7 +6,7 @@ import core.game.GameState;
 import core.actors.units.Unit;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import core.Types;
 
 import static core.TribesConfig.RECOVER_IN_CITY_PLUS_HP;
 import static core.TribesConfig.RECOVER_PLUS_HP;

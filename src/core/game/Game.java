@@ -185,7 +185,7 @@ public class Game {
                 terminate();
                 firstEnd = false;
 
-                for(AIStats ais : aiStats)
+                if(VERBOSE) for(AIStats ais : aiStats)
                     ais.print();
 
                 if (!VISUALS || frame == null) {

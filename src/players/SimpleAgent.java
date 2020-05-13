@@ -69,8 +69,8 @@ public class SimpleAgent extends Agent {
                 bestAction = a;
                 bestActionScore = actionScore;
             }
-            //If the agent has lot of actions worth 0 then the agent probably has run out of worthwhile actions
-//            if(zeroActions >allActions.size() -1){
+//            If the agent has lot of actions worth 0 then the agent probably has run out of worthwhile actions
+//            if(zeroActions >=allActions.size()-1){
 //                //Find the endturn action
 //                for (Action ac : allActions
 //                ) {
@@ -78,9 +78,6 @@ public class SimpleAgent extends Agent {
 //                        bestAction = ac;
 //                }
 //            }
-
-
-
         }
 
 
@@ -182,6 +179,10 @@ public class SimpleAgent extends Agent {
         if (a instanceof ResearchTech) {
             score = evalResearch(a, gs, thisTribe);
 
+        }
+
+        if(a instanceof MakeVeteran){
+            score = 5;
         }
 
         return score;
@@ -539,22 +540,33 @@ public class SimpleAgent extends Agent {
         Unit thisUnit = (Unit) gs.getActor(((Move) a).getUnitId());
         Vector2d currentPos = thisUnit.getPosition();
         Board b = gs.getBoard();
+        int maxCities = 3; //Arbritary amount of cities we want in case we met no tribes
+
+        ArrayList<Integer> tribesMet = thisTribe.getTribesMet();
+        if(tribesMet.size() >1) {
+            for (int tribeID : tribesMet
+            ) {
+                if (gs.getTribe(tribeID).getNumCities() > maxCities)
+                    maxCities = gs.getTribe(tribeID).getNumCities();
+
+            }
+        }
         boolean inRange = false;
-        int score = 0;
+
+
+       // int score = 0;
         boolean[][] obsGrid = thisTribe.getObsGrid();
         for (int x = 0; x < obsGrid.length; x++) {
             for (int y = 0; y < obsGrid.length; y++) {
                 if (obsGrid[x][y]) {
                     Unit enemy = b.getUnitAt(x, y);
-                    City c = b.getCityInBorders(x,y);
-                    Types.TERRAIN t = b.getTerrainAt(x,y);
                     if (enemy != null) {
                         if (enemy.getTribeId() != thisTribe.getTribeId()) {
                             // Check if we are in the range of an enemy
                             inRange = checkInRange(enemy, thisUnit, thisTribe, b);
                             if (enemy.DEF < thisUnit.ATK && thisUnit.getCurrentHP() >= enemy.getCurrentHP()) { //Incentive to attack weaker enemy
                                 if (Vector2d.chebychevDistance(dest, enemy.getPosition()) < Vector2d.chebychevDistance(currentPos, enemy.getPosition())) {
-                                    score = 3;
+                                    return 3;
                                 }
                             } else { //Higher Incentive to move away from enemy if the enemy is stronger, especially if we are in range
                                 if (Vector2d.chebychevDistance(dest, enemy.getPosition()) > Vector2d.chebychevDistance(currentPos, enemy.getPosition()) && inRange) {
@@ -562,30 +574,54 @@ public class SimpleAgent extends Agent {
                                 }
                             }
                         }
-                    }else if(c!=null){
-                        if (c.getTribeId() != thisTribe.getTribeId()){ // High incentive to move towards enemy city to capture
-                            if(Vector2d.chebychevDistance(dest,c.getPosition()) < Vector2d.chebychevDistance(thisUnit.getPosition(),c.getPosition()))
-                                return 5;
-                            }
-                    }else if(t == Types.TERRAIN.VILLAGE){ // High incentive to move to village to capture
-                        if(Vector2d.chebychevDistance(dest,new Vector2d(x,y)) < Vector2d.chebychevDistance(thisUnit.getPosition(),new Vector2d(x,y)))
-                            return 5;
                     }
+                }
+            }
+        }
+
+        for(int x = thisUnit.getPosition().x-thisUnit.RANGE; x<thisUnit.getPosition().x+ thisUnit.RANGE; x++){ //Check if any cities/villages in range
+            for(int y = thisUnit.getPosition().y-thisUnit.RANGE; y<thisUnit.getPosition().y+ thisUnit.RANGE; y++) {
+                try {
+                    if(obsGrid[x][y]){
+                        City c = b.getCityInBorders(x, y);
+                        Types.TERRAIN t = b.getTerrainAt(x, y);
+                        if (c != null) {
+                            if (c.getTribeId() != thisTribe.getTribeId()) { // High incentive to move towards enemy city to capture
+                                if (Vector2d.chebychevDistance(dest, c.getPosition()) < Vector2d.chebychevDistance(thisUnit.getPosition(), c.getPosition())) {
+
+                                    if (thisTribe.getCitiesID().size() > maxCities) // Agent wants the most cities
+                                        return 5;
+                                    else
+                                        return 4;
+                                }
+                            }
+                        }
+                        if (t == Types.TERRAIN.VILLAGE) { // High incentive to move to village to capture as it is easier than capturing an actual city
+                            if (Vector2d.chebychevDistance(dest, new Vector2d(x, y)) < Vector2d.chebychevDistance(thisUnit.getPosition(), new Vector2d(x, y))) {
+
+                                if (thisTribe.getCitiesID().size() > maxCities) // Agent wants the most cities
+                                    return 4;
+                                else
+                                    return 5;
+                            }
+                        }
+                    }
+                }catch (IndexOutOfBoundsException e){
+                    continue;
                 }
             }
         }
         for (int i = 0; i < thisUnit.RANGE; i++) {
             try {
                 if (!obsGrid[dest.x + thisUnit.RANGE][dest.y + thisUnit.RANGE] || !obsGrid[dest.x - thisUnit.RANGE][dest.y - thisUnit.RANGE]) {
-                    score = 3; //Incentive to explore;
-                    break;
+                    return 3; //Incentive to explore;
                 }
             } catch (ArrayIndexOutOfBoundsException e) {
                 continue;
             }
 
         }
-        return score;
+        return 0;
     }
 
     public int evalAttack(Action a, GameState gs, Tribe thisTribe) {

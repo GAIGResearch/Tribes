@@ -31,8 +31,8 @@ public class Play {
         Types.GAME_MODE gameMode = CAPITALS;
         String saveGameFile = null;
 
-        String filename = "levels/SampleLevel2p.csv";
-//        String filename = "levels/SampleLevel.csv";
+//        String filename = "levels/SampleLevel2p.csv";
+        String filename = "levels/SampleLevel.csv";
 //        String filename = "levels/MinimalLevel.csv";
 //        String filename = "levels/MinimalLevel_water.csv";
 //        String filename = "levels/MinimalLevel2.csv";
@@ -40,10 +40,10 @@ public class Play {
         String f = "save/1588441574160/27_0/game.json";
 //        saveGameFile= f;
 
-//        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode, saveGameFile);
+        play(filename, new PlayerType[]{PlayerType.SIMPLE, PlayerType.MC, PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode, saveGameFile);
 //        play(filename, new PlayerType[]{PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode, saveGameFile);
 //        play(filename, new PlayerType[]{PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI}, gameMode, saveGameFile);
-        play(filename, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode, saveGameFile);
+//        play(filename, new PlayerType[]{PlayerType.SIMPLE, PlayerType.MC}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode, saveGameFile);
 //        play(filename, new PlayerType[]{PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.RANDOM, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode, saveGameFile);
     }
 

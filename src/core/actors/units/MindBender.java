@@ -20,6 +20,7 @@ public class MindBender extends Unit
     public MindBender copy(boolean hideInfo) {
         MindBender c = new MindBender(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
+        c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         return hideInfo ? (MindBender) c.hide() : c;

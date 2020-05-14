@@ -98,6 +98,10 @@ public abstract class Unit extends Actor
         if(status == FINISHED)
             return false;
 
+        //Allows a unit to transition from any state to FINISHED.
+        if(transition == FINISHED)
+            return true;
+
         switch (getType()) {
             //Either move or attack
             case MIND_BENDER:
@@ -141,6 +145,13 @@ public abstract class Unit extends Actor
 
     public void transitionToStatus(Types.TURN_STATUS newStatus) {
         if(canTransitionTo(newStatus)) {
+
+            //Allows a unit to transition from any state to FINISHED
+            if(newStatus == FINISHED) {
+                this.status = FINISHED;
+                return;
+            }
+            
             switch (getType()) {
                 case MIND_BENDER:
                 case CATAPULT:

@@ -75,7 +75,7 @@ public class Examine extends UnitAction
                 case RESEARCH:
                     boolean researched = technologyTree.researchAtRandom(rnd);
                     if(!researched)
-                        System.out.println("ERROR: researchAtRandom couldn't do any research.");
+                        System.out.println(gs.getTick() + " ERROR: researchAtRandom couldn't do any research.");
                     break;
 
                 case POP_GROWTH:

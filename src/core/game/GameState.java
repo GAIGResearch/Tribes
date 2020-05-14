@@ -70,6 +70,7 @@ public class GameState {
         this.gameIsOver = false;
     }
 
+    //This Constructor is used when loading from a savegame.
     public GameState(Random rnd, Types.GAME_MODE gameMode, Tribe[] tribes, Board board, int tick){
         this(rnd, gameMode);
         this.tick = tick;

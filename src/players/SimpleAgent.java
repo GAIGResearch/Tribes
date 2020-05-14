@@ -431,7 +431,7 @@ public class SimpleAgent extends Agent {
         return 0;
     }
 
-
+    //Evaluate a recover action
     private int evalRecover(Action a, GameState gs, Tribe thisTribe) {
         boolean[][] obsGrid = thisTribe.getObsGrid();
         Unit thisUnit = (Unit) gs.getActor(((Recover) a).getUnitId());
@@ -559,7 +559,7 @@ public class SimpleAgent extends Agent {
                 }
             }
         }
-
+        //Check unit range for cities/villages
         for(int x = thisUnit.getPosition().x-thisUnit.RANGE; x<thisUnit.getPosition().x+ thisUnit.RANGE; x++){ //Check if any cities/villages in range
             for(int y = thisUnit.getPosition().y-thisUnit.RANGE; y<thisUnit.getPosition().y+ thisUnit.RANGE; y++) {
                 try {
@@ -601,6 +601,7 @@ public class SimpleAgent extends Agent {
         return score;
     }
 
+    //Evaluate an attack action
     public int evalAttack(Action a, GameState gs, Tribe thisTribe) {
         int score = 0;
         Unit attacker = (Unit) gs.getActor(((Attack) a).getUnitId());

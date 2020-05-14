@@ -1,6 +1,5 @@
 package players;
 
-import com.sun.javafx.scene.traversal.Hueristic2D;
 import core.TribesConfig;
 import core.Types;
 import core.actions.Action;

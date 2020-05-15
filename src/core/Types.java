@@ -66,8 +66,14 @@ public class Types {
             return children;
         }
 
-        public int getCost(int numOfCities) {
-            return TECH_BASE_COST + this.tier * numOfCities;
+        public int getCost(int numOfCities, TechnologyTree tt) {
+            int cost = TECH_BASE_COST + this.tier * numOfCities;
+            if(tt.isResearched(TECH_DISCOUNT))
+            {
+                double disc_cost = cost * TECH_DISCOUNT_VALUE;
+                cost = (int)disc_cost;
+            }
+            return cost;
         }
 
     }

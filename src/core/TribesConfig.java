@@ -204,6 +204,8 @@ public class TribesConfig
 
     // Research
     public static final int TECH_BASE_COST = 4;
+    public static final Types.TECHNOLOGY TECH_DISCOUNT = Types.TECHNOLOGY.PHILOSOPHY;
+    public static final double TECH_DISCOUNT_VALUE = 0.2;
 
     /* TRIBES */
     public static final int INITIAL_STARS = 5;//1000;

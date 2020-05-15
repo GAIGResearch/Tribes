@@ -1,0 +1,56 @@
+{
+  "WATER" : {
+    "XIN_XI" : 0,
+    "IMPERIUS" : 0,
+    "BARDUR" : 0,
+    "OUMAJI" : 0
+  },
+  "FOREST" : {
+    "XIN_XI" : 1,
+    "IMPERIUS" : 1,
+    "BARDUR" : 1,
+    "OUMAJI" : 0.1
+  },
+  "MOUNTAIN" : {
+    "XIN_XI" : 1.5,
+    "IMPERIUS" : 1,
+    "BARDUR" : 1,
+    "OUMAJI" : 1
+  },
+  "ORE" : {
+    "XIN_XI" : 1,
+    "IMPERIUS" : 1,
+    "BARDUR" : 1,
+    "OUMAJI" : 1
+  },
+  "FRUIT" : {
+    "XIN_XI" : 1,
+    "IMPERIUS" : 1,
+    "BARDUR" : 1.5,
+    "OUMAJI" : 1
+  },
+  "CROPS" : {
+    "XIN_XI" : 1,
+    "IMPERIUS" : 1,
+    "BARDUR" : 0.1,
+    "OUMAJI" : 1
+  },
+  "ANIMAL" : {
+    "XIN_XI" : 1,
+    "IMPERIUS" : 1,
+    "BARDUR" : 2,
+    "OUMAJI" : 1
+  },
+  "FISH" : {
+    "XIN_XI" : 1,
+    "IMPERIUS" : 1,
+    "BARDUR" : 1,
+    "OUMAJI" : 1
+  },
+  "WHALES" : {
+    "XIN_XI" : 1,
+    "IMPERIUS" : 1,
+    "BARDUR" : 1,
+    "OUMAJI" : 1
+  }
+}

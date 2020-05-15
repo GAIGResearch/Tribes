@@ -168,6 +168,7 @@ public class Types {
         }
         public int getCost() {return cost;}
         public int getBonus() {return bonus;}
+        public char getMapChar() {return mapChar;}
 
         public static RESOURCE getType(char resourceChar) {
             for(RESOURCE r : Types.RESOURCE.values()){

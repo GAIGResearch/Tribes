@@ -1,5 +1,9 @@
 package core.levelgen;
 
+import static core.Types.RESOURCE.FRUIT;
+import static core.Types.TERRAIN.*;
+import static core.Types.TRIBE.*;
+
 import core.Types;
 import org.json.JSONObject;
 
@@ -14,6 +18,7 @@ public class LevelGenerator {
     private int smoothing;
     private int relief;
     private double initialLand;
+    private double landCoefficient;
     private String[] level;
 
     //JSON that contains all the probability values for all the tribes.
@@ -43,16 +48,27 @@ public class LevelGenerator {
         this.smoothing = smoothing;
         this.relief = relief;
         this.initialLand = initialLand;
-        this.level = new String[mapSize];
+        this.level = new String[mapSize*mapSize];
+        this.landCoefficient = (0.5 + relief) / 9;
 
-        //Initialize level with the colon tile separator.
-        for(int i = 0; i < mapSize*mapSize; i++){ level[i] = ":"; };
+        //Initialize the level with deep water.
+        for(int i = 0; i < mapSize*mapSize; i++){ level[i] = "d:"; };
     }
 
     /**
      * Generates the level.
      */
     public void generate() {
+
+        //Randomly replace half of the tiles with ground.
+        int i = 0;
+        while(i < mapSize*mapSize*initialLand) {
+            int index = randomInt(0, mapSize*mapSize);
+            if(getTerrain(index) == DEEP_WATER.getMapChar()) {
+                i++;
+                writeTile(index, PLAIN, null);
+            }
+        }
 
     }
 
@@ -93,16 +109,32 @@ public class LevelGenerator {
     }
 
     /**
-     * Writes a level tile at position x, y.
+     * Writes a level tile at position index.
      */
     public void writeTile(int index, Types.TERRAIN terrain, Types.RESOURCE resource) {
 
         level[index] = (resource == null) ? ""+ terrain.getMapChar() + ':' : ""+ terrain.getMapChar() + ':' + resource.getMapChar();
     }
 
+    /**
+     * Returns a tile's terrain at index
+     */
+    public char getTerrain(int index) {
+        return level[index].split(":")[0].charAt(0);
+    }
+
+    /**
+     * Returns a random int in the range [min, max)
+     */
+    public int randomInt(int min, int max) {
+        return (int) Math.floor(min + Math.random() * (max - min));
+    }
+
+
     public static void main(String[] args) {
 
         LevelGenerator gen = new LevelGenerator();
-
+        gen.writeTile(55, MOUNTAIN, FRUIT);
+        System.out.println(gen.getTerrain(55));
     }
 }

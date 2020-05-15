@@ -336,11 +336,11 @@ public class Game {
                     endTurnDelay.setMaxTimeMillis(FRAME_DELAY);
                 }
 
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    Thread.sleep(10);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
             } else if (action instanceof EndTurn) { // If no visuals and we should end the turn, just break out of loop here
                 break;
             }

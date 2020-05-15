@@ -19,37 +19,37 @@ import static core.Types.UNIT.*;
 public class Types {
 
     public enum TECHNOLOGY {
-        CLIMBING(5, null),
-        FISHING(5, null),
-        HUNTING(5, null),
-        ORGANIZATION(5, null),
-        RIDING(5, null),
-        ARCHERY(6, HUNTING),
-        FARMING(6, ORGANIZATION),
-        FORESTRY(6, HUNTING),
-        FREE_SPIRIT(6, RIDING),
-        MEDITATION(6, CLIMBING),
-        MINING(6, CLIMBING),
-        ROADS(6, RIDING),
-        SAILING(6, FISHING),
-        SHIELDS(6, ORGANIZATION),
-        WHALING(6, FISHING),
-        AQUATISM(7, WHALING),
-        CHIVALRY(7, FREE_SPIRIT),
-        CONSTRUCTION(7, FARMING),
-        MATHEMATICS(7, FORESTRY),
-        NAVIGATION(7, SAILING),
-        SMITHERY(7, MINING),
-        SPIRITUALISM(7, ARCHERY),
-        TRADE(7, ROADS),
-        PHILOSOPHY(7, MEDITATION);
+        CLIMBING(1, null),
+        FISHING(1, null),
+        HUNTING(1, null),
+        ORGANIZATION(1, null),
+        RIDING(1, null),
+        ARCHERY(2, HUNTING),
+        FARMING(2, ORGANIZATION),
+        FORESTRY(2, HUNTING),
+        FREE_SPIRIT(2, RIDING),
+        MEDITATION(2, CLIMBING),
+        MINING(2, CLIMBING),
+        ROADS(2, RIDING),
+        SAILING(2, FISHING),
+        SHIELDS(2, ORGANIZATION),
+        WHALING(2, FISHING),
+        AQUATISM(3, WHALING),
+        CHIVALRY(3, FREE_SPIRIT),
+        CONSTRUCTION(3, FARMING),
+        MATHEMATICS(3, FORESTRY),
+        NAVIGATION(3, SAILING),
+        SMITHERY(3, MINING),
+        SPIRITUALISM(3, ARCHERY),
+        TRADE(3, ROADS),
+        PHILOSOPHY(3, MEDITATION);
 
-        private int baseCost;
+        private int tier;
         private TECHNOLOGY parent;
         private ArrayList<TECHNOLOGY> children;
 
-        TECHNOLOGY(int baseCost, TECHNOLOGY parent) {
-            this.baseCost = baseCost; this.parent = parent;
+        TECHNOLOGY(int tier, TECHNOLOGY parent) {
+            this.tier = tier; this.parent = parent;
         }
 
         public TECHNOLOGY getParentTech() {return this.parent;}
@@ -67,7 +67,7 @@ public class Types {
         }
 
         public int getCost(int numOfCities) {
-            return baseCost * numOfCities;
+            return TECH_BASE_COST + this.tier * numOfCities;
         }
 
     }
@@ -115,7 +115,7 @@ public class Types {
     }
 
     /**
-     * Defines the status of the turn for an  (May be in java?)
+     * Defines the status of the turn for a unit
      */
     public enum TURN_STATUS {
         FRESH,
@@ -201,7 +201,7 @@ public class Types {
         FORGE (2,"img/building/forge2.png", FORGE_COST, FORGE_BONUS, SMITHERY, new HashSet<>(Collections.singletonList(PLAIN))),
         FARM (3, "img/building/farm2.png", FARM_COST, FARM_BONUS, FARMING, new HashSet<>(Collections.singletonList(PLAIN))),
         WINDMILL (4,"img/building/windmill2.png", WIND_MILL_COST, WIND_MILL_BONUS, CONSTRUCTION, new HashSet<>(Collections.singletonList(PLAIN))),
-        CUSTOM_HOUSE (5,"img/building/custom_house2.png", CUSTOM_COST, CUSTOM_BONUS, TRADE, new HashSet<>(Collections.singletonList(PLAIN))),
+        CUSTOMS_HOUSE(5,"img/building/custom_house2.png", CUSTOMS_COST, CUSTOMS_BONUS, TRADE, new HashSet<>(Collections.singletonList(PLAIN))),
         LUMBER_HUT(6,"img/building/lumber_hut2.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, FORESTRY, new HashSet<>(Collections.singletonList(FOREST))),
         SAWMILL (7,"img/building/sawmill2.png", SAW_MILL_COST, SAW_MILL_BONUS, MATHEMATICS, new HashSet<>(Collections.singletonList(PLAIN))),
         TEMPLE (8, "img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, FREE_SPIRIT, new HashSet<>(Collections.singletonList(PLAIN))),
@@ -223,7 +223,7 @@ public class Types {
                 case "FORGE": return FORGE;
                 case "FARM": return FARM;
                 case "WINDMILL": return WINDMILL;
-                case "CUSTOM_HOUSE": return CUSTOM_HOUSE;
+                case "CUSTOMS_HOUSE": return CUSTOMS_HOUSE;
                 case "LUMBER_HUT": return LUMBER_HUT;
                 case "SAWMILL": return SAWMILL;
                 case "TEMPLE": return TEMPLE;
@@ -295,7 +295,7 @@ public class Types {
 
         public Types.BUILDING getAdjacencyConstraint()
         {
-            if(this == CUSTOM_HOUSE) return PORT;
+            if(this == CUSTOMS_HOUSE) return PORT;
             if(this == WINDMILL) return FARM;
             if(this == FORGE) return MINE;
             if(this == SAWMILL) return LUMBER_HUT;
@@ -306,11 +306,11 @@ public class Types {
         {
             switch (this)
             {
-                case PORT: return CUSTOM_HOUSE;
+                case PORT: return CUSTOMS_HOUSE;
                 case FARM: return WINDMILL;
                 case MINE: return FORGE;
                 case LUMBER_HUT: return SAWMILL;
-                case CUSTOM_HOUSE: return PORT;
+                case CUSTOMS_HOUSE: return PORT;
                 case WINDMILL: return FARM;
                 case FORGE: return MINE;
                 case SAWMILL: return LUMBER_HUT;
@@ -446,11 +446,15 @@ public class Types {
         }
 
         public int getLevelUpPoints(){
-            //TODO: What happens when level > 10? Negative points? Unlikely!
             if (level == 1){
                 return 100;
             }
             return 50 - level * 5;
+        }
+
+        public boolean grantsMonument()
+        {
+            return this.level == PARK_OF_FORTUNE_LEVEL;
         }
     }
 

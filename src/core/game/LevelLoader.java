@@ -4,7 +4,6 @@ import core.Types;
 import core.actors.City;
 import core.actors.Tribe;
 import core.actors.units.Unit;
-import utils.IO;
 import utils.Vector2d;
 
 import java.awt.*;
@@ -37,7 +36,7 @@ class LevelLoader
 
         board.init(size.width, tribes);
 
-        //Go through evert token in the level file
+        //Go through every token in the level file
         for (int i = 0; i < size.height; ++i) {
             String line = lines[i];
 

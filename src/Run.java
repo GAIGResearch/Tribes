@@ -27,4 +27,13 @@ class Run {
 
         g.run(frame, wi);
     }
+
+
+    /**
+     * Runs a game, no visuals nor human player
+     * @param g - game to run
+     */
+    static void runGame(Game g) {
+        g.run(null, null);
+    }
 }

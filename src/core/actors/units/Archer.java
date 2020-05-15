@@ -20,6 +20,7 @@ public class Archer extends Unit
     public Archer copy(boolean hideInfo) {
         Archer c = new Archer(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
         c.setCurrentHP(getCurrentHP());
+        c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());
         c.setStatus(getStatus());
         return hideInfo ? (Archer) c.hide() : c;

@@ -671,7 +671,7 @@ public class Board {
      */
     private void moveOneToNewCity(City destCity, Tribe tribe, Random rnd)
     {
-        //Capital is special, we start taking unnits from there.
+        //Capital is special, we start taking units from there.
         boolean ownsCapital = tribe.controlsCapital();
         City capital = (City) getActor(tribe.getCapitalID());
         LinkedList<Integer> cities = new LinkedList<>(tribe.getCitiesID());

@@ -128,7 +128,7 @@ public class TechnologyTree {
        ArrayList<Types.TECHNOLOGY> available = new ArrayList<>();
        for(Types.TECHNOLOGY tech : Types.TECHNOLOGY.values())
        {
-           if(!isResearched(tech))
+           if(isResearchable(tech))
                available.add(tech);
        }
 

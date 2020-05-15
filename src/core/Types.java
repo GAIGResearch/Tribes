@@ -737,9 +737,10 @@ public class Types {
         CLIMB_MOUNTAIN(null, CLIMBING),
         ATTACK("img/actions/attack.png", null),
         CAPTURE("img/actions/capture.png", null),
+        CONVERT("img/actions/convert.png", null),
         EXAMINE("img/actions/examine.png", null),
         DISBAND("img/actions/disband.png", FREE_SPIRIT),
-        HEAL("img/actions/heal.png", null),
+        HEAL("img/actions/heal2.png", null),
         UPGRADE_BOAT("img/actions/upgrade.png", SAILING),
         UPGRADE_SHIP("img/actions/upgrade.png", NAVIGATION),
         BURN_FOREST(null, CHIVALRY),
@@ -764,7 +765,7 @@ public class Types {
                 return ImageIO.GetInstance().getImage(MOVE.imgPath);
             } else if (a instanceof Attack) {
                 return ImageIO.GetInstance().getImage(ATTACK.imgPath);
-            } else if (a instanceof Capture || a instanceof Convert) {
+            } else if (a instanceof Capture) {
                 return ImageIO.GetInstance().getImage(CAPTURE.imgPath);
             } else if (a instanceof Examine) {
                 return ImageIO.GetInstance().getImage(EXAMINE.imgPath);
@@ -774,6 +775,8 @@ public class Types {
                 return ImageIO.GetInstance().getImage(HEAL.imgPath);
             } else if (a instanceof Upgrade) {
                 return ImageIO.GetInstance().getImage(UPGRADE_BOAT.imgPath);
+            } else if (a instanceof Convert) {
+                return ImageIO.GetInstance().getImage(CONVERT.imgPath);
             }
             return null;
         }

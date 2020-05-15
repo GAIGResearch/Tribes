@@ -4,6 +4,7 @@ import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actions.tribeactions.EndTurn;
+import core.actions.unitactions.Attack;
 import core.actors.Tribe;
 import players.Agent;
 import players.HumanAgent;
@@ -301,11 +302,6 @@ public class Game {
                             aiStats[playerID].addBranchingFactor(gs.getTick(), gameStateObservations[playerID].getAllAvailableActions().size());
                         curActionCounter++;
 
-                        // Play the action in the game and update the available actions list and observations
-                        gs.next(action);
-                        gs.computePlayerActions(tribe);
-                        updateAssignedGameStates();
-
                         if (actionDelayTimer != null) {  // Reset action delay timer for next action request
                             actionDelayTimer = new ElapsedCpuTimer();
                             actionDelayTimer.setMaxTimeMillis(FRAME_DELAY);
@@ -339,8 +335,24 @@ public class Game {
                     endTurnDelay = new ElapsedCpuTimer();
                     endTurnDelay.setMaxTimeMillis(FRAME_DELAY);
                 }
+
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             } else if (action instanceof EndTurn) { // If no visuals and we should end the turn, just break out of loop here
                 break;
+            }
+
+            if (action != null && !VISUALS || frame != null && (!(action instanceof Attack) && action != null ||
+                    (action = frame.getAnimatedAction()) != null)) {
+                // Play the action in the game and update the available actions list and observations
+                // Some actions are animated, the condition above checks if this animation is finished and retrieves
+                // the action after all the GUI updates.
+                gs.next(action);
+                gs.computePlayerActions(tribe);
+                updateAssignedGameStates();
             }
 
             if(gameOver())

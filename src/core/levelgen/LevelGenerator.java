@@ -6,33 +6,15 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
+//TODO add BASE_PROB to json
 public class LevelGenerator {
-
-    enum BASE_PROB {
-
-        WATER(0.0),
-        MOUNTAIN(0.15),
-        FOREST(0.4),
-        FRUIT(0.5),
-        CROP(0.5),
-        FISH(0.5),
-        ANIMAL(0.5),
-        WHALE(0.4),
-        ORE(0.5);
-
-        double baseProb;
-
-        BASE_PROB(double baseProb) {
-            this.baseProb = baseProb;
-        }
-    }
 
     //Level parameters, can be changed using init().
     private int mapSize;
     private int smoothing;
     private int relief;
     private double initialLand;
-    private String[][] level;
+    private String[] level;
 
     //JSON that contains all the probability values for all the tribes.
     private JSONObject data;
@@ -61,10 +43,10 @@ public class LevelGenerator {
         this.smoothing = smoothing;
         this.relief = relief;
         this.initialLand = initialLand;
-        this.level = new String[mapSize][mapSize];
+        this.level = new String[mapSize];
 
         //Initialize level with the colon tile separator.
-        for(int i = 0; i < mapSize*mapSize; i++){ level[i/mapSize][i%mapSize] = ":"; };
+        for(int i = 0; i < mapSize*mapSize; i++){ level[i] = ":"; };
     }
 
     /**
@@ -99,16 +81,23 @@ public class LevelGenerator {
     /**
      * Returns probability of a specific tile type for a specific tribe.
      */
-    public double _getTribeProb(BASE_PROB b, Types.TRIBE tribe) {
-        return data.getJSONObject(b.toString()).getDouble(tribe.toString());
+    public double getTribeProb(String name, Types.TRIBE tribe) {
+        return data.getJSONObject(name.toString()).getDouble(tribe.toString());
+    }
+
+    /**
+     * Returns the base probability of a specific tile type.
+     */
+    public double getBaseProb(String name) {
+        return data.getJSONObject(name.toString()).getDouble("BASE");
     }
 
     /**
      * Writes a level tile at position x, y.
      */
-    public void writeTile(int x, int y, Types.TERRAIN terrain, Types.RESOURCE resource) {
+    public void writeTile(int index, Types.TERRAIN terrain, Types.RESOURCE resource) {
 
-        level[x][y] = (resource == null) ? ""+ terrain.getMapChar() + ':' : ""+ terrain.getMapChar() + ':' + resource.getMapChar();
+        level[index] = (resource == null) ? ""+ terrain.getMapChar() + ':' : ""+ terrain.getMapChar() + ':' + resource.getMapChar();
     }
 
     public static void main(String[] args) {

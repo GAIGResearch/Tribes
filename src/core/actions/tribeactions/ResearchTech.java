@@ -25,7 +25,7 @@ public class ResearchTech extends TribeAction {
         if(tech == null)
             return false;
 
-        if(tribe.getStars() >= tech.getCost(tribe.getNumCities()))
+        if(tribe.getStars() >= tech.getCost(tribe.getNumCities(), tribe.getTechTree()))
             return tribe.getTechTree().isResearchable(this.tech);
         return false;
     }
@@ -36,7 +36,7 @@ public class ResearchTech extends TribeAction {
         if(isFeasible(gs))
         {
             //Research tech
-            int techCost = tech.getCost(tribe.getNumCities());
+            int techCost = tech.getCost(tribe.getNumCities(), tribe.getTechTree());
             tribe.subtractStars(techCost);
             tribe.getTechTree().doResearch(tech);
 

@@ -128,7 +128,7 @@ public class TechView extends JComponent {
                     Types.TECHNOLOGY opt = Types.TECHNOLOGY.values()[i];
                     boolean researched = tt.isResearched(opt);
                     boolean techRequirement = tt.isResearchable(opt);
-                    int starCost = opt.getCost(t.getNumCities());
+                    int starCost = opt.getCost(t.getNumCities(), tt);
                     boolean starRequirement = t.getStars() >= starCost;
                     boolean researchable = techRequirement && starRequirement;
                     if (!(researchable || researched)) {

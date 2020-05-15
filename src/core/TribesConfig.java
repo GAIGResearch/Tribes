@@ -31,7 +31,7 @@ public class TribesConfig
     public static final int CATAPULT_COST = 8;
     static final int CATAPULT_POINTS = 40;
 
-    //Swordman
+    //Swordsman
     public static final int SWORDMAN_ATTACK = 3;
     public static final int SWORDMAN_DEFENCE = 3;
     public static final int SWORDMAN_MOVEMENT = 1;
@@ -120,7 +120,7 @@ public class TribesConfig
     public static final int VETERAN_KILLS = 3;
     public static final int VETERAN_PLUS_HP = 5;
     public static final int RECOVER_PLUS_HP = 2;
-    public static final int RECOVER_IN_CITY_PLUS_HP = 2;
+    public static final int RECOVER_IN_BORDERS_PLUS_HP = 2;
 
     /* BUILDINGS */
 
@@ -155,9 +155,9 @@ public class TribesConfig
     static final int PORT_BONUS = 2;
     public static final int PORT_TRADE_DISTANCE = 4; //Count includes destination port.
 
-    // Custom House
-    static final int CUSTOM_COST = 5;
-    static final int CUSTOM_BONUS = 2;
+    // Customs House
+    static final int CUSTOMS_COST = 5;
+    static final int CUSTOMS_BONUS = 2;
 
     //Monuments
     static final int MONUMENT_BONUS = 3;
@@ -166,6 +166,7 @@ public class TribesConfig
     public static final int GATE_OF_POWER_KILLS = 10;
     public static final int GRAND_BAZAR_CITIES = 5;
     public static final int ALTAR_OF_PEACE_TURNS = 5;
+    public static final int PARK_OF_FORTUNE_LEVEL = 5;
 
 
     // Temple
@@ -185,7 +186,6 @@ public class TribesConfig
     static final int WHALES_STARS = 10;
     static final int FRUIT_POP = 1;
 
-
     // ROAD
     public static final int ROAD_COST = 2;
 
@@ -201,6 +201,11 @@ public class TribesConfig
     public static final int NEW_CITY_CLEAR_RANGE = 1;
     public static final int CITY_EXPANSION_TILES = 1;
     public static final int POINTS_PER_POPULATION = 5;
+
+    // Research
+    public static final int TECH_BASE_COST = 4;
+    public static final Types.TECHNOLOGY TECH_DISCOUNT = Types.TECHNOLOGY.PHILOSOPHY;
+    public static final double TECH_DISCOUNT_VALUE = 0.2;
 
     /* TRIBES */
     public static final int INITIAL_STARS = 5;//1000;

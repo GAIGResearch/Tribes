@@ -470,30 +470,32 @@ public class Types {
      */
     public enum UNIT
     {
-        WARRIOR (0,"img/unit/warrior/", WARRIOR_COST, null, WARRIOR_POINTS), //+10
-        RIDER (1,"img/unit/rider/", RIDER_COST, RIDING, RIDER_POINTS), //+15
-        DEFENDER (2,"img/unit/defender/", DEFENDER_COST, SHIELDS, DEFENDER_POINTS), // +15
-        SWORDMAN (3,"img/unit/swordsman/", SWORDMAN_COST, SMITHERY, SWORDMAN_POINTS), //+25
-        ARCHER (4,"img/unit/archer/", ARCHER_COST, ARCHERY, ARCHER_POINTS),//+15
-        CATAPULT (5,"img/unit/catapult/", CATAPULT_COST, MATHEMATICS, CATAPULT_POINTS), //+40
-        KNIGHT (6,"img/unit/knight/", KNIGHT_COST, CHIVALRY, KNIGHT_POINTS), //+40
-        MIND_BENDER(7,"img/unit/mind_bender/", MINDBENDER_COST, PHILOSOPHY, MINDBENDER_POINTS), //+25
-        BOAT(8,"img/unit/boat/", BOAT_COST, SAILING, BOAT_POINTS), //+0
-        SHIP(9,"img/unit/ship/", SHIP_COST, SAILING, SHIP_POINTS),//+0
-        BATTLESHIP(10,"img/unit/battleship/", BATTLESHIP_COST, NAVIGATION, BATTLESHIP_POINTS),//+0
-        SUPERUNIT(11, "img/unit/superunit/", SUPERUNIT_COST, null, SUPERUNIT_POINTS); //+50
+        WARRIOR (0,"img/unit/warrior/", "img/weapons/melee/tile006.png", WARRIOR_COST, null, WARRIOR_POINTS), //+10
+        RIDER (1,"img/unit/rider/", "img/weapons/melee/tile001.png", RIDER_COST, RIDING, RIDER_POINTS), //+15
+        DEFENDER (2,"img/unit/defender/", "img/weapons/melee/tile002.png", DEFENDER_COST, SHIELDS, DEFENDER_POINTS), // +15
+        SWORDMAN (3,"img/unit/swordsman/", "img/weapons/melee/tile000.png", SWORDMAN_COST, SMITHERY, SWORDMAN_POINTS), //+25
+        ARCHER (4,"img/unit/archer/", "img/weapons/arrows/", ARCHER_COST, ARCHERY, ARCHER_POINTS),//+15
+        CATAPULT (5,"img/unit/catapult/", "img/weapons/bombs/rock.png", CATAPULT_COST, MATHEMATICS, CATAPULT_POINTS), //+40
+        KNIGHT (6,"img/unit/knight/", "img/weapons/melee/spear.png", KNIGHT_COST, CHIVALRY, KNIGHT_POINTS), //+40
+        MIND_BENDER(7,"img/unit/mind_bender/", "img/weapons/effects/bender.png", MINDBENDER_COST, PHILOSOPHY, MINDBENDER_POINTS), //+25
+        BOAT(8,"img/unit/boat/", "img/weapons/arrows/boat.png", BOAT_COST, SAILING, BOAT_POINTS), //+0
+        SHIP(9,"img/unit/ship/", "img/weapons/bombs/", SHIP_COST, SAILING, SHIP_POINTS),//+0
+        BATTLESHIP(10,"img/unit/battleship/", "img/weapons/bombs/", BATTLESHIP_COST, NAVIGATION, BATTLESHIP_POINTS),//+0
+        SUPERUNIT(11, "img/unit/superunit/", "img/weapons/melee/tile003.png", SUPERUNIT_COST, null, SUPERUNIT_POINTS); //+50
 
         private int key;
-        private String imageFile;
+        private String imageFile, weapon;
         private int cost;
         private TECHNOLOGY requirement;
         private int points;
-        UNIT(int numVal, String imageFile, int cost, Types.TECHNOLOGY requirement, int points) {
+
+        UNIT(int numVal, String imageFile, String weaponFile, int cost, Types.TECHNOLOGY requirement, int points) {
             this.key = numVal;
             this.imageFile = imageFile;
             this.cost = cost;
             this.requirement = requirement;
             this.points = points;
+            this.weapon = weaponFile;
         }
 
         public static UNIT stringToType(String type) {
@@ -516,6 +518,12 @@ public class Types {
 
         public Image getImage(int tribeKey) { return ImageIO.GetInstance().getImage(imageFile + tribeKey + ".png"); }
         public String getImageFile() { return imageFile; }
+        public Image getWeaponImage(int tribeKey) {
+            if (this == SHIP || this == BATTLESHIP || this == ARCHER) {
+                return ImageIO.GetInstance().getImage(weapon + tribeKey + ".png");
+            }
+            return ImageIO.GetInstance().getImage(weapon);
+        }
         public int getCost() {
             return cost;
         }
@@ -739,9 +747,10 @@ public class Types {
         CLIMB_MOUNTAIN(null, CLIMBING),
         ATTACK("img/actions/attack.png", null),
         CAPTURE("img/actions/capture.png", null),
+        CONVERT("img/actions/convert.png", null),
         EXAMINE("img/actions/examine.png", null),
         DISBAND("img/actions/disband.png", FREE_SPIRIT),
-        HEAL("img/actions/heal.png", null),
+        HEAL("img/actions/heal2.png", null),
         UPGRADE_BOAT("img/actions/upgrade.png", SAILING),
         UPGRADE_SHIP("img/actions/upgrade.png", NAVIGATION),
         BURN_FOREST(null, CHIVALRY),
@@ -766,7 +775,7 @@ public class Types {
                 return ImageIO.GetInstance().getImage(MOVE.imgPath);
             } else if (a instanceof Attack) {
                 return ImageIO.GetInstance().getImage(ATTACK.imgPath);
-            } else if (a instanceof Capture || a instanceof Convert) {
+            } else if (a instanceof Capture) {
                 return ImageIO.GetInstance().getImage(CAPTURE.imgPath);
             } else if (a instanceof Examine) {
                 return ImageIO.GetInstance().getImage(EXAMINE.imgPath);
@@ -776,6 +785,8 @@ public class Types {
                 return ImageIO.GetInstance().getImage(HEAL.imgPath);
             } else if (a instanceof Upgrade) {
                 return ImageIO.GetInstance().getImage(UPGRADE_BOAT.imgPath);
+            } else if (a instanceof Convert) {
+                return ImageIO.GetInstance().getImage(CONVERT.imgPath);
             }
             return null;
         }

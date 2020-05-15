@@ -42,6 +42,16 @@ public class Vector2d
         }
     }
 
+    public boolean equalsPlusError(Object o, double error) {
+        if (o instanceof Vector2d) {
+            Vector2d v = (Vector2d) o;
+            return x >= v.x - error && x <= v.x + error &&
+                    y >= v.y - error && y <= v.y + error;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Builds a vector from its coordinates.
      * @param x x coordinate
@@ -311,6 +321,10 @@ public class Vector2d
             return new Vector2d((int)(this.x/l),(int)(this.y/l));
         }
         else return new Vector2d(1,0);
+    }
+
+    public boolean adjacentTo(Vector2d v) {
+        return Math.abs(v.x-x) <= 1 && Math.abs(v.y-y) <= 1;
     }
 
     @Override

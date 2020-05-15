@@ -1,5 +1,4 @@
 import core.Types;
-import core.actions.Action;
 import core.game.Game;
 import core.actors.Tribe;
 import players.*;
@@ -56,7 +55,6 @@ public class Play {
 
         //3. Play one game with visuals from a savegame
 //        load(new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI}, saveGameFile);
-
     }
 
     private static void play(String levelFile, PlayerType[] playerTypes, Types.TRIBE[] tribes, Types.GAME_MODE gameMode)

@@ -477,7 +477,7 @@ public class Types {
         ARCHER (4,"img/unit/archer/", "img/weapons/arrows/", ARCHER_COST, ARCHERY, ARCHER_POINTS),//+15
         CATAPULT (5,"img/unit/catapult/", "img/weapons/bombs/rock.png", CATAPULT_COST, MATHEMATICS, CATAPULT_POINTS), //+40
         KNIGHT (6,"img/unit/knight/", "img/weapons/melee/spear.png", KNIGHT_COST, CHIVALRY, KNIGHT_POINTS), //+40
-        MIND_BENDER(7,"img/unit/mind_bender/", "img/weapons/effects/bender.png", MINDBENDER_COST, PHILOSOPHY, MINDBENDER_POINTS), //+25
+        MIND_BENDER(7,"img/unit/mind_bender/", "img/weapons/effects/bender/", MINDBENDER_COST, PHILOSOPHY, MINDBENDER_POINTS), //+25
         BOAT(8,"img/unit/boat/", "img/weapons/arrows/boat.png", BOAT_COST, SAILING, BOAT_POINTS), //+0
         SHIP(9,"img/unit/ship/", "img/weapons/bombs/", SHIP_COST, SAILING, SHIP_POINTS),//+0
         BATTLESHIP(10,"img/unit/battleship/", "img/weapons/bombs/", BATTLESHIP_COST, NAVIGATION, BATTLESHIP_POINTS),//+0
@@ -519,7 +519,7 @@ public class Types {
         public Image getImage(int tribeKey) { return ImageIO.GetInstance().getImage(imageFile + tribeKey + ".png"); }
         public String getImageFile() { return imageFile; }
         public Image getWeaponImage(int tribeKey) {
-            if (this == SHIP || this == BATTLESHIP || this == ARCHER) {
+            if (this == SHIP || this == BATTLESHIP || this == ARCHER || this == MIND_BENDER) {
                 return ImageIO.GetInstance().getImage(weapon + tribeKey + ".png");
             }
             return ImageIO.GetInstance().getImage(weapon);

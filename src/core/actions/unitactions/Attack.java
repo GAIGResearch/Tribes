@@ -127,24 +127,6 @@ public class Attack extends UnitAction
     }
 
     /**
-     * Calculates if attacker or defender are killed after executing this action.
-     * @param gs - current game state
-     * @return - Pair of booleans, first is true if attacker killed (false if attacker alive),
-     * second is true if target killed (false if target alive)
-     */
-    public Pair<Boolean, Boolean> isSomeoneKilled(GameState gs) {
-        // Assumes retaliation happens
-        Unit target = (Unit) gs.getActor(this.targetId);
-        Unit attacker = (Unit) gs.getActor(this.unitId);
-        Pair<Integer, Integer> attackResults = getAttackResults(gs);
-        int defenceResult = attackResults.getSecond();
-        int attackResult = attackResults.getFirst();
-        boolean attackerKilled = attacker.getCurrentHP() <= defenceResult;
-        boolean targetKilled = target.getCurrentHP() <= attackResult;
-        return new Pair<>(attackerKilled, targetKilled);
-    }
-
-    /**
      * Calculates the damage dealt by the attacker and by the defender.
      * @param gs - current game state
      * @return Pair, where first element is the attack power (attackResult) and second is defence power (defenceResult)

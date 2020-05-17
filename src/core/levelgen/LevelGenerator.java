@@ -70,6 +70,25 @@ public class LevelGenerator {
             }
         }
 
+        //Turning random water/ground grid into something smooth.
+        for (i = 0; i < smoothing; i++) {
+            for (int cell = 0; cell < mapSize * mapSize; cell++) {
+
+                int water_count = 0;
+                int tile_count = 0;
+                for (int n : round(cell, 1)) {
+                    if (getTerrain(n) == DEEP_WATER.getMapChar()) {
+                        water_count++;
+                    }
+                    tile_count++;
+                }
+                if (water_count / (double) tile_count <= landCoefficient) {
+                    writeTile(cell, PLAIN, null);
+                } else {
+                    writeTile(cell, DEEP_WATER, null);
+                }
+            }
+        }
     }
 
     /**

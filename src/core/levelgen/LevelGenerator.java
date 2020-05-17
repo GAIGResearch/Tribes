@@ -9,6 +9,8 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class LevelGenerator {
@@ -114,7 +116,7 @@ public class LevelGenerator {
     }
 
     /**
-     * Returns probability of a specific tile type for a specific tribe.
+     * Returns the probability of a specific tile type for a specific tribe.
      */
     public double getTribeProb(String name, Types.TRIBE tribe) {
         return data.getJSONObject(name.toString()).getDouble(tribe.toString());
@@ -143,7 +145,10 @@ public class LevelGenerator {
     }
 
     /**
-     * Returns a random int in the range [min, max)
+     * Returns a random int in the range [min, max).
+     * @param min lower bound (inclusive).
+     * @param max upper bound (exclusive).
+     * @return a random int.
      */
     public int randomInt(int min, int max) {
         return (int) Math.floor(min + Math.random() * (max - min));
@@ -197,10 +202,36 @@ public class LevelGenerator {
         return round;
     }
 
+    public void toCSV() {
+        try {
+            FileWriter writer = new FileWriter("src/core/levelgen/test.csv");
+            writer.append(level[0]);
+            writer.append(',');
+            for(int i = 1; i < mapSize*mapSize; i++) {
+                if(i % mapSize == 0) {
+                    writer.append('\n');
+                    writer.append(level[i]);
+                    writer.append(',');
+                } else if(i % mapSize == mapSize - 1) {
+                    writer.append(level[i]);
+                }else {
+                    writer.append(level[i]);
+                    writer.append(',');
+                }
+            }
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
 
         LevelGenerator gen = new LevelGenerator();
-        gen.writeTile(55, MOUNTAIN, FRUIT);
-        System.out.println(gen.getTerrain(55));
+        gen.init(12, 3, 4, 0.5);
+        gen.generate();
+        gen.toCSV();
+
     }
 }

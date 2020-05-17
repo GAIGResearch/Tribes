@@ -9,8 +9,8 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
 
-//TODO add BASE_PROB to json
 public class LevelGenerator {
 
     //Level parameters, can be changed using init().
@@ -130,6 +130,53 @@ public class LevelGenerator {
         return (int) Math.floor(min + Math.random() * (max - min));
     }
 
+    public ArrayList<Integer> circle(int center, int radius) {
+        ArrayList<Integer> circle = new ArrayList<>();
+        int row = center / mapSize;
+        int column = center % mapSize;
+        int i = row - radius;
+        if (i >= 0 && i < mapSize) {
+            for (int j = column - radius; j < column + radius; j++) {
+                if (j >= 0 && j < mapSize) {
+                    circle.add(i * mapSize + j);
+                }
+            }
+        }
+        i = row + radius;
+        if (i >= 0 && i < mapSize) {
+            for (int j = column + radius; j > column - radius; j--) {
+                if (j >= 0 && j < mapSize) {
+                    circle.add(i * mapSize + j);
+                }
+            }
+        }
+        int j = column - radius;
+        if (j >= 0 && j < mapSize) {
+            for (i = row + radius; i > row - radius; i--) {
+                if (i >= 0 && i < mapSize) {
+                    circle.add(i * mapSize + j);
+                }
+            }
+        }
+        j = column + radius;
+        if (j >= 0 && j < mapSize) {
+            for (i = row - radius; i < row + radius; i++) {
+                if (i >= 0 && i < mapSize) {
+                    circle.add(i * mapSize + j);
+                }
+            }
+        }
+        return circle;
+    }
+
+    public ArrayList<Integer> round(int center, int radius) {
+        ArrayList<Integer> round = new ArrayList<>();
+        for (int r = 1; r <= radius; r++) {
+            round.addAll(circle(center, r));
+        }
+        round.add(center);
+        return round;
+    }
 
     public static void main(String[] args) {
 

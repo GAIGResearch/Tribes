@@ -1,6 +1,5 @@
 package core.levelgen;
 
-import static core.Types.RESOURCE.FRUIT;
 import static core.Types.TERRAIN.*;
 import static core.Types.TRIBE.*;
 
@@ -10,7 +9,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -73,7 +71,7 @@ public class LevelGenerator {
             int index = randomInt(0, mapSize*mapSize);
             if(getTerrain(index) == DEEP_WATER.getMapChar()) {
                 i++;
-                writeTile(index, PLAIN, null);
+                writeTile(index, ""+PLAIN.getMapChar(), null);
             }
         }
 
@@ -90,9 +88,9 @@ public class LevelGenerator {
                     tile_count++;
                 }
                 if (water_count / (double) tile_count <= landCoefficient) {
-                    writeTile(cell, PLAIN, null);
+                    writeTile(cell, ""+PLAIN.getMapChar(), null);
                 } else {
-                    writeTile(cell, DEEP_WATER, null);
+                    writeTile(cell, ""+DEEP_WATER.getMapChar(), null);
                 }
             }
         }
@@ -146,7 +144,59 @@ public class LevelGenerator {
             }
         }
         for (i = 0; i < capitalCells.size(); i++) {
-            writeTile((capitalCells.get(i) / mapSize) * mapSize + (capitalCells.get(i) % mapSize), CITY, null);
+            writeTile((capitalCells.get(i) / mapSize) * mapSize + (capitalCells.get(i) % mapSize), ""+CITY.getMapChar(), null);
+        }
+
+        // terrain distribution
+        ArrayList<Integer> doneTiles = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> activeTiles = new ArrayList<>(); // done tiles that generate terrain around them
+        Types.TRIBE[] tileOwner = new Types.TRIBE[mapSize*mapSize];
+
+        for (i = 0; i < capitalCells.size(); i++) {
+            doneTiles.add(i, capitalCells.get(i));
+            ArrayList<Integer> cap = new ArrayList<>();
+            cap.add(capitalCells.get(i));
+            activeTiles.add(i, cap);
+        }
+        // we'll start from capital tiles and evenly expand until the whole map is covered
+        while (doneTiles.size() != mapSize*mapSize) {
+            for (i = 0; i < tribes.length; i++) {
+                if (activeTiles.get(i).size() != 0) {
+                    int randNumber = randomInt(0, activeTiles.get(i).size());
+                    int randCell = activeTiles.get(i).get(randNumber);
+                    ArrayList<Integer> neighbours = circle(randCell, 1);
+                    ArrayList<Integer> validNeighbours = (ArrayList<Integer>) neighbours.clone();
+                    validNeighbours.removeIf(value -> doneTiles.indexOf(value) == -1 && getTerrain(value) != DEEP_WATER.getMapChar());
+                    if (validNeighbours.size() == 0) {
+                        validNeighbours = (ArrayList<Integer>) neighbours.clone();
+                        validNeighbours.removeIf(value -> doneTiles.indexOf(value) == -1);
+                    } // if there are no land tiles around, accept water tiles
+                    if (validNeighbours.size() != 0) {
+                        int new_rand_number = randomInt(0, validNeighbours.size());
+                        int new_rand_cell = validNeighbours.get(new_rand_number);
+                        tileOwner[new_rand_cell] = tribes[i];
+                        activeTiles.get(i).add(new_rand_cell);
+                        doneTiles.add(new_rand_cell);
+                    } else {
+                        activeTiles.get(i).remove(randNumber); // deactivate tiles surrounded with done tiles
+                    }
+                }
+            }
+        }
+
+        for (int cell = 0; cell < mapSize*mapSize; cell++) {
+            if (getTerrain(cell) == PLAIN.getMapChar()) {
+                double rand = Math.random(); // 0 (---forest---)--nothing--(-mountain-) 1
+                if (rand < getBaseProb("FOREST") * getTribeProb("FOREST", tileOwner[cell])) {
+                    writeTile(cell, null, ""+FOREST.getMapChar());
+                } else if (rand > 1 - getBaseProb("MOUNTAIN") * getTribeProb("MOUNTAIN", tileOwner[cell])) {
+                    writeTile(cell, null, ""+MOUNTAIN.getMapChar());
+                }
+                rand = Math.random(); // 0 (---water---)--------nothing-------- 1
+                if (rand < getTribeProb("WATER", tileOwner[cell])) {
+                    writeTile(cell, null, ""+DEEP_WATER.getMapChar());
+                }
+            }
         }
 
     }
@@ -190,9 +240,14 @@ public class LevelGenerator {
     /**
      * Writes a level tile at position index.
      */
-    public void writeTile(int index, Types.TERRAIN terrain, Types.RESOURCE resource) {
-
-        level[index] = (resource == null) ? ""+ terrain.getMapChar() + ':' : ""+ terrain.getMapChar() + ':' + resource.getMapChar();
+    public void writeTile(int index, String type1, String type2) {
+        if(type1 == null) {
+            level[index] = "" + getTerrain(index) + ':' + type2;
+        }if(type2 == null) {
+            level[index] = "" + getTerrain(index) + ':';
+        }else {
+            level[index] = "" + type1 + ':' + type2;
+        }
     }
 
     /**

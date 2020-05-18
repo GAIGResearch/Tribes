@@ -12,6 +12,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class LevelGenerator {
 
@@ -22,6 +25,7 @@ public class LevelGenerator {
     private double initialLand;
     private double landCoefficient;
     private String[] level;
+    private Types.TRIBE[] tribes;
 
     //JSON that contains all the probability values for all the tribes.
     private JSONObject data;
@@ -32,7 +36,7 @@ public class LevelGenerator {
     public LevelGenerator() {
 
         //Initialize with default values.
-        init(11, 3, 4, 0.5);
+        init(11, 3, 4, 0.5, new Types.TRIBE[]{XIN_XI, OUMAJI});
 
         //Read the JSON that contains all the probability values for all the tribes.
         try {
@@ -45,12 +49,13 @@ public class LevelGenerator {
     /**
      * Initializes the map generation parameters.
      */
-    public void init(int mapSize, int smoothing, int relief, double initialLand) {
+    public void init(int mapSize, int smoothing, int relief, double initialLand, Types.TRIBE[] tribes) {
         this.mapSize = mapSize;
         this.smoothing = smoothing;
         this.relief = relief;
         this.initialLand = initialLand;
         this.level = new String[mapSize*mapSize];
+        this.tribes = tribes;
         this.landCoefficient = (0.5 + relief) / 9;
 
         //Initialize the level with deep water.
@@ -91,6 +96,59 @@ public class LevelGenerator {
                 }
             }
         }
+
+        // capital distribution
+        ArrayList<Integer> capitalCells = new ArrayList<>();
+        HashMap<Integer, Integer> capitalMap = new HashMap<>();
+        // make a map of potential (ground) tiles associated with numbers (0 by default)
+        for (Types.TRIBE tribe : tribes) {
+            for (int row = 2; row < mapSize - 2; row++) {
+                for (int column = 2; column < mapSize - 2; column++) {
+                    if (getTerrain(row * mapSize + column) == PLAIN.getMapChar()) {
+                        capitalMap.put(row * mapSize + column, 0);
+                    }
+                }
+            }
+        }
+        for (Types.TRIBE tribe : tribes) {
+            int max = 0;
+            // this number is a sum of distances between the tile and all capitals
+            Iterator capitalIterator = capitalMap.entrySet().iterator();
+            while (capitalIterator.hasNext()) {
+                Map.Entry cell = (Map.Entry)capitalIterator.next();
+                cell.setValue(mapSize);
+                for (int capital_cell : capitalCells) {
+                    cell.setValue(Math.min((int)cell.getValue(), distance((int)cell.getValue(), capital_cell, mapSize)));
+                }
+                max = Math.max(max, (int)cell.getValue());
+            }
+
+            int len = 0;
+            capitalIterator = capitalMap.entrySet().iterator();
+            while (capitalIterator.hasNext()) {
+                Map.Entry cell = (Map.Entry)capitalIterator.next();
+                if ((int)cell.getValue() == max) {
+                    len++;
+                }
+            }
+
+            // we want to find a tile with a maximum sum
+            int randCell = randomInt(0, len);
+            capitalIterator = capitalMap.entrySet().iterator();
+            while (capitalIterator.hasNext()) {
+                Map.Entry cell = (Map.Entry) capitalIterator.next();
+                if ((int)cell.getValue() == max) {
+                    if (randCell == 0) {
+                        capitalCells.add((int)cell.getKey());
+                    }
+                    randCell--;
+                }
+            }
+        }
+        for (i = 0; i < capitalCells.size(); i++) {
+            writeTile((capitalCells.get(i) / mapSize) * mapSize + (capitalCells.get(i) % mapSize), CITY, null);
+        }
+
     }
 
     /**
@@ -202,6 +260,15 @@ public class LevelGenerator {
         return round;
     }
 
+    // we use pythagorean distances
+    public int distance(int a, int b, int size) {
+        int ax = a % size;
+        int ay = a / size;
+        int bx = b % size;
+        int by = b / size;
+        return Math.max(Math.abs(ax - bx), Math.abs(ay - by));
+    }
+
     public void toCSV() {
         try {
             FileWriter writer = new FileWriter("src/core/levelgen/test.csv");
@@ -229,7 +296,7 @@ public class LevelGenerator {
     public static void main(String[] args) {
 
         LevelGenerator gen = new LevelGenerator();
-        gen.init(12, 3, 4, 0.5);
+        gen.init(12, 3, 4, 0.5, new Types.TRIBE[]{XIN_XI, OUMAJI});
         gen.generate();
         gen.toCSV();
 

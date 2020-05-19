@@ -575,6 +575,10 @@ public class Board {
         return tradeNetwork.getTradeNetworkValue(x,y) && terrains[x][y] != SHALLOW_WATER && terrains[x][y] != DEEP_WATER && terrains[x][y] != CITY;
     }
 
+    public boolean checkTradeNetwork(int x, int y) {
+        return tradeNetwork.getTradeNetworkValue(x,y);
+    }
+
 
     /**
      * Gets all the tiles that belong to a city

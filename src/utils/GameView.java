@@ -38,7 +38,8 @@ public class GameView extends JComponent {
 
     private Color progressColor = new Color(53, 183, 255);
     private Color negativeColor = new Color(255, 63, 73);
-    private Image starImg, starShadow, capitalImg, capitalShadow, cityWalls, road;
+    private Image starImg, starShadow, capitalImg, capitalShadow, cityWalls; // road;
+    private Image roadVhalf, roadDhalf;
 
     boolean[][] actionable;
 
@@ -92,7 +93,9 @@ public class GameView extends JComponent {
         capitalImg = ImageIO.GetInstance().getImage("img/decorations/capital.png");
         capitalShadow = ImageIO.GetInstance().getImage("img/decorations/capitalShadow.png");
         cityWalls = ImageIO.GetInstance().getImage("img/terrain/walls.png");
-        road = ImageIO.GetInstance().getImage("img/terrain/road.png");
+//        road = ImageIO.GetInstance().getImage("img/terrain/road.png");
+        roadDhalf = ImageIO.GetInstance().getImage("img/terrain/road-d-half.png");
+        roadVhalf = ImageIO.GetInstance().getImage("img/terrain/road-v-half.png");
 
         int expLength = nTilesExplosion * delay;
         int pierceLength = nTilesPierce * delay;
@@ -154,6 +157,7 @@ public class GameView extends JComponent {
         updateActionableTiles();
         paintTerrains(g);
         paintRoads(g);
+        paintCities(g);
         paintResourcesBuildings(g);
 
         int highlightX = infoView.getHighlightX();
@@ -191,10 +195,25 @@ public class GameView extends JComponent {
         for(int i = 0; i < gridSize; ++i) {
             for(int j = 0; j < gridSize; ++j) {
                 Types.TERRAIN t = board.getTerrainAt(i,j);
-                if(t == null || t == FOG) {
-                    paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, fogImg, CELL_SIZE, panTranslate);
+                Image toPaint;
+                if (t == null || t == FOG) {
+                    toPaint = fogImg;
+                } else if (t != CITY) {
+                    toPaint = getContextImg(i, j, t);
                 } else {
-                    Image toPaint = getContextImg(i, j, t);
+                    toPaint = getContextImg(i, j, PLAIN);
+                }
+                paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, toPaint, CELL_SIZE, panTranslate);
+            }
+        }
+    }
+
+    private void paintCities(Graphics2D g) {
+        for(int i = 0; i < gridSize; ++i) {
+            for(int j = 0; j < gridSize; ++j) {
+                Types.TERRAIN t = board.getTerrainAt(i,j);
+                if (t == CITY) {
+                    Image toPaint = t.getImage(null);
                     paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, toPaint, CELL_SIZE, panTranslate);
                 }
             }
@@ -204,8 +223,37 @@ public class GameView extends JComponent {
     private void paintRoads(Graphics2D g) {
         for(int i = 0; i < gridSize; ++i) {
             for (int j = 0; j < gridSize; ++j) {
-                if (board.isRoad(i, j)) {
-                    paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, road, CELL_SIZE, panTranslate);
+                Vector2d cur = new Vector2d(i, j);
+                LinkedList<Vector2d> neighborhood = cur.neighborhood(1, 0, gridSize);
+                boolean anyRoads = false;
+                if (board.checkTradeNetwork(i, j)) {
+                    for (Vector2d n: neighborhood) {
+                        if (board.checkTradeNetwork(n.x, n.y)) {
+                            // Draw half road in that direction
+                            Vector2d rotated = rotatePoint(j, i);
+
+                            double dx = (n.x - cur.x);
+                            double dy = (n.y - cur.y);
+                            boolean diagonal = Math.abs(dx) == 1 && Math.abs(dy) == 1;
+                            double imageAngleRad = Math.atan2(dx, dy) + Math.toRadians(isometricAngle+90);
+
+                            int x = rotated.x + CELL_SIZE/4;
+                            int y = rotated.y - CELL_SIZE/2;
+
+                            if (!diagonal) {
+                                paintImageRotated(g, x, y, roadVhalf, CELL_SIZE, panTranslate, imageAngleRad, x + CELL_SIZE / 2, y + CELL_SIZE / 2);
+                            } else {
+                                paintImageRotated(g, x, y, roadDhalf, CELL_SIZE, panTranslate, imageAngleRad - Math.toRadians(45), x + CELL_SIZE / 2, y + CELL_SIZE / 2);
+                            }
+                            anyRoads = true;
+
+//                             // Debugging
+//                            g.drawString("R", rotated.x + CELL_SIZE/2, rotated.y + CELL_SIZE/2);
+                        }
+                    }
+                    if (!anyRoads && board.getTerrainAt(i, j) != CITY && board.getBuildingAt(i, j) != Types.BUILDING.PORT) {
+                        paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, roadVhalf, CELL_SIZE, panTranslate);
+                    }
                 }
             }
         }
@@ -341,7 +389,7 @@ public class GameView extends JComponent {
     }
 
     private static void paintImageRotated(Graphics2D gphx, int x, int y, Image img, int imgSize, Vector2d panTranslate,
-                                          double angle) {
+                                          double angle, int xAnchor, int yAnchor) {
         if (img != null) {
             int w = img.getWidth(null);
             int h = img.getHeight(null);
@@ -350,7 +398,7 @@ public class GameView extends JComponent {
 
             Graphics2D g2 = (Graphics2D)gphx.create();
             g2.translate(panTranslate.x, panTranslate.y);
-            g2.rotate(angle, x + imgSize/2.0, y + imgSize/2.0);
+            g2.rotate(angle, xAnchor, yAnchor);
             g2.drawImage(img, x, y, (int) (w*scaleX), (int) (h*scaleY), null);
             g2.dispose();
         }
@@ -805,7 +853,9 @@ public class GameView extends JComponent {
                     Vector2d rotated = rotatePoint(1.0 * effectPosition.x / CELL_SIZE, 1.0 * effectPosition.y / CELL_SIZE);
                     paintImage(g, rotated.x + CELL_SIZE / 5, rotated.y - CELL_SIZE / 2, effectImage, CELL_SIZE, panTranslate);
                     if (effectType == EFFECT.SLASH || effectType == EFFECT.CONVERT) {
-                        paintImageRotated(g, rotated.x + CELL_SIZE / 5, rotated.y - CELL_SIZE / 2, effectImage, CELL_SIZE, panTranslate, Math.PI / 2);
+                        int x = rotated.x + CELL_SIZE / 5;
+                        int y = rotated.y - CELL_SIZE / 2;
+                        paintImageRotated(g, x, y, effectImage, CELL_SIZE, panTranslate, Math.PI / 2, x + CELL_SIZE/2, y + CELL_SIZE/2);
                     }
                 }
                 effectDrawingIdx++;
@@ -886,7 +936,9 @@ public class GameView extends JComponent {
                 double imageAngleRad = Math.atan2(dx, dy);// + Math.toRadians(180);
 
                 Vector2d rotated = rotatePoint(1.0 * currentPosition.x / CELL_SIZE, 1.0 * currentPosition.y / CELL_SIZE);
-                paintImageRotated(g, rotated.x + CELL_SIZE / 2, rotated.y - CELL_SIZE / 4, sourceAnimationInfo.getFirst(), CELL_SIZE / 2, panTranslate, imageAngleRad);
+                int x = rotated.x + CELL_SIZE / 2;
+                int y = rotated.y - CELL_SIZE / 4;
+                paintImageRotated(g, x, y, sourceAnimationInfo.getFirst(), CELL_SIZE / 2, panTranslate, imageAngleRad, x + CELL_SIZE/4, y + CELL_SIZE/4);
 
                 if (currentPosition.equalsPlusError(targetAnimationInfo.getSecond(), CELL_SIZE * animationSpeed.get(i))) {
                     // Reached destination, no more drawing. Reset animation variables and unpause game, unless retaliation happening

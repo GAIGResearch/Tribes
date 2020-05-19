@@ -680,7 +680,7 @@ public class Types {
         DEEP_WATER(2, "img/terrain/deepwater.png", 'd'),
         MOUNTAIN(3, "img/terrain/mountain3.png", 'm'),
         VILLAGE(4, "img/terrain/village2.png", 'v'),
-        CITY(5, "img/terrain/city2.png", 'c'),
+        CITY(5, "img/terrain/city3.png", 'c'),
         FOREST(6, "img/terrain/forest2.png", 'f'),
         FOG(7, "img/fog.png", ' ');
 

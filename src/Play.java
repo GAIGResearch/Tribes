@@ -33,11 +33,13 @@ public class Play {
 
         Types.GAME_MODE gameMode = CAPITALS;
 
-        String filename = "levels/SampleLevel2p.csv";
+//        String filename = "levels/SampleLevel2p.csv";
 //        String filename = "levels/SampleLevel.csv";
 //        String filename = "levels/MinimalLevel.csv";
 //        String filename = "levels/MinimalLevel_water.csv";
 //        String filename = "levels/MinimalLevel2.csv";
+//        String filename = "levels/SampleLevel4p_2.csv";
+        String filename = "levels/SymmetricalLevel4p.csv";
 
         String saveGameFile = "save/1589357287411/4_0/game.json";
 
@@ -45,11 +47,11 @@ public class Play {
         //THREE WAYS OF RUNNING Tribes:
 
         //1. Play one game with visuals:
-//        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA, PlayerType.SIMPLE, PlayerType.SIMPLE}, new Types.TRIBE[] {XIN_XI, OUMAJI, BARDUR, IMPERIUS}, gameMode);
+        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA, PlayerType.SIMPLE, PlayerType.SIMPLE}, new Types.TRIBE[] {XIN_XI, OUMAJI, BARDUR, IMPERIUS}, gameMode);
 
         //2. Play N games without visuals
-        int nReps = 10;
-        run(filename, new PlayerType[]{PlayerType.MC, PlayerType.SIMPLE}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode,nReps);
+//        int nReps = 10;
+//        run(filename, new PlayerType[]{PlayerType.MC, PlayerType.SIMPLE}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode,nReps);
 
         //3. Play one game with visuals from a savegame
 //        load(new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI}, saveGameFile);

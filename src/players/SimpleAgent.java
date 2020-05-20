@@ -51,7 +51,6 @@ public class SimpleAgent extends Agent {
         //Initially pick a random action so that at least that can be returned
         Action bestAction = allActions.get(gs.getRandomGenerator().nextInt(nActions));
         int bestActionScore = evalAction(gs,bestAction);
-        TribesSimpleHeuristic heuristic = new TribesSimpleHeuristic(this.playerID);
 
         for (Action a : allActions
         ) {

@@ -156,6 +156,7 @@ public abstract class Unit extends Actor
                 case MIND_BENDER:
                 case CATAPULT:
                 case DEFENDER:
+                case SUPERUNIT:
                     this.status = FINISHED;
                     break;
                 case ARCHER:
@@ -164,7 +165,6 @@ public abstract class Unit extends Actor
                 case SHIP:
                 case WARRIOR:
                 case SWORDMAN:
-                case SUPERUNIT:
                     if(newStatus == MOVED && this.status == FRESH) { this.status = MOVED; }
                     if(newStatus == ATTACKED && this.status == FRESH) { this.status = FINISHED; }
                     if(newStatus == ATTACKED && this.status == MOVED) { this.status = FINISHED; }

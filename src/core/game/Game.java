@@ -8,10 +8,7 @@ import core.actions.unitactions.Attack;
 import core.actors.Tribe;
 import players.Agent;
 import players.HumanAgent;
-import utils.AIStats;
-import utils.ElapsedCpuTimer;
-import utils.GUI;
-import utils.WindowInput;
+import utils.*;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -184,6 +181,9 @@ public class Game {
             // Check end of game
             if (firstEnd && gameOver()) {
                 terminate();
+                if(firstEnd && VERBOSE)
+                    printGameResults();
+
                 firstEnd = false;
 
                 if(VERBOSE) for(AIStats ais : aiStats)
@@ -365,7 +365,19 @@ public class Game {
         gs.endTurn(tribe);
     }
 
-
+    /**
+     * Prints the results of the game.
+     */
+    private void printGameResults()
+    {
+        Types.RESULT[] results = getWinnerStatus();
+        int[] sc = getScores();
+        Tribe[] tribes = gs.getBoard().getTribes();
+        for(int i = 0; i < results.length; ++i)
+        {
+            System.out.println("Tribe " + i + " (" + tribes[i].getType() + "): " + results[i] + ", " + sc[i] + " points.");
+        }
+    }
 
 
     /**

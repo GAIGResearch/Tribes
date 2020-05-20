@@ -7,7 +7,7 @@ public class Constants {
     public static int FRAME_DELAY = 500; //1000;
     public static boolean TURN_LIMITED = false;
     public static long TURN_TIME_MILLIS = 10000000; //10000; //10 seconds.
-    public static int GUI_INFO_DELAY = 250;
+    public static int GUI_INFO_DELAY = 50000;
 
     // Display settings
     public static int GUI_GAME_VIEW_SIZE;

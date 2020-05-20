@@ -44,7 +44,7 @@ public class Game {
     /**
      * Constructor of the game
      */
-    public Game()
+    public  Game()
     {}
 
     /**
@@ -174,28 +174,33 @@ public class Game {
         boolean firstEnd = true;
 
         while(frame == null || !frame.isClosed()) {
+//            System.out.println("Frame closed: " + frame.isClosed());
             // Loop while window is still open, even if the game ended.
             // If not playing with visuals, loop is broken when game's ended.
 
+            boolean gameOver = gameOver();
             // Check end of game
-            if (firstEnd && gameOver()) {
+            if (firstEnd && gameOver) {
                 terminate();
-                if(firstEnd && VERBOSE)
-                    printGameResults();
 
                 firstEnd = false;
 
-                if(VERBOSE) for(AIStats ais : aiStats)
-                    ais.print();
+                if(VERBOSE)
+                {
+                    printGameResults();
+                    for(AIStats ais : aiStats)
+                        ais.print();
+                }
 
                 if (!VISUALS || frame == null) {
                     // The game has ended, end the loop if we're running without visuals.
                     break;
-                } else {
-                    frame.update(getGameState(-1), null); // One last update with full observation
                 }
-            } else {
+            }
+            if (!gameOver) {
                 tick(frame);
+            } else {
+                frame.update(getGameState(-1), null);
             }
         }
     }

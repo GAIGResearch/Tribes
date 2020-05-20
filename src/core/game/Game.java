@@ -179,7 +179,6 @@ public class Game {
         while(frame == null || !frame.isClosed()) {
             // Loop while window is still open, even if the game ended.
             // If not playing with visuals, loop is broken when game's ended.
-            tick(frame);
 
             // Check end of game
             if (firstEnd && gameOver()) {
@@ -195,9 +194,10 @@ public class Game {
                 } else {
                     frame.update(getGameState(-1), null); // One last update with full observation
                 }
+            } else {
+                tick(frame);
             }
         }
-
     }
 
     /**
@@ -281,7 +281,7 @@ public class Game {
             actionDelayTimer.setMaxTimeMillis(FRAME_DELAY);
         }
 
-        while (true) {
+        while (frame == null || !frame.isClosed()) {
             // Keep track of action played in this loop, null if no action.
             Action action = null;
 

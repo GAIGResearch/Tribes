@@ -1,5 +1,4 @@
 import core.Types;
-import core.actions.Action;
 import core.game.Game;
 import core.actors.Tribe;
 import players.*;
@@ -33,13 +32,12 @@ public class Play {
 
         Types.GAME_MODE gameMode = CAPITALS;
 
-        String filename = "levels/SampleLevel2p.csv";
+//        String filename = "levels/SampleLevel2p.csv";
+        String filename = "levels/test.csv";
 //        String filename = "levels/SampleLevel.csv";
 //        String filename = "levels/MinimalLevel.csv";
 //        String filename = "levels/MinimalLevel_water.csv";
 //        String filename = "levels/MinimalLevel2.csv";
-//        String filename = "levels/SampleLevel4p_2.csv";
-//        String filename = "levels/SymmetricalLevel4p.csv";
 
         String saveGameFile = "save/1589357287411/4_0/game.json";
 
@@ -47,15 +45,17 @@ public class Play {
         //THREE WAYS OF RUNNING Tribes:
 
         //1. Play one game with visuals:
- //       play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA, PlayerType.SIMPLE, PlayerType.SIMPLE}, new Types.TRIBE[] {XIN_XI, OUMAJI, BARDUR, IMPERIUS}, gameMode);
+        play(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
+//        play(filename, new PlayerType[]{PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
+//        play(filename, new PlayerType[]{PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN}, new Types.TRIBE[] {XIN_XI, IMPERIUS, BARDUR, OUMAJI}, gameMode);
 
         //2. Play N games without visuals
-        int nReps = 10;
-        run(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.SIMPLE}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode,nReps);
+//        int nReps = 50;
+//        run(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode, nReps);
+
 
         //3. Play one game with visuals from a savegame
 //        load(new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI}, saveGameFile);
-
     }
 
     private static void play(String levelFile, PlayerType[] playerTypes, Types.TRIBE[] tribes, Types.GAME_MODE gameMode)

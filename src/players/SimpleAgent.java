@@ -1,12 +1,9 @@
 package players;
 
-import com.sun.javafx.scene.traversal.Hueristic2D;
-import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actions.cityactions.*;
 import core.actions.tribeactions.BuildRoad;
-import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.ResearchTech;
 import core.actions.unitactions.*;
 import core.actors.Building;
@@ -17,7 +14,6 @@ import core.actors.units.Catapult;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
-import players.heuristics.TribesSimpleHeuristic;
 import utils.ElapsedCpuTimer;
 import utils.Vector2d;
 
@@ -398,7 +394,7 @@ public class SimpleAgent extends Agent {
             case LUMBER_HUT:
                 score = 3; // These increase population less and cost more so are of less priority
             case GRAND_BAZAR:
-            case CUSTOM_HOUSE:
+            case CUSTOMS_HOUSE:
             case EMPERORS_TOMB:
             case GATE_OF_POWER:
             case EYE_OF_GOD:

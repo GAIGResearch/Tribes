@@ -4,13 +4,11 @@ import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actions.tribeactions.EndTurn;
+import core.actions.unitactions.Attack;
 import core.actors.Tribe;
 import players.Agent;
 import players.HumanAgent;
-import utils.AIStats;
-import utils.ElapsedCpuTimer;
-import utils.GUI;
-import utils.WindowInput;
+import utils.*;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -46,7 +44,7 @@ public class Game {
     /**
      * Constructor of the game
      */
-    public Game()
+    public  Game()
     {}
 
     /**
@@ -176,27 +174,35 @@ public class Game {
         boolean firstEnd = true;
 
         while(frame == null || !frame.isClosed()) {
+//            System.out.println("Frame closed: " + frame.isClosed());
             // Loop while window is still open, even if the game ended.
             // If not playing with visuals, loop is broken when game's ended.
-            tick(frame);
 
+            boolean gameOver = gameOver();
             // Check end of game
-            if (firstEnd && gameOver()) {
+            if (firstEnd && gameOver) {
                 terminate();
+
                 firstEnd = false;
 
-                if(VERBOSE) for(AIStats ais : aiStats)
-                    ais.print();
+                if(VERBOSE)
+                {
+                    printGameResults();
+                    for(AIStats ais : aiStats)
+                        ais.print();
+                }
 
                 if (!VISUALS || frame == null) {
                     // The game has ended, end the loop if we're running without visuals.
                     break;
-                } else {
-                    frame.update(getGameState(-1), null); // One last update with full observation
                 }
             }
+            if (!gameOver) {
+                tick(frame);
+            } else {
+                frame.update(getGameState(-1), null);
+            }
         }
-
     }
 
     /**
@@ -280,7 +286,7 @@ public class Game {
             actionDelayTimer.setMaxTimeMillis(FRAME_DELAY);
         }
 
-        while (true) {
+        while (frame == null || !frame.isClosed()) {
             // Keep track of action played in this loop, null if no action.
             Action action = null;
 
@@ -300,11 +306,6 @@ public class Game {
                         if(!isHumanPlayer)
                             aiStats[playerID].addBranchingFactor(gs.getTick(), gameStateObservations[playerID].getAllAvailableActions().size());
                         curActionCounter++;
-
-                        // Play the action in the game and update the available actions list and observations
-                        gs.next(action);
-                        gs.computePlayerActions(tribe);
-                        updateAssignedGameStates();
 
                         if (actionDelayTimer != null) {  // Reset action delay timer for next action request
                             actionDelayTimer = new ElapsedCpuTimer();
@@ -339,8 +340,24 @@ public class Game {
                     endTurnDelay = new ElapsedCpuTimer();
                     endTurnDelay.setMaxTimeMillis(FRAME_DELAY);
                 }
+
+//                try {
+//                    Thread.sleep(10);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
             } else if (action instanceof EndTurn) { // If no visuals and we should end the turn, just break out of loop here
                 break;
+            }
+
+            if (action != null && !VISUALS || frame != null && (!(action instanceof Attack) && action != null ||
+                    (action = frame.getAnimatedAction()) != null)) {
+                // Play the action in the game and update the available actions list and observations
+                // Some actions are animated, the condition above checks if this animation is finished and retrieves
+                // the action after all the GUI updates.
+                gs.next(action);
+                gs.computePlayerActions(tribe);
+                updateAssignedGameStates();
             }
 
             if(gameOver())
@@ -353,7 +370,19 @@ public class Game {
         gs.endTurn(tribe);
     }
 
-
+    /**
+     * Prints the results of the game.
+     */
+    private void printGameResults()
+    {
+        Types.RESULT[] results = getWinnerStatus();
+        int[] sc = getScores();
+        Tribe[] tribes = gs.getBoard().getTribes();
+        for(int i = 0; i < results.length; ++i)
+        {
+            System.out.println("Tribe " + i + " (" + tribes[i].getType() + "): " + results[i] + ", " + sc[i] + " points.");
+        }
+    }
 
 
     /**

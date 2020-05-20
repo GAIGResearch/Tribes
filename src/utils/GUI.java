@@ -280,7 +280,7 @@ public class GUI extends JFrame {
 
         JTabbedPane tribeResearchInfo = new JTabbedPane();
         tribeView = new TribeView();
-        techView = new TechView(ac, infoView);
+        techView = new TechView(game, ac, infoView);
         tribeResearchInfo.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_TECH_PANEL_HEIGHT));
         tribeResearchInfo.add("Tribe Info", tribeView);
         tribeResearchInfo.add("Tech Tree", techView);

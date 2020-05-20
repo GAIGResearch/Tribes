@@ -3,8 +3,10 @@ package utils;
 import core.TechnologyTree;
 import core.Types;
 import core.actors.Tribe;
+import core.game.Game;
 import core.game.GameState;
 import players.ActionController;
+import players.HumanAgent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,12 +24,14 @@ public class TechView extends JComponent {
     TechnologyNode[] technologies;
     ArrayList<TechnologyNode> roots, leaves;
     InfoView infoView;
+    Game game;
 
     // TODO: search functionality (i.e. "custom house -> Trade research")
-    TechView(ActionController ac, InfoView infoView)
+    TechView(Game game, ActionController ac, InfoView infoView)
     {
         this.setLayout(new FlowLayout());
         this.infoView = infoView;
+        this.game = game;
 
         this.ac = ac;
         this.size = new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_TECH_PANEL_HEIGHT);
@@ -96,7 +100,10 @@ public class TechView extends JComponent {
             button.setBackground(Color.DARK_GRAY);
             button.addActionListener(e -> {
                 infoView.setTechHighlightText(ef);
-                infoView.setTechHighlight(t);
+                if (game.getPlayers()[gs.getActiveTribeID()] instanceof HumanAgent ||
+                        !DISABLE_NON_HUMAN_GRID_HIGHLIGHT) {
+                    infoView.setTechHighlight(t);
+                }
             });
             button.setOpaque(true);
             techs[i] = button;
@@ -131,10 +138,14 @@ public class TechView extends JComponent {
                     int starCost = opt.getCost(t.getNumCities(), tt);
                     boolean starRequirement = t.getStars() >= starCost;
                     boolean researchable = techRequirement && starRequirement;
+
                     if (!(researchable || researched)) {
-//                        techs[i].setEnabled(false);
                         techs[i].setBackground(Color.DARK_GRAY);
                         techs[i].setForeground(new Color(176, 183, 181));
+                        techs[i].setFont(new Font(getFont().getName(), Font.PLAIN, getFont().getSize()));
+                        if (techRequirement) {
+                            techs[i].setForeground(new Color(255, 167, 163));
+                        }
                     } else {
                         if (researched) {
                             techs[i].setBackground(new Color(4, 77, 118));

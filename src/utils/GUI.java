@@ -280,7 +280,7 @@ public class GUI extends JFrame {
 
         JTabbedPane tribeResearchInfo = new JTabbedPane();
         tribeView = new TribeView();
-        techView = new TechView(ac, infoView);
+        techView = new TechView(game, ac, infoView);
         tribeResearchInfo.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_TECH_PANEL_HEIGHT));
         tribeResearchInfo.add("Tribe Info", tribeView);
         tribeResearchInfo.add("Tech Tree", techView);
@@ -476,10 +476,10 @@ public class GUI extends JFrame {
         if (gs.getActiveTribe() != null) {
             activeTribe.setText("Tribe acting: " + gs.getActiveTribe().getName());
             activeTribeInfo.setText("stars: " + gs.getActiveTribe().getStars() + " (+" + gs.getActiveTribe().getMaxProduction(gs) + ")");
-            Types.RESULT winStatus = gs.getActiveTribe().getWinner();
+            Types.RESULT winStatus = gs.getTribeWinStatus();
             if (winStatus != Types.RESULT.INCOMPLETE) {
-                otherInfo.setText("Game result: " + winStatus.toString());
-            } else if (lastExamineAction != null) {
+                otherInfo.setText("Game result: " + winStatus);
+            } else if (lastExamineAction != null && lastExamineAction.getBonus() != null) {
                 otherInfo.setText("Ruins: " + lastExamineAction.getBonus().toString());
                 otherInfoDelay--;
                 if (otherInfoDelay == 0) {

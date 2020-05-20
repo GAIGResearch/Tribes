@@ -295,7 +295,6 @@ public class GameView extends JComponent {
                 if (u != null) {
                     int imgSize = (int) (CELL_SIZE * 0.75);
                     if (u instanceof SuperUnit || u instanceof Catapult) imgSize = CELL_SIZE;
-                    String imgFile = u.getType().getImageFile();
 
                     Vector2d rotated = rotatePoint(j, i);
                     int x = rotated.x + CELL_SIZE*CELL_SIZE/4/imgSize;
@@ -307,15 +306,32 @@ public class GameView extends JComponent {
                     Tribe t = gameState.getTribe(u.getTribeId());
                     int imageTribeId = t.getType().getKey();
 
-                    if (exhausted) {
-                        String exhaustedStr = imgFile + imageTribeId + "Exhausted.png";
-                        Image exhaustedImg = ImageIO.GetInstance().getImage(exhaustedStr);
-                        paintImage(g, x, y, exhaustedImg, imgSize, panTranslate);
-                    } else {
-                        paintImage(g, x, y, u.getType().getImage(imageTribeId), imgSize, panTranslate);
+                    paintUnit(g, x, y, u.getType(), imgSize, imageTribeId, exhausted);
+
+                    if (u.getType().isWaterUnit()) {
+                        // Paint base land unit for water units
+                        int size = imgSize/2;
+                        paintUnit(g, x + CELL_SIZE/4, y + CELL_SIZE/4, board.getBaseLandUnit(u), size, imageTribeId, exhausted);
                     }
+
+                    Font f = g.getFont();
+                    g.setFont(new Font(f.getFontName(), Font.PLAIN, CELL_SIZE/5));
+                    g.setColor(Color.black);
+                    g.drawString(u.getCurrentHP() + "/" + u.getMaxHP(), x + g.getFont().getSize()/2 + panTranslate.x, y + panTranslate.y);
+                    g.setFont(f);
                 }
             }
+        }
+    }
+
+    private void paintUnit(Graphics2D g, int x, int y, Types.UNIT type, int imgSize, int tribeId, boolean exhausted) {
+        String imgFile = type.getImageFile();
+        if (exhausted) {
+            String exhaustedStr = imgFile + tribeId + "Exhausted.png";
+            Image exhaustedImg = ImageIO.GetInstance().getImage(exhaustedStr);
+            paintImage(g, x, y, exhaustedImg, imgSize, panTranslate);
+        } else {
+            paintImage(g, x, y, type.getImage(tribeId), imgSize, panTranslate);
         }
     }
 

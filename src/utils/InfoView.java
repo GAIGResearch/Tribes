@@ -417,11 +417,11 @@ public class InfoView extends JComponent {
                     } else {
                         if (researched) {
                             actionResearch.setEnabled(false);
-                            txt = "Researched.";
+                            txt = "Researched";
                             actionResearch.setText("Researched");
                         } else {
                             actionResearch.setEnabled(true);
-                            txt = "Researchable.";
+                            txt = "Researchable";
                             actionResearch.setText("Research");
                         }
                     }

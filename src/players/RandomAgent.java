@@ -23,7 +23,7 @@ public class RandomAgent extends Agent {
         ArrayList<Action> allActions = gs.getAllAvailableActions();
         int nActions = allActions.size();
         Action toExecute = allActions.get(rnd.nextInt(nActions));
-        System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + nActions + ". Executing " + toExecute);
+//        System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + nActions + ". Executing " + toExecute);
         return toExecute;
     }
 

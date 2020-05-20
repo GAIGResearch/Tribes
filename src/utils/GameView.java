@@ -169,8 +169,8 @@ public class GameView extends JComponent {
         paintUnits(g);
         paintActionsHighlightedUnit(g, highlightX, highlightY);
         paintOtherActions(g);
-        paintActionAnimations(g);
         paintEffects(g);
+        paintActionAnimations(g);
 
         g.setColor(Color.BLACK);
         //player.draw(g); //if we want to give control to the agent to paint something (for debug), start here.
@@ -824,7 +824,6 @@ public class GameView extends JComponent {
             if (effectType == EFFECT.EXPLOSION) {
                 if (effectDrawingIdx >= explosionEffect.length) {
                     effectDrawingIdx = -1;  // Finished
-                    game.setPaused(false);
                     effectPositions.clear();
                     return;
                 }
@@ -832,7 +831,6 @@ public class GameView extends JComponent {
             } else if (effectType == EFFECT.PIERCE) {
                 if (effectDrawingIdx >= pierceEffect.length) {
                     effectDrawingIdx = -1;  // Finished
-                    game.setPaused(false);
                     effectPositions.clear();
                     return;
                 }
@@ -840,7 +838,6 @@ public class GameView extends JComponent {
             } else if (effectType == EFFECT.SLASH) {
                 if (effectDrawingIdx >= slashEffect[effectTribeIdx].length) {
                     effectDrawingIdx = -1;  // Finished
-                    game.setPaused(false);
                     effectPositions.clear();
                     return;
                 }
@@ -848,7 +845,6 @@ public class GameView extends JComponent {
             } else if (effectType == EFFECT.HEAL) {
                 if (effectDrawingIdx >= healEffect[effectTribeIdx].length) {
                     effectDrawingIdx = -1;  // Finished
-                    game.setPaused(false);
                     effectPositions.clear();
                     return;
                 }
@@ -856,7 +852,6 @@ public class GameView extends JComponent {
             } else if (effectType == EFFECT.CONVERT) {
                 if (effectDrawingIdx >= convertEffect[effectTribeIdx].length) {
                     effectDrawingIdx = -1;  // Finished
-                    game.setPaused(false);
                     effectPositions.clear();
                     return;
                 }
@@ -878,13 +873,18 @@ public class GameView extends JComponent {
             } else {
                 effectDrawingIdx = -1;
                 effectPositions.clear();
-                game.setPaused(false);
             }
         }
     }
 
     void paintAction(UnitAction a) {
         if (a instanceof Attack || a instanceof Convert || a instanceof HealOthers) {  // These are the actions currently animated
+            animationSpeed.clear();
+            actionAnimationUnitsTribe.clear();
+            sourceTargetAnimationInfo.clear();
+            animatedAction = null;
+
+
             Unit source = (Unit) gameState.getBoard().getActor(a.getUnitId());
             Image weapon1 = source.getType().getWeaponImage(source.getTribeId());
 
@@ -934,17 +934,17 @@ public class GameView extends JComponent {
         if (sourceTargetAnimationInfo.size() > 0) {
             ArrayList<Integer> finished = new ArrayList<>();
             for (int i = 0; i < sourceTargetAnimationInfo.size(); i++) {
-                Pair<Image,Vector2d> sourceAnimationInfo = sourceTargetAnimationInfo.get(i).getFirst();
-                Pair<Image,Vector2d> targetAnimationInfo = sourceTargetAnimationInfo.get(i).getSecond();
+                Pair<Image,Vector2d> source = sourceTargetAnimationInfo.get(i).getFirst();
+                Pair<Image,Vector2d> target = sourceTargetAnimationInfo.get(i).getSecond();
 
                 // Sprite not yet reached its destination, paint current and calculate next
-                Vector2d currentPosition = sourceAnimationInfo.getSecond().copy();
+                Vector2d currentPosition = source.getSecond().copy();
 
                 // Next position, move closer to target
-                int xDir = (int) (CELL_SIZE * animationSpeed.get(i) * Math.signum(targetAnimationInfo.getSecond().x - currentPosition.x));
-                int yDir = (int) (CELL_SIZE * animationSpeed.get(i) * Math.signum(targetAnimationInfo.getSecond().y - currentPosition.y));
-                sourceAnimationInfo.getSecond().add(xDir, yDir);
-                Vector2d nextPosition = sourceAnimationInfo.getSecond().copy();
+                int xDir = (int) (CELL_SIZE * animationSpeed.get(i) * Math.signum(target.getSecond().x - currentPosition.x));
+                int yDir = (int) (CELL_SIZE * animationSpeed.get(i) * Math.signum(target.getSecond().y - currentPosition.y));
+                source.getSecond().add(xDir, yDir);
+                Vector2d nextPosition = source.getSecond().copy();
 
                 // Rotate image in direction of travel
                 double dx = nextPosition.x - currentPosition.x;
@@ -954,25 +954,25 @@ public class GameView extends JComponent {
                 Vector2d rotated = rotatePoint(1.0 * currentPosition.x / CELL_SIZE, 1.0 * currentPosition.y / CELL_SIZE);
                 int x = rotated.x + CELL_SIZE / 2;
                 int y = rotated.y - CELL_SIZE / 4;
-                paintImageRotated(g, x, y, sourceAnimationInfo.getFirst(), CELL_SIZE / 2, panTranslate, imageAngleRad, x + CELL_SIZE/4, y + CELL_SIZE/4);
+                paintImageRotated(g, x, y, source.getFirst(), CELL_SIZE / 2, panTranslate, imageAngleRad, x + CELL_SIZE/4, y + CELL_SIZE/4);
 
-                if (currentPosition.equalsPlusError(targetAnimationInfo.getSecond(), CELL_SIZE * animationSpeed.get(i))) {
+                if (currentPosition.equalsPlusError(target.getSecond(), CELL_SIZE * animationSpeed.get(i))) {
                     // Reached destination, no more drawing. Reset animation variables and unpause game, unless retaliation happening
 
                     // Draw end of animation effect
-                    effectPositions.add(targetAnimationInfo.getSecond());
+                    effectPositions.add(target.getSecond());
                     effectTribeIdx = actionAnimationUnitsTribe.get(i).getFirst();
                     effectDrawingIdx = 0;
 
-                    if (animatedAction instanceof Attack && targetAnimationInfo.getFirst() != null && ((Attack) animatedAction).isRetaliation(gameState)) {
+                    if (animatedAction instanceof Attack && target.getFirst() != null && ((Attack) animatedAction).isRetaliation(gameState)) {
                         // Retaliating! Reset variables to target's attack
-                        Vector2d startPosition = targetAnimationInfo.getSecond().copy();
+                        Vector2d startPosition = target.getSecond().copy();
                         Vector2d targetPosition = board.getActor(animatedAction.getUnitId()).getPosition().copy();
                         Vector2d endPosition = new Vector2d(targetPosition.y * CELL_SIZE, targetPosition.x * CELL_SIZE);
-                        sourceAnimationInfo = new Pair<>(targetAnimationInfo.getFirst(), startPosition);
-                        targetAnimationInfo = new Pair<>(null, endPosition);
+                        source = new Pair<>(target.getFirst(), startPosition);
+                        target = new Pair<>(null, endPosition);
                         actionAnimationUnitsTribe.get(i).swap();
-                        sourceTargetAnimationInfo.set(i, new Pair<>(sourceAnimationInfo, targetAnimationInfo));
+                        sourceTargetAnimationInfo.set(i, new Pair<>(source, target));
                     } else {
                         // No more of this animation
                         finished.add(i);
@@ -983,6 +983,10 @@ public class GameView extends JComponent {
                 sourceTargetAnimationInfo.remove(i);
                 animationSpeed.remove(i);
                 actionAnimationUnitsTribe.remove(i);
+            }
+        } else {
+            if (effectDrawingIdx == -1) {
+                game.setPaused(false);
             }
         }
     }

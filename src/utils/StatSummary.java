@@ -29,8 +29,6 @@ public class StatSummary {
     private double median;
     private double sd;
 
-    private int wins;
-
     private double lastAdded;
 
     // trick class loader into loading this now
@@ -50,7 +48,6 @@ public class StatSummary {
         n = 0;
         sum = 0;
         sumsq = 0;
-        wins = 0;
         // ensure that the first number to be
         // added will fix up min and max to
         // be that number
@@ -64,7 +61,6 @@ public class StatSummary {
         n = 0;
         sum = 0;
         sumsq = 0;
-        wins = 0;
         // ensure that the first number to be
         // added will fix up min and max to
         // be that number
@@ -85,10 +81,6 @@ public class StatSummary {
         if (!valid)
             computeStats();
         return mean;
-    }
-
-    public double winPercent() {
-        return (wins * 100) / (n * 1.0);
     }
 
     // returns the sum of the squares of the differences
@@ -135,7 +127,6 @@ public class StatSummary {
         sumsq += ss.sumsq;
         max = Math.max(max, ss.max);
         min = Math.min(min, ss.min);
-        wins += ss.wins;
         valid = false;
         lastAdded = ss.lastAdded;
     }
@@ -148,10 +139,6 @@ public class StatSummary {
         max = Math.max(max, d);
         valid = false;
         lastAdded = d;
-    }
-
-    public void addWin() {
-        wins++;
     }
 
     public void add(Number n) {
@@ -184,8 +171,6 @@ public class StatSummary {
                 " se  = " + stdErr() + "\n" +
                 " sum  = " + sum + "\n" +
                 " sumsq  = " + sumsq + "\n" +
-                " wins = " + wins + "\n" +
-                " wins% = " + winPercent() + "\n" +
                 " n   = " + n;
         return s;
 
@@ -208,7 +193,6 @@ public class StatSummary {
         ss.sd = this.sd;
         ss.n = this.n;
         ss.valid = this.valid;
-        ss.wins = this.wins;
         ss.lastAdded = this.lastAdded;
 
         return ss;

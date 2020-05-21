@@ -51,7 +51,7 @@ public class Play {
 
         //2. Play N games without visuals
         int nReps = 50;
-        run(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.SIMPLE}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode, nReps);
+        run(filename, new PlayerType[]{PlayerType.SIMPLE, PlayerType.MC}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode, nReps);
 
 
         //3. Play one game with visuals from a savegame

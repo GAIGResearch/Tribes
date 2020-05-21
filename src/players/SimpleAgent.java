@@ -269,6 +269,7 @@ public class SimpleAgent extends Agent {
 
     }
 
+    //Evaluate a research action
     private int evalResearch(Action a, GameState gs, Tribe thisTribe) {
         Types.TECHNOLOGY t = ((ResearchTech) a).getTech();
         //If we don't have enough stars over a certain threshold we need to focus on that before researching tech
@@ -427,7 +428,7 @@ public class SimpleAgent extends Agent {
         return 0;
     }
 
-
+    //Evaluate a recover action
     private int evalRecover(Action a, GameState gs, Tribe thisTribe) {
         boolean[][] obsGrid = thisTribe.getObsGrid();
         Unit thisUnit = (Unit) gs.getActor(((Recover) a).getUnitId());
@@ -498,25 +499,27 @@ public class SimpleAgent extends Agent {
     //Evaluate the convert action, lesser units such as Warriors, riders are prioritised far less than more expensive ones.
     private int evalConvert(Action a, GameState gs, Tribe thisTribe) {
         Unit defender = (Unit) gs.getActor(((Convert) a).getTargetId());
-        switch (defender.getType()) {
-            case RIDER:
-            case ARCHER:
-                return 2;
-            case SUPERUNIT:
-                return 5; //heavily weight superunit capture
-            case SWORDMAN:
-            case BATTLESHIP:
-            case KNIGHT:
-            case CATAPULT:
-                return 4;
-            case MIND_BENDER:
-            case BOAT:
-            case WARRIOR:
-                return 1;
-            case DEFENDER:
-            case SHIP:
-                return 3;
+        if(defender!=null) {
+            switch (defender.getType()) {
+                case RIDER:
+                case ARCHER:
+                    return 2;
+                case SUPERUNIT:
+                    return 5; //heavily weight superunit capture
+                case SWORDMAN:
+                case BATTLESHIP:
+                case KNIGHT:
+                case CATAPULT:
+                    return 4;
+                case MIND_BENDER:
+                case BOAT:
+                case WARRIOR:
+                    return 1;
+                case DEFENDER:
+                case SHIP:
+                    return 3;
 
+            }
         }
         return 0;
     }
@@ -611,6 +614,7 @@ public class SimpleAgent extends Agent {
         return 0;
     }
 
+    //Evaluate an attack action
     public int evalAttack(Action a, GameState gs, Tribe thisTribe) {
         int score = 0;
         Unit attacker = (Unit) gs.getActor(((Attack) a).getUnitId());

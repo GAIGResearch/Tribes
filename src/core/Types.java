@@ -621,9 +621,7 @@ public class Types {
         public int getKey() { return this.key; }
 
         public int getMaxTurns() {
-            if (this == CAPITALS)
-                return Integer.MAX_VALUE;
-            else return TribesConfig.MAX_TURNS;
+            return (this == CAPITALS) ? TribesConfig.MAX_TURNS_CAPITALS : TribesConfig.MAX_TURNS;
         }
 
         public static GAME_MODE getTypeByKey(int key) {

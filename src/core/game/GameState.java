@@ -15,10 +15,7 @@ import core.actors.units.Unit;
 import utils.IO;
 import utils.Vector2d;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Random;
+import java.util.*;
 
 public class GameState {
 
@@ -58,6 +55,9 @@ public class GameState {
     // Indicates if a city is leveling up, which reduces action list to only 2 options
     private boolean levelingUp;
 
+    //Ranking of the game
+    private TreeSet<TribeResult> ranking;
+
     //Constructor.
     public GameState(Random rnd, Types.GAME_MODE gameMode) {
         this.rnd = rnd;
@@ -66,6 +66,7 @@ public class GameState {
         this.cityActions = new HashMap<>();
         this.unitActions = new HashMap<>();
         this.tribeActions = new ArrayList<>();
+        this.ranking = new TreeSet<>();
         this.turnMustEnd = false;
         this.gameIsOver = false;
     }
@@ -262,10 +263,11 @@ public class GameState {
     {
         if(action != null)
         {
-            boolean executed =action.execute(this);
+            boolean executed = action.execute(this);
 
             if(!executed) {
-                System.out.println("Action [" + action + "] couldn't execute?");
+                System.out.println("Tick: " + this.tick + "; action [" + action + "] couldn't execute?");
+                action.execute(this);
             }
 
             //Post-action execution matters:
@@ -525,48 +527,24 @@ public class GameState {
             copy.cityActions.put(cityId, actionsC);
         }
 
+        copy.ranking = new TreeSet<>();
+        for(TribeResult tr : ranking) copy.ranking.add(tr.copy());
+
         return copy;
     }
 
 
     /**
      * Method to identify the end of the game. If the game is over, the winner is decided.
-     * The winner of a game is determined by TribesConfig.GAME_MODE and TribesConfig.MAX_TURNS
+     * The winner of a game is determined by TribesConfig.GAME_MODE and gameMode.getMaxTurns()
      * @return true if the game has ended, false otherwise.
      */
     boolean gameOver() {
         int maxTurns = gameMode.getMaxTurns();
         boolean isEnded = false;
         int[] capitals = board.getCapitalIDs();
-        int bestTribe = -1;
 
-        if(gameMode == Types.GAME_MODE.SCORE || tick > maxTurns)
-        {
-            isEnded = true;
-            int maxScore = Integer.MIN_VALUE;
-            for(int i = 0; i < canEndTurn.length; ++i)
-            {
-                Tribe t = board.getTribe(i);
-
-                //Already lost?
-                if(t.getWinner() == Types.RESULT.LOSS)
-                    continue;
-
-                if(t.getScore() > maxScore)
-                {
-                    maxScore = t.getScore();
-                    bestTribe = i;
-                  
-                }else if(t.getScore() == maxScore)
-                {
-                    if(tribeTieCompareTo(t, board.getTribe(bestTribe)) == -1)
-                    {
-                        bestTribe = i;
-                    }
-                }
-            }
-
-        } else if(gameMode == Types.GAME_MODE.CAPITALS) {
+        if(gameMode == Types.GAME_MODE.CAPITALS) {
             //Game over if one tribe controls all capitals
             for (int i = 0; i < canEndTurn.length; ++i) {
                 Tribe t = board.getTribe(i);
@@ -585,21 +563,30 @@ public class GameState {
 
                 if (winner) {
                     //we have a winner: tribe t.
-                    bestTribe = i;
                     isEnded = true;
+                    board.getTribe(i).setWinner(Types.RESULT.WIN);
                     break; //no need to go further, all the others have lost the game.
                 }
 
             }
         }
 
-        if(isEnded)
+        //Compute the current ranking
+        computeGameRanking();
+
+        //We need to set all the winning conditions for the tribes if the game is over.
+        if(isEnded || tick > maxTurns)
         {
-            //We need to set all the winning conditions for the tribes.
-            for(int i = 0; i < canEndTurn.length; ++i)
+            boolean first = true;
+            for(TribeResult tr : ranking)
             {
-                board.getTribe(i).setWinner ( (bestTribe == i)? Types.RESULT.WIN : Types.RESULT.LOSS);
+                int tribeId = tr.getId();
+                Types.RESULT res = first? Types.RESULT.WIN : Types.RESULT.LOSS;
+                board.getTribe(tribeId).setWinner (res);
+                tr.setResult(res);
+                first = false;
             }
+            isEnded = true;
         }
 
         gameIsOver = isEnded;
@@ -607,35 +594,25 @@ public class GameState {
     }
 
     /**
-     * Policy for deciding which tribe is ahead in case of a tie in score.
-     * @param one one tribe
-     * @param two another tribe
-     * @return -1 if tribe one is better, +1 if tribe 2 is better. No 0, winner determined at random
-     * if all tiebreakers are equal.
+     * Computes the current game ranking based on the current state of the tribes.
+     * Updates the field 'ranking' from GameState
      */
-    private int tribeTieCompareTo(Tribe one, Tribe two)
+    public void computeGameRanking()
     {
-        //Tie breaker 1: num tech researched
-        if(one.getTechTree().getNumResearched() > two.getTechTree().getNumResearched())
-            return -1;
-        else if (one.getTechTree().getNumResearched() < two.getTechTree().getNumResearched())
-            return 1;
-
-        //Tie breaker 2: num cities owned
-        if(one.getNumCities() > two.getNumCities())
-            return -1;
-        else if(one.getNumCities() < two.getNumCities())
-            return 1;
-
-        //Tie breaker 3: production
-        if(one.getMaxProduction(this) > two.getMaxProduction(this))
-            return -1;
-        else if(one.getMaxProduction(this) < two.getMaxProduction(this))
-            return 1;
-
-        //If here, all is the same. Choose at random.
-        return rnd.nextBoolean() ? -1 : 1;
+        ranking = new TreeSet<>();
+        for(int i = 0; i < canEndTurn.length; ++i)
+        {
+            Tribe t = board.getTribe(i);
+            TribeResult tribeResult = new TribeResult(i, t.getWinner(), t.getScore(), t.getTechTree().getNumResearched(), t.getNumCities(), t.getMaxProduction(this));
+            ranking.add(tribeResult);
+        }
     }
+
+    /**
+     * Returns the current ranking of the game. Ranking are computed at the end of each turn.
+     * @return the current ranking of the game.
+     */
+    public TreeSet<TribeResult> getCurrentRanking() {return ranking;}
 
 
     /**
@@ -832,5 +809,6 @@ public class GameState {
     public Types.RESULT getTribeWinStatus() {
         return getActiveTribe().getWinner();
     }
+
 
 }

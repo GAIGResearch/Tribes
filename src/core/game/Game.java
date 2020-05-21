@@ -12,6 +12,7 @@ import utils.*;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.TreeSet;
 
 import static core.Constants.*;
 
@@ -185,9 +186,9 @@ public class Game {
 
                 firstEnd = false;
 
+                printGameResults();
                 if(VERBOSE)
                 {
-                    printGameResults();
                     for(AIStats ais : aiStats)
                         ais.print();
                 }
@@ -378,9 +379,13 @@ public class Game {
         Types.RESULT[] results = getWinnerStatus();
         int[] sc = getScores();
         Tribe[] tribes = gs.getBoard().getTribes();
-        for(int i = 0; i < results.length; ++i)
+
+        TreeSet<TribeResult> ranking = gs.getCurrentRanking();
+        for(TribeResult tr : ranking)
         {
-            System.out.println("Tribe " + i + " (" + tribes[i].getType() + "): " + results[i] + ", " + sc[i] + " points.");
+            int tribeId = tr.getId();
+            System.out.print("Tribe " + tribeId + " (" + tribes[tribeId].getType() + "): " + results[tribeId] + ", " + sc[tribeId] + " points;");
+            System.out.println(" #tech: " + tr.getNumTechsResearched() + ", #cities: " + tr.getNumCities() + ", production: " + tr.getProduction());
         }
     }
 
@@ -482,4 +487,7 @@ public class Game {
         return paused;
     }
 
+    public TreeSet<TribeResult> getCurrentRanking() {
+        return gs.getCurrentRanking();
+    }
 }

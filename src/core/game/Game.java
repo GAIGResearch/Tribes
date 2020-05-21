@@ -1,5 +1,6 @@
 package core.game;
 
+import core.Constants;
 import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
@@ -324,7 +325,7 @@ public class Game {
 
             // Update GUI after every iteration
             if (VISUALS && frame != null) {
-                boolean showAllBoard = TribesConfig.GUI_FORCE_FULL_OBS || TribesConfig.PLAY_WITH_FULL_OBS;
+                boolean showAllBoard = Constants.GUI_FORCE_FULL_OBS || Constants.PLAY_WITH_FULL_OBS;
 
                 if (showAllBoard) frame.update(getGameState(-1), action);  // Full Obs
                 else frame.update(gameStateObservations[gs.getActiveTribeID()], action);        // Partial Obs

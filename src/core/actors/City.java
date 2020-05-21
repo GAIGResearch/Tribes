@@ -166,7 +166,7 @@ public class City extends Actor{
                 if(!onlyMatching) addPopulation(tribe, building.type.getBonus() * multiplier);
                 applyBonus(gameState, building, false, onlyMatching, multiplier);
                 break;
-            case CUSTOM_HOUSE:
+            case CUSTOMS_HOUSE:
                 applyBonus(gameState, building, false, onlyMatching, multiplier);
                 break;
             case TEMPLE:

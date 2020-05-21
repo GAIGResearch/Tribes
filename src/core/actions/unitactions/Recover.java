@@ -6,9 +6,8 @@ import core.game.GameState;
 import core.actors.units.Unit;
 
 import java.util.ArrayList;
-import core.Types;
 
-import static core.TribesConfig.RECOVER_IN_CITY_PLUS_HP;
+import static core.TribesConfig.RECOVER_IN_BORDERS_PLUS_HP;
 import static core.TribesConfig.RECOVER_PLUS_HP;
 
 public class Recover extends UnitAction
@@ -38,7 +37,7 @@ public class Recover extends UnitAction
             if (cityID != -1){
                 ArrayList<Integer> citesID = gs.getTribe(unit.getTribeId()).getCitiesID();
                 if (citesID.contains(cityID)){
-                    addHP += RECOVER_IN_CITY_PLUS_HP;
+                    addHP += RECOVER_IN_BORDERS_PLUS_HP;
                 }
             }
             unit.setCurrentHP(Math.min(currentHP + addHP, unit.getMaxHP()));

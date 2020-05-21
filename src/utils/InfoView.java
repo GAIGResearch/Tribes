@@ -400,7 +400,7 @@ public class InfoView extends JComponent {
                 if (tt != null) {
                     boolean researched = tt.isResearched(techHighlight);
                     boolean techRequirement = tt.isResearchable(techHighlight);
-                    int starCost = techHighlight.getCost(t.getNumCities());
+                    int starCost = techHighlight.getCost(t.getNumCities(), tt);
                     boolean starRequirement = t.getStars() >= starCost;
                     boolean researchable = techRequirement && starRequirement;
 
@@ -417,11 +417,11 @@ public class InfoView extends JComponent {
                     } else {
                         if (researched) {
                             actionResearch.setEnabled(false);
-                            txt = "Researched.";
+                            txt = "Researched";
                             actionResearch.setText("Researched");
                         } else {
                             actionResearch.setEnabled(true);
-                            txt = "Researchable.";
+                            txt = "Researchable";
                             actionResearch.setText("Research");
                         }
                     }

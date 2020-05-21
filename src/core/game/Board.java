@@ -379,30 +379,30 @@ public class Board {
         removeUnitFromBoard(unit);
         removeUnitFromCity(unit, city, tribe);
         
-        Types.UNIT baseLandUnit;
-        switch (unit.getType())
-        {
-            case BOAT:
-                Boat boat = (Boat) unit; 
-                baseLandUnit = boat.getBaseLandUnit();
-                break;
-            case SHIP:
-                Ship ship = (Ship) unit;
-                baseLandUnit = ship.getBaseLandUnit();  
-                break;
-            case BATTLESHIP:
-                Battleship battleship = (Battleship) unit;
-                baseLandUnit = battleship.getBaseLandUnit();
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + unit.getType());
-        }
+        Types.UNIT baseLandUnit = getBaseLandUnit(unit);
+
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(x, y);
         Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), baseLandUnit);
         newUnit.setCurrentHP(unit.getCurrentHP());
         newUnit.setMaxHP(unit.getMaxHP());
         addUnit(city, newUnit);
+    }
+
+    public Types.UNIT getBaseLandUnit(Unit unit) {
+        switch (unit.getType()) {
+            case BOAT:
+                Boat boat = (Boat) unit;
+                return boat.getBaseLandUnit();
+            case SHIP:
+                Ship ship = (Ship) unit;
+                return ship.getBaseLandUnit();
+            case BATTLESHIP:
+                Battleship battleship = (Battleship) unit;
+                return battleship.getBaseLandUnit();
+            default:
+                throw new IllegalStateException("Unexpected value: " + unit.getType());
+        }
     }
 
     /**
@@ -573,6 +573,10 @@ public class Board {
      */
     public boolean isRoad(int x, int y) {
         return tradeNetwork.getTradeNetworkValue(x,y) && terrains[x][y] != SHALLOW_WATER && terrains[x][y] != DEEP_WATER && terrains[x][y] != CITY;
+    }
+
+    public boolean checkTradeNetwork(int x, int y) {
+        return tradeNetwork.getTradeNetworkValue(x,y);
     }
 
 

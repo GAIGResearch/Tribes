@@ -6,6 +6,7 @@ import core.game.TribeResult;
 import players.*;
 import players.mc.MonteCarloAgent;
 import players.mcts.MCTSPlayer;
+import players.oep.OEPAgent;
 import players.osla.OneStepLookAheadAgent;
 import utils.MultiStatSummary;
 import utils.StatSummary;
@@ -27,7 +28,8 @@ public class Play {
         OSLA,
         MC,
         SIMPLE,
-        MCTS
+        MCTS,
+        OEP
     }
 
     public static void main(String[] args) {
@@ -56,7 +58,6 @@ public class Play {
 //        int nReps = 12;
 //        run(filename, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA}, gameMode, nReps, true);
 //        run(filename, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.RANDOM, PlayerType.OSLA}, gameMode, nReps, true);
-
 
         //3. Play one game with visuals from a savegame
 //        load(new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.RANDOM, PlayerType.OSLA}, saveGameFile);
@@ -248,6 +249,7 @@ public class Play {
             case MC: return new MonteCarloAgent(agentSeed);
             case SIMPLE: return new SimpleAgent(agentSeed);
             case MCTS: return new MCTSPlayer(agentSeed);
+            case OEP: return new OEPAgent(agentSeed);
         }
         return null;
     }

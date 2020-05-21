@@ -142,7 +142,8 @@ public class Attack extends UnitAction
         //If target unit in city border increase defence force by 300% if city has walls or 50% if city does not have walls
 
         int cityID = gs.getBoard().getCityIdAt(target.getPosition().x, target.getPosition().y);
-        if (cityID != -1){
+        boolean isCityCenter = gs.getBoard().getTerrainAt(target.getPosition().x, target.getPosition().y) == Types.TERRAIN.CITY;
+        if (isCityCenter && cityID != -1){
             ArrayList<Integer> citesID = gs.getTribe(target.getTribeId()).getCitiesID();
             if (citesID.contains(cityID)){
                 City c = gs.getBoard().getCityInBorders(target.getPosition().x, target.getPosition().y);

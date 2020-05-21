@@ -467,14 +467,18 @@ public class SimpleAgent extends Agent {
 
         for (Vector2d tile : thisUnit.getPosition().neighborhood(thisUnit.RANGE, 0, b.getSize())) {
             Unit target = b.getUnitAt(tile.x, tile.y);
-            if (target.getCurrentHP() < target.getMaxHP()) {
-                //Check if unit is in any potential danger
-                for (Vector2d t : thisUnit.getPosition().neighborhood(target.RANGE, 0, b.getSize())) {
-                    Unit enemy = b.getUnitAt(t.x, t.y);
-                    if (enemy.getTribeId() == target.getTribeId())
-                        continue;
-                    else if (enemy.getCurrentHP() > target.getCurrentHP()) {
-                        potentialHeals += 1;
+            if(target !=null) {
+                if (target.getCurrentHP() < target.getMaxHP()) {
+                    //Check if unit is in any potential danger
+                    for (Vector2d t : thisUnit.getPosition().neighborhood(target.RANGE, 0, b.getSize())) {
+                        Unit enemy = b.getUnitAt(t.x, t.y);
+                        if(enemy !=null) {
+                            if (enemy.getTribeId() == target.getTribeId())
+                                continue;
+                            else if (enemy.getCurrentHP() > target.getCurrentHP()) {
+                                potentialHeals += 1;
+                            }
+                        }
                     }
                 }
             }

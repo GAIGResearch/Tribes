@@ -540,35 +540,7 @@ public class GameState {
         int[] capitals = board.getCapitalIDs();
         int bestTribe = -1;
 
-        if(gameMode == Types.GAME_MODE.CAPITALS)
-        {
-            //Game over if one tribe controls all capitals
-            for(int i = 0; i < canEndTurn.length; ++i) {
-                Tribe t = board.getTribe(i);
-
-                //Already lost?
-                if(t.getWinner() == Types.RESULT.LOSS)
-                    continue;
-
-                boolean winner = true;
-                for (int cap : capitals) {
-                    if (!t.getCitiesID().contains(cap)) {
-                        winner = false;
-                        break;
-                    }
-                }
-
-                if (winner) {
-                    //we have a winner: tribe t.
-                    bestTribe = i;
-                    isEnded = true;
-                    break; //no need to go further, all the others have lost the game.
-                }
-
-            }
-
-
-        }else if(gameMode == Types.GAME_MODE.SCORE && tick > maxTurns)
+        if(gameMode == Types.GAME_MODE.SCORE || tick > maxTurns)
         {
             isEnded = true;
             int maxScore = Integer.MIN_VALUE;
@@ -588,6 +560,31 @@ public class GameState {
                 //TODO: Manage ties in the score.
             }
 
+        } else if(gameMode == Types.GAME_MODE.CAPITALS) {
+            //Game over if one tribe controls all capitals
+            for (int i = 0; i < canEndTurn.length; ++i) {
+                Tribe t = board.getTribe(i);
+
+                //Already lost?
+                if (t.getWinner() == Types.RESULT.LOSS)
+                    continue;
+
+                boolean winner = true;
+                for (int cap : capitals) {
+                    if (!t.getCitiesID().contains(cap)) {
+                        winner = false;
+                        break;
+                    }
+                }
+
+                if (winner) {
+                    //we have a winner: tribe t.
+                    bestTribe = i;
+                    isEnded = true;
+                    break; //no need to go further, all the others have lost the game.
+                }
+
+            }
         }
 
         if(isEnded)

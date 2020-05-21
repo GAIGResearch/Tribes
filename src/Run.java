@@ -20,11 +20,20 @@ class Run {
         if (VISUALS) {
             wi = new WindowInput();
             wi.windowClosed = false;
-            frame = new GUI(g, "Tribes", ki, wi, ac, true);
+            frame = new GUI(g, "Tribes", ki, wi, ac, false);
             frame.addWindowListener(wi);
             frame.addKeyListener(ki);
         }
 
         g.run(frame, wi);
+    }
+
+
+    /**
+     * Runs a game, no visuals nor human player
+     * @param g - game to run
+     */
+    static void runGame(Game g) {
+        g.run(null, null);
     }
 }

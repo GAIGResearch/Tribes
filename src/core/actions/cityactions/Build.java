@@ -43,7 +43,7 @@ public class Build extends CityAction
 
             //Buildings that must be unique in a city
             case SAWMILL:
-            case CUSTOM_HOUSE:
+            case CUSTOMS_HOUSE:
             case WINDMILL:
             case FORGE:
                 return isBuildable(gs, buildingType.getCost(), true);

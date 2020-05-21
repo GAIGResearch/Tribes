@@ -4,18 +4,17 @@ import core.Types;
 import core.actors.City;
 import core.actors.Tribe;
 import core.actors.units.Unit;
-import utils.IO;
 import utils.Vector2d;
 
 import java.awt.*;
 import java.util.Random;
 
-public class LevelLoader
+class LevelLoader
 {
 
     private Dimension size;
 
-    public LevelLoader()
+    LevelLoader()
     {
         size = new Dimension();
     }
@@ -25,7 +24,7 @@ public class LevelLoader
      * @param tribes tribes to play in this game
      * @param lines lines containing the level
      */
-    public Board buildLevel(Tribe[] tribes, String[] lines, Random rnd) {
+    Board buildLevel(Tribe[] tribes, String[] lines, Random rnd) {
 
         Board board = new Board();
 
@@ -37,7 +36,7 @@ public class LevelLoader
 
         board.init(size.width, tribes);
 
-        //Go through evert token in the level file
+        //Go through every token in the level file
         for (int i = 0; i < size.height; ++i) {
             String line = lines[i];
 

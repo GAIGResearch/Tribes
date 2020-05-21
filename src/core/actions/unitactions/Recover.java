@@ -1,13 +1,13 @@
 package core.actions.unitactions;
 
+import core.Types;
 import core.actions.Action;
 import core.game.GameState;
 import core.actors.units.Unit;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
-import static core.TribesConfig.RECOVER_IN_CITY_PLUS_HP;
+import static core.TribesConfig.RECOVER_IN_BORDERS_PLUS_HP;
 import static core.TribesConfig.RECOVER_PLUS_HP;
 
 public class Recover extends UnitAction
@@ -16,7 +16,6 @@ public class Recover extends UnitAction
     {
         super.unitId = unitId;
     }
-
 
     @Override
     public boolean isFeasible(final GameState gs) {
@@ -31,17 +30,18 @@ public class Recover extends UnitAction
         int currentHP = unit.getCurrentHP();
         int addHP = RECOVER_PLUS_HP;
 
+        //Check if action is feasible before execution
         if (isFeasible(gs)) {
 
-           int cityID = gs.getBoard().getCityIdAt(unit.getPosition().x, unit.getPosition().y);
-           if (cityID != -1){
-               ArrayList<Integer> citesID = gs.getTribe(unit.getTribeId()).getCitiesID();
-               if (citesID.contains(cityID)){
-                   addHP += RECOVER_IN_CITY_PLUS_HP;
-               }
+            int cityID = gs.getBoard().getCityIdAt(unit.getPosition().x, unit.getPosition().y);
+            if (cityID != -1){
+                ArrayList<Integer> citesID = gs.getTribe(unit.getTribeId()).getCitiesID();
+                if (citesID.contains(cityID)){
+                    addHP += RECOVER_IN_BORDERS_PLUS_HP;
+                }
             }
-
             unit.setCurrentHP(Math.min(currentHP + addHP, unit.getMaxHP()));
+            unit.transitionToStatus(Types.TURN_STATUS.FINISHED);
             return true;
         }
         return false;

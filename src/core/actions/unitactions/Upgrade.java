@@ -52,6 +52,7 @@ public class Upgrade extends UnitAction
             //Create the new unit
             Unit newUnit = Types.UNIT.createUnit(unit.getPosition(), unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), nextType);
             newUnit.setCurrentHP(unit.getCurrentHP());
+            newUnit.setMaxHP(unit.getMaxHP());
             if(nextType == SHIP)
                 ((Ship)newUnit).setBaseLandUnit(((Boat)unit).getBaseLandUnit());
             else

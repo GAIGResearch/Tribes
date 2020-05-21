@@ -62,6 +62,13 @@ public class Board {
         this.gameActors = new HashMap<>();
     }
 
+    /**
+     * Loads a board from a JSON object
+     * @param JBoard JSON object to load the board from
+     * @param capitalIDs IDs of the cities that are capiral
+     * @param activeTribeID id of the tribe that is next ot move
+     * @param tribes All tribes in the game
+     */
     public Board(JSONObject JBoard, int[] capitalIDs, int activeTribeID, Tribe[] tribes){
         this.gameActors = new HashMap<>();
         this.capitalIDs = capitalIDs;
@@ -79,6 +86,7 @@ public class Board {
         units = new int[size][size];
         tileCityId = new int[size][size];
         isNative = true;
+        actorIDcounter = JBoard.getInt("actorIDcounter");
         this.activeTribeID = activeTribeID;
         this.assignTribes(tribes);
 
@@ -105,15 +113,7 @@ public class Board {
 
         }
 
-        tradeNetwork = new TradeNetwork(size, networkTiles);
-
-//        TODO: testing
-//        System.out.println(Arrays.deepToString(terrains));
-//        System.out.println(Arrays.deepToString(resources));
-//        System.out.println(Arrays.deepToString(buildings));
-//        System.out.println(Arrays.deepToString(units));
-//        System.out.println(Arrays.deepToString(tileCityId));
-//        System.out.println(tradeNetwork);
+        tradeNetwork = new TradeNetwork(networkTiles);
     }
 
 
@@ -379,30 +379,30 @@ public class Board {
         removeUnitFromBoard(unit);
         removeUnitFromCity(unit, city, tribe);
         
-        Types.UNIT baseLandUnit;
-        switch (unit.getType())
-        {
-            case BOAT:
-                Boat boat = (Boat) unit; 
-                baseLandUnit = boat.getBaseLandUnit();
-                break;
-            case SHIP:
-                Ship ship = (Ship) unit;
-                baseLandUnit = ship.getBaseLandUnit();  
-                break;
-            case BATTLESHIP:
-                Battleship battleship = (Battleship) unit;
-                baseLandUnit = battleship.getBaseLandUnit();
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + unit.getType());
-        }
+        Types.UNIT baseLandUnit = getBaseLandUnit(unit);
+
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(x, y);
         Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), baseLandUnit);
         newUnit.setCurrentHP(unit.getCurrentHP());
         newUnit.setMaxHP(unit.getMaxHP());
         addUnit(city, newUnit);
+    }
+
+    public Types.UNIT getBaseLandUnit(Unit unit) {
+        switch (unit.getType()) {
+            case BOAT:
+                Boat boat = (Boat) unit;
+                return boat.getBaseLandUnit();
+            case SHIP:
+                Ship ship = (Ship) unit;
+                return ship.getBaseLandUnit();
+            case BATTLESHIP:
+                Battleship battleship = (Battleship) unit;
+                return battleship.getBaseLandUnit();
+            default:
+                throw new IllegalStateException("Unexpected value: " + unit.getType());
+        }
     }
 
     /**
@@ -575,6 +575,10 @@ public class Board {
         return tradeNetwork.getTradeNetworkValue(x,y) && terrains[x][y] != SHALLOW_WATER && terrains[x][y] != DEEP_WATER && terrains[x][y] != CITY;
     }
 
+    public boolean checkTradeNetwork(int x, int y) {
+        return tradeNetwork.getTradeNetworkValue(x,y);
+    }
+
 
     /**
      * Gets all the tiles that belong to a city
@@ -671,7 +675,7 @@ public class Board {
      */
     private void moveOneToNewCity(City destCity, Tribe tribe, Random rnd)
     {
-        //Capital is special, we start taking unnits from there.
+        //Capital is special, we start taking units from there.
         boolean ownsCapital = tribe.controlsCapital();
         City capital = (City) getActor(tribe.getCapitalID());
         LinkedList<Integer> cities = new LinkedList<>(tribe.getCitiesID());
@@ -764,7 +768,7 @@ public class Board {
      * @param tribeId id of the tribe to set the capital
      * @param capitalId id of the capital city to set.
      */
-    void setCapitalId(int tribeId, int capitalId)
+    private void setCapitalId(int tribeId, int capitalId)
     {
         tribes[tribeId].setCapitalID(capitalId);
         capitalIDs[tribeId] = capitalId;
@@ -848,9 +852,13 @@ public class Board {
         actor.setActorId(actorIDcounter);
     }
 
-    public void addActor(core.actors.Actor actor, int actorID)
+    /**
+     * Adds an actor to the set of game actors with the supplied id
+     * @param actor actor to add
+     * @param actorID id of the actor, which is set in actor and as key in gameActors hash
+     */
+    void addActor(core.actors.Actor actor, int actorID)
     {
-        actorIDcounter++;
         gameActors.put(actorID, actor);
         actor.setActorId(actorID);
     }
@@ -996,5 +1004,7 @@ public class Board {
     public int getCityIdAt(int x, int y) { return tileCityId[x][y]; }
     public int[] getCapitalIDs() {return capitalIDs;}
     boolean isNative() { return isNative; }
-
+    public int getActorIDcounter() {
+        return actorIDcounter;
+    }
 }

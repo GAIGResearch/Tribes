@@ -17,7 +17,7 @@ import static core.Types.EXAMINE_BONUS.*;
 
 public class Examine extends UnitAction
 {
-    Types.EXAMINE_BONUS bonus;
+    private Types.EXAMINE_BONUS bonus;
 
     public Examine(int unitId)
     {
@@ -73,7 +73,9 @@ public class Examine extends UnitAction
                     break;
 
                 case RESEARCH:
-                    technologyTree.researchAtRandom(rnd);
+                    boolean researched = technologyTree.researchAtRandom(rnd);
+                    if(!researched)
+                        System.out.println(gs.getTick() + " ERROR: researchAtRandom couldn't do any research.");
                     break;
 
                 case POP_GROWTH:

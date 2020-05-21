@@ -70,6 +70,7 @@ public class GameState {
         this.gameIsOver = false;
     }
 
+    //This Constructor is used when loading from a savegame.
     public GameState(Random rnd, Types.GAME_MODE gameMode, Tribe[] tribes, Board board, int tick){
         this(rnd, gameMode);
         this.tick = tick;
@@ -288,7 +289,7 @@ public class GameState {
             boolean executed = action.execute(this);
 
             if(!executed) {
-                System.out.println("Action [" + action + "] couldn't execute?");
+                System.out.println("FM: Action [" + action + "] couldn't execute?");
             }
 
             if(executed) {
@@ -401,7 +402,7 @@ public class GameState {
             for(Building b : city.getBuildings())
             {
                 if(b.type.isTemple()) {
-                    int templePoints = ((Temple) b).score();
+                    int templePoints = ((Temple) b).newTurn();
                     tribe.addScore(templePoints);
                     city.addPointsWorth(templePoints);
                 }
@@ -539,14 +540,39 @@ public class GameState {
         int[] capitals = board.getCapitalIDs();
         int bestTribe = -1;
 
-        if(gameMode == Types.GAME_MODE.CAPITALS)
+        if(gameMode == Types.GAME_MODE.SCORE || tick > maxTurns)
         {
-            //Game over if one tribe controls all capitals
-            for(int i = 0; i < canEndTurn.length; ++i) {
+            isEnded = true;
+            int maxScore = Integer.MIN_VALUE;
+            for(int i = 0; i < canEndTurn.length; ++i)
+            {
                 Tribe t = board.getTribe(i);
 
                 //Already lost?
                 if(t.getWinner() == Types.RESULT.LOSS)
+                    continue;
+
+                if(t.getScore() > maxScore)
+                {
+                    maxScore = t.getScore();
+                    bestTribe = i;
+                  
+                }else if(t.getScore() == maxScore)
+                {
+                    if(tribeTieCompareTo(t, board.getTribe(bestTribe)) == -1)
+                    {
+                        bestTribe = i;
+                    }
+                }
+            }
+
+        } else if(gameMode == Types.GAME_MODE.CAPITALS) {
+            //Game over if one tribe controls all capitals
+            for (int i = 0; i < canEndTurn.length; ++i) {
+                Tribe t = board.getTribe(i);
+
+                //Already lost?
+                if (t.getWinner() == Types.RESULT.LOSS)
                     continue;
 
                 boolean winner = true;
@@ -564,32 +590,6 @@ public class GameState {
                     break; //no need to go further, all the others have lost the game.
                 }
 
-            }
-
-
-        }else if(gameMode == Types.GAME_MODE.SCORE && tick > maxTurns)
-        {
-            isEnded = true;
-            int maxScore = Integer.MIN_VALUE;
-            for(int i = 0; i < canEndTurn.length; ++i)
-            {
-                Tribe t = board.getTribe(i);
-
-                //Already lost?
-                if(t.getWinner() == Types.RESULT.LOSS)
-                    continue;
-
-                if(t.getScore() > maxScore)
-                {
-                    maxScore = t.getScore();
-                    bestTribe = i;
-                }else if(t.getScore() == maxScore)
-                {
-                    if(tribeTieCompareTo(t, board.getTribe(bestTribe)) == -1)
-                    {
-                        bestTribe = i;
-                    }
-                }
             }
         }
 
@@ -723,7 +723,7 @@ public class GameState {
         return rnd;
     }
 
-    public boolean isNative() {
+    boolean isNative() {
         return board.isNative();
     }
 

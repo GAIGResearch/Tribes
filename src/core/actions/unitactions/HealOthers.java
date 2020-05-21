@@ -8,7 +8,7 @@ import core.game.GameState;
 import core.actors.units.Unit;
 import utils.Vector2d;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class HealOthers extends UnitAction
 {
@@ -30,7 +30,7 @@ public class HealOthers extends UnitAction
         //Feasible if this unit can heal this turn and if there is at least one friendly unit adjacent.
         for(Vector2d tile : unit.getPosition().neighborhood(unit.RANGE, 0, board.getSize())){
             Unit u = board.getUnitAt(tile.x, tile.y);
-            if(canBeHealed(u, board.getUnitAt(tile.x, tile.y)))
+            if (canBeHealed(unit, u))
                 return true;
         }
 
@@ -40,16 +40,12 @@ public class HealOthers extends UnitAction
     @Override
     public boolean execute(GameState gs) {
 
-        if(isFeasible(gs)){
+        if (isFeasible(gs)) {  // TODO: this iterates twice to find if possible targets, and then heal them
             Unit unit = (Unit) gs.getActor(this.unitId);
-            Board board = gs.getBoard();
+            ArrayList<Unit> targets = getTargets(gs);
 
-            for(Vector2d tile : unit.getPosition().neighborhood(unit.RANGE, 0, board.getSize())){
-                Unit target  = board.getUnitAt(tile.x, tile.y);
-                if(canBeHealed(unit, target))
-                {
-                    target.setCurrentHP(Math.min(target.getCurrentHP() + TribesConfig.MINDBENDER_HEAL, target.getMaxHP()));
-                }
+            for (Unit target: targets) {
+                target.setCurrentHP(Math.min(target.getCurrentHP() + TribesConfig.MINDBENDER_HEAL, target.getMaxHP()));
             }
 
             unit.transitionToStatus(Types.TURN_STATUS.ATTACKED);
@@ -65,10 +61,21 @@ public class HealOthers extends UnitAction
 
     private boolean canBeHealed(Unit healer, Unit target)
     {
-        if(target != null && target.getTribeId() != healer.getTribeId()){
+        if(target != null && target.getTribeId() == healer.getTribeId()){
             return (target.getCurrentHP() < target.getMaxHP()) && (target.getTribeId() == healer.getTribeId());
         }
         return false;
+    }
+
+    public ArrayList<Unit> getTargets(GameState gs) {
+        ArrayList<Unit> targets = new ArrayList<>();
+        Unit unit = (Unit) gs.getActor(this.unitId);
+        for (Vector2d tile : unit.getPosition().neighborhood(unit.RANGE, 0, gs.getBoard().getSize())){
+            Unit u = gs.getBoard().getUnitAt(tile.x, tile.y);
+            if (canBeHealed(unit, u))
+                targets.add(u);
+        }
+        return targets;
     }
 
     public String toString() {

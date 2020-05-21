@@ -94,12 +94,13 @@ public class GameState {
      * Initializes the GameState.
      * The level is only generated when this initialization method is called.
      */
-    void init(String filename, Tribe[] tribes) {
+    void init(String filename) {
 
         String[] lines = new IO().readFile(filename);
         LevelLoader ll = new LevelLoader();
-        board = ll.buildLevel(tribes, lines, rnd);
+        board = ll.buildLevel(lines, rnd);
 
+        Tribe[] tribes = board.getTribes();
         for(Tribe tribe : tribes)
         {
             int startingCityId = tribe.getCitiesID().get(0);

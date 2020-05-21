@@ -52,30 +52,23 @@ public class Game {
      * Initializes the game. This method does the following:
      *   Sets the players of the game, the number of players and their IDs
      *   Initializes the array to hold the player game states.
-     *   Assigns the tribes that will play the game.
+     *   Assigns the tribes that will play the game, reading it from the file.
      *   Creates the board according to the above information and resets the game so it's ready to start.
      *   Turn order: by default, turns run following the order in the tribes array.
      * @param players Players of the game.
-     * @param tribes Tribes to play the game with. Players and tribes related by position in array lists.
      * @param filename Name of the file with the level information.
      * @param seed Seed for the game (used only for board generation)
      * @param gameMode Game Mode for this game.
      */
-    public void init(ArrayList<Agent> players, ArrayList<Tribe> tribes, String filename, long seed, Types.GAME_MODE gameMode) {
+    public void init(ArrayList<Agent> players, String filename, long seed, Types.GAME_MODE gameMode) {
 
         //Initiate the bare bones of the main game classes
         this.seed = seed;
         this.rnd = new Random(seed);
         this.gs = new GameState(rnd, gameMode);
 
-        Tribe[] tribesArray = new Tribe[tribes.size()];
-        for (int i = 0; i < tribesArray.length; ++i)
-        {
-            tribesArray[i] = tribes.get(i);
-        }
-
-        initGameStructures(players, tribes.size());
-        this.gs.init(filename, tribesArray);
+        this.gs.init(filename);
+        initGameStructures(players, this.gs.getTribes().length);
         updateAssignedGameStates();
     }
 
@@ -105,7 +98,8 @@ public class Game {
     {
         if(players.size() != nTribes)
         {
-            System.out.println("ERROR: Number of tribes must equal the number of players.");
+            System.out.println("ERROR: Number of tribes must _equal_ the number of players. There are " +
+                    players.size() + " players for " + nTribes + " tribes in this level.");
             System.exit(-1);
         }
 

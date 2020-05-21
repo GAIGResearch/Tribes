@@ -103,7 +103,7 @@ public class Play {
             System.out.print("Playing with [");
             for(int i =0; i < playerTypes.length; ++i)
             {
-                System.out.print(playerTypes[i]);
+                System.out.print(i + ":" + playerTypes[i]);
                 if(i < playerTypes.length-1)
                     System.out.print(", ");
             }

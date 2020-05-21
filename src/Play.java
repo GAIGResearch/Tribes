@@ -4,6 +4,8 @@ import core.game.Game;
 import core.actors.Tribe;
 import players.*;
 import players.mc.MonteCarloAgent;
+import players.mcts.MCTSPlayer;
+import players.oep.OEPAgent;
 import players.osla.OneStepLookAheadAgent;
 import utils.StatSummary;
 
@@ -24,7 +26,9 @@ public class Play {
         RANDOM,
         OSLA,
         MC,
-        SIMPLE
+        SIMPLE,
+        MCTS,
+        OEP
     }
 
     public static void main(String[] args) {
@@ -43,11 +47,11 @@ public class Play {
         //THREE WAYS OF RUNNING Tribes:
 
         //1. Play one game with visuals:
-//        play(filename, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode);
+        play(filename, new PlayerType[]{PlayerType.OEP, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode);
 
         //2. Play N games without visuals
-        int nReps = 50;
-        run(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode, nReps);
+//        int nReps = 50;
+//        run(filename, new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI}, gameMode, nReps);
 
         //3. Play one game with visuals from a savegame
 //        load(new PlayerType[]{PlayerType.OSLA, PlayerType.OSLA}, new Types.TRIBE[] {XIN_XI, OUMAJI}, saveGameFile);
@@ -172,6 +176,8 @@ public class Play {
             case OSLA: return new OneStepLookAheadAgent(agentSeed);
             case MC: return new MonteCarloAgent(agentSeed);
             case SIMPLE: return new SimpleAgent(agentSeed);
+            case MCTS: return new MCTSPlayer(agentSeed);
+            case OEP: return new OEPAgent(agentSeed);
         }
         return null;
     }

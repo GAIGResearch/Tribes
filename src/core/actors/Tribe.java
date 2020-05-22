@@ -1,5 +1,6 @@
 package core.actors;
 
+import core.Constants;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
@@ -133,7 +134,7 @@ public class Tribe extends Actor {
 
     public void initObsGrid(int size) {
         obsGrid = new boolean[size][size];
-        if(TribesConfig.PLAY_WITH_FULL_OBS)
+        if(Constants.PLAY_WITH_FULL_OBS)
         {
             for (boolean[] booleans : obsGrid) Arrays.fill(booleans, true);
         }
@@ -222,7 +223,7 @@ public class Tribe extends Actor {
 
         //We may be clearing the last tiles of the board, which grants a monument.
         // The boost is only available when playing with partial observability.
-        if(!TribesConfig.PLAY_WITH_FULL_OBS && monuments.get(EYE_OF_GOD) == MONUMENT_STATUS.UNAVAILABLE)
+        if(!Constants.PLAY_WITH_FULL_OBS && monuments.get(EYE_OF_GOD) == MONUMENT_STATUS.UNAVAILABLE)
         {
             for (boolean[] booleans : obsGrid)
                 for (int j = 0; j < obsGrid[0].length; ++j) {
@@ -387,7 +388,7 @@ public class Tribe extends Actor {
         tribesMet.add(tribeID); // add to this tribe
 
         //The tech boost is only available when playing with partial observability
-        if(!TribesConfig.PLAY_WITH_FULL_OBS) {
+        if(!Constants.PLAY_WITH_FULL_OBS) {
             //Pick a technology at random from the tribe to learn
             TechnologyTree thisTribeTree = getTechTree();
             TechnologyTree metTribeTree = tribes[tribeID].getTechTree();

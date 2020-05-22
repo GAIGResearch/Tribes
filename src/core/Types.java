@@ -19,37 +19,37 @@ import static core.Types.UNIT.*;
 public class Types {
 
     public enum TECHNOLOGY {
-        CLIMBING(5, null),
-        FISHING(5, null),
-        HUNTING(5, null),
-        ORGANIZATION(5, null),
-        RIDING(5, null),
-        ARCHERY(6, HUNTING),
-        FARMING(6, ORGANIZATION),
-        FORESTRY(6, HUNTING),
-        FREE_SPIRIT(6, RIDING),
-        MEDITATION(6, CLIMBING),
-        MINING(6, CLIMBING),
-        ROADS(6, RIDING),
-        SAILING(6, FISHING),
-        SHIELDS(6, ORGANIZATION),
-        WHALING(6, FISHING),
-        AQUATISM(7, WHALING),
-        CHIVALRY(7, FREE_SPIRIT),
-        CONSTRUCTION(7, FARMING),
-        MATHEMATICS(7, FORESTRY),
-        NAVIGATION(7, SAILING),
-        SMITHERY(7, MINING),
-        SPIRITUALISM(7, ARCHERY),
-        TRADE(7, ROADS),
-        PHILOSOPHY(7, MEDITATION);
+        CLIMBING(1, null),
+        FISHING(1, null),
+        HUNTING(1, null),
+        ORGANIZATION(1, null),
+        RIDING(1, null),
+        ARCHERY(2, HUNTING),
+        FARMING(2, ORGANIZATION),
+        FORESTRY(2, HUNTING),
+        FREE_SPIRIT(2, RIDING),
+        MEDITATION(2, CLIMBING),
+        MINING(2, CLIMBING),
+        ROADS(2, RIDING),
+        SAILING(2, FISHING),
+        SHIELDS(2, ORGANIZATION),
+        WHALING(2, FISHING),
+        AQUATISM(3, WHALING),
+        CHIVALRY(3, FREE_SPIRIT),
+        CONSTRUCTION(3, FARMING),
+        MATHEMATICS(3, FORESTRY),
+        NAVIGATION(3, SAILING),
+        SMITHERY(3, MINING),
+        SPIRITUALISM(3, ARCHERY),
+        TRADE(3, ROADS),
+        PHILOSOPHY(3, MEDITATION);
 
-        private int baseCost;
+        private int tier;
         private TECHNOLOGY parent;
         private ArrayList<TECHNOLOGY> children;
 
-        TECHNOLOGY(int baseCost, TECHNOLOGY parent) {
-            this.baseCost = baseCost; this.parent = parent;
+        TECHNOLOGY(int tier, TECHNOLOGY parent) {
+            this.tier = tier; this.parent = parent;
         }
 
         public TECHNOLOGY getParentTech() {return this.parent;}
@@ -66,8 +66,14 @@ public class Types {
             return children;
         }
 
-        public int getCost(int numOfCities) {
-            return baseCost * numOfCities;
+        public int getCost(int numOfCities, TechnologyTree tt) {
+            int cost = TECH_BASE_COST + this.tier * numOfCities;
+            if(tt.isResearched(TECH_DISCOUNT))
+            {
+                double disc_cost = cost * TECH_DISCOUNT_VALUE;
+                cost = (int)disc_cost;
+            }
+            return cost;
         }
 
     }
@@ -115,7 +121,7 @@ public class Types {
     }
 
     /**
-     * Defines the status of the turn for an  (May be in java?)
+     * Defines the status of the turn for a unit
      */
     public enum TURN_STATUS {
         FRESH,
@@ -202,7 +208,7 @@ public class Types {
         FORGE (2,"img/building/forge2.png", FORGE_COST, FORGE_BONUS, SMITHERY, new HashSet<>(Collections.singletonList(PLAIN))),
         FARM (3, "img/building/farm2.png", FARM_COST, FARM_BONUS, FARMING, new HashSet<>(Collections.singletonList(PLAIN))),
         WINDMILL (4,"img/building/windmill2.png", WIND_MILL_COST, WIND_MILL_BONUS, CONSTRUCTION, new HashSet<>(Collections.singletonList(PLAIN))),
-        CUSTOM_HOUSE (5,"img/building/custom_house2.png", CUSTOM_COST, CUSTOM_BONUS, TRADE, new HashSet<>(Collections.singletonList(PLAIN))),
+        CUSTOMS_HOUSE(5,"img/building/custom_house2.png", CUSTOMS_COST, CUSTOMS_BONUS, TRADE, new HashSet<>(Collections.singletonList(PLAIN))),
         LUMBER_HUT(6,"img/building/lumber_hut2.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, FORESTRY, new HashSet<>(Collections.singletonList(FOREST))),
         SAWMILL (7,"img/building/sawmill2.png", SAW_MILL_COST, SAW_MILL_BONUS, MATHEMATICS, new HashSet<>(Collections.singletonList(PLAIN))),
         TEMPLE (8, "img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, FREE_SPIRIT, new HashSet<>(Collections.singletonList(PLAIN))),
@@ -224,7 +230,7 @@ public class Types {
                 case "FORGE": return FORGE;
                 case "FARM": return FARM;
                 case "WINDMILL": return WINDMILL;
-                case "CUSTOM_HOUSE": return CUSTOM_HOUSE;
+                case "CUSTOMS_HOUSE": return CUSTOMS_HOUSE;
                 case "LUMBER_HUT": return LUMBER_HUT;
                 case "SAWMILL": return SAWMILL;
                 case "TEMPLE": return TEMPLE;
@@ -296,7 +302,7 @@ public class Types {
 
         public Types.BUILDING getAdjacencyConstraint()
         {
-            if(this == CUSTOM_HOUSE) return PORT;
+            if(this == CUSTOMS_HOUSE) return PORT;
             if(this == WINDMILL) return FARM;
             if(this == FORGE) return MINE;
             if(this == SAWMILL) return LUMBER_HUT;
@@ -307,11 +313,11 @@ public class Types {
         {
             switch (this)
             {
-                case PORT: return CUSTOM_HOUSE;
+                case PORT: return CUSTOMS_HOUSE;
                 case FARM: return WINDMILL;
                 case MINE: return FORGE;
                 case LUMBER_HUT: return SAWMILL;
-                case CUSTOM_HOUSE: return PORT;
+                case CUSTOMS_HOUSE: return PORT;
                 case WINDMILL: return FARM;
                 case FORGE: return MINE;
                 case SAWMILL: return LUMBER_HUT;
@@ -447,11 +453,15 @@ public class Types {
         }
 
         public int getLevelUpPoints(){
-            //TODO: What happens when level > 10? Negative points? Unlikely!
             if (level == 1){
                 return 100;
             }
             return 50 - level * 5;
+        }
+
+        public boolean grantsMonument()
+        {
+            return this.level == PARK_OF_FORTUNE_LEVEL;
         }
     }
 
@@ -461,30 +471,32 @@ public class Types {
      */
     public enum UNIT
     {
-        WARRIOR (0,"img/unit/warrior/", WARRIOR_COST, null, WARRIOR_POINTS), //+10
-        RIDER (1,"img/unit/rider/", RIDER_COST, RIDING, RIDER_POINTS), //+15
-        DEFENDER (2,"img/unit/defender/", DEFENDER_COST, SHIELDS, DEFENDER_POINTS), // +15
-        SWORDMAN (3,"img/unit/swordsman/", SWORDMAN_COST, SMITHERY, SWORDMAN_POINTS), //+25
-        ARCHER (4,"img/unit/archer/", ARCHER_COST, ARCHERY, ARCHER_POINTS),//+15
-        CATAPULT (5,"img/unit/catapult/", CATAPULT_COST, MATHEMATICS, CATAPULT_POINTS), //+40
-        KNIGHT (6,"img/unit/knight/", KNIGHT_COST, CHIVALRY, KNIGHT_POINTS), //+40
-        MIND_BENDER(7,"img/unit/mind_bender/", MINDBENDER_COST, PHILOSOPHY, MINDBENDER_POINTS), //+25
-        BOAT(8,"img/unit/boat/", BOAT_COST, SAILING, BOAT_POINTS), //+0
-        SHIP(9,"img/unit/ship/", SHIP_COST, SAILING, SHIP_POINTS),//+0
-        BATTLESHIP(10,"img/unit/battleship/", BATTLESHIP_COST, NAVIGATION, BATTLESHIP_POINTS),//+0
-        SUPERUNIT(11, "img/unit/superunit/", SUPERUNIT_COST, null, SUPERUNIT_POINTS); //+50
+        WARRIOR (0,"img/unit/warrior/", "img/weapons/melee/tile006.png", WARRIOR_COST, null, WARRIOR_POINTS), //+10
+        RIDER (1,"img/unit/rider/", "img/weapons/melee/tile001.png", RIDER_COST, RIDING, RIDER_POINTS), //+15
+        DEFENDER (2,"img/unit/defender/", "img/weapons/melee/tile002.png", DEFENDER_COST, SHIELDS, DEFENDER_POINTS), // +15
+        SWORDMAN (3,"img/unit/swordsman/", "img/weapons/melee/tile000.png", SWORDMAN_COST, SMITHERY, SWORDMAN_POINTS), //+25
+        ARCHER (4,"img/unit/archer/", "img/weapons/arrows/", ARCHER_COST, ARCHERY, ARCHER_POINTS),//+15
+        CATAPULT (5,"img/unit/catapult/", "img/weapons/bombs/rock.png", CATAPULT_COST, MATHEMATICS, CATAPULT_POINTS), //+40
+        KNIGHT (6,"img/unit/knight/", "img/weapons/melee/spear.png", KNIGHT_COST, CHIVALRY, KNIGHT_POINTS), //+40
+        MIND_BENDER(7,"img/unit/mind_bender/", "img/weapons/effects/bender/", MINDBENDER_COST, PHILOSOPHY, MINDBENDER_POINTS), //+25
+        BOAT(8,"img/unit/boat/", "img/weapons/arrows/boat.png", BOAT_COST, SAILING, BOAT_POINTS), //+0
+        SHIP(9,"img/unit/ship/", "img/weapons/bombs/", SHIP_COST, SAILING, SHIP_POINTS),//+0
+        BATTLESHIP(10,"img/unit/battleship/", "img/weapons/bombs/", BATTLESHIP_COST, NAVIGATION, BATTLESHIP_POINTS),//+0
+        SUPERUNIT(11, "img/unit/superunit/", "img/weapons/melee/tile003.png", SUPERUNIT_COST, null, SUPERUNIT_POINTS); //+50
 
         private int key;
-        private String imageFile;
+        private String imageFile, weapon;
         private int cost;
         private TECHNOLOGY requirement;
         private int points;
-        UNIT(int numVal, String imageFile, int cost, Types.TECHNOLOGY requirement, int points) {
+
+        UNIT(int numVal, String imageFile, String weaponFile, int cost, Types.TECHNOLOGY requirement, int points) {
             this.key = numVal;
             this.imageFile = imageFile;
             this.cost = cost;
             this.requirement = requirement;
             this.points = points;
+            this.weapon = weaponFile;
         }
 
         public static UNIT stringToType(String type) {
@@ -507,6 +519,12 @@ public class Types {
 
         public Image getImage(int tribeKey) { return ImageIO.GetInstance().getImage(imageFile + tribeKey + ".png"); }
         public String getImageFile() { return imageFile; }
+        public Image getWeaponImage(int tribeKey) {
+            if (this == SHIP || this == BATTLESHIP || this == ARCHER || this == MIND_BENDER) {
+                return ImageIO.GetInstance().getImage(weapon + tribeKey + ".png");
+            }
+            return ImageIO.GetInstance().getImage(weapon);
+        }
         public int getCost() {
             return cost;
         }
@@ -604,9 +622,7 @@ public class Types {
         public int getKey() { return this.key; }
 
         public int getMaxTurns() {
-            if (this == CAPITALS)
-                return Integer.MAX_VALUE;
-            else return TribesConfig.MAX_TURNS;
+            return (this == CAPITALS) ? Constants.MAX_TURNS_CAPITALS : Constants.MAX_TURNS;
         }
 
         public static GAME_MODE getTypeByKey(int key) {
@@ -663,7 +679,7 @@ public class Types {
         DEEP_WATER(2, "img/terrain/deepwater.png", 'd'),
         MOUNTAIN(3, "img/terrain/mountain3.png", 'm'),
         VILLAGE(4, "img/terrain/village2.png", 'v'),
-        CITY(5, "img/terrain/city2.png", 'c'),
+        CITY(5, "img/terrain/city3.png", 'c'),
         FOREST(6, "img/terrain/forest2.png", 'f'),
         FOG(7, "img/fog.png", ' ');
 
@@ -730,9 +746,10 @@ public class Types {
         CLIMB_MOUNTAIN(null, CLIMBING),
         ATTACK("img/actions/attack.png", null),
         CAPTURE("img/actions/capture.png", null),
+        CONVERT("img/actions/convert.png", null),
         EXAMINE("img/actions/examine.png", null),
         DISBAND("img/actions/disband.png", FREE_SPIRIT),
-        HEAL("img/actions/heal.png", null),
+        HEAL("img/actions/heal2.png", null),
         UPGRADE_BOAT("img/actions/upgrade.png", SAILING),
         UPGRADE_SHIP("img/actions/upgrade.png", NAVIGATION),
         BURN_FOREST(null, CHIVALRY),
@@ -757,7 +774,7 @@ public class Types {
                 return ImageIO.GetInstance().getImage(MOVE.imgPath);
             } else if (a instanceof Attack) {
                 return ImageIO.GetInstance().getImage(ATTACK.imgPath);
-            } else if (a instanceof Capture || a instanceof Convert) {
+            } else if (a instanceof Capture) {
                 return ImageIO.GetInstance().getImage(CAPTURE.imgPath);
             } else if (a instanceof Examine) {
                 return ImageIO.GetInstance().getImage(EXAMINE.imgPath);
@@ -767,6 +784,8 @@ public class Types {
                 return ImageIO.GetInstance().getImage(HEAL.imgPath);
             } else if (a instanceof Upgrade) {
                 return ImageIO.GetInstance().getImage(UPGRADE_BOAT.imgPath);
+            } else if (a instanceof Convert) {
+                return ImageIO.GetInstance().getImage(CONVERT.imgPath);
             }
             return null;
         }

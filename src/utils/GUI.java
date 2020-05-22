@@ -43,13 +43,13 @@ public class GUI extends JFrame {
     private ActionController ac;
     private Examine lastExamineAction;
 
-    private GameView view;
+    private GameView boardView;
     private TribeView tribeView;
     private TechView techView;
     private InfoView infoView;
 
     // Zoomed screen dragging vars
-    private Point2D startDrag, endDrag, panTranslate;
+    private Vector2d startDrag, endDrag, panTranslate;
 
     public static double screenDiagonal;
     double scale = 1;
@@ -91,8 +91,8 @@ public class GUI extends JFrame {
         this.replayer = new ActionController();
 
         infoView = new InfoView(ac);
-        panTranslate = new Point2D.Double(0,0);
-        view = new GameView(game.getBoard(), infoView, panTranslate);
+        panTranslate = new Vector2d(0,0);
+        boardView = new GameView(game, infoView, panTranslate);
 
         // Create frame layout
         GridBagLayout gbl = new GridBagLayout();
@@ -147,15 +147,15 @@ public class GUI extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 //Only provide information if clicking on a visible tile
-                Point2D translate = view.getPanTranslate();
-                Point2D ep = new Point2D.Double(e.getX() - translate.getX(), e.getY() - translate.getY());
-                Point2D p = GameView.rotatePointReverse((int)ep.getX(), (int)ep.getY());
+                Vector2d translate = boardView.getPanTranslate();
+                Vector2d ep = new Vector2d(e.getX() - translate.x, e.getY() - translate.y);
+                Vector2d p = GameView.rotatePointReverse((int)ep.x, (int)ep.y);
 
                 // If unit highlighted and action at new click valid for unit, execute action
                 if (game.getPlayers()[gs.getActiveTribeID()] instanceof HumanAgent ||
                         !DISABLE_NON_HUMAN_GRID_HIGHLIGHT) {
                     // Only do this if actions should be executed, or it is human agent playing
-                    Action candidate = getActionAt((int) p.getX(), (int) p.getY(), infoView.getHighlightX(), infoView.getHighlightY());
+                    Action candidate = getActionAt(p.x, p.y, infoView.getHighlightX(), infoView.getHighlightY());
                     if (candidate != null) {
                         int n = 0;
                         if (candidate instanceof Disband) {  // These actions needs confirmation before executing
@@ -174,7 +174,7 @@ public class GUI extends JFrame {
                         infoView.resetHighlight();
                     } else {
                         // Otherwise highlight new cell
-                        infoView.setHighlight((int) p.getX(), (int) p.getY());
+                        infoView.setHighlight(p.x, p.y);
 //                    System.out.println("Highlighting: " + (int)p.getX() + " " + (int)p.getY());
                     }
                 }
@@ -182,16 +182,16 @@ public class GUI extends JFrame {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                startDrag = new Point2D.Double(e.getX(), e.getY());
+                startDrag = new Vector2d(e.getX(), e.getY());
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                endDrag = new Point2D.Double(e.getX(), e.getY());
+                endDrag = new Vector2d(e.getX(), e.getY());
                 if (startDrag != null && !(startDrag.equals(endDrag))) {
-                    panTranslate = new Point2D.Double(+ endDrag.getX() - startDrag.getX(), + endDrag.getY() - startDrag.getY());
-                    if (panTranslate.distance(0, 0) >= GUI_MIN_PAN) {
-                        view.updatePan(panTranslate);
+                    panTranslate = new Vector2d(+ endDrag.x - startDrag.x, + endDrag.y - startDrag.y);
+                    if (panTranslate.dist(0, 0) >= GUI_MIN_PAN) {
+                        boardView.updatePan(panTranslate);
                         infoView.resetHighlight();
                     }
                 }
@@ -210,18 +210,18 @@ public class GUI extends JFrame {
         mainPanel.addMouseWheelListener(e -> {
             Point2D mouseLocation = MouseInfo.getPointerInfo().getLocation();
             Point2D panelLocation = mainPanel.getLocationOnScreen();
-            Point2D viewCenter = new Point2D.Double(view.getPreferredSize().width/2.0, view.getPreferredSize().height/2.0);
-            Point2D diff = new Point2D.Double((mouseLocation.getX() - panelLocation.getX() - viewCenter.getX())/GUI_ZOOM_FACTOR,
-                    (mouseLocation.getY() - panelLocation.getY() - viewCenter.getY())/GUI_ZOOM_FACTOR);
+            Vector2d viewCenter = new Vector2d(boardView.getPreferredSize().width/2, boardView.getPreferredSize().height/2);
+            Vector2d diff = new Vector2d((int)(mouseLocation.getX() - panelLocation.getX() - viewCenter.x)/GUI_ZOOM_FACTOR,
+                    (int)(mouseLocation.getY() - panelLocation.getY() - viewCenter.y)/GUI_ZOOM_FACTOR);
             if (e.getWheelRotation() < 0) {
                 // Zooming in
                 CELL_SIZE += GUI_ZOOM_FACTOR;
-                diff = new Point2D.Double(diff.getX()*-1, diff.getY()*-1);
+                diff = new Vector2d(diff.x*-1, diff.y*-1);
             } else {
                 // Zooming out
                 CELL_SIZE -= GUI_ZOOM_FACTOR;
             }
-            view.updatePan(diff);
+            boardView.updatePan(diff);
         });
 
         mainPanel.setLayout(new GridBagLayout());
@@ -233,7 +233,7 @@ public class GUI extends JFrame {
         mainPanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
 
         c.gridy++;
-        mainPanel.add(view, c);
+        mainPanel.add(boardView, c);
 
         c.gridy++;
         mainPanel.add(Box.createRigidArea(new Dimension(0, GUI_COMP_SPACING/2)), c);
@@ -280,7 +280,7 @@ public class GUI extends JFrame {
 
         JTabbedPane tribeResearchInfo = new JTabbedPane();
         tribeView = new TribeView();
-        techView = new TechView(ac, infoView);
+        techView = new TechView(game, ac, infoView);
         tribeResearchInfo.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_TECH_PANEL_HEIGHT));
         tribeResearchInfo.add("Tribe Info", tribeView);
         tribeResearchInfo.add("Tech Tree", techView);
@@ -393,7 +393,7 @@ public class GUI extends JFrame {
         if (this.gs == null || this.gs.getActiveTribeID() != gs.getActiveTribeID()) {
             // Tribe change
             infoView.resetHighlight();  // Reset highlights
-            view.setPanToTribe(gs);  // Pan camera to tribe capital
+            boardView.setPanToTribe(gs);  // Pan camera to tribe capital
             ac.reset();  // Clear action queue
             otherInfo.setText("");  // Reset info
         }
@@ -401,6 +401,10 @@ public class GUI extends JFrame {
         // Display result of Examine action
         if (a instanceof Examine) {
             lastExamineAction = (Examine) a;
+        }
+        // Draw animations for these actions
+        if (a instanceof Attack || a instanceof Convert || a instanceof HealOthers) {
+            boardView.paintAction((UnitAction)a);
         }
 
 //        if (this.gs != null) {
@@ -464,7 +468,7 @@ public class GUI extends JFrame {
     }
 
     private void performUpdate() {
-        view.paint(gs);
+        boardView.paint(gs);
         tribeView.paint(gs);
         techView.paint(gs);
         infoView.paint(gs);
@@ -472,10 +476,10 @@ public class GUI extends JFrame {
         if (gs.getActiveTribe() != null) {
             activeTribe.setText("Tribe acting: " + gs.getActiveTribe().getName());
             activeTribeInfo.setText("stars: " + gs.getActiveTribe().getStars() + " (+" + gs.getActiveTribe().getMaxProduction(gs) + ")");
-            Types.RESULT winStatus = gs.getActiveTribe().getWinner();
+            Types.RESULT winStatus = gs.getTribeWinStatus();
             if (winStatus != Types.RESULT.INCOMPLETE) {
-                otherInfo.setText("Game result: " + winStatus.toString());
-            } else if (lastExamineAction != null) {
+                otherInfo.setText("Game result: " + winStatus);
+            } else if (lastExamineAction != null && lastExamineAction.getBonus() != null) {
                 otherInfo.setText("Ruins: " + lastExamineAction.getBonus().toString());
                 otherInfoDelay--;
                 if (otherInfoDelay == 0) {
@@ -498,9 +502,12 @@ public class GUI extends JFrame {
         } else if (a instanceof Recover) {
             Unit u = (Unit) gs.getActor(((UnitAction) a).getUnitId());
             pos = u.getPosition();
-        } else if (a instanceof Capture || a instanceof Convert || a instanceof Examine) {
+        } else if (a instanceof Capture || a instanceof Examine) {
             Unit u = (Unit) gs.getActor(((UnitAction) a).getUnitId());
             pos = new Vector2d(u.getPosition().x-1, u.getPosition().y);
+        } else if (a instanceof Convert) {
+            Unit target = (Unit) gs.getActor(((Convert) a).getTargetId());
+            pos = target.getPosition();
         }
         return pos;
     }
@@ -523,5 +530,9 @@ public class GUI extends JFrame {
 
     public void setPauseAfterTick(boolean p) {
         pauseAfterTick = p;
+    }
+
+    public Action getAnimatedAction() {
+        return boardView.getAnimatedAction();
     }
 }

@@ -1,11 +1,9 @@
 package players;
 
-import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actions.cityactions.*;
 import core.actions.tribeactions.BuildRoad;
-import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.ResearchTech;
 import core.actions.unitactions.*;
 import core.actors.Building;
@@ -16,7 +14,6 @@ import core.actors.units.Catapult;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
-import players.heuristics.TribesSimpleHeuristic;
 import utils.ElapsedCpuTimer;
 import utils.Vector2d;
 
@@ -55,15 +52,15 @@ public class SimpleAgent extends Agent {
         Action bestAction = allActions.get(gs.getRandomGenerator().nextInt(nActions));
         int bestActionScore = evalAction(gs,bestAction);
 
-
         for (Action a : allActions
         ) {
             int actionScore = evalAction(gs, a);
-            if(actionScore == 0)
+
             if (actionScore > bestActionScore) {
                 bestAction = a;
                 bestActionScore = actionScore;
             }
+
         }
 
 
@@ -139,14 +136,13 @@ public class SimpleAgent extends Agent {
         if (a instanceof LevelUp) {
             Types.CITY_LEVEL_UP bonus = ((LevelUp) a).getBonus();
             switch (bonus) {
+                case SUPERUNIT:
                 case PARK:
                 case EXPLORER:
                 case WORKSHOP:
-                case POP_GROWTH:
-                case RESOURCES:
-                    score = 0; //Find other ways to increase population and resources
-                case SUPERUNIT:
                 case CITY_WALL:
+                case RESOURCES:
+                case POP_GROWTH:
                 case BORDER_GROWTH:
                     score = 5;
             }
@@ -169,7 +165,7 @@ public class SimpleAgent extends Agent {
         }
 
         if(a instanceof MakeVeteran){
-            score = 5; //No disadvantage to making a unit a veteran so this receives max priority
+            score = 5;
         }
 
         return score;
@@ -177,10 +173,11 @@ public class SimpleAgent extends Agent {
 
     }
 
+
     //Evaluate an action for building a road
     private int evalRoad(Action a, GameState gs, Tribe thisTribe){
         Vector2d pos = ((BuildRoad) a).getPosition();
-//        ArrayList<Integer> citiesID = thisTribe.getCitiesID();
+        ArrayList<Integer> citiesID = thisTribe.getCitiesID();
         for(int x =pos.x-1; x<pos.x+1; x++){
             for (int y =pos.y-1; y<pos.y+1; y++){
                 try {
@@ -272,6 +269,7 @@ public class SimpleAgent extends Agent {
 
     }
 
+    //Evaluate a research action
     private int evalResearch(Action a, GameState gs, Tribe thisTribe) {
         Types.TECHNOLOGY t = ((ResearchTech) a).getTech();
         //If we don't have enough stars over a certain threshold we need to focus on that before researching tech
@@ -320,7 +318,7 @@ public class SimpleAgent extends Agent {
         int noOfForests = 0;
         int noOfLumberHuts = 0;
         for (Vector2d t: cityTiles
-             ) {
+        ) {
 
             Types.TERRAIN type = gs.getBoard().getTerrainAt(t.x,t.y);
             Types.BUILDING b = gs.getBoard().getBuildingAt(t.x,t.y);
@@ -396,7 +394,7 @@ public class SimpleAgent extends Agent {
             case LUMBER_HUT:
                 score = 3; // These increase population less and cost more so are of less priority
             case GRAND_BAZAR:
-            case CUSTOM_HOUSE:
+            case CUSTOMS_HOUSE:
             case EMPERORS_TOMB:
             case GATE_OF_POWER:
             case EYE_OF_GOD:
@@ -430,7 +428,7 @@ public class SimpleAgent extends Agent {
         return 0;
     }
 
-
+    //Evaluate a recover action
     private int evalRecover(Action a, GameState gs, Tribe thisTribe) {
         boolean[][] obsGrid = thisTribe.getObsGrid();
         Unit thisUnit = (Unit) gs.getActor(((Recover) a).getUnitId());
@@ -470,14 +468,18 @@ public class SimpleAgent extends Agent {
 
         for (Vector2d tile : thisUnit.getPosition().neighborhood(thisUnit.RANGE, 0, b.getSize())) {
             Unit target = b.getUnitAt(tile.x, tile.y);
-            if (target.getCurrentHP() < target.getMaxHP()) {
-                //Check if unit is in any potential danger
-                for (Vector2d t : thisUnit.getPosition().neighborhood(target.RANGE, 0, b.getSize())) {
-                    Unit enemy = b.getUnitAt(t.x, t.y);
-                    if (enemy.getTribeId() == target.getTribeId())
-                        continue;
-                    else if (enemy.getCurrentHP() > target.getCurrentHP()) {
-                        potentialHeals += 1;
+            if(target !=null) {
+                if (target.getCurrentHP() < target.getMaxHP()) {
+                    //Check if unit is in any potential danger
+                    for (Vector2d t : thisUnit.getPosition().neighborhood(target.RANGE, 0, b.getSize())) {
+                        Unit enemy = b.getUnitAt(t.x, t.y);
+                        if(enemy !=null) {
+                            if (enemy.getTribeId() == target.getTribeId())
+                                continue;
+                            else if (enemy.getCurrentHP() > target.getCurrentHP()) {
+                                potentialHeals += 1;
+                            }
+                        }
                     }
                 }
             }
@@ -497,25 +499,27 @@ public class SimpleAgent extends Agent {
     //Evaluate the convert action, lesser units such as Warriors, riders are prioritised far less than more expensive ones.
     private int evalConvert(Action a, GameState gs, Tribe thisTribe) {
         Unit defender = (Unit) gs.getActor(((Convert) a).getTargetId());
-        switch (defender.getType()) {
-            case RIDER:
-            case ARCHER:
-                return 2;
-            case SUPERUNIT:
-                return 5; //heavily weight superunit capture
-            case SWORDMAN:
-            case BATTLESHIP:
-            case KNIGHT:
-            case CATAPULT:
-                return 4;
-            case MIND_BENDER:
-            case BOAT:
-            case WARRIOR:
-                return 1;
-            case DEFENDER:
-            case SHIP:
-                return 3;
+        if(defender!=null) {
+            switch (defender.getType()) {
+                case RIDER:
+                case ARCHER:
+                    return 2;
+                case SUPERUNIT:
+                    return 5; //heavily weight superunit capture
+                case SWORDMAN:
+                case BATTLESHIP:
+                case KNIGHT:
+                case CATAPULT:
+                    return 4;
+                case MIND_BENDER:
+                case BOAT:
+                case WARRIOR:
+                    return 1;
+                case DEFENDER:
+                case SHIP:
+                    return 3;
 
+            }
         }
         return 0;
     }
@@ -526,31 +530,37 @@ public class SimpleAgent extends Agent {
         Unit thisUnit = (Unit) gs.getActor(((Move) a).getUnitId());
         Vector2d currentPos = thisUnit.getPosition();
         Board b = gs.getBoard();
-        int score = 0;
+        int maxCities = 3; //Arbritary amount of cities we want in case we met no tribes
 
-        City c = null;
-        Unit enemy = null;
+        ArrayList<Integer> tribesMet = thisTribe.getTribesMet();
+        if(tribesMet.size() >1) {
+            for (int tribeID : tribesMet
+            ) {
+                if (gs.getTribe(tribeID).getNumCities() > maxCities)
+                    maxCities = gs.getTribe(tribeID).getNumCities();
 
+            }
+        }
         boolean inRange = false;
 
 
-       // int score = 0;
+        // int score = 0;
         boolean[][] obsGrid = thisTribe.getObsGrid();
         for (int x = 0; x < obsGrid.length; x++) {
             for (int y = 0; y < obsGrid.length; y++) {
                 if (obsGrid[x][y]) {
-                    enemy = b.getUnitAt(x, y);
+                    Unit enemy = b.getUnitAt(x, y);
                     if (enemy != null) {
                         if (enemy.getTribeId() != thisTribe.getTribeId()) {
                             // Check if we are in the range of an enemy
                             inRange = checkInRange(enemy, thisUnit, thisTribe, b);
                             if (enemy.DEF < thisUnit.ATK && thisUnit.getCurrentHP() >= enemy.getCurrentHP()) { //Incentive to attack weaker enemy
                                 if (Vector2d.chebychevDistance(dest, enemy.getPosition()) < Vector2d.chebychevDistance(currentPos, enemy.getPosition())) {
-                                    score = 3;
+                                    return 3;
                                 }
                             } else { //Higher Incentive to move away from enemy if the enemy is stronger, especially if we are in range
                                 if (Vector2d.chebychevDistance(dest, enemy.getPosition()) > Vector2d.chebychevDistance(currentPos, enemy.getPosition()) && inRange) {
-                                    score = 4;
+                                    return 4;
                                 }
                             }
                         }
@@ -563,18 +573,25 @@ public class SimpleAgent extends Agent {
             for(int y = thisUnit.getPosition().y-thisUnit.RANGE; y<thisUnit.getPosition().y+ thisUnit.RANGE; y++) {
                 try {
                     if(obsGrid[x][y]){
-                        c = b.getCityInBorders(x, y);
+                        City c = b.getCityInBorders(x, y);
                         Types.TERRAIN t = b.getTerrainAt(x, y);
                         if (c != null) {
                             if (c.getTribeId() != thisTribe.getTribeId()) { // High incentive to move towards enemy city to capture
                                 if (Vector2d.chebychevDistance(dest, c.getPosition()) < Vector2d.chebychevDistance(thisUnit.getPosition(), c.getPosition())) {
-                                        score = 4;
+
+                                    if (thisTribe.getCitiesID().size() > maxCities) // Agent wants the most cities
+                                        return 5;
+                                    else
+                                        return 4;
                                 }
                             }
                         }
                         if (t == Types.TERRAIN.VILLAGE) { // High incentive to move to village to capture as it is easier than capturing an actual city
                             if (Vector2d.chebychevDistance(dest, new Vector2d(x, y)) < Vector2d.chebychevDistance(thisUnit.getPosition(), new Vector2d(x, y))) {
 
+                                if (thisTribe.getCitiesID().size() > maxCities) // Agent wants the most cities
+                                    return 4;
+                                else
                                     return 5;
                             }
                         }
@@ -584,22 +601,20 @@ public class SimpleAgent extends Agent {
                 }
             }
         }
-        if(enemy == null && c == null) {
-            for (int i = 0; i < thisUnit.RANGE; i++) {
-                try {
-                    if (!obsGrid[dest.x + thisUnit.RANGE][dest.y + thisUnit.RANGE] || !obsGrid[dest.x - thisUnit.RANGE][dest.y - thisUnit.RANGE]) {
-                        return 3; //Incentive to explore;
-                    }
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    continue;
+        for (int i = 0; i < thisUnit.RANGE; i++) {
+            try {
+                if (!obsGrid[dest.x + thisUnit.RANGE][dest.y + thisUnit.RANGE] || !obsGrid[dest.x - thisUnit.RANGE][dest.y - thisUnit.RANGE]) {
+                    return 3; //Incentive to explore;
                 }
-
+            } catch (ArrayIndexOutOfBoundsException e) {
+                continue;
             }
-        }
 
-        return score;
+        }
+        return 0;
     }
 
+    //Evaluate an attack action
     public int evalAttack(Action a, GameState gs, Tribe thisTribe) {
         int score = 0;
         Unit attacker = (Unit) gs.getActor(((Attack) a).getUnitId());

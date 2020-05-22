@@ -317,11 +317,23 @@ for c in range(map_size ** 2):
     if c % map_size == 0:
         print()
 
+    tribeId = -1
+    if c in capital_cells:
+        if world_map[c]['tribe'] == 'Xin-xi':
+            tribeId = 0
+        elif world_map[c]['tribe'] == 'Imperius':
+            tribeId = 1
+        elif world_map[c]['tribe'] == 'Bardur':
+            tribeId = 2
+        elif world_map[c]['tribe'] == 'Oumaji':
+            tribeId = 3
+
+
     # TRIBES CITY/VILLAGE
     if world_map[c]['above'] == 'village':
         print('v:', end='')
     elif world_map[c]['above'] == 'capital':
-        print('c:', end='')
+        print('c:' + str(tribeId), end='')
     else:
         #  TRIBES TERRAIN
         if world_map[c]['type'] == 'ground':

@@ -46,3 +46,12 @@ Superunit - https://clip.cookdiary.net/wallpaper-5147762
 
 Actions/
 Capture - https://opengameart.org/content/medieval-sword
+
+Weapons/
+Arrows - https://opengameart.org/content/archer-job-set
+Melee - https://opengameart.org/content/16x16-weapontool-spritesheet
+Melee/spear - https://opengameart.org/content/spears
+Effects/slash - https://opengameart.org/content/weapon-slash-effect (https://opengameart.org/content/magic-effects)
+Effects/explosion - https://opengameart.org/content/pixel-explosion-12-frames
+Bombs/rock - https://opengameart.org/content/rock-type-planet
+Bombs - https://opengameart.org/content/bombs

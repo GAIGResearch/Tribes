@@ -61,10 +61,7 @@ public class SingleTreeNode
     void setRootGameState(GameState gs)
     {
         this.rootState = gs;
-        if (params.heuristic_method == params.ENTROPY_HEURISTIC)
-            this.rootStateHeuristic = new TribesEntropyHeuristic(playerID);
-        else if (params.heuristic_method == params.SIMPLE_HEURISTIC) // New method: combined heuristics
-            this.rootStateHeuristic = new TribesSimpleHeuristic(playerID);
+        this.rootStateHeuristic = params.getHeuristic(playerID);
     }
 
 

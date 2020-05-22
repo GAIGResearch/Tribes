@@ -18,10 +18,9 @@ import static core.Constants.TURN_TIME_MILLIS;
 public class OEPAgent extends Agent {
 
     private Random m_rnd;
-    private int POP_SIZE = 10;
-    private double MUTATION_RATE = 0.1;
-    private int DEPTH = 10;
-    private StateHeuristic heuristic = new TribesSimpleHeuristic(getPlayerID());
+    private StateHeuristic heuristic;
+    private OEPParams params;
+
     ArrayList<Genome> pop = new ArrayList<>();
     int currentTurn = -1;
     long timeBudget = 0;
@@ -29,14 +28,16 @@ public class OEPAgent extends Agent {
     int actionIndex = 0;
 
 
-    public OEPAgent(long seed) {
+    public OEPAgent(long seed, OEPParams params) {
         super(seed);
         m_rnd = new Random(seed);
+        this.params = params;
     }
 
     @Override
     public Action act(GameState gs, ElapsedCpuTimer ect) {
 
+        this.heuristic = params.getHeuristic(playerID);
 
         if (currentTurn != gs.getTick()){
             currentTurn = gs.getTick();
@@ -60,7 +61,7 @@ public class OEPAgent extends Agent {
                     }
                 }
                 Collections.sort(pop);
-                for (int i = POP_SIZE-1; i >= (POP_SIZE/2); i--){
+                for (int i = params.POP_SIZE-1; i >= (params.POP_SIZE/2); i--){
                     pop.remove(i);
                 }
                 procreate(gs.copy());
@@ -84,7 +85,7 @@ public class OEPAgent extends Agent {
 
     private void init(GameState gs){
         pop = new ArrayList<>();
-        for(int i = 0; i < POP_SIZE; i++){
+        for(int i = 0; i < params.POP_SIZE; i++){
             GameState clone = gs.copy();
             Genome g = new Genome(randomActions(clone));
             pop.add(g);
@@ -104,10 +105,10 @@ public class OEPAgent extends Agent {
 
     private void procreate(GameState gs){
         int originalSize = pop.size();
-        while (pop.size() < POP_SIZE){
+        while (pop.size() < params.POP_SIZE){
             GameState clone = gs.copy();
             ArrayList<Action> actions = crossover(clone, originalSize);
-            if (m_rnd.nextDouble() < MUTATION_RATE){
+            if (m_rnd.nextDouble() < params.MUTATION_RATE){
                 mutation(gs.copy(), actions);
             }
             pop.add(new Genome(actions));
@@ -235,7 +236,7 @@ public class OEPAgent extends Agent {
 
     public double eval(GameState gs){
 
-        for (int i=0; i<DEPTH; i++){
+        for (int i=0; i<params.DEPTH; i++){
             ArrayList<Action> allAvailableActions = gs.getAllAvailableActions();
             gs.advance(allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size())), true);
         }

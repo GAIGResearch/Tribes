@@ -4,9 +4,13 @@ import core.game.Game;
 import core.actors.Tribe;
 import core.game.TribeResult;
 import players.*;
+import players.mc.MCParams;
 import players.mc.MonteCarloAgent;
+import players.mcts.MCTSParams;
 import players.mcts.MCTSPlayer;
 import players.oep.OEPAgent;
+import players.oep.OEPParams;
+import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
 import utils.MultiStatSummary;
 import utils.StatSummary;
@@ -245,11 +249,17 @@ public class Play {
         {
             case HUMAN: return new HumanAgent(ac);
             case RANDOM: return new RandomAgent(agentSeed);
-            case OSLA: return new OneStepLookAheadAgent(agentSeed);
-            case MC: return new MonteCarloAgent(agentSeed);
+            case OSLA: return new OneStepLookAheadAgent(agentSeed, new OSLAParams());
+            case MC:
+                MCParams mcparams = new MCParams();
+                return new MonteCarloAgent(agentSeed, mcparams);
             case SIMPLE: return new SimpleAgent(agentSeed);
-            case MCTS: return new MCTSPlayer(agentSeed);
-            case OEP: return new OEPAgent(agentSeed);
+            case MCTS:
+                MCTSParams mctsParams = new MCTSParams();
+                return new MCTSPlayer(agentSeed, mctsParams);
+            case OEP:
+                OEPParams oepParams = new OEPParams();
+                return new OEPAgent(agentSeed, oepParams);
         }
         return null;
     }

@@ -1,8 +1,9 @@
 package core.levelgen;
 
+import static core.Types.RESOURCE.*;
 import static core.Types.TERRAIN.*;
 import static core.Types.TRIBE.*;
-
+//import static core.Types.RESOURCE.*;
 import core.Types;
 import org.json.JSONObject;
 
@@ -24,6 +25,7 @@ public class LevelGenerator {
     private double landCoefficient;
     private String[] level;
     private Types.TRIBE[] tribes;
+    private double BORDER_EXPANSION = 1/3.0;
 
     //JSON that contains all the probability values for all the tribes.
     private JSONObject data;
@@ -147,7 +149,7 @@ public class LevelGenerator {
             }
         }
         for (i = 0; i < capitalCells.size(); i++) {
-            writeTile((capitalCells.get(i) / mapSize) * mapSize + (capitalCells.get(i) % mapSize), ""+CITY.getMapChar(), null);
+            writeTile((capitalCells.get(i) / mapSize) * mapSize + (capitalCells.get(i) % mapSize), ""+CITY.getMapChar(), String.valueOf(tribes[i].getKey()));
         }
 
         // Terrain distribution
@@ -204,9 +206,9 @@ public class LevelGenerator {
             if (getTerrain(cell) == PLAIN.getMapChar()) {
                 double rand = Math.random(); // 0 (---forest---)--nothing--(-mountain-) 1
                 if (rand < getBaseProb("FOREST") * getTribeProb("FOREST", tileOwner[cell])) {
-                    writeTile(cell, null, ""+FOREST.getMapChar());
+                    writeTile(cell,""+FOREST.getMapChar(), null);
                 } else if (rand > 1 - getBaseProb("MOUNTAIN") * getTribeProb("MOUNTAIN", tileOwner[cell])) {
-                    writeTile(cell, null, ""+MOUNTAIN.getMapChar());
+                    writeTile(cell,""+MOUNTAIN.getMapChar(), null);
                 }
             }
         }
@@ -273,7 +275,49 @@ public class LevelGenerator {
                 villageMap.set(cell, Math.max(villageMap.get(cell), 1));
             }
         }
-        
+
+        // Generate resources
+        for (int cell = 0; cell < mapSize*mapSize; cell++) {
+            if(getTerrain(cell) == PLAIN.getMapChar()) {
+                double fruit = getBaseProb("FRUIT") * getTribeProb("FRUIT", tileOwner[cell]);
+                double crop = getBaseProb("CROPS") * getTribeProb("CROPS", tileOwner[cell]);
+                if (getTerrain(cell) != CITY.getMapChar()) {
+                    if (villageMap.get(cell) == 3) {
+                        writeTile(cell, ""+VILLAGE.getMapChar(), null);
+                    } else if (proc(villageMap, cell, fruit * (1 - crop / 2))) {
+                        writeTile(cell, null, ""+FRUIT.getMapChar());
+                    } else if (proc(villageMap, cell, crop * (1 - fruit / 2))) {
+                        writeTile(cell, null, ""+CROPS.getMapChar());
+                    }
+                }
+            } else if(getTerrain(cell) == FOREST.getMapChar()) {
+                if (getTerrain(cell) != CITY.getMapChar()) {
+                    if (villageMap.get(cell) == 3) {
+                        writeTile(cell, ""+VILLAGE.getMapChar(), " ");
+                    } else if (proc(villageMap, cell, getBaseProb("ANIMAL") * getTribeProb("ANIMAL", tileOwner[cell]))) {
+                        writeTile(cell, null, ""+ANIMAL.getMapChar());
+                    }
+                }
+            } else if(getTerrain(cell) == SHALLOW_WATER.getMapChar()) {
+                if (proc(villageMap, cell, getBaseProb("FISH") * getTribeProb("FISH", tileOwner[cell]))) {
+                    writeTile(cell, null, ""+FISH.getMapChar());
+                }
+            } else if(getTerrain(cell) == DEEP_WATER.getMapChar()) {
+                if (proc(villageMap, cell, getBaseProb("WHALES") * getTribeProb("WHALES", tileOwner[cell]))) {
+                    writeTile(cell, null, ""+WHALES.getMapChar());
+                }
+            } else if(getTerrain(cell) == MOUNTAIN.getMapChar()) {
+                if (proc(villageMap, cell, getBaseProb("ORE") * getTribeProb("ORE", tileOwner[cell]))) {
+                    writeTile(cell, null, ""+ORE.getMapChar());
+                }
+            }
+        }
+
+
+    }
+
+    public boolean proc(ArrayList<Integer> villageMap, int cell, double probability) {
+        return (villageMap.get(cell) == 2 && Math.random() < probability) || (villageMap.get(cell) == 1 && Math.random() < probability * BORDER_EXPANSION);
     }
 
     /**

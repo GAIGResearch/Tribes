@@ -54,6 +54,9 @@ public class StepMove implements NeighbourHelper
             Types.TERRAIN terrain = board.getTerrainAt(tile.x, tile.y);
             double stepCost = 0.0;
 
+            //Check if the unit has reached the limit of it's movement range
+            if(costFrom == unit.MOV) { continue; }
+
             //Cannot move into tiles that have not been discovered yet.
             if(!gs.getTribe(unit.getTribeId()).isVisible(tile.x, tile.y)) { continue; }
 

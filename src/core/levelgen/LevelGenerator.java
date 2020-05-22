@@ -248,7 +248,7 @@ public class LevelGenerator {
             }
         }
 
-        // mark tiles next to capitals according to the notation
+        // Mark tiles next to capitals according to the notation
         int villageCount = 0;
         for (int capital : capitalCells){
             villageMap.set(capital, 3);
@@ -260,9 +260,20 @@ public class LevelGenerator {
             }
         }
 
-        // generate villages & mark tiles next to them
-
-
+        // Generate villages & mark tiles next to them
+        // We will place villages until there are none of 'far away'(villageMap == 0) tiles
+        System.out.println("lele");
+        while(villageMap.contains(0)) {
+            int new_village = villageMap.indexOf(0);
+            villageMap.set(new_village, 3);
+            for (int cell : circle(new_village, 1)) {
+                villageMap.set(cell, Math.max(villageMap.get(cell), 2));
+            }
+            for (int cell : circle(new_village, 2)) {
+                villageMap.set(cell, Math.max(villageMap.get(cell), 1));
+            }
+        }
+        
     }
 
     /**

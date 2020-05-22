@@ -57,7 +57,7 @@ public class LevelGenerator {
         this.landCoefficient = (0.5 + relief) / 9;
 
         //Initialize the level with deep water.
-        for(int i = 0; i < mapSize*mapSize; i++){ level[i] = "d:"; };
+        for(int i = 0; i < mapSize*mapSize; i++){ level[i] = "d: "; };
     }
 
     /**
@@ -66,6 +66,7 @@ public class LevelGenerator {
     public void generate() {
 
         //Randomly replace half of the tiles with ground.
+        System.out.println("Randomly replace half of the tiles with ground.");
         int i = 0;
         while(i < mapSize*mapSize*initialLand) {
             int index = randomInt(0, mapSize*mapSize);
@@ -76,6 +77,7 @@ public class LevelGenerator {
         }
 
         //Turning random water/ground grid into something smooth.
+        System.out.println("Turning random water/ground grid into something smooth.");
         for (i = 0; i < smoothing; i++) {
             for (int cell = 0; cell < mapSize * mapSize; cell++) {
 
@@ -95,7 +97,8 @@ public class LevelGenerator {
             }
         }
 
-        // capital distribution
+        // Capital distribution
+        System.out.println("Capital distribution");
         ArrayList<Integer> capitalCells = new ArrayList<>();
         HashMap<Integer, Integer> capitalMap = new HashMap<>();
         // make a map of potential (ground) tiles associated with numbers (0 by default)
@@ -147,7 +150,8 @@ public class LevelGenerator {
             writeTile((capitalCells.get(i) / mapSize) * mapSize + (capitalCells.get(i) % mapSize), ""+CITY.getMapChar(), null);
         }
 
-        // terrain distribution
+        // Terrain distribution
+        System.out.println("Terrain distribution");
         ArrayList<Integer> doneTiles = new ArrayList<>();
         ArrayList<ArrayList<Integer>> activeTiles = new ArrayList<>(); // done tiles that generate terrain around them
         Types.TRIBE[] tileOwner = new Types.TRIBE[mapSize*mapSize];
@@ -158,19 +162,29 @@ public class LevelGenerator {
             cap.add(capitalCells.get(i));
             activeTiles.add(i, cap);
         }
-        // we'll start from capital tiles and evenly expand until the whole map is covered
+        // We will start from capital tiles and evenly expand until the whole map is covered
         while (doneTiles.size() != mapSize*mapSize) {
             for (i = 0; i < tribes.length; i++) {
                 if (activeTiles.get(i).size() != 0) {
                     int randNumber = randomInt(0, activeTiles.get(i).size());
                     int randCell = activeTiles.get(i).get(randNumber);
+
                     ArrayList<Integer> neighbours = circle(randCell, 1);
-                    ArrayList<Integer> validNeighbours = (ArrayList<Integer>) neighbours.clone();
-                    validNeighbours.removeIf(value -> doneTiles.indexOf(value) == -1 && getTerrain(value) != DEEP_WATER.getMapChar());
+
+                    ArrayList<Integer> validNeighbours = new ArrayList<>();
+                    for(int n : neighbours){
+                        if(!doneTiles.contains(n) && getTerrain(n) != DEEP_WATER.getMapChar()){
+                            validNeighbours.add(n);
+                        }
+                    }
+                    // If there are no land tiles around, accept water tiles
                     if (validNeighbours.size() == 0) {
-                        validNeighbours = (ArrayList<Integer>) neighbours.clone();
-                        validNeighbours.removeIf(value -> doneTiles.indexOf(value) == -1);
-                    } // if there are no land tiles around, accept water tiles
+                        for(int n : neighbours){
+                            if(!doneTiles.contains(n)){
+                                validNeighbours.add(n);
+                            }
+                        }
+                    }
                     if (validNeighbours.size() != 0) {
                         int new_rand_number = randomInt(0, validNeighbours.size());
                         int new_rand_cell = validNeighbours.get(new_rand_number);
@@ -184,6 +198,8 @@ public class LevelGenerator {
             }
         }
 
+        // Generate forest, mountains.
+        System.out.println("Generate forest, mountains");
         for (int cell = 0; cell < mapSize*mapSize; cell++) {
             if (getTerrain(cell) == PLAIN.getMapChar()) {
                 double rand = Math.random(); // 0 (---forest---)--nothing--(-mountain-) 1
@@ -192,12 +208,60 @@ public class LevelGenerator {
                 } else if (rand > 1 - getBaseProb("MOUNTAIN") * getTribeProb("MOUNTAIN", tileOwner[cell])) {
                     writeTile(cell, null, ""+MOUNTAIN.getMapChar());
                 }
-                rand = Math.random(); // 0 (---water---)--------nothing-------- 1
-                if (rand < getTribeProb("WATER", tileOwner[cell])) {
-                    writeTile(cell, null, ""+DEEP_WATER.getMapChar());
+            }
+        }
+
+        ArrayList<Integer> villageMap = new ArrayList<Integer>(mapSize*mapSize);
+
+        // Initialize with zeros.
+        for(i = 0; i < mapSize*mapSize; i++) {
+            villageMap.add(0);
+        }
+
+        // -1 - water far away
+        // 0 - far away
+        // 1 - border expansion
+        // 2 - initial territory
+        // 3 - village
+        for (int cell = 0; cell < mapSize*mapSize; cell++) {
+            int row = cell / mapSize;
+            int column = cell % mapSize;
+            if (getTerrain(cell) == DEEP_WATER.getMapChar() || getTerrain(cell) == MOUNTAIN.getMapChar()) {
+                villageMap.set(cell, -1);
+            } else if (row == 0 || row == mapSize - 1 || column == 0 || column == mapSize - 1) {
+                villageMap.set(cell, -1); // villages don't spawn next to the map border
+            } else {
+                villageMap.set(cell, 0);
+            }
+        }
+
+        // Replace some ocean with shallow water
+        System.out.println("Replace some ocean with shallow water");
+        for (int cell = 0; cell < mapSize*mapSize; cell++) {
+            if (getTerrain(cell) == DEEP_WATER.getMapChar()) {
+                for (int neighbour : plusSign(cell)) {
+                    if (getTerrain(neighbour) == DEEP_WATER.getMapChar()) {
+                        writeTile(neighbour, ""+SHALLOW_WATER.getMapChar(), null);
+                        break;
+                    }
                 }
             }
         }
+
+        // mark tiles next to capitals according to the notation
+        int villageCount = 0;
+        for (int capital : capitalCells){
+            villageMap.set(capital, 3);
+            for (int cell : circle(capital, 1)){
+                villageMap.set(cell, Math.max(villageMap.get(cell), 2));
+            }
+            for (int cell : circle(capital, 2)){
+                villageMap.set(cell, Math.max(villageMap.get(cell), 1));
+            }
+        }
+
+        // generate villages & mark tiles next to them
+
 
     }
 
@@ -227,7 +291,11 @@ public class LevelGenerator {
      * Returns the probability of a specific tile type for a specific tribe.
      */
     public double getTribeProb(String name, Types.TRIBE tribe) {
-        return data.getJSONObject(name.toString()).getDouble(tribe.toString());
+        if(tribe == null) {
+            return 1.0;
+        } else {
+            return data.getJSONObject(name.toString()).getDouble(tribe.toString());
+        }
     }
 
     /**
@@ -243,8 +311,8 @@ public class LevelGenerator {
     public void writeTile(int index, String type1, String type2) {
         if(type1 == null) {
             level[index] = "" + getTerrain(index) + ':' + type2;
-        }if(type2 == null) {
-            level[index] = "" + getTerrain(index) + ':';
+        }else if(type2 == null) {
+            level[index] = "" + type1 + ':' + getResource(index);
         }else {
             level[index] = "" + type1 + ':' + type2;
         }
@@ -255,6 +323,18 @@ public class LevelGenerator {
      */
     public char getTerrain(int index) {
         return level[index].split(":")[0].charAt(0);
+    }
+
+    /**
+     * Returns a tile's resource at index
+     */
+    public char getResource(int index) {
+        return level[index].split(":")[1].charAt(0);
+//        try {
+//            return level[index].split(":")[1].charAt(0);
+//        } catch(Exception e) {
+//            return '';
+//        }
     }
 
     /**
@@ -313,6 +393,25 @@ public class LevelGenerator {
         }
         round.add(center);
         return round;
+    }
+
+    public ArrayList<Integer> plusSign(int center) {
+        ArrayList<Integer> plus_sign = new ArrayList<>();
+        int row = center / mapSize;
+        int column = center % mapSize;
+        if (column > 0) {
+            plus_sign.add(center - 1);
+        }
+        if (column < mapSize - 1) {
+            plus_sign.add(center + 1);
+        }
+        if (row > 0) {
+            plus_sign.add(center - mapSize);
+        }
+        if (row < mapSize - 1) {
+            plus_sign.add(center + mapSize);
+        }
+        return plus_sign;
     }
 
     // we use pythagorean distances

@@ -12,6 +12,9 @@ public class Temple extends Building
     //Number of turns require to produce score for the tribe that owns this temple.
     private int turnsToScore;
 
+    //TribesConfig Object
+    private TribesConfig tc = new TribesConfig();
+
     /**
      * Creates a new temple
      * @param x x position for this temple
@@ -41,7 +44,7 @@ public class Temple extends Building
     private void levelUp()
     {
         level++;
-        turnsToScore = TribesConfig.TEMPLE_TURNS_TO_SCORE;
+        turnsToScore = tc.TEMPLE_TURNS_TO_SCORE;
     }
 
     /**
@@ -56,7 +59,7 @@ public class Temple extends Building
             if(turnsToScore == 0)
             {
                 levelUp();
-                return TribesConfig.TEMPLE_POINTS[level-1];
+                return tc.TEMPLE_POINTS[level-1];
             }
         }
         return 0;
@@ -70,7 +73,7 @@ public class Temple extends Building
     {
         int totPoints = 0;
         for(int i = 0; i < level; ++i)
-            totPoints += TribesConfig.TEMPLE_POINTS[i];
+            totPoints += tc.TEMPLE_POINTS[i];
         return totPoints;
     }
 

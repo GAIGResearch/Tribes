@@ -13,6 +13,7 @@ import java.util.LinkedList;
 
 public class GrowForest extends CityAction
 {
+    TribesConfig tc = new TribesConfig();
 
     public GrowForest(int cityId)
     {
@@ -28,7 +29,7 @@ public class GrowForest extends CityAction
         if(b.getCityIdAt(targetPos.x, targetPos.y) != city.getActorId()) return false;
 
         Tribe t = gs.getTribe(city.getTribeId());
-        if(t.getStars() < TribesConfig.GROW_FOREST_COST) return false;
+        if(t.getStars() < tc.GROW_FOREST_COST) return false;
         return t.getTechTree().isResearched(Types.TECHNOLOGY.SPIRITUALISM);
     }
 
@@ -39,7 +40,7 @@ public class GrowForest extends CityAction
             City city = (City) gs.getActor(this.cityId);
             b.setTerrainAt(targetPos.x, targetPos.y, Types.TERRAIN.FOREST);
             b.setResourceAt(targetPos.x, targetPos.y, null);
-            gs.getTribe(city.getTribeId()).subtractStars(TribesConfig.GROW_FOREST_COST);
+            gs.getTribe(city.getTribeId()).subtractStars(tc.GROW_FOREST_COST);
             return true;
         }
         return false;

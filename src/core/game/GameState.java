@@ -99,6 +99,7 @@ public class GameState {
         String[] lines = new IO().readFile(filename);
         LevelLoader ll = new LevelLoader();
         board = ll.buildLevel(lines, rnd);
+        TribesConfig tc = new TribesConfig();
 
         Tribe[] tribes = board.getTribes();
         for(Tribe tribe : tribes)
@@ -106,7 +107,7 @@ public class GameState {
             int startingCityId = tribe.getCitiesID().get(0);
             City c = (City) board.getActor(startingCityId);
             Vector2d cityPos = c.getPosition();
-            tribe.clearView(cityPos.x, cityPos.y, TribesConfig.FIRST_CITY_CLEAR_RANGE, rnd, board);
+            tribe.clearView(cityPos.x, cityPos.y, tc.FIRST_CITY_CLEAR_RANGE, rnd, board);
         }
 
         canEndTurn = new boolean[tribes.length];
@@ -380,6 +381,7 @@ public class GameState {
         //Get all cities of this tribe
         ArrayList<Integer> tribeCities = tribe.getCitiesID();
         ArrayList<Integer> allTribeUnits = new ArrayList<>();
+        TribesConfig tc = new TribesConfig();
         this.setEndTurn(false);
 
         //1. Compute stars per turn.
@@ -415,7 +417,7 @@ public class GameState {
         if(tick == 0)
         {
             tribe.setScore(tribe.getType().getInitialScore());
-            tribe.setStars(TribesConfig.INITIAL_STARS);
+            tribe.setStars(tc.INITIAL_STARS);
         }else{
             acumProd = Math.max(0, acumProd); //Never have a negative amount of stars.
             tribe.addStars(acumProd);

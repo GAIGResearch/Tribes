@@ -63,6 +63,8 @@ public class Tribe extends Actor {
     //Turns since the last attack of this tribe if Meditation is reseached.
     private int nPacifistCount;
 
+    private TribesConfig tc;
+
     public Tribe(Types.TRIBE tribe) {
         this.tribe = tribe;
         init();
@@ -73,10 +75,12 @@ public class Tribe extends Actor {
         citiesID = new ArrayList<>();
         citiesID.add(cityID);
         this.tribe = tribe;
+        tc = new TribesConfig();
         init();
     }
 
     public Tribe(int id, JSONObject obj){
+        tc = new TribesConfig();
         tribeId = id;
         citiesID = new ArrayList<>();
         JSONArray JCitiesID = obj.getJSONArray("citiesID");
@@ -119,10 +123,11 @@ public class Tribe extends Actor {
     }
 
     private void init() {
+        tc = new TribesConfig();
         techTree = new TechnologyTree();
         techTree.doResearch(tribe.getInitialTech());
         citiesID = new ArrayList<>();
-        stars = TribesConfig.INITIAL_STARS;
+        stars = tc.INITIAL_STARS;
         score = tribe.getInitialScore();
         tribesMet = new ArrayList<>();
         extraUnits = new ArrayList<>();
@@ -192,7 +197,7 @@ public class Tribe extends Actor {
             if (!obsGrid[tile.x][tile.y]) {
                 //Points and visibility.
                 obsGrid[tile.x][tile.y] = true;
-                this.score += TribesConfig.CLEAR_VIEW_POINTS;
+                this.score += tc.CLEAR_VIEW_POINTS;
 
                 //Network updates for this tribe, only if a road or a water tile has been revealed.
                 Types.TERRAIN terr = b.getTerrainAt(tile.x, tile.y);
@@ -324,7 +329,7 @@ public class Tribe extends Actor {
     public void addStars(int stars) {
         this.stars += stars;
 
-        if(this.stars >= TribesConfig.EMPERORS_TOMB_STARS && monuments.get(Types.BUILDING.EMPERORS_TOMB) == MONUMENT_STATUS.UNAVAILABLE)
+        if(this.stars >= tc.EMPERORS_TOMB_STARS && monuments.get(Types.BUILDING.EMPERORS_TOMB) == MONUMENT_STATUS.UNAVAILABLE)
             monuments.put(EMPERORS_TOMB, MONUMENT_STATUS.AVAILABLE);
     }
 
@@ -367,7 +372,7 @@ public class Tribe extends Actor {
         this.nKills++;
 
         //we may have a new monument availability here
-        if(this.nKills >= TribesConfig.GATE_OF_POWER_KILLS && monuments.get(GATE_OF_POWER) == MONUMENT_STATUS.UNAVAILABLE)
+        if(this.nKills >= tc.GATE_OF_POWER_KILLS && monuments.get(GATE_OF_POWER) == MONUMENT_STATUS.UNAVAILABLE)
             monuments.put(GATE_OF_POWER, MONUMENT_STATUS.AVAILABLE);
     }
 
@@ -466,7 +471,7 @@ public class Tribe extends Actor {
             capital.addPopulation(this, capitalGain);
 
             //We may be adding a new monument to the pool!
-            if(connectedCities.size() >= TribesConfig.GRAND_BAZAR_CITIES && monuments.get(GRAND_BAZAR) == MONUMENT_STATUS.UNAVAILABLE) {
+            if(connectedCities.size() >= tc.GRAND_BAZAR_CITIES && monuments.get(GRAND_BAZAR) == MONUMENT_STATUS.UNAVAILABLE) {
                 monuments.put(GRAND_BAZAR, MONUMENT_STATUS.AVAILABLE);
             }
         }
@@ -552,7 +557,7 @@ public class Tribe extends Actor {
     public boolean canBuildRoads() {
         //Factors for tree building in general: tech and enough stars.
         boolean canBuildRoad = techTree.isResearched(Types.TECHNOLOGY.ROADS);
-        boolean hasMoney = stars >= TribesConfig.ROAD_COST;
+        boolean hasMoney = stars >= tc.ROAD_COST;
         return canBuildRoad && hasMoney;
     }
 
@@ -618,7 +623,7 @@ public class Tribe extends Actor {
         if(techTree.isResearched(Types.TECHNOLOGY.MEDITATION))
         {
             nPacifistCount++;
-            if(nPacifistCount == TribesConfig.ALTAR_OF_PEACE_TURNS)
+            if(nPacifistCount == tc.ALTAR_OF_PEACE_TURNS)
             {
                 monuments.put(ALTAR_OF_PEACE, MONUMENT_STATUS.AVAILABLE);
             }

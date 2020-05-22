@@ -44,11 +44,12 @@ public class LevelUp extends CityAction {
         City city = (City) gs.getActor(this.cityId);
         Tribe tribe = gs.getBoard().getTribe(city.getTribeId());
         Vector2d cityPos = city.getPosition();
+        TribesConfig tc = new TribesConfig();
 
         switch(bonus)
         {
             case WORKSHOP:
-                city.addProduction(TribesConfig.CITY_LEVEL_UP_WORKSHOP_PROD);
+                city.addProduction(tc.CITY_LEVEL_UP_WORKSHOP_PROD);
                 break;
             case EXPLORER:
                 gs.getBoard().launchExplorer(cityPos.x, cityPos.y, city.getTribeId(), gs.getRandomGenerator());
@@ -57,17 +58,17 @@ public class LevelUp extends CityAction {
                 city.setWalls(true);
                 break;
             case RESOURCES:
-                tribe.addStars(TribesConfig.CITY_LEVEL_UP_RESOURCES);
+                tribe.addStars(tc.CITY_LEVEL_UP_RESOURCES);
                 break;
             case POP_GROWTH:
-                city.addPopulation(tribe, TribesConfig.CITY_LEVEL_UP_POP_GROWTH);
+                city.addPopulation(tribe, tc.CITY_LEVEL_UP_POP_GROWTH);
                 break;
             case BORDER_GROWTH:
                 gs.getBoard().expandBorder(city);
                 break;
             case PARK:
-                tribe.addScore(TribesConfig.CITY_LEVEL_UP_PARK);
-                city.addPointsWorth(TribesConfig.CITY_LEVEL_UP_PARK);
+                tribe.addScore(tc.CITY_LEVEL_UP_PARK);
+                city.addPointsWorth(tc.CITY_LEVEL_UP_PARK);
                 break;
             case SUPERUNIT:
                 Unit unitInCity = gs.getBoard().getUnitAt(cityPos.x, cityPos.y);

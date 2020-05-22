@@ -134,10 +134,10 @@ public class Attack extends UnitAction
     private Pair<Integer, Integer> getAttackResults(GameState gs) {
         Unit attacker = (Unit) gs.getActor(this.unitId);
         Unit target = (Unit) gs.getActor(this.targetId);
-
+        TribesConfig tc = new TribesConfig();
         double attackForce = attacker.ATK*((double) attacker.getCurrentHP()/ attacker.getMaxHP());
         double defenceForce =target.DEF*((double)target.getCurrentHP()/target.getMaxHP());
-        double accelerator = TribesConfig.ATTACK_MODIFIER;
+        double accelerator = tc.ATTACK_MODIFIER;
 
         //If target unit in city border increase defence force by 300% if city has walls or 50% if city does not have walls
 
@@ -147,7 +147,7 @@ public class Attack extends UnitAction
             ArrayList<Integer> citesID = gs.getTribe(target.getTribeId()).getCitiesID();
             if (citesID.contains(cityID)){
                 City c = gs.getBoard().getCityInBorders(target.getPosition().x, target.getPosition().y);
-                defenceForce *= c.hasWalls() ? TribesConfig.DEFENCE_IN_WALLS : TribesConfig.DEFENCE;
+                defenceForce *= c.hasWalls() ? tc.DEFENCE_IN_WALLS : tc.DEFENCE;
             }
         }
         double totalDamage =attackForce+defenceForce;

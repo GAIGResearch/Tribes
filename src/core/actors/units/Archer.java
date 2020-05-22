@@ -1,5 +1,6 @@
 package core.actors.units;
 
+import core.TribesConfig;
 import core.Types;
 import utils.Vector2d;
 
@@ -7,8 +8,8 @@ import static core.TribesConfig.*;
 
 public class Archer extends Unit
 {
-    public Archer(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId) {
-        super(ARCHER_ATTACK, ARCHER_DEFENCE, ARCHER_MOVEMENT, ARCHER_MAX_HP, ARCHER_RANGE, ARCHER_COST, pos, kills, isVeteran, cityId, tribeId);
+    public Archer(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId, TribesConfig tc) {
+        super(tc.ARCHER_ATTACK, tc.ARCHER_DEFENCE, tc.ARCHER_MOVEMENT, tc.ARCHER_MAX_HP, tc.ARCHER_RANGE, tc.ARCHER_COST, pos, kills, isVeteran, cityId, tribeId);
     }
 
     @Override
@@ -18,7 +19,7 @@ public class Archer extends Unit
 
     @Override
     public Archer copy(boolean hideInfo) {
-        Archer c = new Archer(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
+        Archer c = new Archer(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(),new TribesConfig());
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

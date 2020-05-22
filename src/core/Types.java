@@ -10,7 +10,6 @@ import utils.Vector2d;
 import java.awt.*;
 import java.util.*;
 
-import static core.TribesConfig.*;
 import static core.Types.BUILDING.MONUMENT_STATUS.*;
 import static core.Types.TECHNOLOGY.*;
 import static core.Types.TERRAIN.*;
@@ -47,9 +46,11 @@ public class Types {
         private int tier;
         private TECHNOLOGY parent;
         private ArrayList<TECHNOLOGY> children;
+        TribesConfig tc;
 
         TECHNOLOGY(int tier, TECHNOLOGY parent) {
             this.tier = tier; this.parent = parent;
+            tc = new TribesConfig();
         }
 
         public TECHNOLOGY getParentTech() {return this.parent;}
@@ -67,10 +68,10 @@ public class Types {
         }
 
         public int getCost(int numOfCities, TechnologyTree tt) {
-            int cost = TECH_BASE_COST + this.tier * numOfCities;
-            if(tt.isResearched(TECH_DISCOUNT))
+            int cost = tc.TECH_BASE_COST + this.tier * numOfCities;
+            if(tt.isResearched(tc.TECH_DISCOUNT))
             {
-                double disc_cost = cost * TECH_DISCOUNT_VALUE;
+                double disc_cost = cost * tc.TECH_DISCOUNT_VALUE;
                 cost = (int)disc_cost;
             }
             return cost;
@@ -137,13 +138,13 @@ public class Types {
      */
     public enum RESOURCE
     {
-        FISH(0, "img/resource/fish2.png", null,'h', FISH_COST, FISH_POP, FISHING),
-        FRUIT(1, "img/resource/fruit2.png", null, 'f', FRUIT_COST, FRUIT_POP, ORGANIZATION),
-        ANIMAL(2, "img/resource/animal2.png", null, 'a', ANIMAL_COST, ANIMAL_POP, HUNTING),
-        WHALES(3, "img/resource/whale2.png", "img/resource/whale3.png", 'w', WHALES_COST, WHALES_STARS, WHALING),
-        ORE(5, "img/resource/ore2.png", null, 'o', 0, 0, MINING),
-        CROPS(6, "img/resource/crops2.png", null, 'c', 0, 0, FARMING),
-        RUINS(7, "img/resource/ruins2.png", null, 'r', 0, 0, null);
+        FISH(0, "img/resource/fish2.png", null,'h', FISHING),
+        FRUIT(1, "img/resource/fruit2.png", null, 'f', ORGANIZATION),
+        ANIMAL(2, "img/resource/animal2.png", null, 'a', HUNTING),
+        WHALES(3, "img/resource/whale2.png", "img/resource/whale3.png", 'w', WHALING),
+        ORE(5, "img/resource/ore2.png", null, 'o', MINING),
+        CROPS(6, "img/resource/crops2.png", null, 'c', FARMING),
+        RUINS(7, "img/resource/ruins2.png", null, 'r', null);
 
         private int key;
         private String imageFile, secondaryImageFile;
@@ -151,15 +152,45 @@ public class Types {
         private int cost;
         private int bonus;
         private TECHNOLOGY tech;
+        TribesConfig tc;
 
-        RESOURCE(int numVal, String imageFile, String secondaryImageFile, char mapChar, int cost, int bonus, TECHNOLOGY t) {
+
+        RESOURCE(int numVal, String imageFile, String secondaryImageFile, char mapChar, TECHNOLOGY t) {
+            this.tc = new TribesConfig();
             this.key = numVal;
             this.imageFile = imageFile;
             this.secondaryImageFile = secondaryImageFile;
             this.mapChar = mapChar;
-            this.cost = cost;
-            this.bonus = bonus;
+            this.cost = setCost(numVal);
+            this.bonus = setBonus(numVal);
             this.tech = t;
+        }
+        public int setCost(int numVal){
+            switch (numVal){
+                case 0:
+                    return tc.FISH_COST;
+                case 1:
+                    return tc.FRUIT_COST;
+                case 2:
+                    return tc.ANIMAL_COST;
+                case 3:
+                    return tc.WHALES_COST;
+            }
+            return 0;
+        }
+
+        public int setBonus(int numVal){
+            switch (numVal){
+                case 0:
+                    return tc.FISH_POP;
+                case 1:
+                    return tc.FRUIT_POP;
+                case 2:
+                    return tc.ANIMAL_POP;
+                case 3:
+                    return tc.WHALES_STARS;
+            }
+            return 0;
         }
         public int getKey() {  return key; }
         public Image getImage(TERRAIN t) {
@@ -191,6 +222,10 @@ public class Types {
             return null;
         }
 
+        public TribesConfig getTribesConfig(){
+            return this.tc;
+        }
+
 
         public TECHNOLOGY getTechnologyRequirement() {
             return tech;
@@ -202,25 +237,25 @@ public class Types {
      */
     public enum BUILDING
     {
-        PORT (0,"img/building/dock2.png", PORT_COST, PORT_BONUS, SAILING, new HashSet<>(Collections.singletonList(SHALLOW_WATER))),
-        MINE (1,"img/building/mine2.png", MINE_COST, MINE_BONUS, MINING, new HashSet<>(Collections.singletonList(MOUNTAIN))),
-        FORGE (2,"img/building/forge2.png", FORGE_COST, FORGE_BONUS, SMITHERY, new HashSet<>(Collections.singletonList(PLAIN))),
-        FARM (3, "img/building/farm2.png", FARM_COST, FARM_BONUS, FARMING, new HashSet<>(Collections.singletonList(PLAIN))),
-        WINDMILL (4,"img/building/windmill2.png", WIND_MILL_COST, WIND_MILL_BONUS, CONSTRUCTION, new HashSet<>(Collections.singletonList(PLAIN))),
-        CUSTOMS_HOUSE(5,"img/building/custom_house2.png", CUSTOMS_COST, CUSTOMS_BONUS, TRADE, new HashSet<>(Collections.singletonList(PLAIN))),
-        LUMBER_HUT(6,"img/building/lumber_hut2.png", LUMBER_HUT_COST, LUMBER_HUT_BONUS, FORESTRY, new HashSet<>(Collections.singletonList(FOREST))),
-        SAWMILL (7,"img/building/sawmill2.png", SAW_MILL_COST, SAW_MILL_BONUS, MATHEMATICS, new HashSet<>(Collections.singletonList(PLAIN))),
-        TEMPLE (8, "img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, FREE_SPIRIT, new HashSet<>(Collections.singletonList(PLAIN))),
-        WATER_TEMPLE (9,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, AQUATISM, new HashSet<>(Arrays.asList(SHALLOW_WATER, DEEP_WATER))),
-        FOREST_TEMPLE (10,"img/building/temple2.png", TEMPLE_FOREST_COST, TEMPLE_BONUS, SPIRITUALISM, new HashSet<>(Collections.singletonList(FOREST))),
-        MOUNTAIN_TEMPLE (11,"img/building/temple2.png", TEMPLE_COST, TEMPLE_BONUS, MEDITATION, new HashSet<>(Collections.singletonList(MOUNTAIN))),
-        ALTAR_OF_PEACE (12,"img/building/monument2.png", 0, MONUMENT_BONUS, MEDITATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        EMPERORS_TOMB (13,"img/building/monument2.png", 0, MONUMENT_BONUS, TRADE, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        EYE_OF_GOD (14,"img/building/monument2.png", 0, MONUMENT_BONUS, NAVIGATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        GATE_OF_POWER (15,"img/building/monument2.png", 0, MONUMENT_BONUS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        GRAND_BAZAR (16,"img/building/monument2.png", 0, MONUMENT_BONUS, ROADS, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        PARK_OF_FORTUNE (17,"img/building/monument2.png", 0, MONUMENT_BONUS, null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
-        TOWER_OF_WISDOM (18, "img/building/monument2.png", 0, MONUMENT_BONUS, PHILOSOPHY,new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN)));
+        PORT (0,"img/building/dock2.png", SAILING, new HashSet<>(Collections.singletonList(SHALLOW_WATER))),
+        MINE (1,"img/building/mine2.png", MINING, new HashSet<>(Collections.singletonList(MOUNTAIN))),
+        FORGE (2,"img/building/forge2.png", SMITHERY, new HashSet<>(Collections.singletonList(PLAIN))),
+        FARM (3, "img/building/farm2.png", FARMING, new HashSet<>(Collections.singletonList(PLAIN))),
+        WINDMILL (4,"img/building/windmill2.png", CONSTRUCTION, new HashSet<>(Collections.singletonList(PLAIN))),
+        CUSTOMS_HOUSE(5,"img/building/custom_house2.png", TRADE, new HashSet<>(Collections.singletonList(PLAIN))),
+        LUMBER_HUT(6,"img/building/lumber_hut2.png", FORESTRY, new HashSet<>(Collections.singletonList(FOREST))),
+        SAWMILL (7,"img/building/sawmill2.png", MATHEMATICS, new HashSet<>(Collections.singletonList(PLAIN))),
+        TEMPLE (8, "img/building/temple2.png", FREE_SPIRIT, new HashSet<>(Collections.singletonList(PLAIN))),
+        WATER_TEMPLE (9,"img/building/temple2.png", AQUATISM, new HashSet<>(Arrays.asList(SHALLOW_WATER, DEEP_WATER))),
+        FOREST_TEMPLE (10,"img/building/temple2.png", SPIRITUALISM, new HashSet<>(Collections.singletonList(FOREST))),
+        MOUNTAIN_TEMPLE (11,"img/building/temple2.png", MEDITATION, new HashSet<>(Collections.singletonList(MOUNTAIN))),
+        ALTAR_OF_PEACE (12,"img/building/monument2.png", MEDITATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        EMPERORS_TOMB (13,"img/building/monument2.png", TRADE, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        EYE_OF_GOD (14,"img/building/monument2.png", NAVIGATION, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        GATE_OF_POWER (15,"img/building/monument2.png", null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        GRAND_BAZAR (16,"img/building/monument2.png", ROADS, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        PARK_OF_FORTUNE (17,"img/building/monument2.png", null, new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN))),
+        TOWER_OF_WISDOM (18, "img/building/monument2.png", PHILOSOPHY,new HashSet<>(Arrays.asList(SHALLOW_WATER, PLAIN)));
 
         public static BUILDING stringToType(String type) {
             switch (type) {
@@ -276,14 +311,73 @@ public class Types {
         private HashSet<TERRAIN> terrainRequirements;
         private int cost;
         private int bonus;
-        BUILDING(int numVal, String imageFile, int cost, int bonus, TECHNOLOGY technologyRequirement, HashSet<TERRAIN> terrainRequirements)
+        private TribesConfig tc;
+        BUILDING(int numVal, String imageFile, TECHNOLOGY technologyRequirement, HashSet<TERRAIN> terrainRequirements)
         {
+            this.tc = new TribesConfig();
             this.key = numVal;
-            this.cost = cost;
-            this.bonus = bonus;
+            this.cost = setCost(numVal);
+            this.bonus = setBonus(numVal);
             this.imageFile = imageFile;
             this.technologyRequirement = technologyRequirement;
             this.terrainRequirements = terrainRequirements;
+        }
+
+        public int setCost(int numVal){
+            switch (numVal){
+                case 0:
+                    return tc.PORT_COST;
+                case 1:
+                    return tc.MINE_COST;
+                case 2:
+                    return tc.FORGE_COST;
+                case 3:
+                    return tc.FARM_COST;
+                case 4:
+                    return tc.WIND_MILL_COST;
+                case 5:
+                    return tc.CUSTOMS_COST;
+                case 6:
+                    return tc.LUMBER_HUT_COST;
+                case 7:
+                    return tc.SAW_MILL_COST;
+                case 8:
+                case 11:
+                case 9:
+                    return tc.TEMPLE_COST;
+                case 10:
+                    return tc.TEMPLE_FOREST_COST;
+
+
+            }
+            return 0;
+        }
+
+        public int setBonus(int numVal){
+            switch (numVal){
+                case 0:
+                    return tc.PORT_BONUS;
+                case 1:
+                    return tc.MINE_BONUS;
+                case 2:
+                    return tc.FORGE_BONUS;
+                case 3:
+                    return tc.FARM_BONUS;
+                case 4:
+                    return tc.WIND_MILL_BONUS;
+                case 5:
+                    return tc.CUSTOMS_BONUS;
+                case 6:
+                    return tc.LUMBER_HUT_BONUS;
+                case 7:
+                    return tc.SAW_MILL_BONUS;
+                case 8:
+                case 11:
+                case 10:
+                case 9:
+                    return tc.TEMPLE_BONUS;
+            }
+            return tc.MONUMENT_BONUS;
         }
         public TECHNOLOGY getTechnologyRequirement() { return technologyRequirement; }
         public HashSet<TERRAIN> getTerrainRequirements() { return terrainRequirements; }
@@ -294,8 +388,8 @@ public class Types {
 
         public Types.RESOURCE getResourceConstraint()
         {
-            if(this == MINE) return MINE_RES_CONSTRAINT;
-            if(this == FARM) return FARM_RES_CONSTRAINT;
+            if(this == MINE) return tc.MINE_RES_CONSTRAINT;
+            if(this == FARM) return tc.FARM_RES_CONSTRAINT;
             return null;
         }
 
@@ -408,9 +502,11 @@ public class Types {
         SUPERUNIT(5);
 
         private int level;
+        private TribesConfig tc;
 
         CITY_LEVEL_UP(int level) {
             this.level = level;
+            tc = new TribesConfig();
         }
 
         public int getLevel() { return level; }
@@ -460,7 +556,7 @@ public class Types {
 
         public boolean grantsMonument()
         {
-            return this.level == PARK_OF_FORTUNE_LEVEL;
+            return this.level == tc.PARK_OF_FORTUNE_LEVEL;
         }
     }
 
@@ -470,34 +566,100 @@ public class Types {
      */
     public enum UNIT
     {
-        WARRIOR (0,"img/unit/warrior/", "img/weapons/melee/tile006.png", WARRIOR_COST, null, WARRIOR_POINTS), //+10
-        RIDER (1,"img/unit/rider/", "img/weapons/melee/tile001.png", RIDER_COST, RIDING, RIDER_POINTS), //+15
-        DEFENDER (2,"img/unit/defender/", "img/weapons/melee/tile002.png", DEFENDER_COST, SHIELDS, DEFENDER_POINTS), // +15
-        SWORDMAN (3,"img/unit/swordsman/", "img/weapons/melee/tile000.png", SWORDMAN_COST, SMITHERY, SWORDMAN_POINTS), //+25
-        ARCHER (4,"img/unit/archer/", "img/weapons/arrows/", ARCHER_COST, ARCHERY, ARCHER_POINTS),//+15
-        CATAPULT (5,"img/unit/catapult/", "img/weapons/bombs/rock.png", CATAPULT_COST, MATHEMATICS, CATAPULT_POINTS), //+40
-        KNIGHT (6,"img/unit/knight/", "img/weapons/melee/spear.png", KNIGHT_COST, CHIVALRY, KNIGHT_POINTS), //+40
-        MIND_BENDER(7,"img/unit/mind_bender/", "img/weapons/effects/bender/", MINDBENDER_COST, PHILOSOPHY, MINDBENDER_POINTS), //+25
-        BOAT(8,"img/unit/boat/", "img/weapons/arrows/boat.png", BOAT_COST, SAILING, BOAT_POINTS), //+0
-        SHIP(9,"img/unit/ship/", "img/weapons/bombs/", SHIP_COST, SAILING, SHIP_POINTS),//+0
-        BATTLESHIP(10,"img/unit/battleship/", "img/weapons/bombs/", BATTLESHIP_COST, NAVIGATION, BATTLESHIP_POINTS),//+0
-        SUPERUNIT(11, "img/unit/superunit/", "img/weapons/melee/tile003.png", SUPERUNIT_COST, null, SUPERUNIT_POINTS); //+50
+        WARRIOR (0,"img/unit/warrior/", "img/weapons/melee/tile006.png", null), //+10
+        RIDER (1,"img/unit/rider/", "img/weapons/melee/tile001.png", RIDING), //+15
+        DEFENDER (2,"img/unit/defender/", "img/weapons/melee/tile002.png", SHIELDS), // +15
+        SWORDMAN (3,"img/unit/swordsman/", "img/weapons/melee/tile000.png", SMITHERY), //+25
+        ARCHER (4,"img/unit/archer/", "img/weapons/arrows/", ARCHERY),//+15
+        CATAPULT (5,"img/unit/catapult/", "img/weapons/bombs/rock.png", MATHEMATICS), //+40
+        KNIGHT (6,"img/unit/knight/", "img/weapons/melee/spear.png", CHIVALRY), //+40
+        MIND_BENDER(7,"img/unit/mind_bender/", "img/weapons/effects/bender/", PHILOSOPHY), //+25
+        BOAT(8,"img/unit/boat/", "img/weapons/arrows/boat.png", SAILING), //+0
+        SHIP(9,"img/unit/ship/", "img/weapons/bombs/", SAILING),//+0
+        BATTLESHIP(10,"img/unit/battleship/", "img/weapons/bombs/", NAVIGATION),//+0
+        SUPERUNIT(11, "img/unit/superunit/", "img/weapons/melee/tile003.png", null); //+50
 
         private int key;
         private String imageFile, weapon;
         private int cost;
         private TECHNOLOGY requirement;
         private int points;
+        private TribesConfig tc;
 
-        UNIT(int numVal, String imageFile, String weaponFile, int cost, Types.TECHNOLOGY requirement, int points) {
+        UNIT(int numVal, String imageFile, String weaponFile, Types.TECHNOLOGY requirement) {
+            this.tc = new TribesConfig();
+
             this.key = numVal;
             this.imageFile = imageFile;
-            this.cost = cost;
+            this.cost = setCost(numVal);
             this.requirement = requirement;
-            this.points = points;
+            this.points = setPoints(numVal);
             this.weapon = weaponFile;
         }
 
+        public int setCost(int numVal){
+            switch (numVal){
+                case 0:
+                    return tc.WARRIOR_COST;
+                case 1:
+                    return tc.RIDER_COST;
+                case 2:
+                    return tc.DEFENDER_COST;
+                case 3:
+                    return tc.SWORDMAN_COST;
+                case 4:
+                    return tc.ARCHER_COST;
+                case 5:
+                    return tc.CATAPULT_COST;
+                case 6:
+                    return tc.KNIGHT_COST;
+                case 7:
+                    return tc.MINDBENDER_COST;
+                case 8:
+                    return tc.BOAT_COST;
+
+                case 9:
+                    return tc.SHIP_COST;
+                case 10:
+                    return tc.BATTLESHIP_COST;
+                case 11:
+                    return tc.SUPERUNIT_COST;
+
+
+            }
+            return 0;
+        }
+
+        public int setPoints(int numVal){
+            switch (numVal){
+                case 0:
+                    return tc.WARRIOR_POINTS;
+                case 1:
+                    return tc.RIDER_POINTS;
+                case 2:
+                    return tc.DEFENDER_POINTS;
+                case 3:
+                    return tc.SWORDMAN_POINTS;
+                case 4:
+                    return tc.ARCHER_POINTS;
+                case 5:
+                    return tc.CATAPULT_POINTS;
+                case 6:
+                    return tc.KNIGHT_POINTS;
+                case 7:
+                    return tc.MINDBENDER_POINTS;
+                case 8:
+                    return tc.BOAT_POINTS;
+
+                case 9:
+                    return tc.SHIP_POINTS;
+                case 10:
+                    return tc.BATTLESHIP_POINTS;
+                case 11:
+                    return tc.SUPERUNIT_POINTS;
+            }
+            return tc.MONUMENT_BONUS;
+        }
         public static UNIT stringToType(String type) {
             switch(type) {
                 case "WARRIOR": return WARRIOR;
@@ -535,20 +697,21 @@ public class Types {
 
         public static Unit createUnit (Vector2d pos, int kills, boolean isVeteran, int ownerID, int tribeID, UNIT type)
         {
+            TribesConfig tc = new TribesConfig();
             switch (type)
             {
-                case WARRIOR: return new Warrior(pos, kills, isVeteran, ownerID, tribeID);
-                case RIDER: return new Rider(pos, kills, isVeteran, ownerID, tribeID);
-                case DEFENDER: return new Defender(pos, kills, isVeteran, ownerID, tribeID);
-                case SWORDMAN: return new Swordman(pos, kills, isVeteran, ownerID, tribeID);
-                case ARCHER: return new Archer(pos, kills, isVeteran, ownerID, tribeID);
-                case CATAPULT: return new Catapult(pos, kills, isVeteran, ownerID, tribeID);
-                case KNIGHT: return new Knight(pos, kills, isVeteran, ownerID, tribeID);
-                case MIND_BENDER: return new MindBender(pos, kills, isVeteran, ownerID, tribeID);
-                case BOAT: return new Boat(pos, kills, isVeteran, ownerID, tribeID);
-                case SHIP: return new Ship(pos, kills, isVeteran, ownerID, tribeID);
-                case BATTLESHIP: return new Battleship(pos, kills, isVeteran, ownerID, tribeID);
-                case SUPERUNIT: return new SuperUnit(pos, kills, isVeteran, ownerID, tribeID);
+                case WARRIOR: return new Warrior(pos, kills, isVeteran, ownerID, tribeID,tc);
+                case RIDER: return new Rider(pos, kills, isVeteran, ownerID, tribeID, tc);
+                case DEFENDER: return new Defender(pos, kills, isVeteran, ownerID, tribeID,tc);
+                case SWORDMAN: return new Swordman(pos, kills, isVeteran, ownerID, tribeID,tc);
+                case ARCHER: return new Archer(pos, kills, isVeteran, ownerID, tribeID,tc);
+                case CATAPULT: return new Catapult(pos, kills, isVeteran, ownerID, tribeID,tc);
+                case KNIGHT: return new Knight(pos, kills, isVeteran, ownerID, tribeID,tc);
+                case MIND_BENDER: return new MindBender(pos, kills, isVeteran, ownerID, tribeID,tc);
+                case BOAT: return new Boat(pos, kills, isVeteran, ownerID, tribeID,tc);
+                case SHIP: return new Ship(pos, kills, isVeteran, ownerID, tribeID,tc);
+                case BATTLESHIP: return new Battleship(pos, kills, isVeteran, ownerID, tribeID,tc);
+                case SUPERUNIT: return new SuperUnit(pos, kills, isVeteran, ownerID, tribeID,tc);
 
                 default:
                     System.out.println("WARNING: TypescreateUnit(), type creation not implemented.");
@@ -789,4 +952,5 @@ public class Types {
             return null;
         }
     }
+
 }

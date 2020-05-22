@@ -1,5 +1,6 @@
 package core.actions.unitactions;
 
+import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.game.GameState;
@@ -7,14 +8,14 @@ import core.actors.units.Unit;
 
 import java.util.ArrayList;
 
-import static core.TribesConfig.RECOVER_IN_BORDERS_PLUS_HP;
-import static core.TribesConfig.RECOVER_PLUS_HP;
 
 public class Recover extends UnitAction
 {
+    TribesConfig tc;
     public Recover(int unitId)
     {
         super.unitId = unitId;
+         tc = new TribesConfig();
     }
 
     @Override
@@ -28,7 +29,7 @@ public class Recover extends UnitAction
     public boolean execute(GameState gs) {
         Unit unit = (Unit) gs.getActor(this.unitId);
         int currentHP = unit.getCurrentHP();
-        int addHP = RECOVER_PLUS_HP;
+        int addHP = tc.RECOVER_PLUS_HP;
 
         //Check if action is feasible before execution
         if (isFeasible(gs)) {
@@ -37,7 +38,7 @@ public class Recover extends UnitAction
             if (cityID != -1){
                 ArrayList<Integer> citesID = gs.getTribe(unit.getTribeId()).getCitiesID();
                 if (citesID.contains(cityID)){
-                    addHP += RECOVER_IN_BORDERS_PLUS_HP;
+                    addHP += tc.RECOVER_IN_BORDERS_PLUS_HP;
                 }
             }
             unit.setCurrentHP(Math.min(currentHP + addHP, unit.getMaxHP()));

@@ -1,5 +1,6 @@
 package core.actors.units;
 
+import core.TribesConfig;
 import core.Types;
 import utils.Vector2d;
 
@@ -9,8 +10,8 @@ public class Ship extends Unit
 {
     private Types.UNIT baseLandUnit;
 
-    public Ship(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId) {
-        super(SHIP_ATTACK, SHIP_DEFENCE, SHIP_MOVEMENT, -1, SHIP_RANGE, SHIP_COST, pos, kills, isVeteran, cityId, tribeId);
+    public Ship(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId, TribesConfig tc) {
+        super(tc.SHIP_ATTACK, tc.SHIP_DEFENCE, tc.SHIP_MOVEMENT, -1, tc.SHIP_RANGE, tc.SHIP_COST, pos, kills, isVeteran, cityId, tribeId);
     }
 
     public Types.UNIT getBaseLandUnit() {
@@ -28,7 +29,7 @@ public class Ship extends Unit
 
     @Override
     public Ship copy(boolean hideInfo) {
-        Ship c = new Ship(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
+        Ship c = new Ship(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), new TribesConfig());
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

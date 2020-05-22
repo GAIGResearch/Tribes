@@ -1,6 +1,7 @@
 package utils;
 
 import core.TechnologyTree;
+import core.TribesConfig;
 import core.Types;
 import core.actions.cityactions.*;
 import core.actions.tribeactions.BuildRoad;
@@ -24,7 +25,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import static core.Constants.*;
-import static core.TribesConfig.VETERAN_KILLS;
 import static utils.GameView.gridSize;
 
 @SuppressWarnings({"StringConcatenationInsideStringBufferAppend", "SuspiciousNameCombination"})
@@ -51,10 +51,13 @@ public class InfoView extends JComponent {
     private boolean updateHighlight, updateTechHighlight;
     Types.TECHNOLOGY techHighlight;
 
+    TribesConfig tc;
+
     private GameState gs;
 
     InfoView(ActionController ac)
     {
+        tc=new TribesConfig();
         this.size = new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_INFO_PANEL_HEIGHT);
         this.ac = ac;
         int scrollBarSize = (Integer) UIManager.get("ScrollBar.width");
@@ -247,8 +250,8 @@ public class InfoView extends JComponent {
         if (u.isVeteran()) {
             sb.append("<b>Veteran unit.</b>");
         } else {
-            int kills = Math.min(u.getKills(), VETERAN_KILLS);
-            sb.append("" + kills + "/" + VETERAN_KILLS + " kills to become a veteran.");
+            int kills = Math.min(u.getKills(), tc.VETERAN_KILLS);
+            sb.append("" + kills + "/" + tc.VETERAN_KILLS + " kills to become a veteran.");
         }
 //        sb.append("</td></tr></table>");
         sb.append("<ul>");

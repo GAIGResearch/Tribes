@@ -9,6 +9,7 @@ import java.util.LinkedList;
 
 public class MakeVeteran extends UnitAction
 {
+    TribesConfig tc = new TribesConfig();
     public MakeVeteran(int unitId)
     {
         super.unitId = unitId;
@@ -18,7 +19,7 @@ public class MakeVeteran extends UnitAction
     @Override
     public boolean isFeasible(final GameState gs) {
         Unit unit = (Unit) gs.getActor(this.unitId);
-        return unit.getKills() >= TribesConfig.VETERAN_KILLS && !unit.isVeteran();
+        return unit.getKills() >= tc.VETERAN_KILLS && !unit.isVeteran();
     }
 
     @Override
@@ -27,7 +28,7 @@ public class MakeVeteran extends UnitAction
         if(isFeasible(gs))
         {
             unit.setVeteran(true);
-            unit.setMaxHP(unit.getMaxHP() + TribesConfig.VETERAN_PLUS_HP);
+            unit.setMaxHP(unit.getMaxHP() + tc.VETERAN_PLUS_HP);
             unit.setCurrentHP(unit.getMaxHP());
             return true;
         }

@@ -42,6 +42,7 @@ public class City extends Actor{
     //List of buildings that belong to this city.
     private LinkedList<Building> buildings = new LinkedList<>();
 
+    private TribesConfig tc = new TribesConfig();
     /**
      * Constructor of a city
      * @param x x position of the city in the grid
@@ -103,8 +104,8 @@ public class City extends Actor{
             value = - level - population;
 
         population += value;
-        tribe.addScore(value * TribesConfig.POINTS_PER_POPULATION);
-        addPointsWorth(value * TribesConfig.POINTS_PER_POPULATION);
+        tribe.addScore(value * tc.POINTS_PER_POPULATION);
+        addPointsWorth(value * tc.POINTS_PER_POPULATION);
     }
 
     /**
@@ -177,7 +178,7 @@ public class City extends Actor{
                 {
                     addPopulation(tribe, building.type.getBonus() * multiplier);
                 }
-                int scoreDiff = negative ? ((Temple)building).getPoints() : TribesConfig.TEMPLE_POINTS[0];
+                int scoreDiff = negative ? ((Temple)building).getPoints() : tc.TEMPLE_POINTS[0];
                 tribe.addScore(scoreDiff);
                 break;
             case ALTAR_OF_PEACE:
@@ -188,7 +189,7 @@ public class City extends Actor{
             case TOWER_OF_WISDOM:
             case GRAND_BAZAR:
                 if(!onlyMatching) addPopulation(tribe,building.type.getBonus() * multiplier);
-                tribe.addScore(TribesConfig.MONUMENT_POINTS * multiplier);
+                tribe.addScore(tc.MONUMENT_POINTS * multiplier);
                 break;
         }
     }
@@ -253,7 +254,7 @@ public class City extends Actor{
      */
     public int getProduction(){
         if(population >= 0) {
-            int capitalBonus = isCapital ? TribesConfig.PROD_CAPITAL_BONUS : 0;
+            int capitalBonus = isCapital ? tc.PROD_CAPITAL_BONUS : 0;
             return level + production + capitalBonus;
         }
         return population;

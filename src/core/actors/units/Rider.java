@@ -1,5 +1,6 @@
 package core.actors.units;
 
+import core.TribesConfig;
 import core.Types;
 import utils.Vector2d;
 
@@ -7,8 +8,8 @@ import static core.TribesConfig.*;
 
 public class Rider extends Unit
 {
-    public Rider(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId) {
-        super(RIDER_ATTACK, RIDER_DEFENCE, RIDER_MOVEMENT, RIDER_MAX_HP, RIDER_RANGE, RIDER_COST, pos, kills, isVeteran, cityId, tribeId);
+    public Rider(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId, TribesConfig tc) {
+        super(tc.RIDER_ATTACK, tc.RIDER_DEFENCE, tc.RIDER_MOVEMENT, tc.RIDER_MAX_HP, tc.RIDER_RANGE, tc.RIDER_COST, pos, kills, isVeteran, cityId, tribeId);
     }
 
     @Override
@@ -18,7 +19,7 @@ public class Rider extends Unit
 
     @Override
     public Rider copy(boolean hideInfo) {
-        Rider c = new Rider(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
+        Rider c = new Rider(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(),new TribesConfig());
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

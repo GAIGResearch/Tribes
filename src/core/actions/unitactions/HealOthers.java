@@ -43,9 +43,10 @@ public class HealOthers extends UnitAction
         if (isFeasible(gs)) {  // TODO: this iterates twice to find if possible targets, and then heal them
             Unit unit = (Unit) gs.getActor(this.unitId);
             ArrayList<Unit> targets = getTargets(gs);
+            TribesConfig tc = new TribesConfig();
 
             for (Unit target: targets) {
-                target.setCurrentHP(Math.min(target.getCurrentHP() + TribesConfig.MINDBENDER_HEAL, target.getMaxHP()));
+                target.setCurrentHP(Math.min(target.getCurrentHP() + tc.MINDBENDER_HEAL, target.getMaxHP()));
             }
 
             unit.transitionToStatus(Types.TURN_STATUS.ATTACKED);

@@ -1,3 +1,4 @@
+import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actions.tribeactions.ResearchTech;
@@ -56,7 +57,8 @@ public class Test
 
         // Recover Testing
         // TODO: test in territory will add 4 when gs is add
-        Unit warrior = new Warrior(new Vector2d(10, 20), 0, false, 1, 1);
+        TribesConfig tc = new TribesConfig();
+        Unit warrior = new Warrior(new Vector2d(10, 20), 0, false, 1, 1, tc);
         testRecovery(warrior);
         warrior.setCurrentHP(5);
         testRecovery(warrior);

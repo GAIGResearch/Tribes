@@ -180,11 +180,12 @@ class TradeNetwork
 
             ArrayList<PathNode> neighbours = new ArrayList<>();
             double stepCost = 1.0;
+            TribesConfig tc = new TribesConfig();
 
             for(Vector2d tile : from.neighborhood(1, 0, size)) {
                 int x = tile.x;
                 int y = tile.y;
-                if(navigable[x][y] && costFrom+stepCost <= TribesConfig.PORT_TRADE_DISTANCE)
+                if(navigable[x][y] && costFrom+stepCost <= tc.PORT_TRADE_DISTANCE)
                 {
                     neighbours.add(new PathNode(new Vector2d(x, y), stepCost));
                 }

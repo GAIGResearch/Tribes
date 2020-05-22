@@ -1,5 +1,6 @@
 package core.actors.units;
 
+import core.TribesConfig;
 import core.Types;
 import utils.Vector2d;
 
@@ -7,8 +8,8 @@ import static core.TribesConfig.*;
 
 public class Warrior extends Unit
 {
-    public Warrior(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId) {
-        super(WARRIOR_ATTACK, WARRIOR_DEFENCE, WARRIOR_MOVEMENT, WARRIOR_MAX_HP, WARRIOR_RANGE, WARRIOR_COST, pos, kills, isVeteran, cityId, tribeId);
+    public Warrior(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId, TribesConfig tc) {
+        super(tc.WARRIOR_ATTACK, tc.WARRIOR_DEFENCE, tc.WARRIOR_MOVEMENT, tc.WARRIOR_MAX_HP, tc.WARRIOR_RANGE, tc.WARRIOR_COST, pos, kills, isVeteran, cityId, tribeId);
     }
 
     @Override
@@ -18,7 +19,7 @@ public class Warrior extends Unit
 
     @Override
     public Warrior copy(boolean hideInfo) {
-        Warrior c = new Warrior(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId());
+        Warrior c = new Warrior(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(),new TribesConfig());
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

@@ -13,6 +13,8 @@ import java.util.LinkedList;
 
 public class BurnForest extends CityAction
 {
+    TribesConfig tc = new TribesConfig();
+
     public BurnForest(int cityId) {
         super.cityId = cityId;
     }
@@ -26,7 +28,7 @@ public class BurnForest extends CityAction
         if(b.getCityIdAt(targetPos.x, targetPos.y) != this.cityId) return false;
 
         Tribe t = gs.getTribe(city.getTribeId());
-        if(t.getStars() < TribesConfig.BURN_FOREST_COST) return false;
+        if(t.getStars() < tc.BURN_FOREST_COST) return false;
         return t.getTechTree().isResearched(Types.TECHNOLOGY.CHIVALRY);
     }
 
@@ -38,7 +40,7 @@ public class BurnForest extends CityAction
             Tribe t = gs.getTribe(city.getTribeId());
             b.setTerrainAt(targetPos.x, targetPos.y, Types.TERRAIN.PLAIN);
             b.setResourceAt(targetPos.x, targetPos.y, Types.RESOURCE.CROPS);
-            t.subtractStars(TribesConfig.BURN_FOREST_COST);
+            t.subtractStars(tc.BURN_FOREST_COST);
             return true;
         }
         return false;

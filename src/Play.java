@@ -54,7 +54,7 @@ public class Play {
         //THREE WAYS OF RUNNING Tribes:
 
         //1. Play one game with visuals:
-        play(filename, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.RANDOM, PlayerType.OSLA}, gameMode);
+        play(filename, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.RANDOM, PlayerType.HUMAN}, gameMode);
 //        play(filename, new PlayerType[]{PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE}, gameMode);
 //        play(filename, new PlayerType[]{PlayerType.HUMAN, PlayerType.SIMPLE}, gameMode);
 

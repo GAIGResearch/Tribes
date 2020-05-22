@@ -10,6 +10,7 @@ import players.mcts.MCTSParams;
 import players.mcts.MCTSPlayer;
 import players.oep.OEPAgent;
 import players.oep.OEPParams;
+import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
 import utils.MultiStatSummary;
 import utils.StatSummary;
@@ -248,7 +249,7 @@ public class Play {
         {
             case HUMAN: return new HumanAgent(ac);
             case RANDOM: return new RandomAgent(agentSeed);
-            case OSLA: return new OneStepLookAheadAgent(agentSeed);
+            case OSLA: return new OneStepLookAheadAgent(agentSeed, new OSLAParams());
             case MC:
                 MCParams mcparams = new MCParams();
                 return new MonteCarloAgent(agentSeed, mcparams);

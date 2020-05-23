@@ -15,6 +15,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * This is a Java port of the level generator created for the game Polytopia adapted to our format.
+ * https://github.com/QuasiStellar/Polytopia-Map-Generator.
+ */
+
+//TODO: Ruins don't seem to spawn very ofter.
+//TODO: Sometimes capitals spawn right next to each other.
+//TODO: Fix chequered board effect with the water.
+//TODO: Clean up and write some comments.
+
 public class LevelGenerator {
 
     //Level parameters, can be changed using init().
@@ -263,8 +273,7 @@ public class LevelGenerator {
         }
 
         // Generate villages & mark tiles next to them
-        // We will place villages until there are none of 'far away'(villageMap == 0) tiles
-        System.out.println("lele");
+        // We will place villages until there are none of "far away" (villageMap == 0) tiles.
         while(villageMap.contains(0)) {
             int new_village = villageMap.indexOf(0);
             villageMap.set(new_village, 3);
@@ -277,6 +286,7 @@ public class LevelGenerator {
         }
 
         // Generate resources
+        System.out.println("Generate resources");
         for (int cell = 0; cell < mapSize*mapSize; cell++) {
             if(getTerrain(cell) == PLAIN.getMapChar()) {
                 double fruit = getBaseProb("FRUIT") * getTribeProb("FRUIT", tileOwner[cell]);
@@ -313,7 +323,72 @@ public class LevelGenerator {
             }
         }
 
+        // Ruins generation.
+        System.out.println("Ruins generation");
 
+        int ruins_number = (int) Math.round(mapSize*0.05);
+        int water_ruins_number = (int) Math.round(ruins_number/3.0);
+        int ruins_count = 0;
+        int water_ruins_count = 0;
+
+        // We are reusing villageMap even though it is irrelevant in this context but it has useful info for ruin placement.
+        ArrayList<Integer> ruinCandidates = new ArrayList<>();
+        for(i=0; i < villageMap.size(); i++) {
+            int cell = villageMap.get(i);
+            if(cell == 0 || cell == 1 || cell == -1) {
+                ruinCandidates.add(i);
+            }
+        }
+
+        while (ruins_count < ruins_number) {
+            int ruin = ruinCandidates.get(randomInt(0,ruinCandidates.size()));
+
+            if (getTerrain(ruin) != SHALLOW_WATER.getMapChar() && (water_ruins_count < water_ruins_number || getTerrain(ruin) != DEEP_WATER.getMapChar())) {
+                writeTile(ruin, null, ""+RUINS.getMapChar());
+                if (getTerrain(ruin) == DEEP_WATER.getMapChar()) {
+                    water_ruins_count++;
+                }
+                ruins_count++;
+            }
+        }
+
+        // Re-adjust starting tiles around capitals
+        System.out.println("Re-adjust starting tiles around capitals");
+        for(int capital : capitalCells) {
+            int owner = getResource(capital);
+
+            if(owner == (char)IMPERIUS.getKey()) {
+                postGenerate(FRUIT.getMapChar(), 2, capital);
+            } else if(owner == (char)BARDUR.getKey()) {
+                postGenerate(ANIMAL.getMapChar(), 2, capital);
+            }
+        }
+
+    }
+
+    public int checkResources(char resource, int capital) {
+        int resources = 0;
+        for (int neighbour : circle(capital, 1)) {
+            if (getResource(neighbour) == resource) {
+                resources++;
+            }
+        }
+        return resources;
+    }
+
+    public void postGenerate(char resource, int quantity, int capital) {
+        int resources = checkResources(resource, capital);
+        while (resources < quantity) {
+            int pos = randomInt(0, 8);
+            ArrayList<Integer> territory = circle(capital, 1);
+            writeTile(territory.get(pos), null, ""+resource);
+            for (int neighbour : plusSign(territory.get(pos))) {
+                if (getTerrain(neighbour) == DEEP_WATER.getMapChar()) {
+                    writeTile(neighbour, ""+SHALLOW_WATER.getMapChar(), null);
+                }
+            }
+            resources = checkResources(resource, capital);
+        }
     }
 
     public boolean proc(ArrayList<Integer> villageMap, int cell, double probability) {
@@ -505,7 +580,7 @@ public class LevelGenerator {
     public static void main(String[] args) {
 
         LevelGenerator gen = new LevelGenerator();
-        gen.init(12, 3, 4, 0.5, new Types.TRIBE[]{XIN_XI, OUMAJI});
+        gen.init(18, 3, 4, 0.5, new Types.TRIBE[]{XIN_XI, OUMAJI});
         gen.generate();
         gen.toCSV();
 

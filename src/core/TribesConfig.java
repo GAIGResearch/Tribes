@@ -1,5 +1,9 @@
 package core;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 public class TribesConfig
 {
     /* UNITS */
@@ -220,6 +224,225 @@ public class TribesConfig
 
     }
 
+    public TribesConfig(File file){
+        readInFile(file);
+    }
+
+    private void readInFile(File file){
+        try{
+            Scanner input = new Scanner(file);
+            WARRIOR_ATTACK = Integer.parseInt(input.next());
+            WARRIOR_DEFENCE =  Integer.parseInt(input.next());
+            WARRIOR_MOVEMENT =  Integer.parseInt(input.next());
+            WARRIOR_MAX_HP =  Integer.parseInt(input.next());
+            WARRIOR_RANGE =  Integer.parseInt(input.next());
+            WARRIOR_COST =  Integer.parseInt(input.next());
+            WARRIOR_POINTS =  Integer.parseInt(input.next());
+
+            //Archer
+            ARCHER_ATTACK =  Integer.parseInt(input.next());
+            ARCHER_DEFENCE =  Integer.parseInt(input.next());
+            ARCHER_MOVEMENT =  Integer.parseInt(input.next());
+            ARCHER_MAX_HP =  Integer.parseInt(input.next());
+            ARCHER_RANGE =  Integer.parseInt(input.next());
+            ARCHER_COST = Integer.parseInt(input.next());
+            ARCHER_POINTS =  Integer.parseInt(input.next()) ;
+
+            //Catapult
+            CATAPULT_ATTACK = Integer.parseInt(input.next());
+            CATAPULT_DEFENCE = Integer.parseInt(input.next());
+            CATAPULT_MOVEMENT =  Integer.parseInt(input.next());
+            CATAPULT_MAX_HP =  Integer.parseInt(input.next());
+            CATAPULT_RANGE = Integer.parseInt(input.next());
+            CATAPULT_COST = Integer.parseInt(input.next());
+            CATAPULT_POINTS = Integer.parseInt(input.next());
+
+            //Swordsman
+            SWORDMAN_ATTACK = Integer.parseInt(input.next());
+            SWORDMAN_DEFENCE = Integer.parseInt(input.next());
+            SWORDMAN_MOVEMENT =  Integer.parseInt(input.next());
+            SWORDMAN_MAX_HP =  Integer.parseInt(input.next());
+            SWORDMAN_RANGE =  Integer.parseInt(input.next());
+            SWORDMAN_COST =  Integer.parseInt(input.next());
+            SWORDMAN_POINTS =  Integer.parseInt(input.next());
+
+            //MindBender
+            MINDBENDER_ATTACK = Integer.parseInt(input.next());
+            MINDBENDER_DEFENCE =  Integer.parseInt(input.next());
+            MINDBENDER_MOVEMENT =  Integer.parseInt(input.next());
+            MINDBENDER_MAX_HP =  Integer.parseInt(input.next());
+            MINDBENDER_RANGE =  Integer.parseInt(input.next());
+            MINDBENDER_COST =  Integer.parseInt(input.next());
+            MINDBENDER_HEAL = Integer.parseInt(input.next());
+            MINDBENDER_POINTS =  Integer.parseInt(input.next());
+
+            //Defender
+            DEFENDER_ATTACK =  Integer.parseInt(input.next());
+            DEFENDER_DEFENCE = Integer.parseInt(input.next());
+            DEFENDER_MOVEMENT =  Integer.parseInt(input.next());
+            DEFENDER_MAX_HP =  Integer.parseInt(input.next());
+            DEFENDER_RANGE =  Integer.parseInt(input.next());
+            DEFENDER_COST = Integer.parseInt(input.next());
+            DEFENDER_POINTS =  Integer.parseInt(input.next());
+
+            //Knight
+            KNIGHT_ATTACK = Integer.parseInt(input.next());
+            KNIGHT_DEFENCE =  Integer.parseInt(input.next());
+            KNIGHT_MOVEMENT = Integer.parseInt(input.next());
+            KNIGHT_MAX_HP =  Integer.parseInt(input.next());
+            KNIGHT_RANGE =  Integer.parseInt(input.next());
+            KNIGHT_COST = Integer.parseInt(input.next());
+            KNIGHT_POINTS = Integer.parseInt(input.next());
+
+            //Rider
+            RIDER_ATTACK =  Integer.parseInt(input.next());
+            RIDER_DEFENCE =  Integer.parseInt(input.next());
+            RIDER_MOVEMENT =  Integer.parseInt(input.next());
+            RIDER_MAX_HP =  Integer.parseInt(input.next());
+            RIDER_RANGE =  Integer.parseInt(input.next());
+            RIDER_COST = Integer.parseInt(input.next());
+            RIDER_POINTS =  Integer.parseInt(input.next());
+
+            // Boat
+            BOAT_ATTACK =  Integer.parseInt(input.next());
+            BOAT_DEFENCE =  Integer.parseInt(input.next());
+            BOAT_MOVEMENT =  Integer.parseInt(input.next());
+            BOAT_RANGE =  Integer.parseInt(input.next());
+            BOAT_COST = Integer.parseInt(input.next());
+            BOAT_POINTS = Integer.parseInt(input.next());
+
+            // Ship
+            SHIP_ATTACK =  Integer.parseInt(input.next());
+            SHIP_DEFENCE =  Integer.parseInt(input.next());
+            SHIP_MOVEMENT = Integer.parseInt(input.next());
+            SHIP_RANGE =  Integer.parseInt(input.next());
+            SHIP_COST =  Integer.parseInt(input.next());
+            SHIP_POINTS = Integer.parseInt(input.next());
+
+            // Battleship
+            BATTLESHIP_ATTACK = Integer.parseInt(input.next());
+            BATTLESHIP_DEFENCE = Integer.parseInt(input.next());
+            BATTLESHIP_MOVEMENT = Integer.parseInt(input.next());
+            BATTLESHIP_RANGE =  Integer.parseInt(input.next());
+            BATTLESHIP_COST =  Integer.parseInt(input.next());
+            BATTLESHIP_POINTS = Integer.parseInt(input.next());
+
+            //Superunit
+            SUPERUNIT_ATTACK =  Integer.parseInt(input.next());
+            SUPERUNIT_DEFENCE = Integer.parseInt(input.next());
+            SUPERUNIT_MOVEMENT =  Integer.parseInt(input.next());
+            SUPERUNIT_MAX_HP = Integer.parseInt(input.next());
+            SUPERUNIT_RANGE =  Integer.parseInt(input.next());
+            SUPERUNIT_COST =  Integer.parseInt(input.next()); //Useful for when unit is disbanded.
+            SUPERUNIT_POINTS =  Integer.parseInt(input.next());
+
+            //Explorer
+            NUM_STEPS =  Integer.parseInt(input.next());
+            ATTACK_MODIFIER = Double.parseDouble(input.next());
+            DEFENCE =  Double.parseDouble(input.next());
+            DEFENCE_IN_WALLS = Double.parseDouble(input.next());
+            VETERAN_KILLS = Integer.parseInt(input.next());
+            VETERAN_PLUS_HP =  Integer.parseInt(input.next());
+            RECOVER_PLUS_HP =  Integer.parseInt(input.next());
+            RECOVER_IN_BORDERS_PLUS_HP =  Integer.parseInt(input.next());
+
+            /* BUILDINGS */
+
+            // Farm
+            FARM_COST =  Integer.parseInt(input.next());
+            FARM_BONUS =  Integer.parseInt(input.next());
+
+            //WindMill
+            WIND_MILL_COST =  Integer.parseInt(input.next());
+            WIND_MILL_BONUS =  Integer.parseInt(input.next());
+
+            // LumberHut
+            LUMBER_HUT_COST =  Integer.parseInt(input.next());
+            LUMBER_HUT_BONUS =  Integer.parseInt(input.next());
+
+            // SawMill
+            SAW_MILL_COST =  Integer.parseInt(input.next());
+            SAW_MILL_BONUS =  Integer.parseInt(input.next());
+
+            //Mine
+            MINE_COST =  Integer.parseInt(input.next());
+            MINE_BONUS =  Integer.parseInt(input.next());
+
+            // Forge
+            FORGE_COST =  Integer.parseInt(input.next());
+            FORGE_BONUS =  Integer.parseInt(input.next());
+
+            // Port
+            PORT_COST =  Integer.parseInt(input.next());
+            PORT_BONUS =  Integer.parseInt(input.next());
+            PORT_TRADE_DISTANCE = Integer.parseInt(input.next()); //Count includes destination port.
+
+            // Customs House
+            CUSTOMS_COST =  Integer.parseInt(input.next());
+            CUSTOMS_BONUS =  Integer.parseInt(input.next());
+
+            //Monuments
+            MONUMENT_BONUS = Integer.parseInt(input.next());;
+            MONUMENT_POINTS = Integer.parseInt(input.next());;
+            EMPERORS_TOMB_STARS =  Integer.parseInt(input.next());
+            GATE_OF_POWER_KILLS =  Integer.parseInt(input.next());
+            GRAND_BAZAR_CITIES =  Integer.parseInt(input.next());
+            ALTAR_OF_PEACE_TURNS =  Integer.parseInt(input.next());
+            PARK_OF_FORTUNE_LEVEL =  Integer.parseInt(input.next());
+
+
+            // Temple
+            TEMPLE_COST =  Integer.parseInt(input.next());
+            TEMPLE_FOREST_COST =  Integer.parseInt(input.next());
+            TEMPLE_BONUS =  Integer.parseInt(input.next());
+            TEMPLE_TURNS_TO_SCORE = Integer.parseInt(input.next());
+            TEMPLE_POINTS = new int[]{ Integer.parseInt(input.next()),  Integer.parseInt(input.next()),  Integer.parseInt(input.next()),  Integer.parseInt(input.next()),  Integer.parseInt(input.next()),Integer.parseInt(input.next())};
+
+            //Resources
+            ANIMAL_COST =  Integer.parseInt(input.next());
+            FISH_COST =  Integer.parseInt(input.next());
+            WHALES_COST = Integer.parseInt(input.next());
+            FRUIT_COST =  Integer.parseInt(input.next());
+            ANIMAL_POP =  Integer.parseInt(input.next());
+            FISH_POP =  Integer.parseInt(input.next());
+            WHALES_STARS =  Integer.parseInt(input.next());
+            FRUIT_POP =  Integer.parseInt(input.next());
+
+            // ROAD
+            ROAD_COST =  Integer.parseInt(input.next());
+
+            // City
+            CITY_LEVEL_UP_WORKSHOP_PROD =  Integer.parseInt(input.next());
+            CITY_LEVEL_UP_RESOURCES =  Integer.parseInt(input.next());
+            CITY_LEVEL_UP_POP_GROWTH = Integer.parseInt(input.next());
+            CITY_LEVEL_UP_PARK =  Integer.parseInt(input.next());
+            CITY_BORDER_POINTS =  Integer.parseInt(input.next());
+            PROD_CAPITAL_BONUS =  Integer.parseInt(input.next());
+            EXPLORER_CLEAR_RANGE =  Integer.parseInt(input.next());
+            FIRST_CITY_CLEAR_RANGE =  Integer.parseInt(input.next());
+            NEW_CITY_CLEAR_RANGE =  Integer.parseInt(input.next());
+            CITY_EXPANSION_TILES =  Integer.parseInt(input.next());
+            POINTS_PER_POPULATION =  Integer.parseInt(input.next());
+
+            // Research
+            TECH_BASE_COST = 4;
+            TECH_DISCOUNT_VALUE = Double.parseDouble(input.next());
+
+            /* TRIBES */
+            INITIAL_STARS =  Integer.parseInt(input.next());
+
+            /* ACTIONS */
+            CLEAR_FOREST_STAR =  Integer.parseInt(input.next());
+            GROW_FOREST_COST =  Integer.parseInt(input.next());
+            BURN_FOREST_COST =  Integer.parseInt(input.next());
+            CLEAR_VIEW_POINTS =  Integer.parseInt(input.next());
+
+
+
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+    }
 
 
 }

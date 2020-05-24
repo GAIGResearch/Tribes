@@ -216,4 +216,7 @@ public class TribesConfig
     public static final int BURN_FOREST_COST = 5;
     public static final int CLEAR_VIEW_POINTS = 5;
 
+    // MAP
+    public static final int[] DEFAULT_MAP_SIZE = new int[]{-1, 11, 14, 16};
+
 }

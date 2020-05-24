@@ -14,7 +14,7 @@ import java.util.*;
 
 /**
  * This is a Java port of the level generator created for the game Polytopia adapted to our format.
- * https://github.com/QuasiStellar/Polytopia-Map-Generator.
+ * Original source: https://github.com/QuasiStellar/Polytopia-Map-Generator.
  */
 
 //TODO: Ruins don't seem to spawn very ofter.
@@ -375,8 +375,8 @@ public class LevelGenerator {
     public int checkResources(char resource, int capital) {
         int resources = 0;
         for (int neighbour : circle(capital, 1)) {
-            char resourceInMap = getResource(neighbour).charAt(0);
-            if (resourceInMap == resource) {
+            String resourceStr = getResource(neighbour);
+            if(resourceStr.length() > 0 && resourceStr.charAt(0) == resource){
                 resources++;
             }
         }
@@ -595,26 +595,44 @@ public class LevelGenerator {
     }
 
     public void print() {
-        try {
-            StringBuffer writer = new StringBuffer();
-            writer.append(level[0]);
-            writer.append(',');
-            for (int i = 1; i < mapSize * mapSize; i++) {
-                if (i % mapSize == 0) {
-                    writer.append('\n');
-                    writer.append(level[i]);
-                    writer.append(',');
-                } else if (i % mapSize == mapSize - 1) {
-                    writer.append(level[i]);
-                } else {
-                    writer.append(level[i]);
-                    writer.append(',');
-                }
+        StringBuffer writer = new StringBuffer();
+        writer.append(level[0]);
+        writer.append(',');
+        for (int i = 1; i < mapSize * mapSize; i++) {
+            if (i % mapSize == 0) {
+                writer.append('\n');
+                writer.append(level[i]);
+                writer.append(',');
+            } else if (i % mapSize == mapSize - 1) {
+                writer.append(level[i]);
+            } else {
+                writer.append(level[i]);
+                writer.append(',');
             }
-            System.out.println(writer.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        System.out.println(writer.toString());
+    }
+
+    public String[] gelLevelLines()
+    {
+        String[] allLines = new String[mapSize];
+        int lineCounter = 0;
+
+        StringBuffer line = new StringBuffer();
+        line.append(level[0]);
+        line.append(',');
+        for (int i = 1; i < mapSize * mapSize; i++) {
+            if (i % mapSize == mapSize - 1) {
+                line.append(level[i]);
+                allLines[lineCounter] = line.toString();
+                lineCounter++;
+                line = new StringBuffer();
+            } else {
+                line.append(level[i]);
+                line.append(',');
+            }
+        }
+        return allLines;
     }
 
     public static void main(String[] args) {

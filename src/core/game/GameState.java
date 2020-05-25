@@ -12,6 +12,7 @@ import core.actions.unitactions.factory.RecoverFactory;
 import core.actions.unitactions.factory.UnitActionBuilder;
 import core.actors.*;
 import core.actors.units.Unit;
+import core.levelgen.LevelGenerator;
 import utils.IO;
 import utils.Vector2d;
 
@@ -91,12 +92,31 @@ public class GameState {
     }
 
     /**
-     * Initializes the GameState.
-     * The level is only generated when this initialization method is called.
+     * Initializes the GameState using a level generator.
+     */
+    void init(long levelgen_seed, Types.TRIBE[] tribes) {
+
+        LevelGenerator levelGen = new LevelGenerator(levelgen_seed);
+        levelGen.init(TribesConfig.DEFAULT_MAP_SIZE[tribes.length-1], 3, 4, 0.5, tribes);
+        levelGen.generate();
+        String[] lines = levelGen.gelLevelLines();
+        initGameState(lines);
+    }
+
+    /**
+     * Initializes the GameState from a file with the board information.
      */
     void init(String filename) {
-
         String[] lines = new IO().readFile(filename);
+        initGameState(lines);
+    }
+
+    /**
+     * Initializes a game state from a series of Strings that determine the initial level disposition
+     * @param lines all components for the board in its initial state.
+     */
+    private void initGameState(String[] lines) {
+
         LevelLoader ll = new LevelLoader();
         board = ll.buildLevel(lines, rnd);
 

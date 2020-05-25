@@ -35,13 +35,14 @@ public class Play {
         MCTS,
         OEP
     }
+    public static boolean RUN_VERBOSE = true;
 
     public static void main(String[] args) {
 
         Types.GAME_MODE gameMode = CAPITALS; //SCORE;
 
 //        String filename = "levels/SampleLevel2p.csv";
-        String filename = "levels/test.csv";
+        String[] filenames = new String[]{"levels/SampleLevel2p.csv", "levels/MinimalLevel2.csv"};
 
 //        String filename = "levels/SampleLevel.csv";
 //        String filename = "levels/MinimalLevel.csv";
@@ -51,27 +52,48 @@ public class Play {
         String saveGameFile = "save/1589357287411/4_0/game.json";
 
 
-        //THREE WAYS OF RUNNING Tribes:
+        //FIVE WAYS OF RUNNING Tribes:
 
-        //1. Play one game with visuals:
-        play(filename, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.RANDOM, PlayerType.HUMAN}, gameMode);
-//        play(filename, new PlayerType[]{PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE}, gameMode);
-//        play(filename, new PlayerType[]{PlayerType.HUMAN, PlayerType.SIMPLE}, gameMode);
+        //1. Play one game with visuals using the Level Generator:
+        play(new Types.TRIBE[]{XIN_XI, IMPERIUS}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA}, gameMode);
+//        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA, PlayerType.OSLA}, gameMode);
+//        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR, OUMAJI}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA}, gameMode);
 
-        //2. Play N games without visuals
-//        int nReps = 12;
-//        run(filename, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA}, gameMode, nReps, true);
-//        run(filename, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.RANDOM, PlayerType.OSLA}, gameMode, nReps, true);
+        //2. Play one game with visuals from a file:
+//        play(filename[0], new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.RANDOM, PlayerType.HUMAN}, gameMode);
+//        play(filename[0], new PlayerType[]{PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE}, gameMode);
+//        play(filename[0], new PlayerType[]{PlayerType.HUMAN, PlayerType.SIMPLE}, gameMode);
 
-        //3. Play one game with visuals from a savegame
+
+        //3. Play N games without visuals from file(s):
+//        int nReps = 4;
+//        run(new Types.TRIBE[]{XIN_XI, IMPERIUS}, new long[]{-1,-1}, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA}, gameMode, nReps, true);
+//        run(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR}, new long[]{0,-1}, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.OSLA}, gameMode, nReps, true);
+//        run(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR, OUMAJI}, new long[]{0,-1}, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA}, gameMode, nReps, true);
+
+
+        //4. Play N games without visuals from file(s):
+//        int nReps = 4;
+//        run(filenames, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA}, gameMode, nReps, true);
+//        run(filenames, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.RANDOM, PlayerType.OSLA}, gameMode, nReps, true);
+
+        //5. Play one game with visuals from a savegame
 //        load(new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.RANDOM, PlayerType.OSLA}, saveGameFile);
+    }
+
+    private static void play(Types.TRIBE[] tribes, long levelSeed, PlayerType[] playerTypes, Types.GAME_MODE gameMode)
+    {
+        KeyController ki = new KeyController(true);
+        ActionController ac = new ActionController();
+
+        Game game = _prepareGame(tribes, levelSeed, playerTypes, gameMode, ac);
+        Run.runGame(game, ki, ac);
     }
 
     private static void play(String levelFile, PlayerType[] playerTypes, Types.GAME_MODE gameMode)
     {
         KeyController ki = new KeyController(true);
         ActionController ac = new ActionController();
-
 
         Game game = _prepareGame(levelFile, playerTypes, gameMode, ac);
         Run.runGame(game, ki, ac);
@@ -89,11 +111,79 @@ public class Play {
         Run.runGame(game, ki, ac);
     }
 
-    private static void run(String levelFile, PlayerType[] playerTypes, Types.GAME_MODE gameMode, int repetitions, boolean shift)
-    {
-        MultiStatSummary[] stats = new MultiStatSummary[playerTypes.length];
 
-        for(int i = 0; i < playerTypes.length; ++i)
+    private static void run(Types.TRIBE[] tribes, long[] levelSeeds, PlayerType[] playerTypes, Types.GAME_MODE gameMode, int repetitions, boolean shift)
+    {
+        MultiStatSummary[] stats = initMultiStats(playerTypes);
+
+        for (long levelSeed : levelSeeds) {
+
+            if(levelSeed == -1)
+            {
+                levelSeed = System.currentTimeMillis() + new Random().nextInt();
+            }
+            System.out.println("**** Playing level with seed " + levelSeed + " ****");
+
+            for (int rep = 0; rep < repetitions; rep++) {
+                System.out.print("Playing with [");
+                for (int i = 0; i < playerTypes.length; ++i) {
+                    System.out.print(i + ":" + playerTypes[i]);
+                    if (i < playerTypes.length - 1)
+                        System.out.print(", ");
+                }
+                System.out.println("]");
+
+                Game game = _prepareGame(tribes, levelSeed, playerTypes, gameMode, null);
+                Run.runGame(game);
+
+                _addGameResults(game, stats);
+
+                //Shift arrays for position changes.
+                if (shift) {
+                    shift(playerTypes);
+                    shift(stats);
+                }
+            }
+        }
+
+        _printRunResults(playerTypes, stats);
+    }
+
+    private static void run(String[] levelFile, PlayerType[] playerTypes, Types.GAME_MODE gameMode, int repetitions, boolean shift)
+    {
+        MultiStatSummary[] stats = initMultiStats(playerTypes);
+
+        for (String s : levelFile) {
+            System.out.println("**** Playing level " + s + " ****");
+            for (int rep = 0; rep < repetitions; rep++) {
+                System.out.print("Playing with [");
+                for (int i = 0; i < playerTypes.length; ++i) {
+                    System.out.print(i + ":" + playerTypes[i]);
+                    if (i < playerTypes.length - 1)
+                        System.out.print(", ");
+                }
+                System.out.println("]");
+
+                Game game = _prepareGame(s, playerTypes, gameMode, null);
+                Run.runGame(game);
+
+                _addGameResults(game, stats);
+
+                //Shift arrays for position changes.
+                if (shift) {
+                    shift(playerTypes);
+                    shift(stats);
+                }
+            }
+        }
+
+        _printRunResults(playerTypes, stats);
+    }
+
+    private static MultiStatSummary[] initMultiStats(PlayerType[] types)
+    {
+        MultiStatSummary[] stats = new MultiStatSummary[types.length];
+        for(int i = 0; i < types.length; ++i)
         {
             stats[i] = new MultiStatSummary();
             stats[i].registerVariable("v");
@@ -102,32 +192,7 @@ public class Play {
             stats[i].registerVariable("c");
             stats[i].registerVariable("p");
         }
-
-        Constants.VERBOSE = false;
-        for(int rep = 0; rep < repetitions; rep++)
-        {
-            System.out.print("Playing with [");
-            for(int i =0; i < playerTypes.length; ++i)
-            {
-                System.out.print(i + ":" + playerTypes[i]);
-                if(i < playerTypes.length-1)
-                    System.out.print(", ");
-            }
-            System.out.println("]");
-
-            Game game = _prepareGame(levelFile, playerTypes, gameMode, null);
-            Run.runGame(game);
-
-            _addGameResults(game, stats);
-
-            //Shift arrays for position changes.
-            if(shift) {
-                shift(playerTypes);
-                shift(stats);
-            }
-        }
-
-        _printRunResults(playerTypes, stats);
+        return stats;
     }
 
     //Shifts the array to the right (towards the highest index). Array[length - 1] -> Array[0]
@@ -143,13 +208,43 @@ public class Play {
 
     private static Game _prepareGame(String levelFile, PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
     {
-
         long gameSeed = System.currentTimeMillis();
-        long agentSeed = System.currentTimeMillis() + new Random().nextInt();
-        if(Constants.VERBOSE)
-            System.out.println("Game seed: " + gameSeed + ", agent random seed: " + agentSeed);
+        if(RUN_VERBOSE) System.out.println("Game seed: " + gameSeed);
 
+        ArrayList<Agent> players = getPlayers(playerTypes, ac);
+
+        Game game = new Game();
+        game.init(players, levelFile, gameSeed, gameMode);
+        return game;
+    }
+
+    private static Game _prepareGame(Types.TRIBE[] tribes, long levelSeed, PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
+    {
+        long gameSeed = System.currentTimeMillis();
+
+        if(RUN_VERBOSE) System.out.println("Game seed: " + gameSeed);
+
+        ArrayList<Agent> players = getPlayers(playerTypes, ac);
+
+        Game game = new Game();
+
+        long levelGenSeed = levelSeed;
+        if(levelGenSeed == -1)
+            levelGenSeed = System.currentTimeMillis() + new Random().nextInt();
+
+        if(RUN_VERBOSE) System.out.println("Level seed: " + levelGenSeed);
+
+        game.init(players, levelGenSeed, tribes, gameSeed, gameMode);
+
+        return game;
+    }
+
+    private static ArrayList<Agent> getPlayers(PlayerType[] playerTypes, ActionController ac)
+    {
         ArrayList<Agent> players = new ArrayList<>();
+        long agentSeed = System.currentTimeMillis() + new Random().nextInt();
+
+        if(RUN_VERBOSE)  System.out.println("Agents random seed: " + agentSeed);
 
         for(int i = 0; i < playerTypes.length; ++i)
         {
@@ -157,10 +252,7 @@ public class Play {
             ag.setPlayerID(i);
             players.add(ag);
         }
-
-        Game game = new Game();
-        game.init(players, levelFile, gameSeed, gameMode);
-        return game;
+        return players;
     }
 
     private static Game _loadGame(PlayerType[] playerTypes, String saveGameFile, long agentSeed)

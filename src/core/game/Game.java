@@ -53,8 +53,9 @@ public class Game {
      * Initializes the game. This method does the following:
      *   Sets the players of the game, the number of players and their IDs
      *   Initializes the array to hold the player game states.
-     *   Assigns the tribes that will play the game, reading it from the file.
-     *   Creates the board according to the above information and resets the game so it's ready to start.
+     *   Assigns the tribes that will play the game.
+     *   Creates the level reading it from the file 'filename'.
+     *   Resets the game so it's ready to start.
      *   Turn order: by default, turns run following the order in the tribes array.
      * @param players Players of the game.
      * @param filename Name of the file with the level information.
@@ -69,6 +70,32 @@ public class Game {
         this.gs = new GameState(rnd, gameMode);
 
         this.gs.init(filename);
+        initGameStructures(players, this.gs.getTribes().length);
+        updateAssignedGameStates();
+    }
+
+    /**
+     * Initializes the game. This method does the following:
+     *   Sets the players of the game, the number of players and their IDs
+     *   Initializes the array to hold the player game states.
+     *   Assigns the tribes that will play the game
+     *   Generates a new level using the seed levelgen_seed
+     *   Resets the game so it's ready to start.
+     *   Turn order: by default, turns run following the order in the tribes array.
+     * @param players Players of the game.
+     * @param levelgen_seed Seed for the level generator.
+     * @param tribes Array of tribe types to play with.
+     * @param seed Seed for the game (used only for board generation)
+     * @param gameMode Game Mode for this game.
+     */
+    public void init(ArrayList<Agent> players, long levelgen_seed, Types.TRIBE[] tribes, long seed, Types.GAME_MODE gameMode) {
+
+        //Initiate the bare bones of the main game classes
+        this.seed = seed;
+        this.rnd = new Random(seed);
+        this.gs = new GameState(rnd, gameMode);
+
+        this.gs.init(levelgen_seed, tribes);
         initGameStructures(players, this.gs.getTribes().length);
         updateAssignedGameStates();
     }
@@ -376,11 +403,14 @@ public class Game {
         Tribe[] tribes = gs.getBoard().getTribes();
 
         TreeSet<TribeResult> ranking = gs.getCurrentRanking();
+        System.out.println("Game Results: ");
+        int rank = 1;
         for(TribeResult tr : ranking)
         {
             int tribeId = tr.getId();
-            System.out.print("Tribe " + tribeId + " (" + tribes[tribeId].getType() + "): " + results[tribeId] + ", " + sc[tribeId] + " points;");
+            System.out.print(" #" + rank + ": Tribe " + tribeId + " (" + tribes[tribeId].getType() + "): " + results[tribeId] + ", " + sc[tribeId] + " points;");
             System.out.println(" #tech: " + tr.getNumTechsResearched() + ", #cities: " + tr.getNumCities() + ", production: " + tr.getProduction());
+            rank++;
         }
     }
 

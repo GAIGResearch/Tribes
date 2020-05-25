@@ -10,14 +10,11 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This is a Java port of the level generator created for the game Polytopia adapted to our format.
- * https://github.com/QuasiStellar/Polytopia-Map-Generator.
+ * Original source: https://github.com/QuasiStellar/Polytopia-Map-Generator.
  */
 
 //TODO: Ruins don't seem to spawn very ofter.
@@ -36,14 +33,21 @@ public class LevelGenerator {
     private String[] level;
     private Types.TRIBE[] tribes;
     private double BORDER_EXPANSION = 1/3.0;
+    private long seed;
+    private Random rnd;
 
     //JSON that contains all the probability values for all the tribes.
     private JSONObject data;
 
+    private boolean LEVELGEN_VERBOSE = false;
+
     /**
      * Constructor of the generator
      */
-    public LevelGenerator() {
+    public LevelGenerator(long seed) {
+
+        this.seed = seed;
+        this.rnd = new Random(seed);
 
         //Initialize with default values.
         init(11, 3, 4, 0.5, new Types.TRIBE[]{XIN_XI, OUMAJI});
@@ -77,8 +81,10 @@ public class LevelGenerator {
      */
     public void generate() {
 
+        if (LEVELGEN_VERBOSE) System.out.println("Generating level with seed: " + this.seed);
+
         //Randomly replace half of the tiles with ground.
-        System.out.println("Randomly replace half of the tiles with ground.");
+        if (LEVELGEN_VERBOSE) System.out.println("Randomly replace half of the tiles with ground.");
         int i = 0;
         while(i < mapSize*mapSize*initialLand) {
             int index = randomInt(0, mapSize*mapSize);
@@ -89,7 +95,7 @@ public class LevelGenerator {
         }
 
         //Turning random water/ground grid into something smooth.
-        System.out.println("Turning random water/ground grid into something smooth.");
+        if (LEVELGEN_VERBOSE) System.out.println("Turning random water/ground grid into something smooth.");
         for (i = 0; i < smoothing; i++) {
             for (int cell = 0; cell < mapSize * mapSize; cell++) {
 
@@ -110,7 +116,7 @@ public class LevelGenerator {
         }
 
         // Capital distribution
-        System.out.println("Capital distribution");
+        if (LEVELGEN_VERBOSE) System.out.println("Capital distribution");
         ArrayList<Integer> capitalCells = new ArrayList<>();
         HashMap<Integer, Integer> capitalMap = new HashMap<>();
         // make a map of potential (ground) tiles associated with numbers (0 by default)
@@ -163,7 +169,7 @@ public class LevelGenerator {
         }
 
         // Terrain distribution
-        System.out.println("Terrain distribution");
+        if (LEVELGEN_VERBOSE) System.out.println("Terrain distribution");
         ArrayList<Integer> doneTiles = new ArrayList<>();
         ArrayList<ArrayList<Integer>> activeTiles = new ArrayList<>(); // done tiles that generate terrain around them
         Types.TRIBE[] tileOwner = new Types.TRIBE[mapSize*mapSize];
@@ -211,10 +217,10 @@ public class LevelGenerator {
         }
 
         // Generate forest, mountains.
-        System.out.println("Generate forest, mountains");
+        if (LEVELGEN_VERBOSE) System.out.println("Generate forest, mountains");
         for (int cell = 0; cell < mapSize*mapSize; cell++) {
             if (getTerrain(cell) == PLAIN.getMapChar()) {
-                double rand = Math.random(); // 0 (---forest---)--nothing--(-mountain-) 1
+                double rand = rnd.nextDouble(); // 0 (---forest---)--nothing--(-mountain-) 1
                 if (rand < getBaseProb("FOREST") * getTribeProb("FOREST", tileOwner[cell])) {
                     writeTile(cell,""+FOREST.getMapChar(), null);
                 } else if (rand > 1 - getBaseProb("MOUNTAIN") * getTribeProb("MOUNTAIN", tileOwner[cell])) {
@@ -248,7 +254,7 @@ public class LevelGenerator {
         }
 
         // Replace some ocean with shallow water
-        System.out.println("Replace some ocean with shallow water");
+        if (LEVELGEN_VERBOSE) System.out.println("Replace some ocean with shallow water");
         for (int cell = 0; cell < mapSize*mapSize; cell++) {
             if (getTerrain(cell) == DEEP_WATER.getMapChar()) {
                 for (int neighbour : plusSign(cell)) {
@@ -286,7 +292,7 @@ public class LevelGenerator {
         }
 
         // Generate resources
-        System.out.println("Generate resources");
+        if (LEVELGEN_VERBOSE) System.out.println("Generate resources");
         for (int cell = 0; cell < mapSize*mapSize; cell++) {
             if(getTerrain(cell) == PLAIN.getMapChar()) {
                 double fruit = getBaseProb("FRUIT") * getTribeProb("FRUIT", tileOwner[cell]);
@@ -324,7 +330,7 @@ public class LevelGenerator {
         }
 
         // Ruins generation.
-        System.out.println("Ruins generation");
+        if (LEVELGEN_VERBOSE) System.out.println("Ruins generation");
 
         int ruins_number = (int) Math.round(mapSize*0.05);
         int water_ruins_number = (int) Math.round(ruins_number/3.0);
@@ -353,9 +359,9 @@ public class LevelGenerator {
         }
 
         // Re-adjust starting tiles around capitals
-        System.out.println("Re-adjust starting tiles around capitals");
+        if (LEVELGEN_VERBOSE) System.out.println("Re-adjust starting tiles around capitals");
         for(int capital : capitalCells) {
-            int owner = getResource(capital);
+            int owner = Integer.parseInt(getResource(capital));
 
             if(owner == (char)IMPERIUS.getKey()) {
                 postGenerate(FRUIT.getMapChar(), 2, capital);
@@ -369,7 +375,8 @@ public class LevelGenerator {
     public int checkResources(char resource, int capital) {
         int resources = 0;
         for (int neighbour : circle(capital, 1)) {
-            if (getResource(neighbour) == resource) {
+            String resourceStr = getResource(neighbour);
+            if(resourceStr.length() > 0 && resourceStr.charAt(0) == resource){
                 resources++;
             }
         }
@@ -392,7 +399,7 @@ public class LevelGenerator {
     }
 
     public boolean proc(ArrayList<Integer> villageMap, int cell, double probability) {
-        return (villageMap.get(cell) == 2 && Math.random() < probability) || (villageMap.get(cell) == 1 && Math.random() < probability * BORDER_EXPANSION);
+        return (villageMap.get(cell) == 2 && rnd.nextDouble() < probability) || (villageMap.get(cell) == 1 && rnd.nextDouble() < probability * BORDER_EXPANSION);
     }
 
     /**
@@ -458,13 +465,23 @@ public class LevelGenerator {
     /**
      * Returns a tile's resource at index
      */
-    public char getResource(int index) {
-        return level[index].split(":")[1].charAt(0);
-//        try {
-//            return level[index].split(":")[1].charAt(0);
-//        } catch(Exception e) {
-//            return '';
-//        }
+//    public char getResource(int index) {
+//        return level[index].split(":")[1].charAt(0);
+////        try {
+////            return level[index].split(":")[1].charAt(0);
+////        } catch(Exception e) {
+////            return '';
+////        }
+//    }
+
+    public String getResource(int index)
+    {
+        String[] pieces = level[index].split(":");
+        if(pieces.length > 1)
+            if(pieces[1].charAt(0) == ' ')
+                return "";
+            else return pieces[1];
+        else return "";
     }
 
     /**
@@ -474,7 +491,7 @@ public class LevelGenerator {
      * @return a random int.
      */
     public int randomInt(int min, int max) {
-        return (int) Math.floor(min + Math.random() * (max - min));
+        return (int) Math.floor(min + rnd.nextDouble() * (max - min));
     }
 
     public ArrayList<Integer> circle(int center, int radius) {
@@ -577,12 +594,55 @@ public class LevelGenerator {
         }
     }
 
+    public void print() {
+        StringBuffer writer = new StringBuffer();
+        writer.append(level[0]);
+        writer.append(',');
+        for (int i = 1; i < mapSize * mapSize; i++) {
+            if (i % mapSize == 0) {
+                writer.append('\n');
+                writer.append(level[i]);
+                writer.append(',');
+            } else if (i % mapSize == mapSize - 1) {
+                writer.append(level[i]);
+            } else {
+                writer.append(level[i]);
+                writer.append(',');
+            }
+        }
+        System.out.println(writer.toString());
+    }
+
+    public String[] gelLevelLines()
+    {
+        String[] allLines = new String[mapSize];
+        int lineCounter = 0;
+
+        StringBuffer line = new StringBuffer();
+        line.append(level[0]);
+        line.append(',');
+        for (int i = 1; i < mapSize * mapSize; i++) {
+            if (i % mapSize == mapSize - 1) {
+                line.append(level[i]);
+                allLines[lineCounter] = line.toString();
+                lineCounter++;
+                line = new StringBuffer();
+            } else {
+                line.append(level[i]);
+                line.append(',');
+            }
+        }
+        return allLines;
+    }
+
     public static void main(String[] args) {
 
-        LevelGenerator gen = new LevelGenerator();
+        long genSeed = System.currentTimeMillis();
+        LevelGenerator gen = new LevelGenerator(genSeed);
         gen.init(18, 3, 4, 0.5, new Types.TRIBE[]{XIN_XI, OUMAJI});
         gen.generate();
-        gen.toCSV();
+//        gen.toCSV();
+        gen.print();
 
     }
 }

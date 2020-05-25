@@ -1,7 +1,7 @@
 package core;
 
 public class Constants {
-    public static boolean VERBOSE = true;
+    public static boolean VERBOSE = false;
     public static boolean VISUALS = true;
     public static boolean DISABLE_NON_HUMAN_GRID_HIGHLIGHT = true;  // If true, human observing/playing doesn't have access to actions of non-human players
     public static int FRAME_DELAY = 500; //1000;

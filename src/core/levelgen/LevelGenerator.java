@@ -270,7 +270,8 @@ public class LevelGenerator {
         for (int cell = 0; cell < mapSize*mapSize; cell++) {
             if (getTerrain(cell) == DEEP_WATER.getMapChar()) {
                 for (int neighbour : plusSign(cell)) {
-                    if (getTerrain(neighbour) == DEEP_WATER.getMapChar()) {
+                    char terrainN = getTerrain(neighbour);
+                    if(terrainN == PLAIN.getMapChar() || terrainN == FOREST.getMapChar() || terrainN == MOUNTAIN.getMapChar()){
                         writeTile(neighbour, ""+SHALLOW_WATER.getMapChar(), null);
                         break;
                     }

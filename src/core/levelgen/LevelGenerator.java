@@ -39,7 +39,7 @@ public class LevelGenerator {
     //JSON that contains all the probability values for all the tribes.
     private JSONObject data;
 
-    private boolean LEVELGEN_VERBOSE = true;
+    private boolean LEVELGEN_VERBOSE = false;
 
     /**
      * Constructor of the generator
@@ -382,9 +382,9 @@ public class LevelGenerator {
             int owner = Integer.parseInt(getResource(capital));
 
             if(owner == (char)IMPERIUS.getKey()) {
-                postGenerate(FRUIT.getMapChar(), 2, capital);
+                postGenerate(FRUIT.getMapChar(), PLAIN.getMapChar(), 2, capital);
             } else if(owner == (char)BARDUR.getKey()) {
-                postGenerate(ANIMAL.getMapChar(), 2, capital);
+                postGenerate(ANIMAL.getMapChar(), FOREST.getMapChar(), 2, capital);
             }
         }
 
@@ -401,12 +401,12 @@ public class LevelGenerator {
         return resources;
     }
 
-    public void postGenerate(char resource, int quantity, int capital) {
+    public void postGenerate(char resource, char terrain, int quantity, int capital) {
         int resources = checkResources(resource, capital);
         while (resources < quantity) {
             int pos = randomInt(0, 8);
             ArrayList<Integer> territory = circle(capital, 1);
-            writeTile(territory.get(pos), null, ""+resource);
+            writeTile(territory.get(pos), ""+terrain, ""+resource);
             for (int neighbour : plusSign(territory.get(pos))) {
                 if (getTerrain(neighbour) == DEEP_WATER.getMapChar()) {
                     writeTile(neighbour, ""+SHALLOW_WATER.getMapChar(), null);

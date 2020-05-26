@@ -39,7 +39,7 @@ public class LevelGenerator {
     //JSON that contains all the probability values for all the tribes.
     private JSONObject data;
 
-    private boolean LEVELGEN_VERBOSE = false;
+    private boolean LEVELGEN_VERBOSE = true;
 
     /**
      * Constructor of the generator
@@ -94,8 +94,12 @@ public class LevelGenerator {
             }
         }
 
+        this.print();
+
         //Turning random water/ground grid into something smooth.
         if (LEVELGEN_VERBOSE) System.out.println("Turning random water/ground grid into something smooth.");
+        ArrayList<Integer> toBeGround = new ArrayList<>();
+
         for (i = 0; i < smoothing; i++) {
             for (int cell = 0; cell < mapSize * mapSize; cell++) {
 
@@ -107,10 +111,17 @@ public class LevelGenerator {
                     }
                     tile_count++;
                 }
-                if (water_count / (double) tile_count <= landCoefficient) {
+
+                if (water_count / (double) tile_count <= landCoefficient)
+                    toBeGround.add(cell);
+            }
+
+            for (int cell = 0; cell < mapSize * mapSize; cell++) {
+                if(toBeGround.contains(cell))
+                {
                     writeTile(cell, ""+PLAIN.getMapChar(), null);
-                } else {
-                    writeTile(cell, ""+DEEP_WATER.getMapChar(), null);
+                }else {
+                    writeTile(cell, "" + DEEP_WATER.getMapChar(), null);
                 }
             }
         }
@@ -137,11 +148,11 @@ public class LevelGenerator {
                 Map.Entry cell = (Map.Entry)capitalIterator.next();
                 cell.setValue(mapSize);
                 for (int capital_cell : capitalCells) {
-                    cell.setValue(Math.min((int)cell.getValue(), distance((int)cell.getValue(), capital_cell, mapSize)));
+                    cell.setValue(Math.min((int)cell.getValue(), distance((int)cell.getKey(), capital_cell, mapSize)));
                 }
                 max = Math.max(max, (int)cell.getValue());
             }
-
+            //Count how many potential capital positions are at a maximum distance
             int len = 0;
             capitalIterator = capitalMap.entrySet().iterator();
             while (capitalIterator.hasNext()) {
@@ -159,6 +170,7 @@ public class LevelGenerator {
                 if ((int)cell.getValue() == max) {
                     if (randCell == 0) {
                         capitalCells.add((int)cell.getKey());
+                        if(LEVELGEN_VERBOSE) System.out.println("Adding a capital for tribe " + tribe + " at tile " + (int)cell.getKey() + " with a max distance of " + cell.getValue());
                     }
                     randCell--;
                 }
@@ -639,7 +651,7 @@ public class LevelGenerator {
 
         long genSeed = System.currentTimeMillis();
         LevelGenerator gen = new LevelGenerator(genSeed);
-        gen.init(18, 3, 4, 0.5, new Types.TRIBE[]{XIN_XI, OUMAJI});
+        gen.init(11, 3, 4, 0.5, new Types.TRIBE[]{XIN_XI, OUMAJI});
         gen.generate();
 //        gen.toCSV();
         gen.print();

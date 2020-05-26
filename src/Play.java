@@ -4,6 +4,7 @@ import core.game.Game;
 import core.actors.Tribe;
 import core.game.TribeResult;
 import players.*;
+import players.heuristics.AlgParams;
 import players.mc.MCParams;
 import players.mc.MonteCarloAgent;
 import players.mcts.MCTSParams;
@@ -25,6 +26,8 @@ import static core.Types.TRIBE.*;
  */
 public class Play {
 
+    public static boolean RUN_VERBOSE = true;
+
     enum PlayerType
     {
         HUMAN,
@@ -35,7 +38,33 @@ public class Play {
         MCTS,
         OEP
     }
-    public static boolean RUN_VERBOSE = true;
+
+
+    private static Agent _getAgent(PlayerType playerType, long agentSeed, ActionController ac)
+    {
+        switch (playerType)
+        {
+            case HUMAN: return new HumanAgent(ac);
+            case RANDOM: return new RandomAgent(agentSeed);
+            case OSLA:
+                OSLAParams oslaParams = new OSLAParams();
+                oslaParams.stop_type = oslaParams.STOP_FMCALLS; //Upper bound
+                return new OneStepLookAheadAgent(agentSeed, oslaParams);
+            case MC:
+                MCParams mcparams = new MCParams();
+                mcparams.stop_type = mcparams.STOP_FMCALLS;
+                return new MonteCarloAgent(agentSeed, mcparams);
+            case SIMPLE: return new SimpleAgent(agentSeed);
+            case MCTS:
+                MCTSParams mctsParams = new MCTSParams();
+                return new MCTSPlayer(agentSeed, mctsParams);
+            case OEP:
+                OEPParams oepParams = new OEPParams();
+                return new OEPAgent(agentSeed, oepParams);
+        }
+        return null;
+    }
+
 
     public static void main(String[] args) {
 
@@ -57,7 +86,7 @@ public class Play {
         //1. Play one game with visuals using the Level Generator:
         play(new Types.TRIBE[]{XIN_XI, IMPERIUS}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA}, gameMode);
 //        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA, PlayerType.OSLA}, gameMode);
-//        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR, OUMAJI}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA}, gameMode);
+//        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR, OUMAJI}, -1, new PlayerType[]{PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE}, gameMode);
 
         //2. Play one game with visuals from a file:
 //        play(filename[0], new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.RANDOM, PlayerType.HUMAN}, gameMode);
@@ -65,9 +94,9 @@ public class Play {
 //        play(filename[0], new PlayerType[]{PlayerType.HUMAN, PlayerType.SIMPLE}, gameMode);
 
 
-        //3. Play N games without visuals from file(s):
-//        int nReps = 4;
-//        run(new Types.TRIBE[]{XIN_XI, IMPERIUS}, new long[]{-1,-1}, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA}, gameMode, nReps, true);
+        //3. Play N games without visuals using level seeds for the generator.:
+        int nReps = 20;
+        run(new Types.TRIBE[]{XIN_XI, IMPERIUS}, new long[]{1592196954443L,1591899575109L}, new PlayerType[]{PlayerType.MC, PlayerType.OSLA}, gameMode, nReps, true);
 //        run(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR}, new long[]{0,-1}, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.OSLA}, gameMode, nReps, true);
 //        run(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR, OUMAJI}, new long[]{0,-1}, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA}, gameMode, nReps, true);
 
@@ -335,25 +364,5 @@ public class Play {
 
     }
 
-    private static Agent _getAgent(PlayerType playerType, long agentSeed, ActionController ac)
-    {
-        switch (playerType)
-        {
-            case HUMAN: return new HumanAgent(ac);
-            case RANDOM: return new RandomAgent(agentSeed);
-            case OSLA: return new OneStepLookAheadAgent(agentSeed, new OSLAParams());
-            case MC:
-                MCParams mcparams = new MCParams();
-                return new MonteCarloAgent(agentSeed, mcparams);
-            case SIMPLE: return new SimpleAgent(agentSeed);
-            case MCTS:
-                MCTSParams mctsParams = new MCTSParams();
-                return new MCTSPlayer(agentSeed, mctsParams);
-            case OEP:
-                OEPParams oepParams = new OEPParams();
-                return new OEPAgent(agentSeed, oepParams);
-        }
-        return null;
-    }
 
 }

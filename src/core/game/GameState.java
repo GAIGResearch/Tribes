@@ -757,10 +757,26 @@ public class GameState {
     public HashMap<Integer, ArrayList<Action>> getCityActions() {     return cityActions;  }
     public ArrayList<Action> getCityActions(City c) {  return cityActions.get(c.getActorId());  }
     public ArrayList<Action> getCityActions(int cityId) {  return cityActions.get(cityId);  }
+    public ArrayList<Action> getAllCityActions()
+    {
+        ArrayList<Action> allActions = new ArrayList<>();
+        for (Integer cityId : this.getCityActions().keySet())
+            allActions.addAll(this.getCityActions(cityId));
+
+        return allActions;
+    }
 
     public HashMap<Integer, ArrayList<Action>> getUnitActions() {  return unitActions;  }
     public ArrayList<Action> getUnitActions(int unitId) {  return unitActions.get(unitId);  }
     public ArrayList<Action> getUnitActions(Unit u) {  return unitActions.get(u.getActorId());  }
+    public ArrayList<Action> getAllUnitActions()
+    {
+        ArrayList<Action> allActions = new ArrayList<>();
+        for (Integer unitId : this.getUnitActions().keySet())
+            allActions.addAll(this.getUnitActions(unitId));
+
+        return allActions;
+    }
 
     public ArrayList<Action> getTribeActions() {  return tribeActions;  }
 

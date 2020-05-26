@@ -5,7 +5,6 @@ import core.actions.tribeactions.EndTurn;
 import core.game.GameState;
 import players.Agent;
 import players.heuristics.StateHeuristic;
-import players.heuristics.TribesSimpleHeuristic;
 import utils.ElapsedCpuTimer;
 import utils.StatSummary;
 
@@ -14,9 +13,19 @@ import java.util.Random;
 
 public class MonteCarloAgent extends Agent {
 
+    enum ACTION_TYPE
+    {
+        CITY,
+        TRIBE,
+        UNIT
+    }
+
+
     private Random m_rnd;
     private MCParams params;
     private StateHeuristic heuristic;
+
+    private int fmCalls;
 
     public MonteCarloAgent(long seed, MCParams params)
     {
@@ -28,6 +37,7 @@ public class MonteCarloAgent extends Agent {
 
     @Override
     public Action act(GameState gs, ElapsedCpuTimer ect) {
+
         //Gather all available actions:
         ArrayList<Action> allActions = gs.getAllAvailableActions();
         int numActions = allActions.size();
@@ -35,19 +45,28 @@ public class MonteCarloAgent extends Agent {
         if(numActions == 1)
             return allActions.get(0); //EndTurn, it's possible.
 
-        int numRollouts = allActions.size() * params.N_ROLLOUT_MULT;
-        StatSummary[] scores = new StatSummary[allActions.size()];
+        fmCalls = 0;
+        boolean end = false;
+
+        //Take one type of action at random:
+
+        ArrayList<Action> rootActions = allActions; //determineActionGroup(gs);
+
+        int numRollouts = rootActions.size() * params.N_ROLLOUT_MULT;
+        StatSummary[] scores = new StatSummary[rootActions.size()];
 
         Action bestAction = null;
         double maxQ = Double.NEGATIVE_INFINITY;
-        for(int i = 0; i < numRollouts; ++i)
+        //for(int i = 0; i < numRollouts; ++i)
+        while (!end)
         {
-            int rootActionIndex = m_rnd.nextInt(numActions);
-            Action act = allActions.get(rootActionIndex);
+            int rootActionIndex = m_rnd.nextInt(rootActions.size());
+            Action act = rootActions.get(rootActionIndex);
+
             while(act instanceof EndTurn)
             {
-                rootActionIndex = m_rnd.nextInt(numActions);
-                act = allActions.get(rootActionIndex);
+                rootActionIndex = m_rnd.nextInt(rootActions.size());
+                act = rootActions.get(rootActionIndex);
             }
 
             if(scores[rootActionIndex] == null)
@@ -64,12 +83,46 @@ public class MonteCarloAgent extends Agent {
                 maxQ = scores[rootActionIndex].mean();
                 bestAction = act;
             }
+
+            if(params.stop_type == params.STOP_FMCALLS && fmCalls >= params.num_fmcalls)
+                end = true;
         }
 
-//        System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + allActions.size() + ". Executing " + bestAction.toString());
+//        System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + rootActions.size() +
+//                ", FM calls: " + fmCalls + ". Executing " + bestAction.toString());
 
         return bestAction;
     }
+
+    private ArrayList<Action> determineActionGroup(GameState gs)
+    {
+        ArrayList<ACTION_TYPE> availableTypes = new ArrayList<>();
+
+        ArrayList<Action> cityActions = gs.getAllCityActions();
+        if(cityActions.size() > 0) availableTypes.add(ACTION_TYPE.CITY);
+
+        ArrayList<Action> unitActions = gs.getAllUnitActions();
+        if(unitActions.size() > 0) availableTypes.add(ACTION_TYPE.UNIT);
+
+        ArrayList<Action> tribeActions = gs.getTribeActions();
+        if(tribeActions.size() > 1) availableTypes.add(ACTION_TYPE.TRIBE); //Need something else than EndTurn only.
+
+        int rndIdx = m_rnd.nextInt(availableTypes.size());
+        ACTION_TYPE rootAction = availableTypes.get(rndIdx);
+        if(rootAction == ACTION_TYPE.CITY)
+        {
+//            System.out.println("Going for cities");
+            return cityActions;
+        }
+        if(rootAction == ACTION_TYPE.UNIT)
+        {
+//            System.out.println("Going for units");
+            return unitActions;
+        }
+//        System.out.println("Going for tribe");
+        return tribeActions;
+    }
+
 
     private double rollout(GameState gs, Action act)
     {
@@ -77,7 +130,7 @@ public class MonteCarloAgent extends Agent {
         boolean end = false;
         int step = 0;
         int turnEndCountDown = params.FORCE_TURN_END;
-        boolean run = true;
+        boolean run;
 
         while(!end)
         {
@@ -91,7 +144,7 @@ public class MonteCarloAgent extends Agent {
 
                 if(canEndTurn) //check if we can actually end the turn.
                 {
-                    gsCopy.advance(endTurn, true);
+                    advance(gsCopy, endTurn, true);
                     turnEndCountDown = params.FORCE_TURN_END;
                     run = false;
                 }
@@ -99,12 +152,15 @@ public class MonteCarloAgent extends Agent {
 
             if(run)
             {
-                gsCopy.advance(act, true);
+                advance(gsCopy, act, true);
                 turnEndCountDown--;
             }
 
             step++;
             end = gsCopy.isGameOver() || (step == params.ROLLOUT_LENGTH);
+
+            boolean budgetOver = (params.stop_type == params.STOP_FMCALLS && fmCalls >= params.num_fmcalls);
+            end |= budgetOver;
 
             if(!end)
             {
@@ -128,6 +184,12 @@ public class MonteCarloAgent extends Agent {
         }
 
         return heuristic.evaluateState(gsCopy);
+    }
+
+    private void advance(GameState gs, Action act, boolean computeActions)
+    {
+        gs.advance(act, computeActions);
+        fmCalls++;
     }
 
     @Override

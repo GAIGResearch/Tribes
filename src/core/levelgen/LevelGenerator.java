@@ -94,8 +94,6 @@ public class LevelGenerator {
             }
         }
 
-        this.print();
-
         //Turning random water/ground grid into something smooth.
         if (LEVELGEN_VERBOSE) System.out.println("Turning random water/ground grid into something smooth.");
         ArrayList<Integer> toBeGround = new ArrayList<>();
@@ -345,28 +343,35 @@ public class LevelGenerator {
         // Ruins generation.
         if (LEVELGEN_VERBOSE) System.out.println("Ruins generation");
 
-        int ruins_number = (int) Math.round(mapSize*0.05);
+        int ruins_number = (int) Math.round((mapSize*mapSize)/40.0);
         int water_ruins_number = (int) Math.round(ruins_number/3.0);
         int ruins_count = 0;
         int water_ruins_count = 0;
 
-        // We are reusing villageMap even though it is irrelevant in this context but it has useful info for ruin placement.
-        ArrayList<Integer> ruinCandidates = new ArrayList<>();
-        for(i=0; i < villageMap.size(); i++) {
-            int cell = villageMap.get(i);
-            if(cell == 0 || cell == 1 || cell == -1) {
-                ruinCandidates.add(i);
-            }
-        }
 
         while (ruins_count < ruins_number) {
-            int ruin = ruinCandidates.get(randomInt(0,ruinCandidates.size()));
 
+            // We are reusing villageMap even though it is irrelevant in this context but it has useful info for ruin placement.
+            ArrayList<Integer> ruinCandidates = new ArrayList<>();
+            for(i=0; i < villageMap.size(); i++) {
+                int cell = villageMap.get(i);
+                if(cell == 0 || cell == 1 || cell == -1) {
+                    ruinCandidates.add(i);
+                }
+            }
+
+            int ruin = ruinCandidates.get(randomInt(0,ruinCandidates.size()));
             if (getTerrain(ruin) != SHALLOW_WATER.getMapChar() && (water_ruins_count < water_ruins_number || getTerrain(ruin) != DEEP_WATER.getMapChar())) {
                 writeTile(ruin, null, ""+RUINS.getMapChar());
                 if (getTerrain(ruin) == DEEP_WATER.getMapChar()) {
                     water_ruins_count++;
                 }
+
+                //This avoids having contiguous ruins and favours dispersion.
+                for (int neighbour : circle(villageMap.get(ruin), 1)) {
+                    villageMap.set(neighbour, Math.max(villageMap.get(neighbour), 2));
+                }
+
                 ruins_count++;
             }
         }

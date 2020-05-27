@@ -36,7 +36,7 @@ public class Game {
     private int numPlayers;
 
     // Is the game paused from the GUI?
-    private boolean paused = false;
+    private boolean paused, animationPause;
 
     // AI stats for each player.
     private AIStats[] aiStats;
@@ -474,6 +474,9 @@ public class Game {
         return gs.gameOver();
     }
 
+    public void setAnimationPaused(boolean p) {
+        animationPause = p;
+    }
     public void setPaused(boolean p) {
         paused = p;
     }

@@ -409,7 +409,7 @@ public class Game {
         for(TribeResult tr : ranking)
         {
             int tribeId = tr.getId();
-            System.out.print(" #" + rank + ": Tribe " + tribeId + " (" + tribes[tribeId].getType() + "): " + results[tribeId] + ", " + sc[tribeId] + " points;");
+            System.out.print(" #" + rank + ": Tribe " + tribes[tribeId].getType() + ": " + results[tribeId] + ", " + sc[tribeId] + " points;");
             System.out.println(" #tech: " + tr.getNumTechsResearched() + ", #cities: " + tr.getNumCities() + ", production: " + tr.getProduction());
             rank++;
         }

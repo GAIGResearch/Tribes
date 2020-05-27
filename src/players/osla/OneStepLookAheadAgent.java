@@ -50,28 +50,28 @@ public class OneStepLookAheadAgent extends Agent {
         while(!end)
         {
             Action act = allActions.get(actionIdx);
+            if(!(act instanceof EndTurn)) {
 
-            if(act instanceof EndTurn) continue;
+                GameState gsCopy = gs.copy();
+                advance(gsCopy, act, false);
+                double Q = heuristic.evaluateState(gsCopy);
+                Q = noise(Q, params.epsilon, this.m_rnd.nextDouble());
 
-            GameState gsCopy = gs.copy();
-            advance(gsCopy, act, false);
-            double Q = heuristic.evaluateState(gsCopy);
-            Q = noise(Q, params.epsilon, this.m_rnd.nextDouble());
+                //scores.put(act, Q);
+                //System.out.println(act + " : " + Q);
 
-            //scores.put(act, Q);
-            //System.out.println(act + " : " + Q);
-
-            //System.out.println("Action:" + action + " score:" + Q);
-            if (Q > maxQ) {
-                maxQ = Q;
-                bestAction = act;
+                //System.out.println("Action:" + action + " score:" + Q);
+                if (Q > maxQ) {
+                    maxQ = Q;
+                    bestAction = act;
+                }
             }
 
             actionIdx++;
             end = (actionIdx == allActions.size() || (params.stop_type == params.STOP_FMCALLS && fmCalls >= params.num_fmcalls));
         }
 
-        System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + allActions.size() + ", FM calls: " + fmCalls + ". Executing " + bestAction);
+//        System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + allActions.size() + ", FM calls: " + fmCalls + ". Executing " + bestAction);
 
         return bestAction;
     }

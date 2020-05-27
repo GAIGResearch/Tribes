@@ -4,6 +4,7 @@ import core.TribesConfig;
 import core.actions.Action;
 import core.game.GameState;
 import core.actors.units.Unit;
+import core.Types;
 
 import java.util.LinkedList;
 
@@ -18,6 +19,8 @@ public class MakeVeteran extends UnitAction
     @Override
     public boolean isFeasible(final GameState gs) {
         Unit unit = (Unit) gs.getActor(this.unitId);
+        if(unit.getType() == Types.UNIT.SUPERUNIT)
+            return false;
         return unit.getKills() >= TribesConfig.VETERAN_KILLS && !unit.isVeteran();
     }
 

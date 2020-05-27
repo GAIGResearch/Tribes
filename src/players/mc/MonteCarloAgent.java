@@ -50,14 +50,15 @@ public class MonteCarloAgent extends Agent {
 
         //Take one type of action at random:
 
-        ArrayList<Action> rootActions = allActions; //determineActionGroup(gs);
+        ArrayList<Action> rootActions = params.PRIORITIZE_ROOT ? determineActionGroup(gs) : allActions;
 
-        int numRollouts = rootActions.size() * params.N_ROLLOUT_MULT;
+        params.num_iterations = rootActions.size() * params.N_ROLLOUT_MULT;
         StatSummary[] scores = new StatSummary[rootActions.size()];
 
         Action bestAction = null;
         double maxQ = Double.NEGATIVE_INFINITY;
-        //for(int i = 0; i < numRollouts; ++i)
+//        for(int i = 0; i < numRollouts; ++i)
+        int nRollouts = 0;
         while (!end)
         {
             int rootActionIndex = m_rnd.nextInt(rootActions.size());
@@ -84,8 +85,13 @@ public class MonteCarloAgent extends Agent {
                 bestAction = act;
             }
 
+            nRollouts++;
+
             if(params.stop_type == params.STOP_FMCALLS && fmCalls >= params.num_fmcalls)
                 end = true;
+            if(params.stop_type == params.STOP_ITERATIONS && nRollouts >= params.num_iterations)
+                end = true;
+
         }
 
 //        System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + rootActions.size() +

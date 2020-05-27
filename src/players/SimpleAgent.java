@@ -19,6 +19,7 @@ import utils.Vector2d;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Random;
 
 /**
  * This is the Simple agent for the game.
@@ -26,6 +27,7 @@ import java.util.LinkedList;
 public class SimpleAgent extends Agent {
 
     private ArrayList<Vector2d> recentlyVisitedPositions;
+    private Random m_rnd;
 
     /**
      * Default constructor, to be called in subclasses (initializes player ID and random seed for this agent.
@@ -34,6 +36,7 @@ public class SimpleAgent extends Agent {
      */
     public SimpleAgent(long seed) {
         super(seed);
+        m_rnd = new Random(seed);
     }
 
 
@@ -49,7 +52,7 @@ public class SimpleAgent extends Agent {
         ArrayList<Action> allActions = gs.getAllAvailableActions();
         int nActions = allActions.size();
         //Initially pick a random action so that at least that can be returned
-        Action bestAction = allActions.get(gs.getRandomGenerator().nextInt(nActions));
+        Action bestAction = allActions.get(m_rnd.nextInt(nActions));
         int bestActionScore = evalAction(gs,bestAction);
 
         for (Action a : allActions
@@ -247,16 +250,20 @@ public class SimpleAgent extends Agent {
             case RIDER:
             case ARCHER:
                 score = 2;
+                break;
             case SWORDMAN:
                 score = 4;
+                break;
             case BATTLESHIP:
             case KNIGHT:
             case CATAPULT:
                 score = 4;
+                break;
             case MIND_BENDER:
             case BOAT:
             case WARRIOR:
                 score = 1;
+                break;
             case DEFENDER:
             case SHIP:
                 score = 3;
@@ -389,10 +396,12 @@ public class SimpleAgent extends Agent {
             case FORGE:
             case WINDMILL:
                 score = 4; //These increase population in a while costing less to build so these cases are weighted higher
+                break;
             case PORT:
             case SAWMILL:
             case LUMBER_HUT:
                 score = 3; // These increase population less and cost more so are of less priority
+                break;
             case GRAND_BAZAR:
             case CUSTOMS_HOUSE:
             case EMPERORS_TOMB:
@@ -402,10 +411,12 @@ public class SimpleAgent extends Agent {
             case TOWER_OF_WISDOM:
             case ALTAR_OF_PEACE:
                 score= 5; //These are for after a task in finished and don't cost anything and increase population so pick these randomly
+                break;
             case TEMPLE:
             case WATER_TEMPLE:
             case MOUNTAIN_TEMPLE:
                 score = 2; // These cost a lot and don't offer a lot of population incrase so are of less priority
+                break;
         }
 
         return score;

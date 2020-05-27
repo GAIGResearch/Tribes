@@ -27,6 +27,7 @@ import static core.Types.TRIBE.*;
 public class Play {
 
     public static boolean RUN_VERBOSE = true;
+    public static long AGENT_SEED = -1, GAME_SEED = -1;
 
     enum PlayerType
     {
@@ -38,6 +39,10 @@ public class Play {
         MCTS,
         OEP
     }
+
+//    Game seed: 1590514560867
+//    Agents random seed: 1590486463964
+//    Level seed: 1591330872230
 
 
     private static Agent _getAgent(PlayerType playerType, long agentSeed, ActionController ac)
@@ -53,10 +58,13 @@ public class Play {
             case MC:
                 MCParams mcparams = new MCParams();
                 mcparams.stop_type = mcparams.STOP_FMCALLS;
+//                mcparams.stop_type = mcparams.STOP_ITERATIONS;
+                mcparams.PRIORITIZE_ROOT = false;
                 return new MonteCarloAgent(agentSeed, mcparams);
             case SIMPLE: return new SimpleAgent(agentSeed);
             case MCTS:
                 MCTSParams mctsParams = new MCTSParams();
+                mctsParams.stop_type = mctsParams.STOP_FMCALLS;
                 return new MCTSPlayer(agentSeed, mctsParams);
             case OEP:
                 OEPParams oepParams = new OEPParams();
@@ -82,9 +90,31 @@ public class Play {
 
 
         //FIVE WAYS OF RUNNING Tribes:
+        long seeds[] = new long[]{
+                1590191438878L, 1590791907337L,
+                1591330872230L, 1590557911279L,
+                1589827394219L, 1590597667781L,
+                1588955551452L, 1588591994323L,
+                1590218550448L, 1592282275322L,
+                1592432219672L, 1590938785410L,
+                1589359308213L, 1591528602817L,
+                1592393638354L, 1588485987095L,
+                1588564020405L, 1589717827778L,
+                1592435145738L, 1592040799152L,
+                1588965819946L, 1589014941900L,
+                1590182659177L, 1590912178111L,
+                1588407146837L
+        };
+
+//        Arrays.fill(seeds, -1);
+//
+//        Game seed: 1590562564866
+//        Agents random seed: 1590529495634
+//        Level seed: 1590791907337
 
         //1. Play one game with visuals using the Level Generator:
-        play(new Types.TRIBE[]{XIN_XI, IMPERIUS}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA}, gameMode);
+//        AGENT_SEED = 1591455948310L; GAME_SEED = 1590563762657L;
+//        play(new Types.TRIBE[]{XIN_XI, IMPERIUS}, -1, new PlayerType[]{PlayerType.MC, PlayerType.SIMPLE}, gameMode);
 //        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA, PlayerType.OSLA}, gameMode);
 //        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR, OUMAJI}, -1, new PlayerType[]{PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE}, gameMode);
 
@@ -95,8 +125,8 @@ public class Play {
 
 
         //3. Play N games without visuals using level seeds for the generator.:
-        int nReps = 20;
-        run(new Types.TRIBE[]{XIN_XI, IMPERIUS}, new long[]{1592196954443L,1591899575109L}, new PlayerType[]{PlayerType.MC, PlayerType.OSLA}, gameMode, nReps, true);
+        int nReps = 10; //4;
+        run(new Types.TRIBE[]{XIN_XI, IMPERIUS}, seeds, new PlayerType[]{PlayerType.SIMPLE, PlayerType.MC}, gameMode, nReps, true);
 //        run(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR}, new long[]{0,-1}, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.OSLA}, gameMode, nReps, true);
 //        run(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR, OUMAJI}, new long[]{0,-1}, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA}, gameMode, nReps, true);
 
@@ -134,7 +164,7 @@ public class Play {
         KeyController ki = new KeyController(true);
         ActionController ac = new ActionController();
 
-        long agentSeed = System.currentTimeMillis();
+        long agentSeed = AGENT_SEED == -1 ? System.currentTimeMillis() + new Random().nextInt() : AGENT_SEED;
 
         Game game = _loadGame(playerTypes, saveGameFile, agentSeed);
         Run.runGame(game, ki, ac);
@@ -237,7 +267,7 @@ public class Play {
 
     private static Game _prepareGame(String levelFile, PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
     {
-        long gameSeed = System.currentTimeMillis();
+        long gameSeed = GAME_SEED == -1 ? System.currentTimeMillis() : GAME_SEED;
         if(RUN_VERBOSE) System.out.println("Game seed: " + gameSeed);
 
         ArrayList<Agent> players = getPlayers(playerTypes, ac);
@@ -249,7 +279,7 @@ public class Play {
 
     private static Game _prepareGame(Types.TRIBE[] tribes, long levelSeed, PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
     {
-        long gameSeed = System.currentTimeMillis();
+        long gameSeed = GAME_SEED == -1 ? System.currentTimeMillis() : GAME_SEED;
 
         if(RUN_VERBOSE) System.out.println("Game seed: " + gameSeed);
 
@@ -271,7 +301,7 @@ public class Play {
     private static ArrayList<Agent> getPlayers(PlayerType[] playerTypes, ActionController ac)
     {
         ArrayList<Agent> players = new ArrayList<>();
-        long agentSeed = System.currentTimeMillis() + new Random().nextInt();
+        long agentSeed = AGENT_SEED == -1 ? System.currentTimeMillis() + new Random().nextInt() : AGENT_SEED;
 
         if(RUN_VERBOSE)  System.out.println("Agents random seed: " + agentSeed);
 

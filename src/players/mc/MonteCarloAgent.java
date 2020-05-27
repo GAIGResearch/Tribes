@@ -138,6 +138,7 @@ public class MonteCarloAgent extends Agent {
         int turnEndCountDown = params.FORCE_TURN_END;
         boolean run;
 
+//        System.out.println("---");
         while(!end)
         {
             run = true;
@@ -195,6 +196,7 @@ public class MonteCarloAgent extends Agent {
     private void advance(GameState gs, Action act, boolean computeActions)
     {
         gs.advance(act, computeActions);
+//        System.out.println(act);
         fmCalls++;
     }
 

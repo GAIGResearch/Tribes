@@ -452,7 +452,7 @@ public class Board {
                     moved = true;
                     currentPos.x = next.x;
                     currentPos.y = next.y;
-                    boolean updateNetwork = tribes[tribeId].clearView(currentPos.x, currentPos.y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this.copy());
+                    boolean updateNetwork = tribes[tribeId].clearView(currentPos.x, currentPos.y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this);
                     if(updateNetwork)
                         tradeNetwork.computeTradeNetworkTribe(this, tribes[tribeId]);
                 }
@@ -462,7 +462,7 @@ public class Board {
 
             if (!moved) {
                 //couldn't move in many steps. Let's just warn and progress from now.
-                System.out.println("WARNING: explorer stuck, " + j + " steps without moving.");
+//                System.out.println("WARNING: explorer stuck, " + j + " steps without moving.");
             }
 
         }

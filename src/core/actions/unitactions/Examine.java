@@ -112,6 +112,6 @@ public class Examine extends UnitAction
     }
 
     public String toString() {
-        return "EXAMINE by unit " + this.unitId + " of target " + this.bonus.toString();
+        return "EXAMINE by unit " + this.unitId + " of ruins.";
     }
 }

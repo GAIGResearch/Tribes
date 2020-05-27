@@ -114,7 +114,7 @@ public class Play {
 
         //1. Play one game with visuals using the Level Generator:
 //        AGENT_SEED = 1591455948310L; GAME_SEED = 1590563762657L;
-//        play(new Types.TRIBE[]{XIN_XI, IMPERIUS}, -1, new PlayerType[]{PlayerType.MC, PlayerType.SIMPLE}, gameMode);
+        play(new Types.TRIBE[]{BARDUR, OUMAJI}, -1, new PlayerType[]{PlayerType.SIMPLE, PlayerType.HUMAN}, gameMode);
 //        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA, PlayerType.OSLA}, gameMode);
 //        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR, OUMAJI}, -1, new PlayerType[]{PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE}, gameMode);
 
@@ -125,8 +125,8 @@ public class Play {
 
 
         //3. Play N games without visuals using level seeds for the generator.:
-        int nReps = 10; //4;
-        run(new Types.TRIBE[]{XIN_XI, IMPERIUS}, seeds, new PlayerType[]{PlayerType.SIMPLE, PlayerType.MC}, gameMode, nReps, true);
+        int nReps = 4; //4;
+//        run(new Types.TRIBE[]{XIN_XI, IMPERIUS}, seeds, new PlayerType[]{PlayerType.OSLA, PlayerType.SIMPLE}, gameMode, nReps, true);
 //        run(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR}, new long[]{0,-1}, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.OSLA}, gameMode, nReps, true);
 //        run(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR, OUMAJI}, new long[]{0,-1}, new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.OSLA, PlayerType.OSLA}, gameMode, nReps, true);
 

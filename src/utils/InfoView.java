@@ -240,8 +240,11 @@ public class InfoView extends JComponent {
     private String getUnitInfo(Unit u) {
 //        String img = u.getType().getImageStr(u.getTribeId());
 
+        Tribe t = gs.getTribe(u.getTribeId());
+        int idx = t.getType().getKey();
+
         StringBuilder sb = new StringBuilder();
-        sb.append("<h1>" + Types.TRIBE.values()[u.getTribeId()] + " " + u.getType() + "</h1>");
+        sb.append("<h1>" + Types.TRIBE.values()[idx] + " " + u.getType() + "</h1>");
 //        sb.append("<table border=\"0\"><tr><td><img src=\"file:" + img + "\"/></p></td><td>");
         sb.append("From city " + u.getCityId() + "<br/>");
         if (u.isVeteran()) {

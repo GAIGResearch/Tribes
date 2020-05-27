@@ -40,7 +40,7 @@ public class HealOthers extends UnitAction
     @Override
     public boolean execute(GameState gs) {
 
-        if (isFeasible(gs)) {  // TODO: this iterates twice to find if possible targets, and then heal them
+        if (isFeasible(gs)) {
             Unit unit = (Unit) gs.getActor(this.unitId);
             ArrayList<Unit> targets = getTargets(gs);
 

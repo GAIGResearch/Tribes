@@ -12,6 +12,7 @@ import players.HumanAgent;
 import utils.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.TreeSet;
 
@@ -96,7 +97,7 @@ public class Game {
         this.gs = new GameState(rnd, gameMode);
 
         this.gs.init(levelgen_seed, tribes);
-        initGameStructures(players, this.gs.getTribes().length);
+        initGameStructures(players, tribes);
         updateAssignedGameStates();
     }
 
@@ -146,43 +147,42 @@ public class Game {
     }
 
 
+    /**
+     * Initializes game structures depending on number of players and tribes
+     * @param players Players to play this game
+     * @param tribes Array of tribe types to play with.
+     */
+    private void initGameStructures(ArrayList<Agent> players, Types.TRIBE[] tribes) {
+        int nTribes = tribes.length;
+        if (players.size() != nTribes) {
+            System.out.println("ERROR: Number of tribes must _equal_ the number of players. There are " +
+                    players.size() + " players for " + nTribes + " tribes in this level.");
+            System.exit(-1);
+        }
 
+        //Create the players and agents to control them
+        numPlayers = players.size();
+        this.players = new Agent[numPlayers];
+        this.aiStats = new AIStats[numPlayers];
 
-//    /**
-//     * Resets the game, providing a seed.
-//     * @param repeatLevel true if the same level should be played.
-//     * @param filename Name of the file with the level information.
-//     */
-//    public void reset(boolean repeatLevel, String filename)
-//    {
-//        this.seed = repeatLevel ? seed : System.currentTimeMillis();
-//        resetGame(filename, numPlayers);
-//    }
-//
-//    /**
-//     * Resets the game, providing a seed.
-//     * @param seed new seed for the game.
-//     * @param filename Name of the file with the level information.
-//     */
-//    public void reset(int seed, String filename)
-//    {
-//        this.seed = seed;
-//        resetGame(filename, numPlayers);
-//    }
+        Tribe[] tribeObjects = gs.getTribes();
 
-//    /**
-//     * Resets the game, creating the original game state (and level) and assigning the initial
-//     * game state views that each player will have.
-//     * @param filename Name of the file with the level information.
-//     */
-//    private void resetGame(String filename)
-//    {
-//        this.gs.init(filename);
-//        updateAssignedGameStates();
-//    }
+        for(int tribeIdx = 0; tribeIdx < tribeObjects.length; ++tribeIdx)
+        {
+            Tribe thisTribe = tribeObjects[tribeIdx];
+            core.Types.TRIBE tribeType = thisTribe.getType();
 
+            int indexInTypes = -1;
+            for(int i = 0; i < tribes.length; ++i)
+                if(tribes[i] == tribeType)
+                    indexInTypes = i;
 
-
+            this.players[tribeIdx] = players.get(indexInTypes);
+            this.players[tribeIdx].setPlayerID(tribeIdx);
+            this.aiStats[tribeIdx] = new AIStats(tribeIdx);
+        }
+        this.gameStateObservations = new GameState[numPlayers];
+    }
 
     /**
      * Runs a game once. Receives frame and window input. If any is null, forces a run with no visuals.
@@ -246,7 +246,8 @@ public class Game {
             processTurn(i, tribe, frame);
 
             // Save Game
-            GameSaver.writeTurnFile(gs, getBoard(), seed);
+            if(Constants.WRITE_SAVEGAMES)
+                GameSaver.writeTurnFile(gs, getBoard(), seed);
 
             //it may be that this player won the game, no more playing.
             if(gameOver())

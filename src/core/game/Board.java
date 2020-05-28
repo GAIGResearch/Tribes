@@ -201,6 +201,7 @@ public class Board {
         for (int i = 0; i < tribes.length; i++) {
             boolean hideInfo = (i != playerId) && partialObs;
             copyBoard.tribes[i] = tribes[i].copy(hideInfo);
+
         }
 
         //Deep copy of all actors in the board
@@ -208,12 +209,24 @@ public class Board {
         for (Actor act : gameActors.values()) {
             int id = act.getActorId();
             int actTribeId = act.getTribeId();
+            boolean actorVisible = playerId == -1 || tribes[playerId].isVisible(act.getPosition().x, act.getPosition().y);
 
             //When do we copy? if it's the tribe (id==playerId), full observable or actor visible if part. obs.
-            if(actTribeId == playerId || !partialObs || tribes[playerId].isVisible(act.getPosition().x, act.getPosition().y))
+            if(actTribeId == playerId || !partialObs || actorVisible)
             {
                 boolean hideInfo = (actTribeId != playerId) && partialObs;
-                copyBoard.gameActors.put(id, act.copy(hideInfo));
+                Actor actorCopy = act.copy(hideInfo);
+                copyBoard.gameActors.put(id, actorCopy);
+
+                //If we're hiding info, the other tribes don't copy cityIDs and unitIDs by default in the arrays. But we need to copy the ones we see.
+                if(hideInfo && actorVisible)
+                {
+                    int tribeId = actorCopy.getTribeId();
+                    if(actorCopy instanceof City)
+                        copyBoard.tribes[tribeId].addCity(actorCopy.getActorId());
+                    else if(actorCopy instanceof Unit)
+                        copyBoard.tribes[tribeId].addExtraUnit((Unit)actorCopy);
+                }
             }
         }
 
@@ -324,7 +337,7 @@ public class Board {
 
         //Water with a port this tribe owns?
         Types.BUILDING b = buildings[x][y];
-        if (terrain == SHALLOW_WATER) {
+        if (terrain == SHALLOW_WATER || terrain == DEEP_WATER) {
             if (b == Types.BUILDING.PORT) {
                 City c = getCityInBorders(x, y);
                 if (c != null && c.getTribeId() == tribeId) {
@@ -378,7 +391,6 @@ public class Board {
         City city = (City) gameActors.get(unit.getCityId());
         removeUnitFromBoard(unit);
         removeUnitFromCity(unit, city, tribe);
-        
         Types.UNIT baseLandUnit = getBaseLandUnit(unit);
 
         //We're actually creating a new unit
@@ -452,7 +464,7 @@ public class Board {
                     moved = true;
                     currentPos.x = next.x;
                     currentPos.y = next.y;
-                    boolean updateNetwork = tribes[tribeId].clearView(currentPos.x, currentPos.y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this.copy());
+                    boolean updateNetwork = tribes[tribeId].clearView(currentPos.x, currentPos.y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this);
                     if(updateNetwork)
                         tradeNetwork.computeTradeNetworkTribe(this, tribes[tribeId]);
                 }
@@ -462,7 +474,7 @@ public class Board {
 
             if (!moved) {
                 //couldn't move in many steps. Let's just warn and progress from now.
-                System.out.println("WARNING: explorer stuck, " + j + " steps without moving.");
+//                System.out.println("WARNING: explorer stuck, " + j + " steps without moving.");
             }
 
         }

@@ -1,8 +1,10 @@
 package players.osla;
 
 import core.actions.Action;
+import core.actions.cityactions.Destroy;
 import core.actions.tribeactions.EndTurn;
 import core.actions.unitactions.Capture;
+import core.actions.unitactions.Disband;
 import core.actions.unitactions.Move;
 import core.game.GameState;
 import players.Agent;
@@ -17,6 +19,7 @@ public class OneStepLookAheadAgent extends Agent {
 
     private Random m_rnd;
     private OSLAParams params;
+    private int fmCalls;
 
     public OneStepLookAheadAgent(long seed, OSLAParams params)
     {
@@ -34,34 +37,43 @@ public class OneStepLookAheadAgent extends Agent {
         if(allActions.size() == 1)
             return allActions.get(0); //EndTurn
 
+        fmCalls = 0;
+
 //        System.out.println("tick: " + gs.getTick() + ", player: " + playerID + ", action space: " + allActions.size());
 
         //THIS IS JUST FOR DEBUG.
         //HashMap<Action, Double> scores = new HashMap<>();
 
-        Action bestAction = null;
+        Action bestAction = new EndTurn();
         double maxQ = Double.NEGATIVE_INFINITY;
         TribesSimpleHeuristic heuristic = new TribesSimpleHeuristic(this.getPlayerID());
-        for(Action act : allActions)
+        boolean end = false;
+        int actionIdx = 0;
+        while(!end)
         {
-            if(act instanceof EndTurn) continue;
+            Action act = allActions.get(actionIdx);
+            if(!(act instanceof EndTurn) && !(act instanceof Destroy) && !(act instanceof Disband)) {
 
-            GameState gsCopy = gs.copy();
-            gsCopy.advance(act, false);
-            double Q = heuristic.evaluateState(gsCopy);
-            Q = noise(Q, params.epsilon, this.m_rnd.nextDouble());
+                GameState gsCopy = gs.copy();
+                advance(gsCopy, act, false);
+                double Q = heuristic.evaluateState(gsCopy);
+                Q = noise(Q, params.epsilon, this.m_rnd.nextDouble());
 
-            //scores.put(act, Q);
-            //System.out.println(act + " : " + Q);
+                //scores.put(act, Q);
+                //System.out.println(act + " : " + Q);
 
-            //System.out.println("Action:" + action + " score:" + Q);
-            if (Q > maxQ) {
-                maxQ = Q;
-                bestAction = act;
+                //System.out.println("Action:" + action + " score:" + Q);
+                if (Q > maxQ) {
+                    maxQ = Q;
+                    bestAction = act;
+                }
             }
+
+            actionIdx++;
+            end = (actionIdx == allActions.size() || (params.stop_type == params.STOP_FMCALLS && fmCalls >= params.num_fmcalls));
         }
 
-        //System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + allActions.size() + ". Executing " + bestAction);
+//        System.out.println("[Tribe: " + playerID + "] Tick " +  gs.getTick() + ", num actions: " + allActions.size() + ", FM calls: " + fmCalls + ". Executing " + bestAction);
 
         return bestAction;
     }
@@ -76,6 +88,12 @@ public class OneStepLookAheadAgent extends Agent {
     private double noise(double input, double epsilon, double random)
     {
         return (input + epsilon) * (1.0 + epsilon * (random - 0.5));
+    }
+
+    private void advance(GameState gs, Action act, boolean computeActions)
+    {
+        gs.advance(act, computeActions);
+        fmCalls++;
     }
 
     @Override

@@ -315,7 +315,7 @@ public class InfoView extends JComponent {
 
         if (cityID != -1) {
             City c = (City) gs.getBoard().getActor(cityID);
-            if (c != null) {  // TODO: this should not be the case. Fix partial observability.
+            if (c != null) {
                 ArrayList<Action> acts = gs.getCityActions(c);
 
                 boolean foundRG = false;

@@ -16,6 +16,7 @@ public class Constants {
     public static int GUI_MIN_PAN;
     public static int GUI_COMP_SPACING;
     public static int GUI_CITY_TAG_WIDTH;
+    public static boolean GUI_DRAW_EFFECTS = false;
 
     public static int GUI_SIDE_PANEL_WIDTH;
     public static int GUI_INFO_PANEL_HEIGHT;

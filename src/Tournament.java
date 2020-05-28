@@ -37,7 +37,7 @@ public class Tournament {
                 MCParams mcparams = new MCParams();
                 mcparams.stop_type = mcparams.STOP_FMCALLS;
 //                mcparams.stop_type = mcparams.STOP_ITERATIONS;
-                mcparams.PRIORITIZE_ROOT = false;
+                mcparams.PRIORITIZE_ROOT = true;
                 return new MonteCarloAgent(agentSeed, mcparams);
             case SIMPLE: return new SimpleAgent(agentSeed);
             case MCTS:
@@ -80,7 +80,6 @@ public class Tournament {
 
 //        t.setPlayers(new PlayerType[]{PlayerType.SIMPLE, PlayerType.DONOTHING, PlayerType.OSLA});
 //        t.setTribes(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR});
-
 
         t.setSeeds(seeds);
         int nRepetitions = 4;

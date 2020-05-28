@@ -1,7 +1,11 @@
 package players.mc;
 
+import core.TechnologyTree;
 import core.actions.Action;
+import core.actions.cityactions.Destroy;
 import core.actions.tribeactions.EndTurn;
+import core.actions.unitactions.Disband;
+import core.actors.Tribe;
 import core.game.GameState;
 import players.Agent;
 import players.heuristics.StateHeuristic;
@@ -52,7 +56,6 @@ public class MonteCarloAgent extends Agent {
         //Gather all available actions:
         ArrayList<Action> allActions = gs.getAllAvailableActions();
         int numActions = allActions.size();
-
         if(numActions == 1)
             return allActions.get(0); //EndTurn, it's possible.
 
@@ -62,6 +65,10 @@ public class MonteCarloAgent extends Agent {
         //Take one type of action at random. With Prioritize Root == true, we focus only on one subset of actions for the root (see determineActionGroup)
         // otherwise, all actions are in the bag.
         ArrayList<Action> rootActions = params.PRIORITIZE_ROOT ? determineActionGroup(gs) : allActions;
+        if(rootActions == null)
+            return new EndTurn();
+
+
         params.num_iterations = rootActions.size() * params.N_ROLLOUT_MULT;
         StatSummary[] scores = new StatSummary[rootActions.size()];
 
@@ -80,9 +87,9 @@ public class MonteCarloAgent extends Agent {
                 act = rootActions.get(rootActionIndex);
             }
 
-//            System.out.println("----- " + gs.getTick() + ":" + actionTurnCounter + ":" + nRollouts + " ------");
+//            System.out.println("----- " + gs.getTick() + ":" + actionTurnCounter + ":" + nRollouts + " ------ " + gs.getActiveTribeID());
 
-            //Another ollout
+            //Another rollout
             double score = rollout(gs, act);
             nRollouts++;
 
@@ -121,19 +128,32 @@ public class MonteCarloAgent extends Agent {
         ArrayList<ACTION_TYPE> availableTypes = new ArrayList<>();
 
         ArrayList<Action> cityActions = gs.getAllCityActions();
-        if(cityActions.size() > 0) availableTypes.add(ACTION_TYPE.CITY);
+        ArrayList<Action> cityGoodActions = new ArrayList<>();
+        for(Action act : cityActions)
+            if(!(act instanceof Destroy))
+                cityGoodActions.add(act);
+        if(cityGoodActions.size() > 0) availableTypes.add(ACTION_TYPE.CITY);
 
         ArrayList<Action> unitActions = gs.getAllUnitActions();
+        ArrayList<Action> unitGoodActions = new ArrayList<>();
+        for(Action act : unitActions)
+            if(!(act instanceof Disband))
+                unitGoodActions.add(act);
         if(unitActions.size() > 0) availableTypes.add(ACTION_TYPE.UNIT);
 
         ArrayList<Action> tribeActions = gs.getTribeActions();
         if(tribeActions.size() > 1) availableTypes.add(ACTION_TYPE.TRIBE); //>1, we need to have something else than EndTurn only.
 
+        if(availableTypes.size() == 0)
+        {
+            return null;
+        }
+
         int rndIdx = m_rnd.nextInt(availableTypes.size());
         ACTION_TYPE rootAction = availableTypes.get(rndIdx);
         if(rootAction == ACTION_TYPE.CITY)
         {
-            return cityActions;
+            return cityGoodActions;
         }
         if(rootAction == ACTION_TYPE.UNIT)
         {
@@ -152,7 +172,7 @@ public class MonteCarloAgent extends Agent {
      */
     private double rollout(GameState gs, Action act)
     {
-        GameState gsCopy = gs.copy();
+        GameState gsCopy = copyGameState(gs);
         boolean end = false;
         int step = 0;
         int turnEndCountDown = params.FORCE_TURN_END; // We force an EndTurn action every FORCE_TURN_END actions in the rollout.
@@ -230,6 +250,32 @@ public class MonteCarloAgent extends Agent {
     {
         gs.advance(act, computeActions);
         fmCalls++;
+    }
+
+    /**
+     * The technology trees of the opponents are always empty (no technology is researched).
+     * As a simple case of gamestate injection, we research N technologies (N=turn/2) for them
+     * @param gs current game state.
+     */
+    private void initTribesResearch(GameState gs)
+    {
+        int turn = gs.getTick();
+        int techsToResearch = (int) (turn / 2.0);
+        for(Tribe t : gs.getTribes())
+        {
+            if(t.getTribeId() != this.playerID)
+            {
+                for(int i = 0; i < techsToResearch; ++i)
+                    t.getTechTree().researchAtRandom(this.m_rnd);
+            }
+        }
+    }
+
+    public GameState copyGameState(GameState gs)
+    {
+        GameState gsCopy = gs.copy();
+        initTribesResearch(gsCopy);
+        return gsCopy;
     }
 
     @Override

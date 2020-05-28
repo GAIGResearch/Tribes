@@ -1,8 +1,10 @@
 package players.osla;
 
 import core.actions.Action;
+import core.actions.cityactions.Destroy;
 import core.actions.tribeactions.EndTurn;
 import core.actions.unitactions.Capture;
+import core.actions.unitactions.Disband;
 import core.actions.unitactions.Move;
 import core.game.GameState;
 import players.Agent;
@@ -42,7 +44,7 @@ public class OneStepLookAheadAgent extends Agent {
         //THIS IS JUST FOR DEBUG.
         //HashMap<Action, Double> scores = new HashMap<>();
 
-        Action bestAction = null;
+        Action bestAction = new EndTurn();
         double maxQ = Double.NEGATIVE_INFINITY;
         TribesSimpleHeuristic heuristic = new TribesSimpleHeuristic(this.getPlayerID());
         boolean end = false;
@@ -50,7 +52,7 @@ public class OneStepLookAheadAgent extends Agent {
         while(!end)
         {
             Action act = allActions.get(actionIdx);
-            if(!(act instanceof EndTurn)) {
+            if(!(act instanceof EndTurn) && !(act instanceof Destroy) && !(act instanceof Disband)) {
 
                 GameState gsCopy = gs.copy();
                 advance(gsCopy, act, false);

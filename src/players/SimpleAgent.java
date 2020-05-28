@@ -125,11 +125,13 @@ public class SimpleAgent extends Agent {
             score = evalConvert(a, gs);
         }else if (a instanceof MakeVeteran) {
             score = 5; //Making a veteran is placed as highest priority
+        }else if (a instanceof Disband) {
+            score = -2;
         }
 
         //CITY ACTIONS
         if (a instanceof Destroy) {
-            score = 0;
+            score = -2;
         }else if (a instanceof BurnForest) {
             score = evalBurn(a, gs, thisTribe);
         }else if (a instanceof ClearForest) {

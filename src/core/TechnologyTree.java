@@ -133,6 +133,9 @@ public class TechnologyTree {
                available.add(tech);
        }
 
+       if(available.size() == 0)
+           return false;
+
        Types.TECHNOLOGY t = available.get(rnd.nextInt(available.size()));
        return doResearch(t);
    }

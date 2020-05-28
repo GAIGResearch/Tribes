@@ -7,11 +7,11 @@ import core.actors.units.Unit;
 import utils.Vector2d;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Random;
 
 class LevelLoader
 {
-
     private Dimension size;
 
     LevelLoader()
@@ -21,16 +21,17 @@ class LevelLoader
 
     /**
      * Builds a level, receiving a file name.
-     * @param tribes tribes to play in this game
      * @param lines lines containing the level
      */
-    Board buildLevel(Tribe[] tribes, String[] lines, Random rnd) {
-
-        Board board = new Board();
+    Board buildLevel(String[] lines, Random rnd) {
 
         // Dimensions of the level read from the file.
         size.width = lines.length;
         size.height = lines.length;
+
+        Tribe[] tribes = extractTribes(lines);
+        Board board = new Board();
+
         int tribeID = 0;
         int numTribes = tribes.length;
 
@@ -84,9 +85,39 @@ class LevelLoader
                 }
             }
         }
-
         return board;
     }
 
+    /**
+     * Extracts the tribes from the file lines initializing them
+     * @param lines information
+     * @return initialized array of tribes.
+     */
+    private Tribe[] extractTribes(String[] lines)
+    {
+        ArrayList<Types.TRIBE> tribes_list = new ArrayList<>();
+        for (int i = 0; i < size.height; ++i) {
+            String line = lines[i];
+            String[] tile = line.split(",");
+            for (String s : tile) {
+                String[] tileSplit = s.split(":");
+                char terrainChar = tileSplit[0].charAt(0);
+                boolean isCity = terrainChar == Types.TERRAIN.CITY.getMapChar();
+
+                if (isCity) {
+                    int tribeID = Integer.parseInt(tileSplit[1]);
+                    tribes_list.add(Types.TRIBE.getTypeByKey(tribeID));
+                }
+            }
+        }
+
+        Tribe[] tribesArray = new Tribe[tribes_list.size()];
+        int i = 0;
+        for(Types.TRIBE trType : tribes_list)
+        {
+            tribesArray[i++] = new Tribe(trType);
+        }
+        return tribesArray;
+    }
 
 }

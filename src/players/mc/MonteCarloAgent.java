@@ -4,6 +4,7 @@ import core.actions.Action;
 import core.actions.tribeactions.EndTurn;
 import core.game.GameState;
 import players.Agent;
+import players.heuristics.StateHeuristic;
 import players.heuristics.TribesSimpleHeuristic;
 import utils.ElapsedCpuTimer;
 import utils.StatSummary;
@@ -13,16 +14,16 @@ import java.util.Random;
 
 public class MonteCarloAgent extends Agent {
 
-    public double epsilon = 1e-6;
     private Random m_rnd;
-    private int ROLLOUT_LENGTH = 20;
-    private int N_ROLLOUT_MULT = 3;
-    private int FORCE_TURN_END = 5;
+    private MCParams params;
+    private StateHeuristic heuristic;
 
-    public MonteCarloAgent(long seed)
+    public MonteCarloAgent(long seed, MCParams params)
     {
         super(seed);
         m_rnd = new Random(seed);
+        this.params = params;
+        this.heuristic = params.getHeuristic(playerID);
     }
 
     @Override
@@ -34,7 +35,7 @@ public class MonteCarloAgent extends Agent {
         if(numActions == 1)
             return allActions.get(0); //EndTurn, it's possible.
 
-        int numRollouts = allActions.size() * N_ROLLOUT_MULT;
+        int numRollouts = allActions.size() * params.N_ROLLOUT_MULT;
         StatSummary[] scores = new StatSummary[allActions.size()];
 
         Action bestAction = null;
@@ -75,7 +76,7 @@ public class MonteCarloAgent extends Agent {
         GameState gsCopy = gs.copy();
         boolean end = false;
         int step = 0;
-        int turnEndCountDown = FORCE_TURN_END;
+        int turnEndCountDown = params.FORCE_TURN_END;
         boolean run = true;
 
         while(!end)
@@ -91,7 +92,7 @@ public class MonteCarloAgent extends Agent {
                 if(canEndTurn) //check if we can actually end the turn.
                 {
                     gsCopy.advance(endTurn, true);
-                    turnEndCountDown = FORCE_TURN_END;
+                    turnEndCountDown = params.FORCE_TURN_END;
                     run = false;
                 }
             }
@@ -103,7 +104,7 @@ public class MonteCarloAgent extends Agent {
             }
 
             step++;
-            end = gsCopy.isGameOver() || (step == ROLLOUT_LENGTH);
+            end = gsCopy.isGameOver() || (step == params.ROLLOUT_LENGTH);
 
             if(!end)
             {
@@ -113,7 +114,7 @@ public class MonteCarloAgent extends Agent {
                     act = allActions.get(m_rnd.nextInt(numActions));
 
                     if(act instanceof EndTurn)
-                        turnEndCountDown = FORCE_TURN_END + 1;
+                        turnEndCountDown = params.FORCE_TURN_END + 1;
 
                 }else
                 {
@@ -126,7 +127,6 @@ public class MonteCarloAgent extends Agent {
             }
         }
 
-        TribesSimpleHeuristic heuristic = new TribesSimpleHeuristic(this.getPlayerID());
         return heuristic.evaluateState(gsCopy);
     }
 

@@ -1,5 +1,6 @@
 package core.game;
 
+import core.Constants;
 import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
@@ -12,6 +13,7 @@ import utils.*;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.TreeSet;
 
 import static core.Constants.*;
 
@@ -52,29 +54,49 @@ public class Game {
      *   Sets the players of the game, the number of players and their IDs
      *   Initializes the array to hold the player game states.
      *   Assigns the tribes that will play the game.
-     *   Creates the board according to the above information and resets the game so it's ready to start.
+     *   Creates the level reading it from the file 'filename'.
+     *   Resets the game so it's ready to start.
      *   Turn order: by default, turns run following the order in the tribes array.
      * @param players Players of the game.
-     * @param tribes Tribes to play the game with. Players and tribes related by position in array lists.
      * @param filename Name of the file with the level information.
      * @param seed Seed for the game (used only for board generation)
      * @param gameMode Game Mode for this game.
      */
-    public void init(ArrayList<Agent> players, ArrayList<Tribe> tribes, String filename, long seed, Types.GAME_MODE gameMode) {
+    public void init(ArrayList<Agent> players, String filename, long seed, Types.GAME_MODE gameMode) {
 
         //Initiate the bare bones of the main game classes
         this.seed = seed;
         this.rnd = new Random(seed);
         this.gs = new GameState(rnd, gameMode);
 
-        Tribe[] tribesArray = new Tribe[tribes.size()];
-        for (int i = 0; i < tribesArray.length; ++i)
-        {
-            tribesArray[i] = tribes.get(i);
-        }
+        this.gs.init(filename);
+        initGameStructures(players, this.gs.getTribes().length);
+        updateAssignedGameStates();
+    }
 
-        initGameStructures(players, tribes.size());
-        this.gs.init(filename, tribesArray);
+    /**
+     * Initializes the game. This method does the following:
+     *   Sets the players of the game, the number of players and their IDs
+     *   Initializes the array to hold the player game states.
+     *   Assigns the tribes that will play the game
+     *   Generates a new level using the seed levelgen_seed
+     *   Resets the game so it's ready to start.
+     *   Turn order: by default, turns run following the order in the tribes array.
+     * @param players Players of the game.
+     * @param levelgen_seed Seed for the level generator.
+     * @param tribes Array of tribe types to play with.
+     * @param seed Seed for the game (used only for board generation)
+     * @param gameMode Game Mode for this game.
+     */
+    public void init(ArrayList<Agent> players, long levelgen_seed, Types.TRIBE[] tribes, long seed, Types.GAME_MODE gameMode) {
+
+        //Initiate the bare bones of the main game classes
+        this.seed = seed;
+        this.rnd = new Random(seed);
+        this.gs = new GameState(rnd, gameMode);
+
+        this.gs.init(levelgen_seed, tribes);
+        initGameStructures(players, this.gs.getTribes().length);
         updateAssignedGameStates();
     }
 
@@ -104,7 +126,8 @@ public class Game {
     {
         if(players.size() != nTribes)
         {
-            System.out.println("ERROR: Number of tribes must equal the number of players.");
+            System.out.println("ERROR: Number of tribes must _equal_ the number of players. There are " +
+                    players.size() + " players for " + nTribes + " tribes in this level.");
             System.exit(-1);
         }
 
@@ -185,9 +208,9 @@ public class Game {
 
                 firstEnd = false;
 
+                printGameResults();
                 if(VERBOSE)
                 {
-                    printGameResults();
                     for(AIStats ais : aiStats)
                         ais.print();
                 }
@@ -329,7 +352,7 @@ public class Game {
 
             // Update GUI after every iteration
             if (VISUALS && frame != null) {
-                boolean showAllBoard = TribesConfig.GUI_FORCE_FULL_OBS || TribesConfig.PLAY_WITH_FULL_OBS;
+                boolean showAllBoard = Constants.GUI_FORCE_FULL_OBS || Constants.PLAY_WITH_FULL_OBS;
 
                 if (showAllBoard) frame.update(getGameState(-1), action);  // Full Obs
                 else frame.update(gameStateObservations[gs.getActiveTribeID()], action);        // Partial Obs
@@ -378,9 +401,16 @@ public class Game {
         Types.RESULT[] results = getWinnerStatus();
         int[] sc = getScores();
         Tribe[] tribes = gs.getBoard().getTribes();
-        for(int i = 0; i < results.length; ++i)
+
+        TreeSet<TribeResult> ranking = gs.getCurrentRanking();
+        System.out.println("Game Results: ");
+        int rank = 1;
+        for(TribeResult tr : ranking)
         {
-            System.out.println("Tribe " + i + " (" + tribes[i].getType() + "): " + results[i] + ", " + sc[i] + " points.");
+            int tribeId = tr.getId();
+            System.out.print(" #" + rank + ": Tribe " + tribeId + " (" + tribes[tribeId].getType() + "): " + results[tribeId] + ", " + sc[tribeId] + " points;");
+            System.out.println(" #tech: " + tr.getNumTechsResearched() + ", #cities: " + tr.getNumCities() + ", production: " + tr.getProduction());
+            rank++;
         }
     }
 
@@ -485,4 +515,7 @@ public class Game {
         return paused;
     }
 
+    public TreeSet<TribeResult> getCurrentRanking() {
+        return gs.getCurrentRanking();
+    }
 }

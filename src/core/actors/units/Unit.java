@@ -151,7 +151,7 @@ public abstract class Unit extends Actor
                 this.status = FINISHED;
                 return;
             }
-            
+
             switch (getType()) {
                 case MIND_BENDER:
                 case CATAPULT:

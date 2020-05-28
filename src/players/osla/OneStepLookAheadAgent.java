@@ -15,13 +15,14 @@ import java.util.Random;
 
 public class OneStepLookAheadAgent extends Agent {
 
-    public double epsilon = 1e-6;
     private Random m_rnd;
+    private OSLAParams params;
 
-    public OneStepLookAheadAgent(long seed)
+    public OneStepLookAheadAgent(long seed, OSLAParams params)
     {
         super(seed);
         m_rnd = new Random(seed);
+        this.params = params;
     }
 
     @Override
@@ -48,7 +49,7 @@ public class OneStepLookAheadAgent extends Agent {
             GameState gsCopy = gs.copy();
             gsCopy.advance(act, false);
             double Q = heuristic.evaluateState(gsCopy);
-            Q = noise(Q, this.epsilon, this.m_rnd.nextDouble());
+            Q = noise(Q, params.epsilon, this.m_rnd.nextDouble());
 
             //scores.put(act, Q);
             //System.out.println(act + " : " + Q);

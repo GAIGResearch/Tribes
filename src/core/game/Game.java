@@ -11,10 +11,7 @@ import players.Agent;
 import players.HumanAgent;
 import utils.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.TreeSet;
+import java.util.*;
 
 import static core.Constants.*;
 
@@ -328,7 +325,9 @@ public class Game {
                         remainingECT = ect.remainingTimeMillis(); // Note down the remaining time to use it for the next iteration
 
                         if(!isHumanPlayer)
-                            aiStats[playerID].addBranchingFactor(gs.getTick(), gameStateObservations[playerID].getAllAvailableActions().size());
+                            updateBranchingFactor(aiStats[playerID], gs.getTick(), gameStateObservations[playerID]);
+
+
                         curActionCounter++;
 
                         if (actionDelayTimer != null) {  // Reset action delay timer for next action request
@@ -428,6 +427,25 @@ public class Game {
             Agent ag = players[i];
             ag.result(gs.copy(), tribes[i].getScore());
         }
+    }
+
+    private void updateBranchingFactor(AIStats aiStats, int turn, GameState currentGameState)
+    {
+        ArrayList<Integer> actionCounts = new ArrayList<>();
+
+        HashMap<Integer, ArrayList<Action>> cityActions = currentGameState.getCityActions();
+        for (Integer id : cityActions.keySet()) {
+            actionCounts.add(cityActions.get(id).size());
+        }
+
+        HashMap<Integer, ArrayList<Action>> unitAcions = currentGameState.getUnitActions();
+        for (Integer id : unitAcions.keySet()) {
+            actionCounts.add(unitAcions.get(id).size());
+        }
+
+        actionCounts.add(currentGameState.getTribeActions().size());
+
+        aiStats.addBranchingFactor(turn, actionCounts);
     }
 
     /**

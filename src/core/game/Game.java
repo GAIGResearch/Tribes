@@ -1,7 +1,6 @@
 package core.game;
 
 import core.Constants;
-import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actions.tribeactions.EndTurn;
@@ -38,7 +37,7 @@ public class Game {
     private int numPlayers;
 
     // Is the game paused from the GUI?
-    private boolean paused, animationPause;
+    private boolean paused, animationPaused;
 
     // AI stats for each player.
     private AIStats[] aiStats;
@@ -316,7 +315,7 @@ public class Game {
             // Check GUI end of turn timer
             if (endTurnDelay != null && endTurnDelay.remainingTimeMillis() <= 0) break;
 
-            if (!paused) {
+            if (!paused && !animationPaused) {
                 // Action request and execution if turn should be continued
                 if (continueTurn) {
                     //noinspection ConstantConditions
@@ -505,7 +504,7 @@ public class Game {
     }
 
     public void setAnimationPaused(boolean p) {
-        animationPause = p;
+        animationPaused = p;
     }
     public void setPaused(boolean p) {
         paused = p;

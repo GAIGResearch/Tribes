@@ -1,5 +1,6 @@
 package core.game;
 
+import core.Constants;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
@@ -338,6 +339,10 @@ public class Board {
         //Water with a port this tribe owns?
         Types.BUILDING b = buildings[x][y];
         if (terrain == SHALLOW_WATER || terrain == DEEP_WATER) {
+
+            if(toPush.getType().isWaterUnit())
+                return true;
+
             if (b == Types.BUILDING.PORT) {
                 City c = getCityInBorders(x, y);
                 if (c != null && c.getTribeId() == tribeId) {
@@ -367,17 +372,19 @@ public class Board {
      * @param y y coordinate of the position where the unit is embarking
      */
     public void embark(Unit unit, Tribe tribe, int x, int y) {
+
         City city = (City) gameActors.get(unit.getCityId());
         removeUnitFromBoard(unit);
         removeUnitFromCity(unit, city, tribe);
 
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(x, y);
-        Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), Types.UNIT.BOAT);
+        Boat boat = (Boat) Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), Types.UNIT.BOAT);
         boat.setCurrentHP(unit.getCurrentHP());
         boat.setMaxHP(unit.getMaxHP());
-        ((Boat)boat).setBaseLandUnit(unit.getType());
+        boat.setBaseLandUnit(unit.getType());
         addUnit(city, boat);
+
     }
 
     /**
@@ -401,7 +408,9 @@ public class Board {
 
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(x, y);
+
         Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), baseLandUnit);
+
         newUnit.setCurrentHP(unit.getCurrentHP());
         newUnit.setMaxHP(unit.getMaxHP());
         addUnit(city, newUnit);

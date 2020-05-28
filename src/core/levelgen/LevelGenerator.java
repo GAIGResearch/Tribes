@@ -54,7 +54,7 @@ public class LevelGenerator {
 
         //Read the JSON that contains all the probability values for all the tribes.
         try {
-            this.data = new JSONObject(_readFile("src/core/levelgen/terrainProbs.json"));
+            this.data = new JSONObject(_readFile("terrainProbs.json"));
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -588,9 +588,9 @@ public class LevelGenerator {
         return Math.max(Math.abs(ax - bx), Math.abs(ay - by));
     }
 
-    public void toCSV() {
+    public void toCSV(String filename) {
         try {
-            FileWriter writer = new FileWriter("src/core/levelgen/test.csv");
+            FileWriter writer = new FileWriter(filename);
             writer.append(level[0]);
             writer.append(',');
             for(int i = 1; i < mapSize*mapSize; i++) {
@@ -659,7 +659,7 @@ public class LevelGenerator {
         LevelGenerator gen = new LevelGenerator(genSeed);
         gen.init(11, 3, 4, 0.5, new Types.TRIBE[]{XIN_XI, OUMAJI});
         gen.generate();
-//        gen.toCSV();
+        gen.toCSV("levels/levelgen_test.csv");
         gen.print();
 
     }

@@ -96,6 +96,8 @@ public class LevelGenerator {
 
         //Turning random water/ground grid into something smooth.
         if (LEVELGEN_VERBOSE) System.out.println("Turning random water/ground grid into something smooth.");
+        ArrayList<Integer> toBeGround = new ArrayList<>();
+
         for (i = 0; i < smoothing; i++) {
             for (int cell = 0; cell < mapSize * mapSize; cell++) {
 
@@ -107,10 +109,17 @@ public class LevelGenerator {
                     }
                     tile_count++;
                 }
-                if (water_count / (double) tile_count <= landCoefficient) {
+
+                if (water_count / (double) tile_count <= landCoefficient)
+                    toBeGround.add(cell);
+            }
+
+            for (int cell = 0; cell < mapSize * mapSize; cell++) {
+                if(toBeGround.contains(cell))
+                {
                     writeTile(cell, ""+PLAIN.getMapChar(), null);
-                } else {
-                    writeTile(cell, ""+DEEP_WATER.getMapChar(), null);
+                }else {
+                    writeTile(cell, "" + DEEP_WATER.getMapChar(), null);
                 }
             }
         }
@@ -137,11 +146,11 @@ public class LevelGenerator {
                 Map.Entry cell = (Map.Entry)capitalIterator.next();
                 cell.setValue(mapSize);
                 for (int capital_cell : capitalCells) {
-                    cell.setValue(Math.min((int)cell.getValue(), distance((int)cell.getValue(), capital_cell, mapSize)));
+                    cell.setValue(Math.min((int)cell.getValue(), distance((int)cell.getKey(), capital_cell, mapSize)));
                 }
                 max = Math.max(max, (int)cell.getValue());
             }
-
+            //Count how many potential capital positions are at a maximum distance
             int len = 0;
             capitalIterator = capitalMap.entrySet().iterator();
             while (capitalIterator.hasNext()) {
@@ -159,6 +168,7 @@ public class LevelGenerator {
                 if ((int)cell.getValue() == max) {
                     if (randCell == 0) {
                         capitalCells.add((int)cell.getKey());
+                        if(LEVELGEN_VERBOSE) System.out.println("Adding a capital for tribe " + tribe + " at tile " + (int)cell.getKey() + " with a max distance of " + cell.getValue());
                     }
                     randCell--;
                 }
@@ -258,7 +268,8 @@ public class LevelGenerator {
         for (int cell = 0; cell < mapSize*mapSize; cell++) {
             if (getTerrain(cell) == DEEP_WATER.getMapChar()) {
                 for (int neighbour : plusSign(cell)) {
-                    if (getTerrain(neighbour) == DEEP_WATER.getMapChar()) {
+                    char terrainN = getTerrain(neighbour);
+                    if(terrainN == PLAIN.getMapChar() || terrainN == FOREST.getMapChar() || terrainN == MOUNTAIN.getMapChar()){
                         writeTile(neighbour, ""+SHALLOW_WATER.getMapChar(), null);
                         break;
                     }
@@ -332,28 +343,35 @@ public class LevelGenerator {
         // Ruins generation.
         if (LEVELGEN_VERBOSE) System.out.println("Ruins generation");
 
-        int ruins_number = (int) Math.round(mapSize*0.05);
+        int ruins_number = (int) Math.round((mapSize*mapSize)/40.0);
         int water_ruins_number = (int) Math.round(ruins_number/3.0);
         int ruins_count = 0;
         int water_ruins_count = 0;
 
-        // We are reusing villageMap even though it is irrelevant in this context but it has useful info for ruin placement.
-        ArrayList<Integer> ruinCandidates = new ArrayList<>();
-        for(i=0; i < villageMap.size(); i++) {
-            int cell = villageMap.get(i);
-            if(cell == 0 || cell == 1 || cell == -1) {
-                ruinCandidates.add(i);
-            }
-        }
 
         while (ruins_count < ruins_number) {
-            int ruin = ruinCandidates.get(randomInt(0,ruinCandidates.size()));
 
+            // We are reusing villageMap even though it is irrelevant in this context but it has useful info for ruin placement.
+            ArrayList<Integer> ruinCandidates = new ArrayList<>();
+            for(i=0; i < villageMap.size(); i++) {
+                int cell = villageMap.get(i);
+                if(cell == 0 || cell == 1 || cell == -1) {
+                    ruinCandidates.add(i);
+                }
+            }
+
+            int ruin = ruinCandidates.get(randomInt(0,ruinCandidates.size()));
             if (getTerrain(ruin) != SHALLOW_WATER.getMapChar() && (water_ruins_count < water_ruins_number || getTerrain(ruin) != DEEP_WATER.getMapChar())) {
                 writeTile(ruin, null, ""+RUINS.getMapChar());
                 if (getTerrain(ruin) == DEEP_WATER.getMapChar()) {
                     water_ruins_count++;
                 }
+
+                //This avoids having contiguous ruins and favours dispersion.
+                for (int neighbour : circle(villageMap.get(ruin), 1)) {
+                    villageMap.set(neighbour, Math.max(villageMap.get(neighbour), 2));
+                }
+
                 ruins_count++;
             }
         }
@@ -364,9 +382,9 @@ public class LevelGenerator {
             int owner = Integer.parseInt(getResource(capital));
 
             if(owner == (char)IMPERIUS.getKey()) {
-                postGenerate(FRUIT.getMapChar(), 2, capital);
+                postGenerate(FRUIT.getMapChar(), PLAIN.getMapChar(), 2, capital);
             } else if(owner == (char)BARDUR.getKey()) {
-                postGenerate(ANIMAL.getMapChar(), 2, capital);
+                postGenerate(ANIMAL.getMapChar(), FOREST.getMapChar(), 2, capital);
             }
         }
 
@@ -383,12 +401,12 @@ public class LevelGenerator {
         return resources;
     }
 
-    public void postGenerate(char resource, int quantity, int capital) {
+    public void postGenerate(char resource, char terrain, int quantity, int capital) {
         int resources = checkResources(resource, capital);
         while (resources < quantity) {
             int pos = randomInt(0, 8);
             ArrayList<Integer> territory = circle(capital, 1);
-            writeTile(territory.get(pos), null, ""+resource);
+            writeTile(territory.get(pos), ""+terrain, ""+resource);
             for (int neighbour : plusSign(territory.get(pos))) {
                 if (getTerrain(neighbour) == DEEP_WATER.getMapChar()) {
                     writeTile(neighbour, ""+SHALLOW_WATER.getMapChar(), null);
@@ -639,7 +657,7 @@ public class LevelGenerator {
 
         long genSeed = System.currentTimeMillis();
         LevelGenerator gen = new LevelGenerator(genSeed);
-        gen.init(18, 3, 4, 0.5, new Types.TRIBE[]{XIN_XI, OUMAJI});
+        gen.init(11, 3, 4, 0.5, new Types.TRIBE[]{XIN_XI, OUMAJI});
         gen.generate();
 //        gen.toCSV();
         gen.print();

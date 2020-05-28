@@ -169,7 +169,9 @@ public class GameView extends JComponent {
         paintUnits(g);
         paintActionsHighlightedUnit(g, highlightX, highlightY);
         paintOtherActions(g);
-        paintEffects(g);
+        if (GUI_DRAW_EFFECTS) {
+            paintEffects(g);
+        }
         paintActionAnimations(g);
 
         g.setColor(Color.BLACK);
@@ -884,13 +886,12 @@ public class GameView extends JComponent {
             sourceTargetAnimationInfo.clear();
             animatedAction = null;
 
-
             Unit source = (Unit) gameState.getBoard().getActor(a.getUnitId());
             Image weapon1 = source.getType().getWeaponImage(source.getTribeId());
 
             if (weapon1 != null) {
                 // Pause the game, paint this weapon image travelling from attacker to target
-                game.setPaused(true);
+                game.setAnimationPaused(true);
                 Pair<Image, Vector2d> sourceAnimationInfo = new Pair<>(weapon1, new Vector2d(source.getPosition().y * CELL_SIZE, source.getPosition().x * CELL_SIZE));
                 ArrayList<Unit> targets = new ArrayList<>();
                 Image weapon2 = null;
@@ -919,7 +920,8 @@ public class GameView extends JComponent {
 
                 for (Unit target: targets) {
                     Pair<Image, Vector2d> targetAnimationInfo = new Pair<>(weapon2, new Vector2d(target.getPosition().y * CELL_SIZE, target.getPosition().x * CELL_SIZE));
-                    animationSpeed.add(Math.min(0.5, manhattanDistance(source.getPosition(), target.getPosition()) * 0.05));
+                    animationSpeed.add(Math.max(1.0,
+                            Math.min(25.0/(FRAME_DELAY+25), manhattanDistance(source.getPosition(), target.getPosition()) * (2.5/(FRAME_DELAY+25)))));
                     actionAnimationUnitsTribe.add(new Pair<>(source.getTribeId(), target.getTribeId()));
                     sourceTargetAnimationInfo.add(new Pair<>(sourceAnimationInfo, targetAnimationInfo));
                 }
@@ -956,7 +958,7 @@ public class GameView extends JComponent {
                 int y = rotated.y - CELL_SIZE / 4;
                 paintImageRotated(g, x, y, source.getFirst(), CELL_SIZE / 2, panTranslate, imageAngleRad, x + CELL_SIZE/4, y + CELL_SIZE/4);
 
-                if (currentPosition.equalsPlusError(target.getSecond(), CELL_SIZE * animationSpeed.get(i))) {
+                if (currentPosition.equalsPlusError(target.getSecond(), CELL_SIZE * 0.5)) {
                     // Reached destination, no more drawing. Reset animation variables and unpause game, unless retaliation happening
 
                     // Draw end of animation effect
@@ -985,8 +987,8 @@ public class GameView extends JComponent {
                 actionAnimationUnitsTribe.remove(i);
             }
         } else {
-            if (effectDrawingIdx == -1) {
-                game.setPaused(false);
+            if (effectDrawingIdx == -1 || !GUI_DRAW_EFFECTS) {
+                game.setAnimationPaused(false);
             }
         }
     }

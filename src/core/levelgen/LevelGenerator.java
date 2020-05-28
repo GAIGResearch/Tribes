@@ -17,9 +17,6 @@ import java.util.*;
  * Original source: https://github.com/QuasiStellar/Polytopia-Map-Generator.
  */
 
-//TODO: Ruins don't seem to spawn very ofter.
-//TODO: Sometimes capitals spawn right next to each other.
-//TODO: Fix chequered board effect with the water.
 //TODO: Clean up and write some comments.
 
 public class LevelGenerator {

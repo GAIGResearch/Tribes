@@ -45,6 +45,13 @@ public class LevelUp extends CityAction {
         Tribe tribe = gs.getBoard().getTribe(city.getTribeId());
         Vector2d cityPos = city.getPosition();
 
+        if(bonus.grantsMonument())
+            tribe.cityMaxedUp();
+
+        tribe.addScore(bonus.getLevelUpPoints());
+        city.addPointsWorth(bonus.getLevelUpPoints());
+        city.levelUp();
+
         switch(bonus)
         {
             case WORKSHOP:
@@ -80,13 +87,6 @@ public class LevelUp extends CityAction {
                 gs.getBoard().addUnit(city, superUnit);
                 break;
         }
-
-        if(bonus.grantsMonument())
-            tribe.cityMaxedUp();
-
-        tribe.addScore(bonus.getLevelUpPoints());
-        city.addPointsWorth(bonus.getLevelUpPoints());
-        city.levelUp();
 
         return true;
     }

@@ -3,6 +3,7 @@ package core;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import static core.Types.TECHNOLOGY.*;
@@ -20,7 +21,7 @@ public class TechnologyTree {
      */
     public TechnologyTree(){
         researched = new boolean[Types.TECHNOLOGY.values().length];
-//        Arrays.fill(researched, true); //Buff for debug purposes, keep this commented for real games.
+//        Arrays.fill(researched, true); everythingResearched = true; //Buff for debug purposes, keep this commented for real games.
     }
 
     /**

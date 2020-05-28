@@ -24,6 +24,8 @@ public class MonteCarloAgent extends Agent {
     private Random m_rnd;
     private MCParams params;
     private StateHeuristic heuristic;
+    private int lastTurn;
+    private int actionTurnCounter;
 
     private int fmCalls;
 
@@ -33,10 +35,20 @@ public class MonteCarloAgent extends Agent {
         m_rnd = new Random(seed);
         this.params = params;
         this.heuristic = params.getHeuristic(playerID);
+        this.lastTurn = -1;
+        this.actionTurnCounter = 0;
     }
 
     @Override
     public Action act(GameState gs, ElapsedCpuTimer ect) {
+
+        if(lastTurn == gs.getTick())
+        {
+            actionTurnCounter++;
+        }else{
+            lastTurn = gs.getTick();
+            actionTurnCounter=0;
+        }
 
         //Gather all available actions:
         ArrayList<Action> allActions = gs.getAllAvailableActions();
@@ -72,6 +84,9 @@ public class MonteCarloAgent extends Agent {
 
             if(scores[rootActionIndex] == null)
                 scores[rootActionIndex] = new StatSummary();
+
+
+//            System.out.println("----- " + gs.getTick() + ":" + actionTurnCounter + ":" + nRollouts + " ------");
 
             double score = rollout(gs, act);
 
@@ -138,7 +153,6 @@ public class MonteCarloAgent extends Agent {
         int turnEndCountDown = params.FORCE_TURN_END;
         boolean run;
 
-//        System.out.println("---");
         while(!end)
         {
             run = true;

@@ -307,6 +307,7 @@ public class City extends Actor{
             }
         }
         System.out.println("Error!! Unit ID "+ id +" does not belong to this city");
+//        Thread.dumpStack();
     }
 
     /**

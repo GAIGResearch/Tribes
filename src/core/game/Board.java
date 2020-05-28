@@ -393,6 +393,12 @@ public class Board {
         removeUnitFromCity(unit, city, tribe);
         Types.UNIT baseLandUnit = getBaseLandUnit(unit);
 
+        if(baseLandUnit==null)
+        {
+            Thread.dumpStack();
+            baseLandUnit=Types.UNIT.WARRIOR;//ERRORSaving
+        }
+
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(x, y);
         Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), baseLandUnit);

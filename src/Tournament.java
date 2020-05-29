@@ -12,9 +12,10 @@ import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
 import utils.MultiStatSummary;
 
+import javax.swing.plaf.metal.MetalBorders;
 import java.util.*;
 
-import static core.Types.GAME_MODE.CAPITALS;
+import static core.Types.GAME_MODE.*;
 import static core.Types.TRIBE.*;
 
 /**
@@ -22,27 +23,39 @@ import static core.Types.TRIBE.*;
  */
 public class Tournament {
 
+    private static int MAX_LENGTH;
+    private static boolean FORCE_TURN_END;
+    private static boolean MCTS_ROLLOUTS;
+
     private static Agent _getAgent(PlayerType playerType, long agentSeed, ActionController ac)
     {
         switch (playerType)
         {
-            case DONOTHING: return new DoNothingAgent(agentSeed);
             case HUMAN: return new HumanAgent(ac);
+            case DONOTHING: return new DoNothingAgent(agentSeed);
             case RANDOM: return new RandomAgent(agentSeed);
+            case SIMPLE: return new SimpleAgent(agentSeed);
             case OSLA:
                 OSLAParams oslaParams = new OSLAParams();
                 oslaParams.stop_type = oslaParams.STOP_FMCALLS; //Upper bound
+                oslaParams.heuristic_method = oslaParams.DIFF_HEURISTIC;
                 return new OneStepLookAheadAgent(agentSeed, oslaParams);
             case MC:
                 MCParams mcparams = new MCParams();
                 mcparams.stop_type = mcparams.STOP_FMCALLS;
-//                mcparams.stop_type = mcparams.STOP_ITERATIONS;
+                mcparams.heuristic_method = mcparams.DIFF_HEURISTIC;
                 mcparams.PRIORITIZE_ROOT = true;
+                mcparams.ROLLOUT_LENGTH = MAX_LENGTH;
+                mcparams.FORCE_TURN_END = FORCE_TURN_END ? 5 : mcparams.ROLLOUT_LENGTH + 1;
                 return new MonteCarloAgent(agentSeed, mcparams);
-            case SIMPLE: return new SimpleAgent(agentSeed);
             case MCTS:
                 MCTSParams mctsParams = new MCTSParams();
                 mctsParams.stop_type = mctsParams.STOP_FMCALLS;
+                mctsParams.heuristic_method = mctsParams.DIFF_HEURISTIC;
+                mctsParams.PRIORITIZE_ROOT = true;
+                mctsParams.ROLLOUT_LENGTH = MAX_LENGTH;
+                mctsParams.FORCE_TURN_END = FORCE_TURN_END ? 5 : mctsParams.ROLLOUT_LENGTH + 1;
+                mctsParams.ROLOUTS_ENABLED = MCTS_ROLLOUTS;
                 return new MCTSPlayer(agentSeed, mctsParams);
             case OEP:
                 OEPParams oepParams = new OEPParams();
@@ -53,7 +66,6 @@ public class Tournament {
 
     public static void main(String[] args) {
 
-        Types.GAME_MODE gameMode = CAPITALS; //SCORE;
 
         long seeds[] = new long[]{
                 1590191438878L, 1590791907337L,
@@ -70,24 +82,79 @@ public class Tournament {
                 1590182659177L, 1590912178111L,
                 1588407146837L
         };
-
 //        Arrays.fill(seeds, -1);
 
+        Types.GAME_MODE gameMode = CAPITALS; //SCORE;
         Tournament t = new Tournament(gameMode);
-//
-        t.setPlayers(new PlayerType[]{PlayerType.OSLA, PlayerType.MC});
-        t.setTribes(new Types.TRIBE[]{XIN_XI, IMPERIUS});
-
-//        t.setPlayers(new PlayerType[]{PlayerType.SIMPLE, PlayerType.DONOTHING, PlayerType.OSLA});
-//        t.setTribes(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR});
-
-        t.setSeeds(seeds);
         int nRepetitions = 4;
-        boolean shiftTribes = true;
+        if(args.length == 0)
+        {
+            t.setPlayers(new PlayerType[]{PlayerType.MC, PlayerType.MC});
+            t.setTribes(new Types.TRIBE[]{XIN_XI, IMPERIUS});
+        }else
+        {
+            try {
+                gameMode = (Integer.parseInt(args[0]) == 0) ? CAPITALS : SCORE;
+                t = new Tournament(gameMode);
+                nRepetitions = Integer.parseInt(args[1]);
 
+                MAX_LENGTH = Integer.parseInt(args[2]);;
+                FORCE_TURN_END = Integer.parseInt(args[3]) == 1;
+                MCTS_ROLLOUTS = Integer.parseInt(args[4]) == 1;
+
+                int nPlayers = (args.length - 5) / 2;
+                PlayerType[] playerTypes = new PlayerType[nPlayers];
+                Types.TRIBE[] tribes = new Types.TRIBE[nPlayers];
+
+                for (int i = 0; i < nPlayers; ++i) {
+                    playerTypes[i] = parsePlayerTypeStr(args[5 + i]);
+                    tribes[i] = parseTribeStr(args[5 + nPlayers + i]);
+                }
+
+                t.setPlayers(playerTypes);
+                t.setTribes(tribes);
+
+
+            }catch(Exception e)
+            {
+                printRunHelp(args);
+                System.exit(-1);
+            }
+        }
+
+        boolean shiftTribes = true;
+        t.setSeeds(seeds);
         t.run(nRepetitions, shiftTribes);
     }
 
+    private static PlayerType parsePlayerTypeStr(String arg) throws Exception
+    {
+        int data = Integer.parseInt(arg);
+        switch(data)
+        {
+            case 0: return PlayerType.DONOTHING;
+            case 1: return PlayerType.RANDOM;
+            case 2: return PlayerType.SIMPLE;
+            case 3: return PlayerType.OSLA;
+            case 4: return PlayerType.MC;
+            case 5: return PlayerType.MCTS;
+            case 6: return PlayerType.OEP;
+        }
+        throw new Exception("Error: unrecognized Player Type: " + data);
+    }
+
+    private static Types.TRIBE parseTribeStr(String arg) throws Exception
+    {
+        int data = Integer.parseInt(arg);
+        switch(data)
+        {
+            case 0: return XIN_XI;
+            case 1: return IMPERIUS;
+            case 2: return BARDUR;
+            case 3: return OUMAJI;
+        }
+        throw new Exception("Error: unrecognized Tribe: " + data);
+    }
 
 
     private Types.GAME_MODE gameMode;
@@ -128,6 +195,7 @@ public class Tournament {
     private void run(int repetitions, boolean shift)
     {
         int starter = 0;
+        int nseed = 0;
         for (long levelSeed : seeds) {
 
             if(levelSeed == -1)
@@ -157,7 +225,7 @@ public class Tournament {
                     if (playersIn < participants.size())
                         System.out.print(", ");
                 }
-                System.out.println("]");
+                System.out.println("] (" + (nseed*repetitions + rep + 1) + "/" + (seeds.length*repetitions) + ")");
 
                 Game game = _prepareGame(tribes, levelSeed, players, gameMode, null);
                 Run.runGame(game);
@@ -169,6 +237,8 @@ public class Tournament {
                     starter = (starter + 1) % participants.size();
                 }
             }
+
+            nseed++;
         }
 
         _printRunResults();
@@ -274,10 +344,14 @@ public class Tournament {
 
         if(RUN_VERBOSE)  System.out.println("Agents random seed: " + agentSeed);
 
+        ArrayList<Integer> allIds = new ArrayList<>();
+        for(int i = 0; i < playerTypes.length; ++i)
+            allIds.add(i);
+
         for(int i = 0; i < playerTypes.length; ++i)
         {
             Agent ag = _getAgent(playerTypes[i], agentSeed, ac);
-            ag.setPlayerID(i);
+            ag.setPlayerIDs(i, allIds);
             players.add(ag);
         }
         return players;
@@ -337,8 +411,13 @@ public class Tournament {
             System.out.println("--------- RESULTS ---------");
             for (MultiStatSummary stat : stats) {
                 Participant thisParticipant = (Participant) stat.getOwner();
-                System.out.printf("[N:%d];", stat.getVariable("v").n());
-                System.out.printf("[W:%d];", (int) stat.getVariable("v").sum());
+                int w = (int) stat.getVariable("v").sum();
+                int n = stat.getVariable("v").n();
+                double perc_w = 100.0 * (double)w/n;
+
+                System.out.printf("[N:%d];", n);
+                System.out.printf("[%%:%.2f];", perc_w);
+                System.out.printf("[W:%d];", w);
                 System.out.printf("[S:%.2f];", stat.getVariable("s").mean());
                 System.out.printf("[T:%.2f];", stat.getVariable("t").mean());
                 System.out.printf("[C:%.2f];", stat.getVariable("c").mean());
@@ -350,6 +429,35 @@ public class Tournament {
 
     }
 
+
+
+    private static void printRunHelp(String args[])
+    {
+        System.out.print("Invalid Arguments ");
+        for(String s : args) {
+            System.out.print(s + " ");
+        }
+        System.out.println(". Usage: ");
+
+        System.out.println("'java Tournament <g> <r> <p1> <p2> [...] <t1> <t2> [...]', where: ");
+        System.out.println("\t<g> is the game mode; 0: capitals, 1: score");
+        System.out.println("\t<r> is the number of repetitions per level");
+        System.out.println("\t<p_i> is player type i:");
+        System.out.println("\t\t0: DoNothing player");
+        System.out.println("\t\t1: Random player");
+        System.out.println("\t\t2: RuleBased player");
+        System.out.println("\t\t3: OneStepLookAhead player");
+        System.out.println("\t\t4: Monte Carlo player");
+        System.out.println("\t\t5: Monte Carlo Tree Search player");
+        System.out.println("\t\t6: Online Evolutionary Planning player");
+        System.out.println("\t<t_i> is tribe i:");
+        System.out.println("\t\t0: Xin Xi tribe");
+        System.out.println("\t\t1: Imperius tribe");
+        System.out.println("\t\t2: Bardur tribe");
+        System.out.println("\t\t3: Oumaji tribe");
+        System.out.println("\tThe number of tribes and players must be equal.");
+        System.out.println("Example: java -jar Tribes.jar 0 10 2 3 0 1");
+    }
 
     /// ----- Players and participants -----
 

@@ -439,9 +439,12 @@ public class Tournament {
         }
         System.out.println(". Usage: ");
 
-        System.out.println("'java Tournament <g> <r> <p1> <p2> [...] <t1> <t2> [...]', where: ");
+        System.out.println("'java Tournament <g> <r> <max> <force> <mcts_rollouts> <p1> <p2> [...] <t1> <t2> [...]', where: ");
         System.out.println("\t<g> is the game mode; 0: capitals, 1: score");
         System.out.println("\t<r> is the number of repetitions per level");
+        System.out.println("\t<max> max length of a rollout");
+        System.out.println("\t<force> forces a turn end after this amount of moves in a rollout");
+        System.out.println("\t<mcts_rollouts> mcts rollouts are toggled on (1) or off (0)");
         System.out.println("\t<p_i> is player type i:");
         System.out.println("\t\t0: DoNothing player");
         System.out.println("\t\t1: Random player");

@@ -13,9 +13,13 @@ import players.HumanAgent;
 import players.KeyController;
 
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +39,7 @@ public class GUI extends JFrame {
     private ArrayList<HashMap<Integer,ArrayList<Action>>> actionHistory;
     private ArrayList<GameState> stateHistory;
     private ActionController replayer;
+    private JEditorPane actionHistoryDisplay;
     private boolean pauseAfterTurn = false;  // If game should automatically pause after one turn (of one tribe) is played
     private boolean pauseAfterTick = false;  // If game should automatically pause after one tick (all tribes) is played
 
@@ -75,7 +80,7 @@ public class GUI extends JFrame {
         GUI_MIN_PAN = (int)(0.015*screenDiagonal*scale);
         GUI_COMP_SPACING = (int)(0.0045*screenDiagonal*scale);
         GUI_CITY_TAG_WIDTH = (int)(0.009*screenDiagonal*scale);
-        GUI_SIDE_PANEL_WIDTH = (int)(0.25*screenDiagonal*scale);
+        GUI_SIDE_PANEL_WIDTH = (int)(0.2*screenDiagonal*scale);
         GUI_INFO_PANEL_HEIGHT = (int)(0.18*screenDiagonal*scale);
         GUI_ACTION_PANEL_HEIGHT = (int)(0.045*screenDiagonal*scale);
         GUI_TECH_PANEL_HEIGHT = (int)(0.16*screenDiagonal*scale);
@@ -105,7 +110,7 @@ public class GUI extends JFrame {
         // Main panel definition
         JPanel mainPanel = createGamePanel();
         JPanel sidePanel = createSidePanel();
-        JPanel frameworkPanel = createFrameworkPanel();
+        JTabbedPane frameworkPanel = createFrameworkPanel();
 
         gbc.gridx = 0;
         getContentPane().add(Box.createRigidArea(new Dimension(GUI_COMP_SPACING, 0)), gbc);
@@ -149,11 +154,11 @@ public class GUI extends JFrame {
                 //Only provide information if clicking on a visible tile
                 Vector2d translate = boardView.getPanTranslate();
                 Vector2d ep = new Vector2d(e.getX() - translate.x, e.getY() - translate.y);
-                Vector2d p = GameView.rotatePointReverse((int)ep.x, (int)ep.y);
+                Vector2d p = GameView.rotatePointReverse(ep.x, ep.y);
 
                 // If unit highlighted and action at new click valid for unit, execute action
                 if (game.getPlayers()[gs.getActiveTribeID()] instanceof HumanAgent ||
-                        !DISABLE_NON_HUMAN_GRID_HIGHLIGHT) {
+                        !DISABLE_NON_HUMAN_ACTION_HIGHLIGHT) {
                     // Only do this if actions should be executed, or it is human agent playing
                     Action candidate = getActionAt(p.x, p.y, infoView.getHighlightX(), infoView.getHighlightY());
                     if (candidate != null) {
@@ -353,27 +358,143 @@ public class GUI extends JFrame {
     /**
      * Panel containing functionality for interacting with the framework and getting high-level information, including:
      * - Game setup:
+     *      - Choosing and editing map for next game (text view) TODO
      *      - Choosing which players should play in the next game TODO
      *      - Choosing which tribe should be associated with each player in the next game TODO
-     *      - Choosing and editing map for next game (text view) TODO
      *      - Choosing game seed for next game TODO
      *      - Start/Restart/End game buttons TODO
-     * - Debugging:
-     *      - observability toggle TODO
-     *      - visuals on/off TODO
      *      - results printout for all games in the same run (if multiple) TODO
-     *      - save game toggle TODO
-     *      - add comments to saved game files TODO
-     *      - action history display TODO
+     *      - visuals on/off? TODO
+     * - Debugging:
+     *      - action history display
+     *      - observability toggle
+     *      - save game toggle
      *      - change game configuration? TODO
-     * @return
+     * @return side panel
      */
-    private JPanel createFrameworkPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
+    private JTabbedPane createFrameworkPanel() {
+        JTabbedPane panel = new JTabbedPane();
+
+        JPanel debug = new JPanel();
+        JPanel setup = new JPanel();
+        panel.add("Debug", debug);
+        panel.add("Setup", setup);
+
+        /* debug panel */
+
+        debug.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.SOUTH;
         c.weighty = 0;
+        c.gridx = 0;
+        c.gridy = 0;
+
+        debug.add(new JLabel("Action history"), c);
+        c.gridy++;
+
+        actionHistoryDisplay = new JEditorPane("text/html", "");
+        actionHistoryDisplay.setBackground(Color.lightGray);
+        DefaultCaret caret = (DefaultCaret)actionHistoryDisplay.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.OUT_BOTTOM);
+        JScrollPane scrollPane = new JScrollPane(actionHistoryDisplay);
+        scrollPane.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_TECH_PANEL_HEIGHT));
+        debug.add(scrollPane, c);
+        c.gridy++;
+
+        JButton saveActionHistoryButton = new JButton("Save action history");
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Locate directory to save text file");
+        saveActionHistoryButton.addActionListener(e -> {
+            int userSelection = fileChooser.showSaveDialog(this);
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                try (PrintWriter out = new PrintWriter(fileToSave.getAbsolutePath())) {
+                    out.println(actionHistoryDisplay.getText());
+                } catch (FileNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        debug.add(saveActionHistoryButton, c);
+        c.gridy++;
+
+        debug.add(Box.createRigidArea(new Dimension(GUI_SIDE_PANEL_WIDTH, 50)), c);
+        c.gridy++;
+        debug.add(new JLabel("Toggles"), c);
+        c.gridy++;
+        JPanel toggles = new JPanel();
+        toggles.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_ACTION_PANEL_HEIGHT));
+
+        // Observability toggle
+        JToggleButton toggleButton1 = new JToggleButton("Force full observability");
+        toggleButton1.addActionListener(e -> GUI_FORCE_FULL_OBS = ((JToggleButton)e.getSource()).isSelected());
+        toggles.add(toggleButton1);
+
+        // Draw effects toggle
+        JToggleButton toggleButton2 = new JToggleButton("Draw effects");
+        toggleButton2.addActionListener(e -> GUI_DRAW_EFFECTS = ((JToggleButton)e.getSource()).isSelected());
+        toggles.add(toggleButton2);
+
+        // Non-human game view highlight toggle
+        JToggleButton toggleButton5 = new JToggleButton("Non-human action highlights");
+        toggleButton5.addActionListener(e -> DISABLE_NON_HUMAN_ACTION_HIGHLIGHT = !((JToggleButton)e.getSource()).isSelected());
+        toggles.add(toggleButton5);
+
+        // Turn limited toggle
+        JToggleButton toggleButton6 = new JToggleButton("Turn limited");
+        toggleButton6.addActionListener(e -> TURN_LIMITED = ((JToggleButton)e.getSource()).isSelected());
+        toggles.add(toggleButton6);
+
+        // Verbose toggle
+        JToggleButton toggleButton3 = new JToggleButton("Verbose");
+        toggleButton3.addActionListener(e -> VERBOSE = ((JToggleButton)e.getSource()).isSelected());
+        toggles.add(toggleButton3);
+
+        // Save game toggle
+        JToggleButton toggleButton4 = new JToggleButton("Save game");
+        toggleButton4.addActionListener(e -> WRITE_SAVEGAMES = ((JToggleButton)e.getSource()).isSelected());
+        toggles.add(toggleButton4);
+
+        debug.add(toggles, c);
+        c.gridy++;
+
+        debug.add(Box.createRigidArea(new Dimension(GUI_SIDE_PANEL_WIDTH, 50)), c);
+        c.gridy++;
+        debug.add(new JLabel("Run settings"), c);
+        c.gridy++;
+
+        JPanel turnOptions = new JPanel();
+        JLabel turnTimeLabel = new JLabel("Turn limit (ms): ");
+        JTextField turnTime = new JTextField("10000000", 15);
+        JButton updateTurnTime = new JButton("OK");
+        updateTurnTime.addActionListener(e -> TURN_TIME_MILLIS = Long.parseLong(turnTime.getText()));
+        turnOptions.add(turnTimeLabel);
+        turnOptions.add(turnTime);
+        turnOptions.add(updateTurnTime);
+        debug.add(turnOptions, c);
+        c.gridy++;
+
+        JPanel delayOptions = new JPanel();
+        JLabel delayLabel = new JLabel("Frame delay: ");
+        JTextField delay = new JTextField("500", 15);
+        JButton updateDelay = new JButton("OK");
+        updateDelay.addActionListener(e -> FRAME_DELAY = Integer.parseInt(delay.getText()));
+        delayOptions.add(delayLabel);
+        delayOptions.add(delay);
+        delayOptions.add(updateDelay);
+        debug.add(delayOptions, c);
+        c.gridy++;
+
+        /* setup panel */
+
+        // game seed, level seed
+        // dropdown levels (incl. random generated) + edit map (new window)
+        // Player 1: dropdown agent, agent random seed, dropdown tribe
+        // Player 2: dropdown agent, agent random seed, dropdown tribe
+        // ...
+        // Start, restart, end game buttons
+        // Results display
+
         return panel;
     }
 
@@ -382,20 +503,28 @@ public class GUI extends JFrame {
      * Paints the GUI, to be called at every game tick.
      */
     public void update(GameState gs, Action a) {
-//        if (this.gs == null || this.gs.getTick() != gs.getTick()) {
-//            // Tick change
+        if (this.gs == null || this.gs.getTick() != gs.getTick()) {
+            // Tick change
+
 //            HashMap<Integer, ArrayList<Action>> tick = new HashMap<>();
 //            for (int i = 0; i < game.getPlayers().length; i++) {
 //                tick.put(i, new ArrayList<>());
 //            }
 //            actionHistory.add(tick);
-//        }
+
+            String historyText = actionHistoryDisplay.getText().replaceAll("</*html>|</*head>|</*body>|\n|\r", "");
+            actionHistoryDisplay.setText(historyText + "<h2>[tick " + gs.getTick() + "]</h2>");
+        }
+
         if (this.gs == null || this.gs.getActiveTribeID() != gs.getActiveTribeID()) {
             // Tribe change
             infoView.resetHighlight();  // Reset highlights
             boardView.setPanToTribe(gs);  // Pan camera to tribe capital
             ac.reset();  // Clear action queue
             otherInfo.setText("");  // Reset info
+
+            String historyText = actionHistoryDisplay.getText().replaceAll("</*html>|</*head>|</*body>|\n|\r", "");
+            actionHistoryDisplay.setText(historyText + "<p><b>" + gs.getActiveTribe().getName() + "</b><br/>");
         }
 
         // Display result of Examine action
@@ -407,15 +536,25 @@ public class GUI extends JFrame {
             boardView.paintAction((UnitAction)a);
         }
 
-//        if (this.gs != null) {
-//            if (a != null) {
-//                actionHistory.get(this.gs.getTick()).get(this.gs.getActiveTribeID()).add(a);
-//            }
-//            stateHistory.add(this.gs);
-//        }
         this.gs = gs;
         if (gs.isLevelingUp()) this.levelingUp++;
         else this.levelingUp = 0;
+
+        if (this.gs != null) {
+            if (a != null) {
+                // Update action history display
+                String historyText = actionHistoryDisplay.getText().replaceAll("</*html>|</*head>|</*body>|\n|\r", "");
+                historyText += a.toString() + "<br/>";
+                if (a instanceof EndTurn) {
+                    historyText += "</p>";
+                    if (gs.getActiveTribeID() == game.getPlayers().length - 1) historyText += "<hr>\n";
+                }
+                actionHistoryDisplay.setText(historyText);
+//                actionHistory.get(this.gs.getTick()).get(this.gs.getActiveTribeID()).add(a);
+            }
+//            stateHistory.add(this.gs);
+        }
+
         performUpdate();
 
         // Check if city is levelling up, pop up dialogue to choose options if human agent
@@ -512,8 +651,8 @@ public class GUI extends JFrame {
         return pos;
     }
 
-    public boolean isClosed() {
-        return wi.windowClosed;
+    public boolean isOpen() {
+        return !wi.windowClosed;
     }
 
     public boolean pauseAfterTurn() {

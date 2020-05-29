@@ -101,7 +101,7 @@ public class TechView extends JComponent {
             button.addActionListener(e -> {
                 infoView.setTechHighlightText(ef);
                 if (game.getPlayers()[gs.getActiveTribeID()] instanceof HumanAgent ||
-                        !DISABLE_NON_HUMAN_GRID_HIGHLIGHT) {
+                        !DISABLE_NON_HUMAN_ACTION_HIGHLIGHT) {
                     infoView.setTechHighlight(t);
                 }
             });

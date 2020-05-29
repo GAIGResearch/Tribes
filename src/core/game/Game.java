@@ -192,7 +192,7 @@ public class Game {
 
         boolean firstEnd = true;
 
-        while(frame == null || !frame.isClosed()) {
+        while(frame == null || frame.isOpen()) {
 //            System.out.println("Frame closed: " + frame.isClosed());
             // Loop while window is still open, even if the game ended.
             // If not playing with visuals, loop is broken when game's ended.
@@ -306,7 +306,7 @@ public class Game {
             actionDelayTimer.setMaxTimeMillis(FRAME_DELAY);
         }
 
-        while (frame == null || !frame.isClosed()) {
+        while (frame == null || frame.isOpen()) {
             // Keep track of action played in this loop, null if no action.
             Action action = null;
 

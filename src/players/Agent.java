@@ -1,11 +1,18 @@
 package players;
 
 import core.actions.Action;
+import core.actions.cityactions.Destroy;
+import core.actions.unitactions.Disband;
 import core.game.GameState;
+import players.mc.MonteCarloAgent;
 import utils.ElapsedCpuTimer;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public abstract class Agent {
 
+    protected ArrayList<Integer> allPlayerIDs;
     protected int playerID;
     protected long seed;
 
@@ -42,8 +49,12 @@ public abstract class Agent {
     /**
      * Setter for the player ID field
      * @param playerID the player ID of this agent
+     * @param allIds all IDs in this game.
      */
-    public void setPlayerID (int playerID) { this.playerID = playerID; }
+    public void setPlayerIDs(int playerID, ArrayList<Integer> allIds) {
+        this.playerID = playerID;
+        this.allPlayerIDs = allIds;
+    }
 
     /**
      * Getter for seed field.
@@ -59,6 +70,60 @@ public abstract class Agent {
         this.seed = seed;
     }
 
+
+
+    enum ACTION_TYPE
+    {
+        CITY,
+        TRIBE,
+        UNIT
+    }
+
+    /**
+     * Determines the action group (City actions, Unit actions or Tribe actions) at random
+     * @param gs current game state
+     * @param rnd random number generator
+     * @return the list of available actions of a given type (City, Unit or Tribe), at random.
+     */
+    protected ArrayList<Action> determineActionGroup(GameState gs, Random rnd)
+    {
+        ArrayList<ACTION_TYPE> availableTypes = new ArrayList<>();
+
+        ArrayList<Action> cityActions = gs.getAllCityActions();
+        ArrayList<Action> cityGoodActions = new ArrayList<>();
+        for(Action act : cityActions)
+            if(!(act instanceof Destroy))
+                cityGoodActions.add(act);
+        if(cityGoodActions.size() > 0) availableTypes.add(ACTION_TYPE.CITY);
+
+        ArrayList<Action> unitActions = gs.getAllUnitActions();
+        ArrayList<Action> unitGoodActions = new ArrayList<>();
+        for(Action act : unitActions)
+            if(!(act instanceof Disband))
+                unitGoodActions.add(act);
+        if(unitActions.size() > 0) availableTypes.add(ACTION_TYPE.UNIT);
+
+        ArrayList<Action> tribeActions = gs.getTribeActions();
+        if(tribeActions.size() > 1) availableTypes.add(ACTION_TYPE.TRIBE); //>1, we need to have something else than EndTurn only.
+
+        if(availableTypes.size() == 0)
+        {
+            return null;
+        }
+
+        int rndIdx = rnd.nextInt(availableTypes.size());
+        ACTION_TYPE rootAction = availableTypes.get(rndIdx);
+        if(rootAction == ACTION_TYPE.CITY)
+        {
+            return cityGoodActions;
+        }
+        if(rootAction == ACTION_TYPE.UNIT)
+        {
+            return unitActions;
+        }
+
+        return tribeActions;
+    }
 
 
 }

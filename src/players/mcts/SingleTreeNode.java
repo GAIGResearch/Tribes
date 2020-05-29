@@ -12,10 +12,11 @@ import utils.Vector2d;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class SingleTreeNode
+class SingleTreeNode
 {
-    public MCTSParams params;
+    private MCTSParams params;
 
+    private SingleTreeNode root;
     private SingleTreeNode parent;
     private SingleTreeNode[] children;
     private double totValue;
@@ -23,45 +24,48 @@ public class SingleTreeNode
     private Random m_rnd;
     private int m_depth;
     private double[] bounds = new double[]{Double.MAX_VALUE, -Double.MAX_VALUE};
-    private int childIdx;
     private int fmCallsCount;
     private int playerID;
-    private int turnEndCountDown;
 
     private ArrayList<Action> actions;
+    private GameState state;
 
     private GameState rootState;
     private StateHeuristic rootStateHeuristic;
 
+    //From MCTSPlayer
     SingleTreeNode(MCTSParams p, Random rnd, int num_actions, ArrayList<Action> actions, int playerID) {
-        this(p, null, -1, rnd, num_actions, actions, 0, null, playerID);
+        this(p, null, rnd, num_actions, actions, null, playerID, null, null);
     }
 
-    private SingleTreeNode(MCTSParams p, SingleTreeNode parent, int childIdx, Random rnd, int num_actions,
-                           ArrayList<Action> actions, int fmCallsCount, StateHeuristic sh, int playerID) {
+    private SingleTreeNode(MCTSParams p, SingleTreeNode parent, Random rnd, int num_actions,
+                           ArrayList<Action> actions, StateHeuristic sh, int playerID, SingleTreeNode root, GameState state) {
         this.params = p;
-        this.fmCallsCount = fmCallsCount;
+        this.fmCallsCount = 0;
         this.parent = parent;
         this.m_rnd = rnd;
         this.actions = actions;
+        this.root = root;
         children = new SingleTreeNode[num_actions];
         totValue = 0.0;
-        this.childIdx = childIdx;
         this.playerID = playerID;
-        this.turnEndCountDown = p.getFORCE_TURN_END();
+        this.state = state;
         if(parent != null) {
             m_depth = parent.m_depth + 1;
             this.rootStateHeuristic = sh;
         }
-        else
+        else {
             m_depth = 0;
+        }
 
     }
 
-    void setRootGameState(GameState gs)
+    void setRootGameState(SingleTreeNode root, GameState gs, ArrayList<Integer> allIDs)
     {
+        this.state = gs;
+        this.root = root;
         this.rootState = gs;
-        this.rootStateHeuristic = params.getHeuristic(playerID);
+        this.rootStateHeuristic = params.getHeuristic(playerID, allIDs);
     }
 
 
@@ -76,141 +80,185 @@ public class SingleTreeNode
         boolean stop = false;
 
         while(!stop){
-
-            GameState state = rootState.copy();
+//            System.out.println("------- " + root.actions.size() + " -------");
             ElapsedCpuTimer elapsedTimerIteration = new ElapsedCpuTimer();
-            SingleTreeNode selected = treePolicy(state);
-            double delta = selected.rollOut(state);
+            SingleTreeNode selected = treePolicy();
+            double delta = selected.rollOut();
             backUp(selected, delta);
+            numIters++;
 
             //Stopping condition
             if(params.stop_type == params.STOP_TIME) {
-                numIters++;
                 acumTimeTaken += (elapsedTimerIteration.elapsedMillis()) ;
                 avgTimeTaken  = acumTimeTaken/numIters;
                 remaining = elapsedTimer.remainingTimeMillis();
                 stop = remaining <= 2 * avgTimeTaken || remaining <= remainingLimit;
             }else if(params.stop_type == params.STOP_ITERATIONS) {
-                numIters++;
                 stop = numIters >= params.num_iterations;
             }else if(params.stop_type == params.STOP_FMCALLS)
             {
-                fmCallsCount+=params.rollout_depth;
-                stop = (fmCallsCount + params.rollout_depth) > params.num_fmcalls;
+                stop = fmCallsCount > params.num_fmcalls;
             }
         }
     }
 
-    private SingleTreeNode treePolicy(GameState state) {
+    private SingleTreeNode treePolicy() {
 
         SingleTreeNode cur = this;
 
-        while (!state.isGameOver() && state.getAllAvailableActions().size() > 1 && cur.m_depth < params.rollout_depth)
+        while (!cur.state.isGameOver() /*&& state.getAllAvailableActions().size() > 1 */ && cur.m_depth < params.ROLLOUT_LENGTH)
         {
             if (cur.notFullyExpanded()) {
-                return cur.expand(state);
+                return cur.expand();
 
             } else {
-                cur = cur.uct(state);
+                cur = cur.uct();
             }
         }
 
         return cur;
     }
 
+    private int tryForceEnd(GameState state, EndTurn endTurn, int depth)
+    {
+        boolean willForceEnd = (depth > 0 && (depth % params.FORCE_TURN_END) == 0) && endTurn.isFeasible(state);
+        if(!willForceEnd)
+            return -1; //Not the time, or not available.
 
-    private SingleTreeNode expand(GameState state) {
+        int actionIdx = 0;
+        while(actionIdx < actions.size())
+        {
+            Action act = actions.get(actionIdx);
+            if(act instanceof EndTurn)
+            {
+                //Here's the end turn, return it's index.
+                return actionIdx;
+            }else actionIdx++;
+        }
 
-        int bestAction = 0;
-        double bestValue = -1;
+        //This should not happen, but EndTurn is not available here.
+        return -1;
+    }
 
-        for (int i = 0; i < children.length; i++) {
-            double x = m_rnd.nextDouble();
-            if (x > bestValue && children[i] == null) {
-                bestAction = i;
-                bestValue = x;
+    private SingleTreeNode expand() {
+
+        int bestAction = tryForceEnd(state, new EndTurn(state.getActiveTribeID()), this.m_depth);
+        if(bestAction == -1)
+        {
+            //No turn end, expand
+            double bestValue = -1;
+
+            for (int i = 0; i < children.length; i++) {
+                double x = m_rnd.nextDouble();
+                if (x > bestValue && children[i] == null) {
+                    bestAction = i;
+                    bestValue = x;
+                }
             }
         }
 
-        //Roll the state
-        ArrayList<Action> newActions = roll(state, this.actions.get(bestAction), false);
-
-        SingleTreeNode tn = new SingleTreeNode(params,this,bestAction,this.m_rnd,newActions.size(),
-                newActions, fmCallsCount, rootStateHeuristic, this.playerID);
+        //Roll the state, create a new node and assign it.
+        GameState nextState = state.copy();
+        ArrayList<Action> newActions = advance(nextState, this.actions.get(bestAction), true);
+        SingleTreeNode tn = new SingleTreeNode(params, this, this.m_rnd, newActions.size(),
+                newActions, rootStateHeuristic, this.playerID, this.m_depth == 0 ? this : this.root, nextState);
         children[bestAction] = tn;
         return tn;
     }
 
-    private ArrayList<Action> roll(GameState gs, Action act, boolean isRollOut)
+
+
+    private ArrayList<Action> advance(GameState gs, Action act, boolean computeActions)
     {
-        if (turnEndCountDown <= 0 && isRollOut){
-            EndTurn endTurn = new EndTurn(gs.getActiveTribeID());
-            if (endTurn.isFeasible(gs)){
-                gs.advance(new EndTurn(gs.getActiveTribeID()), true);
-                turnEndCountDown = params.getFORCE_TURN_END();
-            }else{
-                gs.advance(act, true);
-            }
-        }else{
-            gs.advance(act, true);
-        }
+        gs.advance(act, computeActions);
+        root.fmCallsCount++;
         return gs.getAllAvailableActions();
     }
 
-    private SingleTreeNode uct(GameState state) {
-        SingleTreeNode selected = null;
-        double bestValue = -Double.MAX_VALUE;
-        for (SingleTreeNode child : this.children)
+
+    private SingleTreeNode uct() {
+
+        SingleTreeNode selected;
+        boolean IamMoving = (state.getActiveTribeID() == this.playerID);
+        int bestAction = tryForceEnd(state, new EndTurn(state.getActiveTribeID()), this.m_depth);
+        if(bestAction == -1)
         {
-            double hvVal = child.totValue;
-            double childValue =  hvVal / (child.nVisits + params.epsilon);
+            //No end turn, use uct.
+            double[] vals = new double[this.children.length];
+            for(int i = 0; i < this.children.length; ++i)
+            {
+                SingleTreeNode child = children[i];
 
-            childValue = normalise(childValue, bounds[0], bounds[1]);
+                double hvVal = child.totValue;
+                double childValue =  hvVal / (child.nVisits + params.epsilon);
+                childValue = normalise(childValue, bounds[0], bounds[1]);
 
-            double uctValue = childValue +
-                    params.K * Math.sqrt(Math.log(this.nVisits + 1) / (child.nVisits + params.epsilon));
+                double uctValue = childValue +
+                        params.K * Math.sqrt(Math.log(this.nVisits + 1) / (child.nVisits + params.epsilon));
 
-            uctValue = noise(uctValue, params.epsilon, this.m_rnd.nextDouble());     //break ties randomly
-
-            // small sampleRandom numbers: break ties in unexpanded nodes
-            if (uctValue > bestValue) {
-                selected = child;
-                bestValue = uctValue;
+                uctValue = noise(uctValue, params.epsilon, this.m_rnd.nextDouble());     //break ties randomly
+                vals[i] = uctValue;
             }
-        }
-        if (selected == null)
+
+            int which = -1;
+            double bestValue = IamMoving ? -Double.MAX_VALUE : Double.MAX_VALUE;
+            for(int i = 0; i < vals.length; ++i) {
+                if ((IamMoving && vals[i] > bestValue) || (!IamMoving && vals[i] < bestValue)){
+                    which = i;
+                    bestValue = vals[i];
+                }
+            }
+
+            if (which == -1)
+            {
+                throw new RuntimeException("Warning! couldn't find the best UCT value " + which + " : " + this.children.length + " " +
+                        + bounds[0] + " " + bounds[1]);
+            }
+
+            selected = children[which];
+
+//            System.out.print(this.m_depth + ", AmIMoving? " + IamMoving + ";");
+//            for(int i = 0; i < this.children.length; ++i)
+//                System.out.printf(" %f2", vals[i]);
+//            System.out.println("; selected: " + which);
+
+        }else
         {
-            throw new RuntimeException("Warning! returning null: " + bestValue + " : " + this.children.length + " " +
-                    + bounds[0] + " " + bounds[1]);
+            selected = children[bestAction];
         }
 
-        //Roll the state:
-        roll(state, actions.get(selected.childIdx), false);
-
+        //Roll the state. This is closed loop, we don't advance the state. We can't do open loop here because the
+        // number of actions available on a state depend on the state itself, and random events triggered by multiple
+        // runs over the same tree node would have different outcomes (i.e Examine ruins).
+        //advance(state, actions.get(selected.childIdx), true);
         return selected;
     }
 
-    private double rollOut(GameState state)
+    private double rollOut()
     {
-        int thisDepth = this.m_depth;
-
-        while (!finishRollout(state,thisDepth)) {
-            roll(state, state.getAllAvailableActions().get(m_rnd.nextInt(state.getAllAvailableActions().size())), true);
-            thisDepth++;
+        if(params.ROLOUTS_ENABLED) {
+            GameState rolloutState = state.copy();
+            int thisDepth = this.m_depth;
+            while (!finishRollout(rolloutState, thisDepth)) {
+                EndTurn endTurn = new EndTurn(rolloutState.getActiveTribeID());
+                int bestAction = tryForceEnd(rolloutState, endTurn, thisDepth);
+                Action next = (bestAction != -1) ? endTurn : rolloutState.getAllAvailableActions().get(m_rnd.nextInt(rolloutState.getAllAvailableActions().size()));
+                advance(rolloutState, next, true);
+                thisDepth++;
+            }
+            return normalise(this.rootStateHeuristic.evaluateState(root.rootState, rolloutState), 0, 1);
         }
 
-        return normalise(this.rootStateHeuristic.evaluateState(state), 0, 1);
+        return normalise(this.rootStateHeuristic.evaluateState(root.rootState, this.state), 0, 1);
     }
 
     private boolean finishRollout(GameState rollerState, int depth)
     {
-        if (depth >= params.rollout_depth)      //rollout end condition.
+        if (depth >= params.ROLLOUT_LENGTH)      //rollout end condition.
             return true;
 
-        if (rollerState.isGameOver())               //end of game
-            return true;
-
-        return false;
+        //end of game
+        return rollerState.isGameOver();
     }
 
 
@@ -317,12 +365,7 @@ public class SingleTreeNode
 
     private double noise(double input, double epsilon, double random)
     {
-        if(input != -epsilon) {
-            return (input + epsilon) * (1.0 + epsilon * (random - 0.5));
-        }else {
-            //System.out.format("utils.tiebreaker(): WARNING: value equal to epsilon: %f\n",input);
-            return (input + epsilon) * (1.0 + epsilon * (random - 0.5));
-        }
+        return (input + epsilon) * (1.0 + epsilon * (random - 0.5));
     }
 
 }

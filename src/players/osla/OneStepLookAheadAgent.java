@@ -8,6 +8,7 @@ import core.actions.unitactions.Disband;
 import core.actions.unitactions.Move;
 import core.game.GameState;
 import players.Agent;
+import players.heuristics.StateHeuristic;
 import players.heuristics.TribesSimpleHeuristic;
 import utils.ElapsedCpuTimer;
 
@@ -46,7 +47,7 @@ public class OneStepLookAheadAgent extends Agent {
 
         Action bestAction = new EndTurn();
         double maxQ = Double.NEGATIVE_INFINITY;
-        TribesSimpleHeuristic heuristic = new TribesSimpleHeuristic(this.getPlayerID());
+        StateHeuristic heuristic = params.getHeuristic(this.getPlayerID(), allPlayerIDs);
         boolean end = false;
         int actionIdx = 0;
         while(!end)
@@ -56,7 +57,8 @@ public class OneStepLookAheadAgent extends Agent {
 
                 GameState gsCopy = gs.copy();
                 advance(gsCopy, act, false);
-                double Q = heuristic.evaluateState(gsCopy);
+                double Q = heuristic.evaluateState(gs, gsCopy);
+//                double Q = heuristic.evaluateState(gsCopy);
                 Q = noise(Q, params.epsilon, this.m_rnd.nextDouble());
 
                 //scores.put(act, Q);

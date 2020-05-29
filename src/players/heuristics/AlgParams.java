@@ -14,6 +14,7 @@ public class AlgParams
 
     public final int ENTROPY_HEURISTIC = 0;
     public final int SIMPLE_HEURISTIC = 1;
+    public final int DIFF_HEURISTIC = 2;
     public int heuristic_method = SIMPLE_HEURISTIC;
 
     public double epsilon = 1e-6;
@@ -24,6 +25,7 @@ public class AlgParams
     public int num_fmcalls = 2000;
     public int num_time = 40;
     public int FORCE_TURN_END = 5;
+    public boolean PRIORITIZE_ROOT = false;
 
 
     public void setParameterValue(String param, Object value) { }
@@ -39,16 +41,14 @@ public class AlgParams
         return names;
     }
 
-    public StateHeuristic getHeuristic(int playerID)
+    public StateHeuristic getHeuristic(int playerID, ArrayList<Integer> allIDs)
     {
         if (heuristic_method == ENTROPY_HEURISTIC)
-            return new TribesEntropyHeuristic(playerID);
+            return new TribesEntropyHeuristic(playerID, allIDs);
         else if (heuristic_method == SIMPLE_HEURISTIC) // New method: combined heuristics
-            return new TribesSimpleHeuristic(playerID);
+            return new TribesSimpleHeuristic(playerID, allIDs);
+        else if (heuristic_method == DIFF_HEURISTIC)
+            return new TribesDiffHeuristic(playerID, allIDs);
         return null;
-    }
-
-    public int getFORCE_TURN_END() {
-        return FORCE_TURN_END;
     }
 }

@@ -313,9 +313,11 @@ public class GameState {
 
             if(!executed) {
                 System.out.println("FM: Action [" + action + "] couldn't execute?");
+                action.execute(this);
             }
 
             if(executed) {
+
 
                 //it's an end turn
                 if(action instanceof EndTurn)
@@ -506,8 +508,8 @@ public class GameState {
      */
     public GameState copy(int playerIdx)
     {
-//        GameState copy = new GameState(this.rnd, this.gameMode); //use this for a 100% repetition of the game based on random seed and game seed.
-        GameState copy = new GameState(new Random(), this.gameMode); //copies of the game state can't have the same random generator.
+        GameState copy = new GameState(this.rnd, this.gameMode); //use this for a 100% repetition of the game based on random seed and game seed.
+//        GameState copy = new GameState(new Random(), this.gameMode); //copies of the game state can't have the same random generator.
         copy.board = board.copy(playerIdx!=-1, playerIdx);
         copy.tick = this.tick;
         copy.turnMustEnd = turnMustEnd;
@@ -753,6 +755,17 @@ public class GameState {
         return allActions;
     }
 
+    public ArrayList<Action> getAllAvailableActions(int playerID)
+    {
+        if(playerID == getActiveTribeID())
+            return getAllAvailableActions();
+        else
+        {
+            //TODO: We have to compute them, and now computePlayerActions changes the current active tribe. Fix!
+            System.out.println("Warning: requesting actions for non active tribe is not implemented");
+            return getAllAvailableActions();
+        }
+    }
 
     public HashMap<Integer, ArrayList<Action>> getCityActions() {     return cityActions;  }
     public ArrayList<Action> getCityActions(City c) {  return cityActions.get(c.getActorId());  }
@@ -782,14 +795,25 @@ public class GameState {
 
     /* Potentially helpful methods for agents */
 
-    public int getTribeProduction()
+    public int getTribeProduction(int playerId)
     {
-        return this.getActiveTribe().getMaxProduction(this);
+        if(playerId == getActiveTribeID())
+            return this.getActiveTribe().getMaxProduction(this);
+
+        return this.getTribe(playerId).getMaxProduction(this);
     }
 
-    public TechnologyTree getTribeTechTree()
+
+    public TechnologyTree getTribeTechTree(int playerId)
     {
-        return getActiveTribe().getTechTree();
+        if(playerId == getActiveTribeID())
+            return getActiveTribe().getTechTree();
+        return this.getTribe(playerId).getTechTree();
+    }
+
+    public int getNKills(int playerId)
+    {
+        return getTribe(playerId).getnKills();
     }
 
     public int getScore(int playerID)
@@ -805,9 +829,9 @@ public class GameState {
         return getActiveTribe().getTribesMet();
     }
 
-    public ArrayList<City> getCities()
+    public ArrayList<City> getCities(int playerId)
     {
-        ArrayList<Integer> cities = getActiveTribe().getCitiesID();
+        ArrayList<Integer> cities = getTribe(playerId).getCitiesID();
         ArrayList<City> cityActors = new ArrayList<>();
         for(Integer cityId : cities)
         {
@@ -816,9 +840,9 @@ public class GameState {
         return cityActors;
     }
 
-    public ArrayList<Unit> getUnits()
+    public ArrayList<Unit> getUnits(int playerId)
     {
-        ArrayList<Integer> cities = getActiveTribe().getCitiesID();
+        ArrayList<Integer> cities = getTribe(playerId).getCitiesID();
         ArrayList<Unit> unitActors = new ArrayList<>();
         for(Integer cityId : cities)
         {
@@ -830,7 +854,7 @@ public class GameState {
             }
         }
 
-        for(Integer unitId : getActiveTribe().getExtraUnits())
+        for(Integer unitId : getTribe(playerId).getExtraUnits())
         {
             Unit unit = (Unit) board.getActor(unitId);
             unitActors.add(unit);
@@ -843,8 +867,8 @@ public class GameState {
         return gameMode;
     }
 
-    public Types.RESULT getTribeWinStatus() {
-        return getActiveTribe().getWinner();
+    public Types.RESULT getTribeWinStatus(int playerId) {
+        return getTribe(playerId).getWinner();
     }
 
 

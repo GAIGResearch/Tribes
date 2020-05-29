@@ -35,7 +35,7 @@ public class Move extends UnitAction
             ArrayList<PathNode> path = tp.findPathTo(destination);
             if(path == null)
             {
-                System.out.println("ERROR calculating a path (if actions was created by MoveFactory)");
+                System.out.println("ERROR calculating a path (if actions were created by MoveFactory)");
             }
             return path != null;
         }

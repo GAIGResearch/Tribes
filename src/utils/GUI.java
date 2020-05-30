@@ -10,10 +10,15 @@ import core.game.Game;
 import core.game.GameState;
 import core.actions.Action;
 import core.game.LevelLoader;
-import players.ActionController;
-import players.Agent;
-import players.HumanAgent;
-import players.KeyController;
+import players.*;
+import players.mc.MCParams;
+import players.mc.MonteCarloAgent;
+import players.mcts.MCTSParams;
+import players.mcts.MCTSPlayer;
+import players.oep.OEPAgent;
+import players.oep.OEPParams;
+import players.osla.OSLAParams;
+import players.osla.OneStepLookAheadAgent;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -400,7 +405,7 @@ public class GUI extends JFrame {
         JPanel debug = new JPanel();
         JPanel setup = new JPanel();
         panel.add("Debug", debug);
-        panel.add("Setup", setup);
+        panel.add("Run", setup);
 
         /* debug panel */
 
@@ -548,6 +553,25 @@ public class GUI extends JFrame {
 
         // Level select
         int maxPlayers = Types.TRIBE.values().length;
+
+        String[] playerOpts = new String[maxPlayers+1];
+        playerOpts[0] = "# players";
+        for (int i = 0; i < maxPlayers; i++) {
+            playerOpts[i+1] = "" + (i+1);
+        }
+        JComboBox<String> nPlayersSelect = new JComboBox<>(playerOpts);
+        nPlayersSelect.addActionListener(e -> {
+            int nPlayers = nPlayersSelect.getSelectedIndex();
+            if (nPlayers > 0) {
+                for (int i = 0; i < nPlayers; i++) {
+                    playerSelectPanels[i].setVisible(true);
+                }
+                for (int i = nPlayers; i < maxPlayers; i++) {
+                    playerSelectPanels[i].setVisible(false);
+                }
+            }
+        });
+
         List<File> levelFiles = new ArrayList<>();
         try {
             levelFiles = Files.walk(Paths.get("levels/"))
@@ -578,13 +602,18 @@ public class GUI extends JFrame {
                 for (int i = nPlayers; i < maxPlayers; i++) {
                     playerSelectPanels[i].setVisible(false);
                 }
+                nPlayersSelect.setEnabled(false);
+                nPlayersSelect.setSelectedIndex(nPlayers);
+            } else {
+                nPlayersSelect.setEnabled(true);
             }
         });
-        JButton editLevel = new JButton("Edit");  // TODO: edit map in new window
+        JButton editLevel = new JButton("Edit level");  // TODO: edit map in new window
         JPanel levelSelect = new JPanel();
         levelSelect.add(new JLabel("Level select: "));
         levelSelect.add(levelList);
-        levelSeed.add(editLevel);
+        levelSelect.add(nPlayersSelect);
+        levelSelect.add(editLevel);
         setup.add(levelSelect, c);
         c.gridy++;
 
@@ -622,23 +651,37 @@ public class GUI extends JFrame {
         startGame.addActionListener(e -> {
             // TODO: force end of current game, if not ended
 
-            int nPlayers = maxPlayers;
+            int nPlayers = nPlayersSelect.getSelectedIndex();
+            ArrayList<Agent> players = new ArrayList<>();
+            if (nPlayers > 0) {
 
-            ArrayList<Agent> players = new ArrayList<>(nPlayers);  // TODO: set up players
-            Types.TRIBE[] tribes = new Types.TRIBE[players.size()];
-            if (levelList.getSelectedIndex() == 0) {
-                game.init(players, Long.parseLong(seed2.getText()), tribes, Long.parseLong(seed1.getText()),
-                        (Types.GAME_MODE)modes.getSelectedItem());
-            } else {
-                LevelLoader ll = new LevelLoader();
-                Board board = ll.buildLevel(new IO().readFile((String)levelList.getSelectedItem()),
-                        new Random(Long.parseLong(seed1.getText())));
-                nPlayers = board.getTribes().length;
+                // Set up players
+                Types.TRIBE[] tribes = new Types.TRIBE[nPlayers];
+                for (int i = 0; i < nPlayers; i++) {
+                    long seed = Long.parseLong(playerSelectSeed[i].getText());
+                    tribes[i] = (Types.TRIBE) playerSelectTribe[i].getSelectedItem();
+                    PlayerType type = (PlayerType) playerSelectType[i].getSelectedItem();
+                    Agent a = _getAgent(type, seed, ac);
+                    if (a != null) {
+                        a.setPlayerID(i);
+                        players.add(a);
+                    }
+                }
 
-                game.init(players, "levels/" + levelList.getSelectedItem(), Long.parseLong(seed1.getText()),
-                        (Types.GAME_MODE) modes.getSelectedItem());
+                // Init game
+                if (levelList.getSelectedIndex() == 0) {
+                    // Random
+                    game.init(players, Long.parseLong(seed2.getText()), tribes, Long.parseLong(seed1.getText()),
+                            (Types.GAME_MODE) modes.getSelectedItem());
+                } else {
+                    // Chosen level
+                    game.init(players, "levels/" + levelList.getSelectedItem(), Long.parseLong(seed1.getText()),
+                            (Types.GAME_MODE) modes.getSelectedItem());
+                }
+
+                // Run game
+                game.run(this, wi);
             }
-            game.run(this, wi);
         });
         JButton endGame = new JButton("End game");
         endGame.addActionListener(e -> {
@@ -669,6 +712,11 @@ public class GUI extends JFrame {
         return panel;
     }
 
+    /**
+     * Select agent, random seed and tribe for each player.
+     * @param idx - index of this player
+     * @return JPanel with all selectors initialised.
+     */
     private JPanel createPlayerSelectPanel(int idx) {
         JPanel panel = new JPanel();
         panel.add(new JLabel("Player " + idx + ": "));
@@ -862,5 +910,34 @@ public class GUI extends JFrame {
 
     public Action getAnimatedAction() {
         return boardView.getAnimatedAction();
+    }
+
+    private static Agent _getAgent(PlayerType playerType, long agentSeed, ActionController ac)
+    {
+        switch (playerType)
+        {
+            case DONOTHING: return new DoNothingAgent(agentSeed);
+            case HUMAN: return new HumanAgent(ac);
+            case RANDOM: return new RandomAgent(agentSeed);
+            case OSLA:
+                OSLAParams oslaParams = new OSLAParams();
+                oslaParams.stop_type = oslaParams.STOP_FMCALLS; //Upper bound
+                return new OneStepLookAheadAgent(agentSeed, oslaParams);
+            case MC:
+                MCParams mcparams = new MCParams();
+                mcparams.stop_type = mcparams.STOP_FMCALLS;
+//                mcparams.stop_type = mcparams.STOP_ITERATIONS;
+                mcparams.PRIORITIZE_ROOT = false;
+                return new MonteCarloAgent(agentSeed, mcparams);
+            case SIMPLE: return new SimpleAgent(agentSeed);
+            case MCTS:
+                MCTSParams mctsParams = new MCTSParams();
+                mctsParams.stop_type = mctsParams.STOP_FMCALLS;
+                return new MCTSPlayer(agentSeed, mctsParams);
+            case OEP:
+                OEPParams oepParams = new OEPParams();
+                return new OEPAgent(agentSeed, oepParams);
+        }
+        return null;
     }
 }

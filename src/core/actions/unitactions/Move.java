@@ -33,10 +33,10 @@ public class Move extends UnitAction
         //If the unit can move and the destination is vacant, try to reach it.
         if(unit.canMove() && gs.getBoard().getUnitAt(destination.x, destination.y) == null) {
             ArrayList<PathNode> path = tp.findPathTo(destination);
-            if(path == null)
-            {
-                System.out.println("ERROR calculating a path (if actions were created by MoveFactory)");
-            }
+//            if(path == null)
+//            {
+//                System.out.println("ERROR calculating a path (if actions were created by MoveFactory)");
+//            }
             return path != null;
         }
         return false;

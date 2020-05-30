@@ -9,6 +9,8 @@ import players.oep.OEPAgent;
 import players.oep.OEPParams;
 import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
+import players.rhea.RHEAAgent;
+import players.rhea.RHEAParams;
 
 import java.util.*;
 
@@ -32,6 +34,7 @@ public class Play {
         MC,
         SIMPLE,
         MCTS,
+        RHEA,
         OEP;
     }
 
@@ -71,6 +74,14 @@ public class Play {
 //                mctsParams.ROLOUTS_ENABLED = false;
                 mctsParams.FORCE_TURN_END = 25;
                 return new MCTSPlayer(agentSeed, mctsParams);
+            case RHEA:
+                RHEAParams rheaParams = new RHEAParams();
+                rheaParams.stop_type = rheaParams.STOP_FMCALLS;
+                rheaParams.heuristic_method = rheaParams.DIFF_HEURISTIC;
+                rheaParams.INDIVIDUAL_LENGTH = 20;
+                rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
+                rheaParams.POP_SIZE = 1;
+                return new RHEAAgent(agentSeed, rheaParams);
             case OEP:
                 OEPParams oepParams = new OEPParams();
                 return new OEPAgent(agentSeed, oepParams);
@@ -93,8 +104,8 @@ public class Play {
 
 
         //1. Play one game with visuals using the Level Generator:
-//        AGENT_SEED = 1592145829775L; GAME_SEED = 1590766592609L;
-        play(new Types.TRIBE[]{BARDUR, OUMAJI}, -1, new PlayerType[]{PlayerType.MCTS, PlayerType.SIMPLE}, gameMode);
+//        AGENT_SEED = 1591558056165L; GAME_SEED = 1590855640174L;
+        play(new Types.TRIBE[]{XIN_XI, IMPERIUS}, -1, new PlayerType[]{PlayerType.SIMPLE, PlayerType.RHEA}, gameMode);
 //        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA, PlayerType.OSLA}, gameMode);
 //        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR, OUMAJI}, -1, new PlayerType[]{PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE}, gameMode);
 

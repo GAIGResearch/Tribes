@@ -10,6 +10,8 @@ import players.oep.OEPAgent;
 import players.oep.OEPParams;
 import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
+import players.rhea.RHEAAgent;
+import players.rhea.RHEAParams;
 import utils.MultiStatSummary;
 
 import javax.swing.plaf.metal.MetalBorders;
@@ -26,6 +28,7 @@ public class Tournament {
     private static int MAX_LENGTH;
     private static boolean FORCE_TURN_END;
     private static boolean MCTS_ROLLOUTS;
+    private static int POP_SIZE;
 
     private static Agent _getAgent(PlayerType playerType, long agentSeed, ActionController ac)
     {
@@ -60,6 +63,14 @@ public class Tournament {
             case OEP:
                 OEPParams oepParams = new OEPParams();
                 return new OEPAgent(agentSeed, oepParams);
+            case RHEA:
+                RHEAParams rheaParams = new RHEAParams();
+                rheaParams.stop_type = rheaParams.STOP_FMCALLS;
+                rheaParams.heuristic_method = rheaParams.DIFF_HEURISTIC;
+                rheaParams.INDIVIDUAL_LENGTH = MAX_LENGTH;
+                rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
+                rheaParams.POP_SIZE = POP_SIZE;
+                return new RHEAAgent(agentSeed, rheaParams);
         }
         return null;
     }
@@ -98,22 +109,22 @@ public class Tournament {
                 t = new Tournament(gameMode);
                 nRepetitions = Integer.parseInt(args[1]);
 
-                MAX_LENGTH = Integer.parseInt(args[2]);;
+                MAX_LENGTH = Integer.parseInt(args[2]);
                 FORCE_TURN_END = Integer.parseInt(args[3]) == 1;
                 MCTS_ROLLOUTS = Integer.parseInt(args[4]) == 1;
+                POP_SIZE = Integer.parseInt(args[5]);
 
-                int nPlayers = (args.length - 5) / 2;
+                int nPlayers = (args.length - 6) / 2;
                 PlayerType[] playerTypes = new PlayerType[nPlayers];
                 Types.TRIBE[] tribes = new Types.TRIBE[nPlayers];
 
                 for (int i = 0; i < nPlayers; ++i) {
-                    playerTypes[i] = parsePlayerTypeStr(args[5 + i]);
-                    tribes[i] = parseTribeStr(args[5 + nPlayers + i]);
+                    playerTypes[i] = parsePlayerTypeStr(args[6 + i]);
+                    tribes[i] = parseTribeStr(args[6 + nPlayers + i]);
                 }
 
                 t.setPlayers(playerTypes);
                 t.setTribes(tribes);
-
 
             }catch(Exception e)
             {
@@ -138,7 +149,8 @@ public class Tournament {
             case 3: return PlayerType.OSLA;
             case 4: return PlayerType.MC;
             case 5: return PlayerType.MCTS;
-            case 6: return PlayerType.OEP;
+            case 6: return PlayerType.RHEA;
+            case 7: return PlayerType.OEP;
         }
         throw new Exception("Error: unrecognized Player Type: " + data);
     }
@@ -439,12 +451,13 @@ public class Tournament {
         }
         System.out.println(". Usage: ");
 
-        System.out.println("'java Tournament <g> <r> <max> <force> <mcts_rollouts> <p1> <p2> [...] <t1> <t2> [...]', where: ");
+        System.out.println("'java Tournament <g> <r> <max> <force> <mcts_rollouts> <pop_size> <p1> <p2> [...] <t1> <t2> [...]', where: ");
         System.out.println("\t<g> is the game mode; 0: capitals, 1: score");
         System.out.println("\t<r> is the number of repetitions per level");
-        System.out.println("\t<max> max length of a rollout");
+        System.out.println("\t<max> max length of a rollout (MC/MCTS)");
         System.out.println("\t<force> forces a turn end after this amount of moves in a rollout");
         System.out.println("\t<mcts_rollouts> mcts rollouts are toggled on (1) or off (0)");
+        System.out.println("\t<pop_size> Population size for EA agents");
         System.out.println("\t<p_i> is player type i:");
         System.out.println("\t\t0: DoNothing player");
         System.out.println("\t\t1: Random player");
@@ -452,7 +465,8 @@ public class Tournament {
         System.out.println("\t\t3: OneStepLookAhead player");
         System.out.println("\t\t4: Monte Carlo player");
         System.out.println("\t\t5: Monte Carlo Tree Search player");
-        System.out.println("\t\t6: Online Evolutionary Planning player");
+        System.out.println("\t\t6: Rolling Horizon Evolutionary Algorithm player");
+        System.out.println("\t\t7: Online Evolutionary Planning player");
         System.out.println("\t<t_i> is tribe i:");
         System.out.println("\t\t0: Xin Xi tribe");
         System.out.println("\t\t1: Imperius tribe");
@@ -473,6 +487,7 @@ public class Tournament {
         MC,
         SIMPLE,
         MCTS,
+        RHEA,
         OEP;
     }
 

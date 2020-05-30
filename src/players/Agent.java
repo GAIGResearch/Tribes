@@ -126,4 +126,29 @@ public abstract class Agent {
     }
 
 
+    /**
+     * Returns all available actions filtering out Destroy and Disband
+     * @param gs current game state
+     * @param rnd random number generator
+     * @return the list of available actions of a given type (City, Unit or Tribe), at random.
+     */
+    protected ArrayList<Action> allGoodActions(GameState gs, Random rnd)
+    {
+        ArrayList<Action> allActions = new ArrayList<>();
+        ArrayList<Action> cityActions = gs.getAllCityActions();
+        for(Action act : cityActions)
+            if(!(act instanceof Destroy))
+                allActions.add(act);
+
+        ArrayList<Action> unitActions = gs.getAllUnitActions();
+        for(Action act : unitActions)
+            if(!(act instanceof Disband))
+                allActions.add(act);
+
+        ArrayList<Action> tribeActions = gs.getTribeActions();
+        allActions.addAll(tribeActions);
+        return allActions;
+    }
+
+
 }

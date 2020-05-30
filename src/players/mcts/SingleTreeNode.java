@@ -2,6 +2,7 @@ package players.mcts;
 
 import core.actions.Action;
 import core.actions.tribeactions.EndTurn;
+import core.actors.Tribe;
 import core.game.GameState;
 import players.heuristics.StateHeuristic;
 import players.heuristics.TribesEntropyHeuristic;
@@ -125,10 +126,11 @@ class SingleTreeNode
         if(!willForceEnd)
             return -1; //Not the time, or not available.
 
+        ArrayList<Action> availableActions = state.getAllAvailableActions();
         int actionIdx = 0;
-        while(actionIdx < actions.size())
+        while(actionIdx < availableActions.size())
         {
-            Action act = actions.get(actionIdx);
+            Action act = availableActions.get(actionIdx);
             if(act instanceof EndTurn)
             {
                 //Here's the end turn, return it's index.
@@ -159,9 +161,10 @@ class SingleTreeNode
 
         //Roll the state, create a new node and assign it.
         GameState nextState = state.copy();
-        ArrayList<Action> newActions = advance(nextState, this.actions.get(bestAction), true);
-        SingleTreeNode tn = new SingleTreeNode(params, this, this.m_rnd, newActions.size(),
-                newActions, rootStateHeuristic, this.playerID, this.m_depth == 0 ? this : this.root, nextState);
+        ArrayList<Action> availableActions = m_depth == 0 && params.PRIORITIZE_ROOT ? actions : nextState.getAllAvailableActions();
+        ArrayList<Action> nextActions = advance(nextState, availableActions.get(bestAction), true);
+        SingleTreeNode tn = new SingleTreeNode(params, this, this.m_rnd, nextActions.size(),
+                null, rootStateHeuristic, this.playerID, this.m_depth == 0 ? this : this.root, nextState);
         children[bestAction] = tn;
         return tn;
     }
@@ -211,8 +214,16 @@ class SingleTreeNode
 
             if (which == -1)
             {
-                throw new RuntimeException("Warning! couldn't find the best UCT value " + which + " : " + this.children.length + " " +
+                //if(this.children.length == 0)
+                System.out.println("Warning! couldn't find the best UCT value " + which + " : " + this.children.length + " " +
+                //throw new RuntimeException("Warning! couldn't find the best UCT value " + which + " : " + this.children.length + " " +
                         + bounds[0] + " " + bounds[1]);
+                System.out.print(this.m_depth + ", AmIMoving? " + IamMoving + ";");
+                for(int i = 0; i < this.children.length; ++i)
+                    System.out.printf(" %f2", vals[i]);
+                System.out.println("; selected: " + which);
+
+                which = m_rnd.nextInt(children.length);
             }
 
             selected = children[which];
@@ -231,6 +242,9 @@ class SingleTreeNode
         // number of actions available on a state depend on the state itself, and random events triggered by multiple
         // runs over the same tree node would have different outcomes (i.e Examine ruins).
         //advance(state, actions.get(selected.childIdx), true);
+
+        root.fmCallsCount++;
+
         return selected;
     }
 

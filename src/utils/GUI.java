@@ -5,10 +5,13 @@ import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.TribeAction;
 import core.actions.unitactions.*;
 import core.actors.units.Unit;
+import core.game.Board;
 import core.game.Game;
 import core.game.GameState;
 import core.actions.Action;
+import core.game.LevelLoader;
 import players.ActionController;
+import players.Agent;
 import players.HumanAgent;
 import players.KeyController;
 
@@ -19,15 +22,32 @@ import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static core.Constants.*;
 
 
 public class GUI extends JFrame {
+
+    enum PlayerType
+    {
+        DONOTHING,
+        HUMAN,
+        RANDOM,
+        OSLA,
+        MC,
+        SIMPLE,
+        MCTS,
+        OEP
+    }
+
     private JLabel appTurn;
     private JLabel activeTribe, activeTribeInfo, otherInfo;
     private int otherInfoDelay = GUI_INFO_DELAY;
@@ -36,10 +56,13 @@ public class GUI extends JFrame {
     private Game game;
     private GameState gs;
 
-    private ArrayList<HashMap<Integer,ArrayList<Action>>> actionHistory;
-    private ArrayList<GameState> stateHistory;
-    private ActionController replayer;
-    private JEditorPane actionHistoryDisplay;
+//    private ArrayList<HashMap<Integer,ArrayList<Action>>> actionHistory;
+//    private ArrayList<GameState> stateHistory;
+//    private ActionController replayer;
+    private JEditorPane actionHistoryDisplay, resultsDisplay;
+    private JPanel[] playerSelectPanels;
+    private JComboBox[] playerSelectType, playerSelectTribe;
+    private JTextField[] playerSelectSeed;
     private boolean pauseAfterTurn = false;  // If game should automatically pause after one turn (of one tribe) is played
     private boolean pauseAfterTick = false;  // If game should automatically pause after one tick (all tribes) is played
 
@@ -91,9 +114,9 @@ public class GUI extends JFrame {
         this.wi = wi;
         this.game = game;
 
-        this.actionHistory = new ArrayList<>();
-        this.stateHistory = new ArrayList<>();
-        this.replayer = new ActionController();
+//        this.actionHistory = new ArrayList<>();
+//        this.stateHistory = new ArrayList<>();
+//        this.replayer = new ActionController();
 
         infoView = new InfoView(ac);
         panTranslate = new Vector2d(0,0);
@@ -257,7 +280,6 @@ public class GUI extends JFrame {
      * - tech tree view
      * - buttons to "End Turn", "Play Turn" (game paused after tribe's turn), "Play Tick" (game paused after all tribe's
      *      turns in current tick), "Pause/Resume" (to pause/resume game at any point), all keeping GUI responsive
-     * - quick select buttons (all units / units of type / cities of a tribe) for info display TODO
      * @return JPanel containing all the sub components
      */
     private JPanel createSidePanel()
@@ -358,12 +380,12 @@ public class GUI extends JFrame {
     /**
      * Panel containing functionality for interacting with the framework and getting high-level information, including:
      * - Game setup:
-     *      - Choosing and editing map for next game (text view) TODO
-     *      - Choosing which players should play in the next game TODO
-     *      - Choosing which tribe should be associated with each player in the next game TODO
-     *      - Choosing game seed for next game TODO
-     *      - Start/Restart/End game buttons TODO
-     *      - results printout for all games in the same run (if multiple) TODO
+     *      - Choosing and editing map for next game (text view)
+     *      - Choosing which players should play in the next game
+     *      - Choosing which tribe should be associated with each player in the next game
+     *      - Choosing game seed for next game
+     *      - Start/Restart/End game buttons
+     *      - results printout for all games in the same run (if multiple)
      *      - visuals on/off? TODO
      * - Debugging:
      *      - action history display
@@ -486,15 +508,182 @@ public class GUI extends JFrame {
         c.gridy++;
 
         /* setup panel */
+        setup.setLayout(new GridBagLayout());
+        c.gridx = 0;
+        c.gridy = 0;
 
-        // game seed, level seed
-        // dropdown levels (incl. random generated) + edit map (new window)
-        // Player 1: dropdown agent, agent random seed, dropdown tribe
-        // Player 2: dropdown agent, agent random seed, dropdown tribe
-        // ...
-        // Start, restart, end game buttons
+
+        // Game mode
+        JPanel gameModeOptions = new JPanel();
+        JComboBox<Types.GAME_MODE> modes = new JComboBox<>(Types.GAME_MODE.values());
+        modes.setSelectedIndex(0);
+        gameModeOptions.add(new JLabel("Game mode: "));
+        gameModeOptions.add(modes);
+        setup.add(gameModeOptions, c);
+        c.gridy++;
+
+        // Game seed
+        JPanel gameSeedOptions = new JPanel();
+        JLabel gameSeed = new JLabel("Game seed: ");
+        JTextField seed1 = new JTextField("" + System.currentTimeMillis(), 15);
+        JButton randomSeed1 = new JButton("Randomize");
+        randomSeed1.addActionListener(e -> seed1.setText("" + System.currentTimeMillis()));
+        gameSeedOptions.add(gameSeed);
+        gameSeedOptions.add(seed1);
+        gameSeedOptions.add(randomSeed1);
+        setup.add(gameSeedOptions, c);
+        c.gridy++;
+
+        // Level seed
+        JPanel levelSeedOptions = new JPanel();
+        JLabel levelSeed = new JLabel("Level seed: ");
+        JTextField seed2 = new JTextField("" + System.currentTimeMillis(), 15);
+        JButton randomSeed2 = new JButton("Randomize");
+        randomSeed2.addActionListener(e -> seed2.setText("" + System.currentTimeMillis()));
+        levelSeedOptions.add(levelSeed);
+        levelSeedOptions.add(seed2);
+        levelSeedOptions.add(randomSeed2);
+        setup.add(levelSeedOptions, c);
+        c.gridy++;
+
+        // Level select
+        int maxPlayers = Types.TRIBE.values().length;
+        List<File> levelFiles = new ArrayList<>();
+        try {
+            levelFiles = Files.walk(Paths.get("levels/"))
+                    .filter(Files::isRegularFile)
+                    .map(Path::toFile)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String[] levelOptions = new String[levelFiles.size() + 1];
+        levelOptions[0] = "Random";
+        if (levelFiles.size() > 0) {
+            for (int i = 0; i < levelFiles.size(); i++) {
+                levelOptions[i + 1] = levelFiles.get(i).getName();
+            }
+        }
+        JComboBox<String> levelList = new JComboBox<>(levelOptions);
+        levelList.setSelectedIndex(0);
+        levelList.addActionListener(e -> {
+            if (levelList.getSelectedIndex() != 0) {
+                LevelLoader ll = new LevelLoader();
+                Board board = ll.buildLevel(new IO().readFile("levels/" + levelList.getSelectedItem()),
+                        new Random(Long.parseLong(seed1.getText())));
+                int nPlayers = board.getTribes().length;
+                for (int i = 0; i < nPlayers; i++) {
+                    playerSelectPanels[i].setVisible(true);
+                }
+                for (int i = nPlayers; i < maxPlayers; i++) {
+                    playerSelectPanels[i].setVisible(false);
+                }
+            }
+        });
+        JButton editLevel = new JButton("Edit");  // TODO: edit map in new window
+        JPanel levelSelect = new JPanel();
+        levelSelect.add(new JLabel("Level select: "));
+        levelSelect.add(levelList);
+        levelSeed.add(editLevel);
+        setup.add(levelSelect, c);
+        c.gridy++;
+
+        playerSelectPanels = new JPanel[maxPlayers];
+        playerSelectType = new JComboBox[maxPlayers];
+        playerSelectTribe = new JComboBox[maxPlayers];
+        playerSelectSeed = new JTextField[maxPlayers];
+        for (int i = 0; i < maxPlayers; i++) {
+            playerSelectPanels[i] = createPlayerSelectPanel(i);
+            setup.add(playerSelectPanels[i], c);
+            c.gridy++;
+        }
+
+        JPanel agentSeedSelect = new JPanel();
+        JTextField agentSeed = new JTextField("" + System.currentTimeMillis(), 15);
+        JButton randomSeed = new JButton("Randomize");
+        randomSeed.addActionListener(e -> agentSeed.setText("" + System.currentTimeMillis()));
+        JButton sameSeedAgents = new JButton("Set random seed for all agents");
+        sameSeedAgents.addActionListener(e -> {
+            for (JTextField field: playerSelectSeed) {
+                field.setText(agentSeed.getText());
+            }
+        });
+        agentSeedSelect.add(agentSeed);
+        agentSeedSelect.add(randomSeed);
+        agentSeedSelect.add(sameSeedAgents);
+        setup.add(agentSeedSelect, c);
+        c.gridy++;
+
+        setup.add(Box.createRigidArea(new Dimension(GUI_SIDE_PANEL_WIDTH, 50)), c);
+        c.gridy++;
+
+        JPanel buttons = new JPanel();
+        JButton startGame = new JButton("Start game");
+        startGame.addActionListener(e -> {
+            // TODO: force end of current game, if not ended
+
+            int nPlayers = maxPlayers;
+
+            ArrayList<Agent> players = new ArrayList<>(nPlayers);  // TODO: set up players
+            Types.TRIBE[] tribes = new Types.TRIBE[players.size()];
+            if (levelList.getSelectedIndex() == 0) {
+                game.init(players, Long.parseLong(seed2.getText()), tribes, Long.parseLong(seed1.getText()),
+                        (Types.GAME_MODE)modes.getSelectedItem());
+            } else {
+                LevelLoader ll = new LevelLoader();
+                Board board = ll.buildLevel(new IO().readFile((String)levelList.getSelectedItem()),
+                        new Random(Long.parseLong(seed1.getText())));
+                nPlayers = board.getTribes().length;
+
+                game.init(players, "levels/" + levelList.getSelectedItem(), Long.parseLong(seed1.getText()),
+                        (Types.GAME_MODE) modes.getSelectedItem());
+            }
+            game.run(this, wi);
+        });
+        JButton endGame = new JButton("End game");
+        endGame.addActionListener(e -> {
+            // TODO: force end of game and update resultsDisplay
+            resultsDisplay.setText(game.getScores().toString());
+        });
+
+        buttons.add(startGame);
+        buttons.add(endGame);
+        setup.add(buttons, c);
+        c.gridy++;
+
+        setup.add(Box.createRigidArea(new Dimension(GUI_SIDE_PANEL_WIDTH, 50)), c);
+        c.gridy++;
+
         // Results display
+        resultsDisplay = new JEditorPane("text/html", "");
+        resultsDisplay.setBackground(Color.lightGray);
+        caret = (DefaultCaret)resultsDisplay.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.OUT_BOTTOM);
+        JScrollPane scrollPane2 = new JScrollPane(resultsDisplay);
+        scrollPane2.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_TECH_PANEL_HEIGHT));
+        setup.add(new JLabel("Game results:"), c);
+        c.gridy++;
+        setup.add(scrollPane2, c);
+        c.gridy++;
 
+        return panel;
+    }
+
+    private JPanel createPlayerSelectPanel(int idx) {
+        JPanel panel = new JPanel();
+        panel.add(new JLabel("Player " + idx + ": "));
+        playerSelectType[idx] = new JComboBox<>(PlayerType.values());
+        playerSelectType[idx].setSelectedIndex(idx);
+        panel.add(playerSelectType[idx]);
+        panel.add(new JLabel("Seed: "));
+        playerSelectSeed[idx] = new JTextField("" + System.currentTimeMillis(), 15);
+        panel.add(playerSelectSeed[idx]);
+        JButton randomize = new JButton("Randomize");
+        randomize.addActionListener(e -> playerSelectSeed[idx].setText("" + System.currentTimeMillis()));
+        panel.add(randomize);
+        playerSelectTribe[idx] = new JComboBox<>(Types.TRIBE.values());
+        playerSelectTribe[idx].setSelectedIndex(idx);
+        panel.add(playerSelectTribe[idx]);
         return panel;
     }
 

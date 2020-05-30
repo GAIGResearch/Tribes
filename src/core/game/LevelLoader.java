@@ -10,11 +10,11 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-class LevelLoader
+public class LevelLoader
 {
     private Dimension size;
 
-    LevelLoader()
+    public LevelLoader()
     {
         size = new Dimension();
     }
@@ -23,7 +23,7 @@ class LevelLoader
      * Builds a level, receiving a file name.
      * @param lines lines containing the level
      */
-    Board buildLevel(String[] lines, Random rnd) {
+    public Board buildLevel(String[] lines, Random rnd) {
 
         // Dimensions of the level read from the file.
         size.width = lines.length;

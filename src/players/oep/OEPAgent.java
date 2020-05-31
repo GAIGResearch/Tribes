@@ -37,7 +37,7 @@ public class OEPAgent extends Agent {
     @Override
     public Action act(GameState gs, ElapsedCpuTimer ect) {
 
-        this.heuristic = params.getHeuristic(playerID);
+        this.heuristic = params.getHeuristic(playerID, allPlayerIDs);
 
         if (currentTurn != gs.getTick()){
             currentTurn = gs.getTick();

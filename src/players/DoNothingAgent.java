@@ -1,6 +1,7 @@
 package players;
 
 import core.actions.Action;
+import core.actions.tribeactions.EndTurn;
 import core.game.GameState;
 import utils.ElapsedCpuTimer;
 
@@ -13,7 +14,7 @@ public class DoNothingAgent extends Agent {
 
     @Override
     public Action act(GameState gs, ElapsedCpuTimer ect) {
-        return null;
+        return new EndTurn(gs.getActiveTribeID());
     }
 
     @Override

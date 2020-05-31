@@ -11,6 +11,9 @@ import core.actions.unitactions.HealOthers;
 import core.actions.unitactions.Upgrade;
 import core.actors.City;
 import core.actors.Tribe;
+import core.actors.units.Battleship;
+import core.actors.units.Boat;
+import core.actors.units.Ship;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
@@ -243,8 +246,11 @@ public class InfoView extends JComponent {
     private String getUnitInfo(Unit u) {
 //        String img = u.getType().getImageStr(u.getTribeId());
 
+        Tribe t = gs.getTribe(u.getTribeId());
+        int idx = t.getType().getKey();
+
         StringBuilder sb = new StringBuilder();
-        sb.append("<h1>" + Types.TRIBE.values()[u.getTribeId()] + " " + u.getType() + "</h1>");
+        sb.append("<h1>" + Types.TRIBE.values()[idx] + " " + u.getType() + "</h1>");
 //        sb.append("<table border=\"0\"><tr><td><img src=\"file:" + img + "\"/></p></td><td>");
         sb.append("From city " + u.getCityId() + "<br/>");
         if (u.isVeteran()) {
@@ -261,6 +267,14 @@ public class InfoView extends JComponent {
         sb.append("<li><b>Movement:</b> " + u.MOV + "</li>");
         sb.append("<li><b>Range:</b> " + u.RANGE + "</li>");
         sb.append("<li><b>Status:</b> " + u.getStatus() + "</li>");
+
+        if(u.getType() == Types.UNIT.BOAT)
+            sb.append("<li><b>Land unit:</b> " + ((Boat)u).getBaseLandUnit() + "</li>");
+        else if(u.getType() == Types.UNIT.SHIP)
+            sb.append("<li><b>Land unit:</b> " + ((Ship)u).getBaseLandUnit() + "</li>");
+        else if(u.getType() == Types.UNIT.BATTLESHIP)
+            sb.append("<li><b>Land unit:</b> " + ((Battleship)u).getBaseLandUnit() + "</li>");
+
         sb.append("</ul>");
         return sb.toString();
     }
@@ -304,7 +318,7 @@ public class InfoView extends JComponent {
 
         if (cityID != -1) {
             City c = (City) gs.getBoard().getActor(cityID);
-            if (c != null) {  // TODO: this should not be the case. Fix partial observability.
+            if (c != null) {
                 ArrayList<Action> acts = gs.getCityActions(c);
 
                 boolean foundRG = false;

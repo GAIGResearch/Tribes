@@ -160,8 +160,12 @@ public class Tribe extends Actor {
         tribeCopy.techTree = hideInfo ? new TechnologyTree() : this.techTree.copy();
 
         tribeCopy.obsGrid = new boolean[obsGrid.length][obsGrid.length];
-        if(!hideInfo) for (int i = 0; i < obsGrid.length; ++i)
-            System.arraycopy(obsGrid[i], 0, tribeCopy.obsGrid[i], 0, obsGrid.length);
+        for (int i = 0; i < obsGrid.length; ++i)
+            if(!hideInfo)
+                System.arraycopy(obsGrid[i], 0, tribeCopy.obsGrid[i], 0, obsGrid.length);
+            else //copy all visible (or enemy units won't be able to move in the FM). Assumes other tribes see everything.
+                for(int j = 0; j < obsGrid[i].length; j++)
+                    tribeCopy.obsGrid[i][j] = true;
 
         tribeCopy.citiesID = new ArrayList<>();
         if(!hideInfo) tribeCopy.citiesID.addAll(citiesID);

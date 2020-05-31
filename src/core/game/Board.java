@@ -1,5 +1,6 @@
 package core.game;
 
+import core.Constants;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
@@ -62,8 +63,6 @@ public class Board {
         this.gameActors = new HashMap<>();
     }
 
-    private TribesConfig tc = new TribesConfig();
-
     /**
      * Loads a board from a JSON object
      * @param JBoard JSON object to load the board from
@@ -80,7 +79,6 @@ public class Board {
         JSONArray JCityID = JBoard.getJSONArray("cityID");
         JSONArray JNetwork = JBoard.getJSONArray("network");
         JSONArray JBuilding = JBoard.getJSONArray("building");
-
 
         size = JResource.length();
         terrains = new Types.TERRAIN[size][size];
@@ -204,6 +202,7 @@ public class Board {
         for (int i = 0; i < tribes.length; i++) {
             boolean hideInfo = (i != playerId) && partialObs;
             copyBoard.tribes[i] = tribes[i].copy(hideInfo);
+
         }
 
         //Deep copy of all actors in the board
@@ -211,12 +210,24 @@ public class Board {
         for (Actor act : gameActors.values()) {
             int id = act.getActorId();
             int actTribeId = act.getTribeId();
+            boolean actorVisible = playerId == -1 || tribes[playerId].isVisible(act.getPosition().x, act.getPosition().y);
 
             //When do we copy? if it's the tribe (id==playerId), full observable or actor visible if part. obs.
-            if(actTribeId == playerId || !partialObs || tribes[playerId].isVisible(act.getPosition().x, act.getPosition().y))
+            if(actTribeId == playerId || !partialObs || actorVisible)
             {
                 boolean hideInfo = (actTribeId != playerId) && partialObs;
-                copyBoard.gameActors.put(id, act.copy(hideInfo));
+                Actor actorCopy = act.copy(hideInfo);
+                copyBoard.gameActors.put(id, actorCopy);
+
+                //If we're hiding info, the other tribes don't copy cityIDs and unitIDs by default in the arrays. But we need to copy the ones we see.
+                if(hideInfo && actorVisible)
+                {
+                    int tribeId = actorCopy.getTribeId();
+                    if(actorCopy instanceof City)
+                        copyBoard.tribes[tribeId].addCity(actorCopy.getActorId());
+                    else if(actorCopy instanceof Unit)
+                        copyBoard.tribes[tribeId].addExtraUnit((Unit)actorCopy);
+                }
             }
         }
 
@@ -327,7 +338,11 @@ public class Board {
 
         //Water with a port this tribe owns?
         Types.BUILDING b = buildings[x][y];
-        if (terrain == SHALLOW_WATER) {
+        if (terrain == SHALLOW_WATER || terrain == DEEP_WATER) {
+
+            if(toPush.getType().isWaterUnit())
+                return true;
+
             if (b == Types.BUILDING.PORT) {
                 City c = getCityInBorders(x, y);
                 if (c != null && c.getTribeId() == tribeId) {
@@ -357,17 +372,19 @@ public class Board {
      * @param y y coordinate of the position where the unit is embarking
      */
     public void embark(Unit unit, Tribe tribe, int x, int y) {
+
         City city = (City) gameActors.get(unit.getCityId());
         removeUnitFromBoard(unit);
         removeUnitFromCity(unit, city, tribe);
 
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(x, y);
-        Unit boat = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), Types.UNIT.BOAT);
+        Boat boat = (Boat) Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), Types.UNIT.BOAT);
         boat.setCurrentHP(unit.getCurrentHP());
         boat.setMaxHP(unit.getMaxHP());
-        ((Boat)boat).setBaseLandUnit(unit.getType());
+        boat.setBaseLandUnit(unit.getType());
         addUnit(city, boat);
+
     }
 
     /**
@@ -381,12 +398,19 @@ public class Board {
         City city = (City) gameActors.get(unit.getCityId());
         removeUnitFromBoard(unit);
         removeUnitFromCity(unit, city, tribe);
-        
         Types.UNIT baseLandUnit = getBaseLandUnit(unit);
+
+        if(baseLandUnit==null)
+        {
+            Thread.dumpStack();
+            baseLandUnit=Types.UNIT.WARRIOR;//ERRORSaving
+        }
 
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(x, y);
+
         Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), baseLandUnit);
+
         newUnit.setCurrentHP(unit.getCurrentHP());
         newUnit.setMaxHP(unit.getMaxHP());
         addUnit(city, newUnit);
@@ -442,11 +466,11 @@ public class Board {
     public void launchExplorer(int x0, int y0, int tribeId, Random rnd) {
 
         Vector2d currentPos = new Vector2d(x0, y0);
-        for (int i = 0; i < tc.NUM_STEPS; ++i) {
+        for (int i = 0; i < TribesConfig.NUM_STEPS; ++i) {
             int j = 0;
             boolean moved = false;
 
-            while (!moved && j < tc.NUM_STEPS * 3) {
+            while (!moved && j < TribesConfig.NUM_STEPS * 3) {
                 //Pick a neighbour tile at random
                 LinkedList<Vector2d> neighs = currentPos.neighborhood(1,0, size);
                 Vector2d next = neighs.get(rnd.nextInt(neighs.size()));
@@ -455,7 +479,7 @@ public class Board {
                     moved = true;
                     currentPos.x = next.x;
                     currentPos.y = next.y;
-                    boolean updateNetwork = tribes[tribeId].clearView(currentPos.x, currentPos.y, tc.EXPLORER_CLEAR_RANGE, rnd, this.copy());
+                    boolean updateNetwork = tribes[tribeId].clearView(currentPos.x, currentPos.y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this);
                     if(updateNetwork)
                         tradeNetwork.computeTradeNetworkTribe(this, tribes[tribeId]);
                 }
@@ -465,7 +489,7 @@ public class Board {
 
             if (!moved) {
                 //couldn't move in many steps. Let's just warn and progress from now.
-                System.out.println("WARNING: explorer stuck, " + j + " steps without moving.");
+//                System.out.println("WARNING: explorer stuck, " + j + " steps without moving.");
             }
 
         }
@@ -553,8 +577,8 @@ public class Board {
         {
             if(tileCityId[tile.x][tile.y] == -1){
                 tileCityId[tile.x][tile.y] = c.getActorId();
-                t.addScore(tc.CITY_BORDER_POINTS); // Add score to tribe on border creation
-                c.addPointsWorth(tc.CITY_BORDER_POINTS);
+                t.addScore(TribesConfig.CITY_BORDER_POINTS); // Add score to tribe on border creation
+                c.addPointsWorth(TribesConfig.CITY_BORDER_POINTS);
             }
         }
     }
@@ -564,7 +588,7 @@ public class Board {
      * @param city city whose borders to expand.
      */
     public void expandBorder(City city){
-        city.setBound(city.getBound()+tc.CITY_EXPANSION_TILES);
+        city.setBound(city.getBound()+TribesConfig.CITY_EXPANSION_TILES);
         assignCityTiles(city,city.getBound());
     }
 
@@ -790,7 +814,7 @@ public class Board {
         tribes[c.getTribeId()].addCity(c.getActorId());
 
         //cities provide visibility, which needs updating
-        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, tc.NEW_CITY_CLEAR_RANGE, r, this.copy());
+        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, TribesConfig.NEW_CITY_CLEAR_RANGE, r, this.copy());
 
         //By default, cities are considered to be roads for trade network purposes.
         tradeNetwork.setTradeNetwork(this, c.getPosition().x, c.getPosition().y, true);

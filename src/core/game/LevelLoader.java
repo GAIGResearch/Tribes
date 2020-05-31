@@ -32,7 +32,7 @@ class LevelLoader
         Tribe[] tribes = extractTribes(lines);
         Board board = new Board();
 
-        int tribeID = 0;
+        int tribeCounter = 0;
         int numTribes = tribes.length;
 
         board.init(size.width, tribes);
@@ -52,7 +52,16 @@ class LevelLoader
 
                 if(terrainChar == Types.TERRAIN.CITY.getMapChar())
                 {
-                    if(tribeID==numTribes)
+                    int tribeType = Integer.parseInt(tileSplit[1]);
+                    int tribeID = -1;
+
+                    for(Tribe t : tribes)
+                    {
+                        if(t.getType().getKey() == tribeType)
+                            tribeID = t.getTribeId();
+                    }
+
+                    if(tribeCounter==numTribes)
                     {
                         //If we've already allocated all the cities to the number of tribes, turn this
                         //extra city into a village.
@@ -72,7 +81,7 @@ class LevelLoader
                         //City tiles
                         board.assignCityTiles(c, c.getBound());
 
-                        tribeID++;
+                        tribeCounter++;
                     }
                 }
 

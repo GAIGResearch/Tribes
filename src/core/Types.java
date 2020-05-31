@@ -731,6 +731,12 @@ public class Types {
             return this == BOAT || this == SHIP || this == BATTLESHIP;
         }
 
+
+        public boolean isRanged()
+        {
+            return this == BOAT || this == SHIP || this == BATTLESHIP || this == ARCHER  || this == CATAPULT ;
+        }
+
         public static ArrayList<UNIT> getSpawnableTypes() {
             ArrayList<UNIT> units = new ArrayList<>();
             for (UNIT u: UNIT.values()) {

@@ -12,6 +12,7 @@ import core.actions.unitactions.factory.RecoverFactory;
 import core.actions.unitactions.factory.UnitActionBuilder;
 import core.actors.*;
 import core.actors.units.Unit;
+import core.levelgen.LevelGenerator;
 import utils.IO;
 import utils.Vector2d;
 
@@ -94,12 +95,31 @@ public class GameState {
     }
 
     /**
-     * Initializes the GameState.
-     * The level is only generated when this initialization method is called.
+     * Initializes the GameState using a level generator.
+     */
+    void init(long levelgen_seed, Types.TRIBE[] tribes) {
+
+        LevelGenerator levelGen = new LevelGenerator(levelgen_seed);
+        levelGen.init(TribesConfig.DEFAULT_MAP_SIZE[tribes.length-1], 3, 4, 0.5, tribes);
+        levelGen.generate();
+        String[] lines = levelGen.gelLevelLines();
+        initGameState(lines);
+    }
+
+    /**
+     * Initializes the GameState from a file with the board information.
      */
     void init(String filename) {
-
         String[] lines = new IO().readFile(filename);
+        initGameState(lines);
+    }
+
+    /**
+     * Initializes a game state from a series of Strings that determine the initial level disposition
+     * @param lines all components for the board in its initial state.
+     */
+    private void initGameState(String[] lines) {
+
         LevelLoader ll = new LevelLoader();
         board = ll.buildLevel(lines, rnd);
 
@@ -296,9 +316,11 @@ public class GameState {
 
             if(!executed) {
                 System.out.println("FM: Action [" + action + "] couldn't execute?");
+                action.execute(this);
             }
 
             if(executed) {
+
 
                 //it's an end turn
                 if(action instanceof EndTurn)
@@ -737,27 +759,65 @@ public class GameState {
         return allActions;
     }
 
+    public ArrayList<Action> getAllAvailableActions(int playerID)
+    {
+        if(playerID == getActiveTribeID())
+            return getAllAvailableActions();
+        else
+        {
+            //TODO: We have to compute them, and now computePlayerActions changes the current active tribe. Fix!
+            System.out.println("Warning: requesting actions for non active tribe is not implemented");
+            return getAllAvailableActions();
+        }
+    }
 
     public HashMap<Integer, ArrayList<Action>> getCityActions() {     return cityActions;  }
     public ArrayList<Action> getCityActions(City c) {  return cityActions.get(c.getActorId());  }
     public ArrayList<Action> getCityActions(int cityId) {  return cityActions.get(cityId);  }
+    public ArrayList<Action> getAllCityActions()
+    {
+        ArrayList<Action> allActions = new ArrayList<>();
+        for (Integer cityId : this.getCityActions().keySet())
+            allActions.addAll(this.getCityActions(cityId));
+
+        return allActions;
+    }
 
     public HashMap<Integer, ArrayList<Action>> getUnitActions() {  return unitActions;  }
     public ArrayList<Action> getUnitActions(int unitId) {  return unitActions.get(unitId);  }
     public ArrayList<Action> getUnitActions(Unit u) {  return unitActions.get(u.getActorId());  }
+    public ArrayList<Action> getAllUnitActions()
+    {
+        ArrayList<Action> allActions = new ArrayList<>();
+        for (Integer unitId : this.getUnitActions().keySet())
+            allActions.addAll(this.getUnitActions(unitId));
+
+        return allActions;
+    }
 
     public ArrayList<Action> getTribeActions() {  return tribeActions;  }
 
     /* Potentially helpful methods for agents */
 
-    public int getTribeProduction()
+    public int getTribeProduction(int playerId)
     {
-        return this.getActiveTribe().getMaxProduction(this);
+        if(playerId == getActiveTribeID())
+            return this.getActiveTribe().getMaxProduction(this);
+
+        return this.getTribe(playerId).getMaxProduction(this);
     }
 
-    public TechnologyTree getTribeTechTree()
+
+    public TechnologyTree getTribeTechTree(int playerId)
     {
-        return getActiveTribe().getTechTree();
+        if(playerId == getActiveTribeID())
+            return getActiveTribe().getTechTree();
+        return this.getTribe(playerId).getTechTree();
+    }
+
+    public int getNKills(int playerId)
+    {
+        return getTribe(playerId).getnKills();
     }
 
     public int getScore(int playerID)
@@ -773,9 +833,9 @@ public class GameState {
         return getActiveTribe().getTribesMet();
     }
 
-    public ArrayList<City> getCities()
+    public ArrayList<City> getCities(int playerId)
     {
-        ArrayList<Integer> cities = getActiveTribe().getCitiesID();
+        ArrayList<Integer> cities = getTribe(playerId).getCitiesID();
         ArrayList<City> cityActors = new ArrayList<>();
         for(Integer cityId : cities)
         {
@@ -784,9 +844,9 @@ public class GameState {
         return cityActors;
     }
 
-    public ArrayList<Unit> getUnits()
+    public ArrayList<Unit> getUnits(int playerId)
     {
-        ArrayList<Integer> cities = getActiveTribe().getCitiesID();
+        ArrayList<Integer> cities = getTribe(playerId).getCitiesID();
         ArrayList<Unit> unitActors = new ArrayList<>();
         for(Integer cityId : cities)
         {
@@ -798,7 +858,7 @@ public class GameState {
             }
         }
 
-        for(Integer unitId : getActiveTribe().getExtraUnits())
+        for(Integer unitId : getTribe(playerId).getExtraUnits())
         {
             Unit unit = (Unit) board.getActor(unitId);
             unitActors.add(unit);
@@ -811,8 +871,8 @@ public class GameState {
         return gameMode;
     }
 
-    public Types.RESULT getTribeWinStatus() {
-        return getActiveTribe().getWinner();
+    public Types.RESULT getTribeWinStatus(int playerId) {
+        return getTribe(playerId).getWinner();
     }
 
     public TribesConfig getTribesConfig(){

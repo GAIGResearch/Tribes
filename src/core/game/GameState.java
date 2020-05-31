@@ -45,6 +45,9 @@ public class GameState {
     //Indicates if the game is over.
     private boolean gameIsOver;
 
+    //TribesConfig object
+    private TribesConfig tc = new TribesConfig();
+
     /**
      * This variable indicates if the computed actions in this class are updated.
      * It will take the value of the tribeId for which the actions are computed, and -1 if they are
@@ -99,7 +102,6 @@ public class GameState {
         String[] lines = new IO().readFile(filename);
         LevelLoader ll = new LevelLoader();
         board = ll.buildLevel(lines, rnd);
-        TribesConfig tc = new TribesConfig();
 
         Tribe[] tribes = board.getTribes();
         for(Tribe tribe : tribes)
@@ -381,7 +383,6 @@ public class GameState {
         //Get all cities of this tribe
         ArrayList<Integer> tribeCities = tribe.getCitiesID();
         ArrayList<Integer> allTribeUnits = new ArrayList<>();
-        TribesConfig tc = new TribesConfig();
         this.setEndTurn(false);
 
         //1. Compute stars per turn.
@@ -494,6 +495,7 @@ public class GameState {
         copy.tick = this.tick;
         copy.turnMustEnd = turnMustEnd;
         copy.gameIsOver = gameIsOver;
+
 
         int numTribes = getTribes().length;
         copy.canEndTurn = new boolean[numTribes];
@@ -813,5 +815,8 @@ public class GameState {
         return getActiveTribe().getWinner();
     }
 
+    public TribesConfig getTribesConfig(){
+        return tc;
+    }
 
 }

@@ -15,7 +15,7 @@ public class TribesConfig
     public int WARRIOR_MAX_HP = 10;
     public int WARRIOR_RANGE = 1;
     public int WARRIOR_COST = 2;
-   int WARRIOR_POINTS = 10;
+    int WARRIOR_POINTS = 10;
 
     //Archer
     public int ARCHER_ATTACK = 2;
@@ -24,7 +24,7 @@ public class TribesConfig
     public int ARCHER_MAX_HP = 10;
     public int ARCHER_RANGE = 2;
     public int ARCHER_COST = 3;
-   int ARCHER_POINTS = 15;
+    int ARCHER_POINTS = 15;
 
     //Catapult
     public int CATAPULT_ATTACK = 4;
@@ -33,7 +33,7 @@ public class TribesConfig
     public int CATAPULT_MAX_HP = 10;
     public int CATAPULT_RANGE = 3;
     public int CATAPULT_COST = 8;
-   int CATAPULT_POINTS = 40;
+    int CATAPULT_POINTS = 40;
 
     //Swordsman
     public int SWORDMAN_ATTACK = 3;
@@ -42,7 +42,7 @@ public class TribesConfig
     public int SWORDMAN_MAX_HP = 15;
     public int SWORDMAN_RANGE = 1;
     public int SWORDMAN_COST = 5;
-   int SWORDMAN_POINTS = 25;
+    int SWORDMAN_POINTS = 25;
 
     //MindBender
     public int MINDBENDER_ATTACK = 0;
@@ -52,7 +52,7 @@ public class TribesConfig
     public int MINDBENDER_RANGE = 1;
     public int MINDBENDER_COST = 5;
     public int MINDBENDER_HEAL = 4;
-   int MINDBENDER_POINTS = 25;
+    int MINDBENDER_POINTS = 25;
 
     //Defender
     public int DEFENDER_ATTACK = 1;
@@ -61,7 +61,7 @@ public class TribesConfig
     public int DEFENDER_MAX_HP = 15;
     public int DEFENDER_RANGE = 1;
     public int DEFENDER_COST = 3;
-   int DEFENDER_POINTS = 15;
+    int DEFENDER_POINTS = 15;
 
     //Knight
     public int KNIGHT_ATTACK = 4;
@@ -70,7 +70,7 @@ public class TribesConfig
     public int KNIGHT_MAX_HP = 15;
     public int KNIGHT_RANGE = 1;
     public int KNIGHT_COST = 8;
-   int KNIGHT_POINTS = 40;
+    int KNIGHT_POINTS = 40;
 
     //Rider
     public int RIDER_ATTACK = 2;
@@ -79,7 +79,7 @@ public class TribesConfig
     public int RIDER_MAX_HP = 10;
     public int RIDER_RANGE = 1;
     public int RIDER_COST = 3;
-   int RIDER_POINTS = 15;
+    int RIDER_POINTS = 15;
 
     // Boat
     public int BOAT_ATTACK = 1;
@@ -87,7 +87,7 @@ public class TribesConfig
     public int BOAT_MOVEMENT = 2;
     public int BOAT_RANGE = 2;
     public int BOAT_COST = 0;
-   int BOAT_POINTS = 0;
+    int BOAT_POINTS = 0;
 
     // Ship
     public int SHIP_ATTACK = 2;
@@ -95,7 +95,7 @@ public class TribesConfig
     public int SHIP_MOVEMENT = 3;
     public int SHIP_RANGE = 2;
     public int SHIP_COST = 5;
-   int SHIP_POINTS = 0;
+    int SHIP_POINTS = 0;
 
     // Battleship
     public int BATTLESHIP_ATTACK = 4;
@@ -103,7 +103,7 @@ public class TribesConfig
     public int BATTLESHIP_MOVEMENT = 3;
     public int BATTLESHIP_RANGE = 2;
     public int BATTLESHIP_COST = 15;
-   int BATTLESHIP_POINTS = 0;
+    int BATTLESHIP_POINTS = 0;
 
     //Superunit
     public int SUPERUNIT_ATTACK = 5;
@@ -112,7 +112,7 @@ public class TribesConfig
     public int SUPERUNIT_MAX_HP = 40;
     public int SUPERUNIT_RANGE = 1;
     public int SUPERUNIT_COST = 10; //Useful for when unit is disbanded.
-   int SUPERUNIT_POINTS = 50;
+    int SUPERUNIT_POINTS = 50;
 
     //Explorer
     public int NUM_STEPS = 15;
@@ -436,9 +436,6 @@ public class TribesConfig
             GROW_FOREST_COST =  Integer.parseInt(input.next());
             BURN_FOREST_COST =  Integer.parseInt(input.next());
             CLEAR_VIEW_POINTS =  Integer.parseInt(input.next());
-
-
-
         }catch (FileNotFoundException e){
             e.printStackTrace();
         }

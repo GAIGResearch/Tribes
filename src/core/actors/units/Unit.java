@@ -2,6 +2,7 @@ package core.actors.units;
 
 import core.Types;
 import core.actors.Actor;
+import core.game.GameState;
 import utils.Vector2d;
 
 import static core.Types.TURN_STATUS.*;
@@ -23,6 +24,8 @@ public abstract class Unit extends Actor
     private int cityId;
 
     private Types.TURN_STATUS status;
+
+    GameState gs;
 
 
     public Unit(int atk, int def, int mov, int max_hp, int range, int cost, Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeID){

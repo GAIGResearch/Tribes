@@ -495,7 +495,7 @@ public class GameState {
         copy.tick = this.tick;
         copy.turnMustEnd = turnMustEnd;
         copy.gameIsOver = gameIsOver;
-
+        copy.
 
         int numTribes = getTribes().length;
         copy.canEndTurn = new boolean[numTribes];

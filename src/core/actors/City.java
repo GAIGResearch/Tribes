@@ -164,7 +164,7 @@ public class City extends Actor{
                 applyBonus(gameState, building, true, onlyMatching, multiplier);
                 break;
             case PORT:
-                if(!onlyMatching) addPopulation(tribe, building.type.getBonus() * multiplier);
+                if(!onlyMatching) addPopulation(tribe, building.type.getBonus(building.type.getKey(), gameState.getTribesConfig()) * multiplier);
                 applyBonus(gameState, building, false, onlyMatching, multiplier);
                 break;
             case CUSTOMS_HOUSE:
@@ -176,7 +176,7 @@ public class City extends Actor{
             case FOREST_TEMPLE:
                 if(!onlyMatching)
                 {
-                    addPopulation(tribe, building.type.getBonus() * multiplier);
+                    addPopulation(tribe, building.type.getBonus(building.type.getKey(),gameState.getTribesConfig()) * multiplier);
                 }
                 int scoreDiff = negative ? ((Temple)building).getPoints() : tc.TEMPLE_POINTS[0];
                 tribe.addScore(scoreDiff);
@@ -188,7 +188,7 @@ public class City extends Actor{
             case PARK_OF_FORTUNE:
             case TOWER_OF_WISDOM:
             case GRAND_BAZAR:
-                if(!onlyMatching) addPopulation(tribe,building.type.getBonus() * multiplier);
+                if(!onlyMatching) addPopulation(tribe,building.type.getBonus(building.type.getKey(), gameState.getTribesConfig()) * multiplier);
                 tribe.addScore(tc.MONUMENT_POINTS * multiplier);
                 break;
         }
@@ -212,7 +212,7 @@ public class City extends Actor{
         Tribe tribe = gameState.getTribe(this.tribeId);
 
         //Population added by the base building.
-        if(isBase && isPopulation && !onlyMatching) addPopulation(tribe, multiplier * building.getBonus());
+        if(isBase && isPopulation && !onlyMatching) addPopulation(tribe, multiplier * building.getBonus(gameState.getTribesConfig()));
 
         //Check all buildings next to the new building position.
         for(Vector2d adjPosition : building.position.neighborhood(1, 0, board.getSize()))
@@ -236,7 +236,7 @@ public class City extends Actor{
 
                 }else return; //This may happen if the building belongs to a city from another tribe.
 
-                bonusToAdd = isBase ? existingBuilding.getBonus() : building.getBonus();
+                bonusToAdd = isBase ? existingBuilding.getBonus(gameState.getTribesConfig()) : building.getBonus(gameState.getTribesConfig());
 
                 if(isPopulation)
                     cityToAddTo.addPopulation(tribe, bonusToAdd * multiplier);

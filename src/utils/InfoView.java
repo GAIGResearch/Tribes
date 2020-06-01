@@ -417,7 +417,7 @@ public class InfoView extends JComponent {
                 if (tt != null) {
                     boolean researched = tt.isResearched(techHighlight);
                     boolean techRequirement = tt.isResearchable(techHighlight);
-                    int starCost = techHighlight.getCost(t.getNumCities(), tt);
+                    int starCost = techHighlight.getCost(t.getNumCities(), tt,gs.getTribesConfig());
                     boolean starRequirement = t.getStars() >= starCost;
                     boolean researchable = techRequirement && starRequirement;
 

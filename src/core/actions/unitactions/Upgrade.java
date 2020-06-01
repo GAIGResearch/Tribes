@@ -29,8 +29,8 @@ public class Upgrade extends UnitAction
         TechnologyTree ttree = tribe.getTechTree();
 
         int stars = gs.getTribe(unit.getTribeId()).getStars();
-        return ((unit.getType() == BOAT && ttree.isResearched(Types.TECHNOLOGY.SAILING) && stars >= SHIP.getCost()) ||
-                (unit.getType() == SHIP && ttree.isResearched(Types.TECHNOLOGY.NAVIGATION) && stars >= BATTLESHIP.getCost()));
+        return ((unit.getType() == BOAT && ttree.isResearched(Types.TECHNOLOGY.SAILING) && stars >= SHIP.getCost(SHIP.getKey(), gs.getTribesConfig())) ||
+                (unit.getType() == SHIP && ttree.isResearched(Types.TECHNOLOGY.NAVIGATION) && stars >= BATTLESHIP.getCost(BATTLESHIP.getKey(), gs.getTribesConfig())));
     }
 
     @Override
@@ -59,7 +59,7 @@ public class Upgrade extends UnitAction
                 ((Battleship)newUnit).setBaseLandUnit(((Ship)unit).getBaseLandUnit());
 
             //adjustments in tribe and board.
-            tribe.subtractStars(nextType.getCost());
+            tribe.subtractStars(nextType.getCost(nextType.getKey(), gs.getTribesConfig()));
 
             //We first remove the unit, so there's space for the new one to take its place.
             board.removeUnitFromBoard(unit);

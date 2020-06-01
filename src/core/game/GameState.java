@@ -491,7 +491,7 @@ public class GameState {
         Tribe tribe = getTribe(toKill.getTribeId());
         board.removeUnitFromCity(toKill, c, tribe);
         Tribe t = getTribe(toKill.getTribeId());
-        t.subtractScore(toKill.getType().getPoints());
+        t.subtractScore(toKill.getType().getPoints(toKill.getType().getKey(),this.getTribesConfig()));
     }
 
 

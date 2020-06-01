@@ -47,11 +47,9 @@ public class Types {
         private int tier;
         private TECHNOLOGY parent;
         private ArrayList<TECHNOLOGY> children;
-        TribesConfig tc;
 
         TECHNOLOGY(int tier, TECHNOLOGY parent) {
             this.tier = tier; this.parent = parent;
-            tc = new TribesConfig();
         }
 
         public TECHNOLOGY getParentTech() {return this.parent;}
@@ -68,7 +66,7 @@ public class Types {
             return children;
         }
 
-        public int getCost(int numOfCities, TechnologyTree tt) {
+        public int getCost(int numOfCities, TechnologyTree tt, TribesConfig tc) {
             int cost = tc.TECH_BASE_COST + this.tier * numOfCities;
             if(tt.isResearched(tc.TECH_DISCOUNT))
             {
@@ -150,23 +148,19 @@ public class Types {
         private int key;
         private String imageFile, secondaryImageFile;
         private char mapChar;
-        private int cost;
-        private int bonus;
         private TECHNOLOGY tech;
-        TribesConfig tc;
 
 
         RESOURCE(int numVal, String imageFile, String secondaryImageFile, char mapChar, TECHNOLOGY t) {
-            this.tc = new TribesConfig();
             this.key = numVal;
             this.imageFile = imageFile;
             this.secondaryImageFile = secondaryImageFile;
             this.mapChar = mapChar;
-            this.cost = setCost(numVal);
-            this.bonus = setBonus(numVal);
+
+
             this.tech = t;
         }
-        public int setCost(int numVal){
+        public int getCost(int numVal, TribesConfig tc){
             switch (numVal){
                 case 0:
                     return tc.FISH_COST;
@@ -180,7 +174,8 @@ public class Types {
             return 0;
         }
 
-        public int setBonus(int numVal){
+
+        public int getBonus(int numVal, TribesConfig tc){
             switch (numVal){
                 case 0:
                     return tc.FISH_POP;
@@ -204,8 +199,8 @@ public class Types {
             }
             return ImageIO.GetInstance().getImage(imageFile);
         }
-        public int getCost() {return cost;}
-        public int getBonus() {return bonus;}
+       // public int getCost() {return cost;}
+        //public int getBonus() {return bonus;}
         public char getMapChar() {return mapChar;}
 
         public static RESOURCE getType(char resourceChar) {
@@ -224,9 +219,9 @@ public class Types {
             return null;
         }
 
-        public TribesConfig getTribesConfig(){
-            return this.tc;
-        }
+//        public TribesConfig getTribesConfig(){
+//            return this.tc;
+//        }
 
 
         public TECHNOLOGY getTechnologyRequirement() {
@@ -311,21 +306,17 @@ public class Types {
         private String imageFile;
         private TECHNOLOGY technologyRequirement;
         private HashSet<TERRAIN> terrainRequirements;
-        private int cost;
-        private int bonus;
-        private TribesConfig tc;
+
         BUILDING(int numVal, String imageFile, TECHNOLOGY technologyRequirement, HashSet<TERRAIN> terrainRequirements)
         {
-            this.tc = new TribesConfig();
             this.key = numVal;
-            this.cost = setCost(numVal);
-            this.bonus = setBonus(numVal);
+
             this.imageFile = imageFile;
             this.technologyRequirement = technologyRequirement;
             this.terrainRequirements = terrainRequirements;
         }
 
-        public int setCost(int numVal){
+        public int getCost(int numVal, TribesConfig tc){
             switch (numVal){
                 case 0:
                     return tc.PORT_COST;
@@ -355,7 +346,7 @@ public class Types {
             return 0;
         }
 
-        public int setBonus(int numVal){
+        public int getBonus(int numVal, TribesConfig tc){
             switch (numVal){
                 case 0:
                     return tc.PORT_BONUS;
@@ -384,11 +375,11 @@ public class Types {
         public TECHNOLOGY getTechnologyRequirement() { return technologyRequirement; }
         public HashSet<TERRAIN> getTerrainRequirements() { return terrainRequirements; }
         public int getKey() {  return key; }
-        public int getCost() {return cost; }
-        public int getBonus() {return bonus; }
+//        public int getCost() {return cost; }
+//        public int getBonus() {return bonus; }
         public Image getImage() { return ImageIO.GetInstance().getImage(imageFile); }
 
-        public Types.RESOURCE getResourceConstraint()
+        public Types.RESOURCE getResourceConstraint(TribesConfig tc)
         {
             if(this == MINE) return tc.MINE_RES_CONSTRAINT;
             if(this == FARM) return tc.FARM_RES_CONSTRAINT;
@@ -504,11 +495,9 @@ public class Types {
         SUPERUNIT(5);
 
         private int level;
-        private TribesConfig tc;
 
         CITY_LEVEL_UP(int level) {
             this.level = level;
-            tc = new TribesConfig();
         }
 
         public int getLevel() { return level; }
@@ -556,7 +545,7 @@ public class Types {
             return 50 - level * 5;
         }
 
-        public boolean grantsMonument()
+        public boolean grantsMonument(TribesConfig tc)
         {
             return this.level == tc.PARK_OF_FORTUNE_LEVEL;
         }
@@ -583,23 +572,16 @@ public class Types {
 
         private int key;
         private String imageFile, weapon;
-        private int cost;
         private TECHNOLOGY requirement;
-        private int points;
-        private TribesConfig tc;
 
         UNIT(int numVal, String imageFile, String weaponFile, Types.TECHNOLOGY requirement) {
-            this.tc = new TribesConfig();
-
             this.key = numVal;
             this.imageFile = imageFile;
-            this.cost = setCost(numVal);
             this.requirement = requirement;
-            this.points = setPoints(numVal);
             this.weapon = weaponFile;
         }
 
-        public int setCost(int numVal){
+        public int getCost(int numVal, TribesConfig tc){
             switch (numVal){
                 case 0:
                     return tc.WARRIOR_COST;
@@ -632,7 +614,7 @@ public class Types {
             return 0;
         }
 
-        public int setPoints(int numVal){
+        public int getPoints(int numVal, TribesConfig tc){
             switch (numVal){
                 case 0:
                     return tc.WARRIOR_POINTS;
@@ -688,13 +670,13 @@ public class Types {
             }
             return ImageIO.GetInstance().getImage(weapon);
         }
-        public int getCost() {
-            return cost;
-        }
+      //  public int getCost() {
+      //      return cost;
+      //  }
         public TECHNOLOGY getTechnologyRequirement() {
             return requirement;
         }
-        public int getPoints() { return points; }
+      //  public int getPoints() { return points; }
         public int getKey() {return key;}
 
         public static Unit createUnit (Vector2d pos, int kills, boolean isVeteran, int ownerID, int tribeID, UNIT type, GameState gs)

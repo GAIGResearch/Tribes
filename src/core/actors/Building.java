@@ -1,5 +1,6 @@
 package core.actors;
 
+import core.TribesConfig;
 import core.Types;
 import org.json.JSONObject;
 import utils.Vector2d;
@@ -53,7 +54,7 @@ public class Building {
      * production or population.
      * @return the bonus this building provides to the city.
      */
-    int getBonus(){
-        return type.getBonus();
+    int getBonus(TribesConfig tc){
+        return type.getBonus(type.getKey(),tc );
     }
 }

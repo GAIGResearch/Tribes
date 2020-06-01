@@ -31,7 +31,7 @@ public class Spawn extends CityAction
         if(!unit_type.spawnable()) return false;
 
         //I have enough money.
-        if(t.getStars() < unit_type.getCost()) return false;
+        if(t.getStars() < unit_type.getCost(unit_type.getKey(), gs.getTribesConfig())) return false;
 
         //I have enough space in this city.
         if(!city.canAddUnit()) return false;
@@ -54,8 +54,8 @@ public class Spawn extends CityAction
             Unit newUnit = Types.UNIT.createUnit(new Vector2d(cityPos.x, cityPos.y), 0, false, city.getActorId(), city.getTribeId(), unit_type,gs);
             gs.getBoard().addUnit(city, newUnit);
             Tribe tribe = gs.getTribe(city.getTribeId());
-            tribe.subtractStars(unit_type.getCost());
-            tribe.addScore(unit_type.getPoints());
+            tribe.subtractStars(unit_type.getCost(unit_type.getKey(), gs.getTribesConfig()));
+            tribe.addScore(unit_type.getPoints(unit_type.getKey(),gs.getTribesConfig()));
             return true;
         }
         return false;

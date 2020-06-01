@@ -46,7 +46,7 @@ public class LevelUp extends CityAction {
         Vector2d cityPos = city.getPosition();
         TribesConfig tc = new TribesConfig();
 
-        if(bonus.grantsMonument())
+        if(bonus.grantsMonument(gs.getTribesConfig()))
             tribe.cityMaxedUp();
 
         tribe.addScore(bonus.getLevelUpPoints());

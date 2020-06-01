@@ -33,7 +33,7 @@ public class ResourceGathering extends CityAction
         Tribe t = b.getTribe(city.getTribeId());
 
         // Check if resource can be gathered
-        if(b.getResourceAt(targetPos.x, targetPos.y) == this.resource && t.getStars() >= this.resource.getCost()){
+        if(b.getResourceAt(targetPos.x, targetPos.y) == this.resource && t.getStars() >= this.resource.getCost(this.resource.getKey(), gs.getTribesConfig())){
             switch (this.resource){
                 case ANIMAL:
                     return t.getTechTree().isResearched(Types.TECHNOLOGY.HUNTING);
@@ -56,17 +56,17 @@ public class ResourceGathering extends CityAction
             Vector2d position = super.getTargetPos();
             gs.getBoard().setResourceAt(position.x, position.y, null);
             Tribe tribe = gs.getTribe(city.getTribeId());
-            tribe.subtractStars(this.resource.getCost());
+            tribe.subtractStars(this.resource.getCost(this.resource.getKey(),gs.getTribesConfig()));
             switch (this.resource){
                 case FISH:
                 case ANIMAL:
                 case FRUIT:
-                    city.addPopulation(tribe, this.resource.getBonus());
+                    city.addPopulation(tribe, this.resource.getBonus(this.resource.getKey(),gs.getTribesConfig()));
                     return true;
                 case WHALES: //Whaling is the only resource which provides extra stars
                     Board b = gs.getBoard();
                     Tribe t  = b.getTribe(city.getTribeId());
-                    t.addStars(this.resource.getBonus());
+                    t.addStars(this.resource.getBonus(this.resource.getKey(),gs.getTribesConfig()));
                     return true;
             }
         }

@@ -26,7 +26,7 @@ public class ResearchTechFactory implements ActionFactory {
         // tech tree that are not reachable), although this makes the code more general.
         for(Types.TECHNOLOGY tech : Types.TECHNOLOGY.values())
         {
-            if(stars >= tech.getCost(numCities, techTree) && techTree.isResearchable(tech))
+            if(stars >= tech.getCost(numCities, techTree, gs.getTribesConfig()) && techTree.isResearchable(tech))
             {
                 ResearchTech newAction = new ResearchTech(tribe.getTribeId());
                 newAction.setTech(tech);

@@ -37,7 +37,7 @@ public class Disband extends UnitAction
             t.addStars(starsGained);
             b.removeUnitFromBoard(unit);
             b.removeUnitFromCity(unit, c, t);
-            t.subtractScore(unit.getType().getPoints());
+            t.subtractScore(unit.getType().getPoints(unit.getType().getKey(), gs.getTribesConfig()));
             return true;
         }
 

@@ -39,14 +39,14 @@ public class Build extends CityAction
             case WATER_TEMPLE:
             case MOUNTAIN_TEMPLE:
             case FOREST_TEMPLE:
-                return isBuildable(gs, buildingType.getCost(), false);
+                return isBuildable(gs, buildingType.getCost(buildingType.getKey(),gs.getTribesConfig()), false);
 
             //Buildings that must be unique in a city
             case SAWMILL:
             case CUSTOMS_HOUSE:
             case WINDMILL:
             case FORGE:
-                return isBuildable(gs, buildingType.getCost(), true);
+                return isBuildable(gs, buildingType.getCost(buildingType.getKey(),gs.getTribesConfig()), true);
 
             //Buildings that must be unique in a tribe (i.e. monuments)
             case ALTAR_OF_PEACE:
@@ -56,7 +56,7 @@ public class Build extends CityAction
             case PARK_OF_FORTUNE:
             case TOWER_OF_WISDOM:
             case GRAND_BAZAR:
-                boolean buildingConstraintsOk = isBuildable(gs, buildingType.getCost(), false);
+                boolean buildingConstraintsOk = isBuildable(gs, buildingType.getCost(buildingType.getKey(),gs.getTribesConfig()), false);
                 if(buildingConstraintsOk)
                 {
                     City city = (City) gs.getActor(this.cityId);
@@ -76,7 +76,7 @@ public class Build extends CityAction
 
         if(isFeasible(gs)) {
 
-            tribe.subtractStars(buildingType.getCost());
+            tribe.subtractStars(buildingType.getCost(buildingType.getKey(),gs.getTribesConfig()));
             board.setBuildingAt(targetPos.x, targetPos.y, buildingType);
             board.setResourceAt(targetPos.x, targetPos.y, null);
 
@@ -123,7 +123,7 @@ public class Build extends CityAction
         if (!(buildingType.getTerrainRequirements().contains(board.getTerrainAt(targetPos.x, targetPos.y)))) return false;
 
         //Resource constraint
-        Types.RESOURCE resNeeded = buildingType.getResourceConstraint();
+        Types.RESOURCE resNeeded = buildingType.getResourceConstraint(gs.getTribesConfig());
         if (resNeeded != null)
         {
             //if there's a constraint, resource at location must be what's needed.

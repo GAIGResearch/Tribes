@@ -59,7 +59,7 @@ public class LevelUp extends CityAction {
                 city.addProduction(tc.CITY_LEVEL_UP_WORKSHOP_PROD);
                 break;
             case EXPLORER:
-                gs.getBoard().launchExplorer(cityPos.x, cityPos.y, city.getTribeId(), gs.getRandomGenerator());
+                gs.getBoard().launchExplorer(cityPos.x, cityPos.y, city.getTribeId(), gs.getRandomGenerator(),gs.getTribesConfig());
                 break;
             case CITY_WALL:
                 city.setWalls(true);
@@ -71,7 +71,7 @@ public class LevelUp extends CityAction {
                 city.addPopulation(tribe, tc.CITY_LEVEL_UP_POP_GROWTH);
                 break;
             case BORDER_GROWTH:
-                gs.getBoard().expandBorder(city);
+                gs.getBoard().expandBorder(city,gs.getTribesConfig());
                 break;
             case PARK:
                 tribe.addScore(tc.CITY_LEVEL_UP_PARK);
@@ -81,10 +81,10 @@ public class LevelUp extends CityAction {
                 Unit unitInCity = gs.getBoard().getUnitAt(cityPos.x, cityPos.y);
                 if(unitInCity != null)
                 {
-                    gs.pushUnit(unitInCity, cityPos.x, cityPos.y);
+                    gs.pushUnit(unitInCity, cityPos.x, cityPos.y,gs);
                 }
 
-                Unit superUnit = Types.UNIT.createUnit(cityPos, 0, false, city.getActorId(), city.getTribeId(), Types.UNIT.SUPERUNIT);
+                Unit superUnit = Types.UNIT.createUnit(cityPos, 0, false, city.getActorId(), city.getTribeId(), Types.UNIT.SUPERUNIT,gs);
                 gs.getBoard().addUnit(city, superUnit);
                 break;
         }

@@ -30,8 +30,9 @@ public class GameLoader
     private Tribe[] tribes;
     private int[] allCapitalIds;
     private Types.GAME_MODE game_mode;
+    private GameState gs;
 
-    GameLoader(String fileName) {
+    GameLoader(String fileName, GameState gs) {
 
         String jsonData = readFile(fileName);
         JSONObject gameINFO = new JSONObject(jsonData);
@@ -45,12 +46,13 @@ public class GameLoader
         this.JUnit = gameINFO.getJSONObject("unit");
         this.JCity = gameINFO.getJSONObject("city");
         this.game_mode = Types.GAME_MODE.getTypeByKey(gameINFO.getInt("gameMode"));
+        this.gs = gs;
 
         loadTribes();
 
         loadBoard();
 
-        loadUnits();
+        loadUnits(gs);
 
         loadCities();
 
@@ -74,7 +76,7 @@ public class GameLoader
         board = new Board(JBoard, allCapitalIds, activeTribeID, tribes);
     }
 
-    private void loadUnits(){
+    private void loadUnits(GameState gs){
         Iterator<String> keys = JUnit.keys();
         while (keys.hasNext()){
             String key = keys.next();
@@ -82,7 +84,7 @@ public class GameLoader
             Types.UNIT unitType = Types.UNIT.getTypeByKey(unitINFO.getInt("type"));
             Unit unit = Types.UNIT.createUnit(new Vector2d(unitINFO.getInt("x"),unitINFO.getInt("y")),
                     unitINFO.getInt("kill"), unitINFO.getBoolean("isVeteran"),
-                    unitINFO.getInt("cityID"), unitINFO.getInt("tribeId"), unitType);
+                    unitINFO.getInt("cityID"), unitINFO.getInt("tribeId"), unitType,gs);
             unit.setCurrentHP(unitINFO.getInt("currentHP"));
             unit.setStatus(Types.TURN_STATUS.FRESH);
             if (unitType == Types.UNIT.BOAT){

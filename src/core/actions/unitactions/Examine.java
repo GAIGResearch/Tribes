@@ -59,7 +59,7 @@ public class Examine extends UnitAction
 
                     //instead of a super unit, in the water we create a Battleship of out a warrior
                     Types.UNIT unitType = terr.isWater() ? Types.UNIT.BATTLESHIP : Types.UNIT.SUPERUNIT;
-                    Unit newUnit = Types.UNIT.createUnit(spawnPos, 0, false, -1, unit.getTribeId(), unitType);
+                    Unit newUnit = Types.UNIT.createUnit(spawnPos, 0, false, -1, unit.getTribeId(), unitType,gs);
                     if(terr.isWater())
                     {
                         ((Battleship)newUnit).setBaseLandUnit(Types.UNIT.WARRIOR);
@@ -67,7 +67,7 @@ public class Examine extends UnitAction
 
                     Unit unitInCity = board.getUnitAt(spawnPos.x, spawnPos.y);
                     if(unitInCity != null)
-                        gs.pushUnit(unitInCity, spawnPos.x, spawnPos.y);
+                        gs.pushUnit(unitInCity, spawnPos.x, spawnPos.y,gs);
 
                     board.addUnit((City)gs.getActor(handlerCityId), newUnit);
                     break;
@@ -85,7 +85,7 @@ public class Examine extends UnitAction
 
                 case EXPLORER:
                     spawnPos = unit.getPosition().copy();
-                    gs.getBoard().launchExplorer(spawnPos.x, spawnPos.y, unit.getTribeId(), rnd);
+                    gs.getBoard().launchExplorer(spawnPos.x, spawnPos.y, unit.getTribeId(), rnd, gs.getTribesConfig());
                     break;
 
                 case RESOURCES:

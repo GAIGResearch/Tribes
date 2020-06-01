@@ -104,7 +104,7 @@ public class Game {
      */
     public void init(ArrayList<Agent> players, String fileName){
 
-        GameLoader gameLoader = new GameLoader(fileName);
+        GameLoader gameLoader = new GameLoader(fileName,gs);
         this.seed = gameLoader.getSeed();
         this.rnd = new Random(seed);
         Tribe[] tribes = gameLoader.getTribes();

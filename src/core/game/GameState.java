@@ -121,7 +121,7 @@ public class GameState {
     private void initGameState(String[] lines) {
 
         LevelLoader ll = new LevelLoader();
-        board = ll.buildLevel(lines, rnd);
+        board = ll.buildLevel(lines, rnd, this);
 
         Tribe[] tribes = board.getTribes();
         for(Tribe tribe : tribes)
@@ -470,10 +470,10 @@ public class GameState {
      * @param startX initial x position
      * @param startY initial y position.
      */
-    public void pushUnit(Unit toPush, int startX, int startY)
+    public void pushUnit(Unit toPush, int startX, int startY, GameState gs)
     {
         Tribe tribe = getTribe(toPush.getTribeId());
-        boolean pushed = board.pushUnit(tribe, toPush, startX, startY, rnd);
+        boolean pushed = board.pushUnit(tribe, toPush, startX, startY, rnd,gs);
         if(!pushed)
         {
             killUnit(toPush);
@@ -517,7 +517,6 @@ public class GameState {
         copy.tick = this.tick;
         copy.turnMustEnd = turnMustEnd;
         copy.gameIsOver = gameIsOver;
-        copy.
 
         int numTribes = getTribes().length;
         copy.canEndTurn = new boolean[numTribes];

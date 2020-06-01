@@ -21,7 +21,7 @@ public class MakeVeteran extends UnitAction
         Unit unit = (Unit) gs.getActor(this.unitId);
         if(unit.getType() == Types.UNIT.SUPERUNIT)
             return false;
-        return unit.getKills() >= TribesConfig.VETERAN_KILLS && !unit.isVeteran();
+        return unit.getKills() >= gs.getTribesConfig().VETERAN_KILLS && !unit.isVeteran();
     }
 
     @Override
@@ -30,7 +30,7 @@ public class MakeVeteran extends UnitAction
         if(isFeasible(gs))
         {
             unit.setVeteran(true);
-            unit.setMaxHP(unit.getMaxHP() + TribesConfig.VETERAN_PLUS_HP);
+            unit.setMaxHP(unit.getMaxHP() + gs.getTribesConfig().VETERAN_PLUS_HP);
             unit.setCurrentHP(unit.getMaxHP());
             return true;
         }

@@ -50,7 +50,7 @@ public class Upgrade extends UnitAction
             else return false; //this shouldn't happen, isFeasible should've captured this case
 
             //Create the new unit
-            Unit newUnit = Types.UNIT.createUnit(unit.getPosition(), unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), nextType);
+            Unit newUnit = Types.UNIT.createUnit(unit.getPosition(), unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), nextType,gs);
             newUnit.setCurrentHP(unit.getCurrentHP());
             newUnit.setMaxHP(unit.getMaxHP());
             if(nextType == SHIP)

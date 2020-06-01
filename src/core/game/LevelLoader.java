@@ -23,7 +23,7 @@ class LevelLoader
      * Builds a level, receiving a file name.
      * @param lines lines containing the level
      */
-    Board buildLevel(String[] lines, Random rnd) {
+    Board buildLevel(String[] lines, Random rnd, GameState gs) {
 
         // Dimensions of the level read from the file.
         size.width = lines.length;
@@ -71,15 +71,15 @@ class LevelLoader
                         //A city to create. Add it and assign it to the next tribe.
                         City c = new City(i, j, tribeID);
                         c.setCapital(true);
-                        board.addCityToTribe(c,rnd);
+                        board.addCityToTribe(c,rnd, gs.getTribesConfig());
 
                         //Also, each tribe starts with a unit in the same location where the city is
                         Types.UNIT unitType = tribes[tribeID].getType().getStartingUnit();
-                        Unit unit = Types.UNIT.createUnit(new Vector2d(i,j), 0, false, c.getActorId(), tribeID, unitType);
+                        Unit unit = Types.UNIT.createUnit(new Vector2d(i,j), 0, false, c.getActorId(), tribeID, unitType,gs);
                         board.addUnit(c, unit);
 
                         //City tiles
-                        board.assignCityTiles(c, c.getBound());
+                        board.assignCityTiles(c, c.getBound(),gs.getTribesConfig());
 
                         tribeCounter++;
                     }

@@ -283,7 +283,7 @@ public class Board {
      * @param startY   y coordinate of the starting position of the unit to push
      * @return true if the unit could be pushed.
      */
-    boolean pushUnit(Tribe tribe, Unit toPush, int startX, int startY, Random r) {
+    boolean pushUnit(Tribe tribe, Unit toPush, int startX, int startY, Random r, GameState gs) {
         //xPush and yPush encode the order of tiles where the push may be tried.
         int[] xPush = {0, -1, 0, 1, -1, -1, 1, 1};
         int[] yPush = {1, 0, -1, 0, 1, -1, -1, 1};
@@ -295,7 +295,7 @@ public class Board {
             int y = startY + yPush[idx];
 
             if (x >= 0 && y >= 0 && x < size && y < size) {
-                pushed = tryPush(tribe, toPush, startX, startY, x, y, r);
+                pushed = tryPush(tribe, toPush, startX, startY, x, y, r,gs);
             }
             idx++;
         }
@@ -317,7 +317,7 @@ public class Board {
      * @param r random number generator, necessary to clear view if the pushed unit discovers new tiles.
      * @return true if the unit could be pushed.
      */
-    public boolean tryPush(Tribe tribe, Unit toPush, int startX, int startY, int x, int y, Random r) {
+    public boolean tryPush(Tribe tribe, Unit toPush, int startX, int startY, int x, int y, Random r, GameState gs) {
         //there's no unit? (or killed)
         Unit u = getUnitAt(x, y);
         if (u != null)
@@ -346,7 +346,7 @@ public class Board {
             if (b == Types.BUILDING.PORT) {
                 City c = getCityInBorders(x, y);
                 if (c != null && c.getTribeId() == tribeId) {
-                    embark(toPush, tribe, x, y);
+                    embark(toPush, tribe, x, y,gs);
                     return true;
                 }
 
@@ -371,7 +371,7 @@ public class Board {
      * @param x x coordinate of the position where the unit is embarking
      * @param y y coordinate of the position where the unit is embarking
      */
-    public void embark(Unit unit, Tribe tribe, int x, int y) {
+    public void embark(Unit unit, Tribe tribe, int x, int y, GameState gs) {
 
         City city = (City) gameActors.get(unit.getCityId());
         removeUnitFromBoard(unit);
@@ -379,7 +379,7 @@ public class Board {
 
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(x, y);
-        Boat boat = (Boat) Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), Types.UNIT.BOAT);
+        Boat boat = (Boat) Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), Types.UNIT.BOAT,gs);
         boat.setCurrentHP(unit.getCurrentHP());
         boat.setMaxHP(unit.getMaxHP());
         boat.setBaseLandUnit(unit.getType());
@@ -394,7 +394,7 @@ public class Board {
      * @param x x coordinate of the position where the unit is disembarking
      * @param y y coordinate of the position where the unit is disembarking
      */
-    public void disembark(Unit unit, Tribe tribe, int x, int y) {
+    public void disembark(Unit unit, Tribe tribe, int x, int y, GameState gs) {
         City city = (City) gameActors.get(unit.getCityId());
         removeUnitFromBoard(unit);
         removeUnitFromCity(unit, city, tribe);
@@ -409,7 +409,7 @@ public class Board {
         //We're actually creating a new unit
         Vector2d newPos = new Vector2d(x, y);
 
-        Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), baseLandUnit);
+        Unit newUnit = Types.UNIT.createUnit(newPos, unit.getKills(), unit.isVeteran(), unit.getCityId(), unit.getTribeId(), baseLandUnit,gs);
 
         newUnit.setCurrentHP(unit.getCurrentHP());
         newUnit.setMaxHP(unit.getMaxHP());
@@ -463,14 +463,14 @@ public class Board {
      * @param tribeId id of the tribe that launches the explorer.
      * @param rnd random generator for the explorer's moves.
      */
-    public void launchExplorer(int x0, int y0, int tribeId, Random rnd) {
+    public void launchExplorer(int x0, int y0, int tribeId, Random rnd, TribesConfig tc) {
 
         Vector2d currentPos = new Vector2d(x0, y0);
-        for (int i = 0; i < TribesConfig.NUM_STEPS; ++i) {
+        for (int i = 0; i < tc.NUM_STEPS; ++i) {
             int j = 0;
             boolean moved = false;
 
-            while (!moved && j < TribesConfig.NUM_STEPS * 3) {
+            while (!moved && j < tc.NUM_STEPS * 3) {
                 //Pick a neighbour tile at random
                 LinkedList<Vector2d> neighs = currentPos.neighborhood(1,0, size);
                 Vector2d next = neighs.get(rnd.nextInt(neighs.size()));
@@ -479,7 +479,7 @@ public class Board {
                     moved = true;
                     currentPos.x = next.x;
                     currentPos.y = next.y;
-                    boolean updateNetwork = tribes[tribeId].clearView(currentPos.x, currentPos.y, TribesConfig.EXPLORER_CLEAR_RANGE, rnd, this);
+                    boolean updateNetwork = tribes[tribeId].clearView(currentPos.x, currentPos.y, tc.EXPLORER_CLEAR_RANGE, rnd, this);
                     if(updateNetwork)
                         tradeNetwork.computeTradeNetworkTribe(this, tribes[tribeId]);
                 }
@@ -568,7 +568,7 @@ public class Board {
      * @param c city that has tiles
      * @param radius maximum distance from the city center where the city can adquire tiles.
      */
-    void assignCityTiles(City c, int radius){
+    void assignCityTiles(City c, int radius, TribesConfig tc){
         Vector2d cityPos = c.getPosition();
         Tribe t = getTribe(c.getTribeId());
         LinkedList<Vector2d> tiles = cityPos.neighborhood(radius, 0, size);
@@ -577,8 +577,8 @@ public class Board {
         {
             if(tileCityId[tile.x][tile.y] == -1){
                 tileCityId[tile.x][tile.y] = c.getActorId();
-                t.addScore(TribesConfig.CITY_BORDER_POINTS); // Add score to tribe on border creation
-                c.addPointsWorth(TribesConfig.CITY_BORDER_POINTS);
+                t.addScore(tc.CITY_BORDER_POINTS); // Add score to tribe on border creation
+                c.addPointsWorth(tc.CITY_BORDER_POINTS);
             }
         }
     }
@@ -587,9 +587,9 @@ public class Board {
      * Expands the borders of a given city
      * @param city city whose borders to expand.
      */
-    public void expandBorder(City city){
-        city.setBound(city.getBound()+TribesConfig.CITY_EXPANSION_TILES);
-        assignCityTiles(city,city.getBound());
+    public void expandBorder(City city, TribesConfig tc){
+        city.setBound(city.getBound()+tc.CITY_EXPANSION_TILES);
+        assignCityTiles(city,city.getBound(),tc);
     }
 
     /**
@@ -651,8 +651,8 @@ public class Board {
             City newCity = new City(x, y, capturingTribe.getTribeId());
 
             //Add city to board and set its borders
-            addCityToTribe(newCity,gameState.getRandomGenerator());
-            assignCityTiles(newCity, newCity.getBound());
+            addCityToTribe(newCity,gameState.getRandomGenerator(), gameState.getTribesConfig());
+            assignCityTiles(newCity, newCity.getBound(), gameState.getTribesConfig());
 
             //This becomes a city.
             setTerrainAt(x, y, CITY);
@@ -805,7 +805,7 @@ public class Board {
      * Adds a city to a tribe
      * @param c city to add
      */
-    void addCityToTribe(City c, Random r)
+    void addCityToTribe(City c, Random r, TribesConfig tc)
     {
         addActor(c);
         if (c.isCapital()){
@@ -814,7 +814,7 @@ public class Board {
         tribes[c.getTribeId()].addCity(c.getActorId());
 
         //cities provide visibility, which needs updating
-        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, TribesConfig.NEW_CITY_CLEAR_RANGE, r, this.copy());
+        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, tc.NEW_CITY_CLEAR_RANGE, r, this.copy());
 
         //By default, cities are considered to be roads for trade network purposes.
         tradeNetwork.setTradeNetwork(this, c.getPosition().x, c.getPosition().y, true);

@@ -72,7 +72,7 @@ public class Attack extends UnitAction
                     case WARRIOR:
                     case KNIGHT:
                     case SUPERUNIT:
-                    gs.getBoard().tryPush(attackerTribe, attacker, attacker.getPosition().x, attacker.getPosition().y, target.getPosition().x, target.getPosition().y, gs.getRandomGenerator());
+                    gs.getBoard().tryPush(attackerTribe, attacker, attacker.getPosition().x, attacker.getPosition().y, target.getPosition().x, target.getPosition().y, gs.getRandomGenerator(),gs);
                 }
 
 

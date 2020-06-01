@@ -3,6 +3,7 @@ package core;
 import core.actions.Action;
 import core.actions.unitactions.*;
 import core.actors.units.*;
+import core.game.GameState;
 import org.json.JSONObject;
 import utils.ImageIO;
 import utils.Vector2d;
@@ -696,9 +697,9 @@ public class Types {
         public int getPoints() { return points; }
         public int getKey() {return key;}
 
-        public static Unit createUnit (Vector2d pos, int kills, boolean isVeteran, int ownerID, int tribeID, UNIT type)
+        public static Unit createUnit (Vector2d pos, int kills, boolean isVeteran, int ownerID, int tribeID, UNIT type, GameState gs)
         {
-            TribesConfig tc = new TribesConfig();
+            TribesConfig tc = gs.getTribesConfig();
             switch (type)
             {
                 case WARRIOR: return new Warrior(pos, kills, isVeteran, ownerID, tribeID,tc);

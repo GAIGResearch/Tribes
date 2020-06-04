@@ -85,12 +85,12 @@ public class Build extends CityAction
             else
                 city.addBuilding(gs, new Building(targetPos.x, targetPos.y, buildingType, this.cityId));
 
-
-
             if(buildingType == Types.BUILDING.PORT)
                 board.buildPort(targetPos.x, targetPos.y);
             if(buildingType.isMonument())
                 tribe.monumentIsBuilt(buildingType);
+            if(buildingType == Types.BUILDING.LUMBER_HUT)
+                board.setTerrainAt(targetPos.x, targetPos.y, Types.TERRAIN.PLAIN);
 
             return true;
         }

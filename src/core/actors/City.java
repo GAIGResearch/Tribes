@@ -235,13 +235,14 @@ public class City extends Actor{
 
                 }else return; //This may happen if the building belongs to a city from another tribe.
 
-                bonusToAdd = isBase ? existingBuilding.getBonus() : building.getBonus();
+                if(existingBuilding != null) {
+                    bonusToAdd = isBase ? existingBuilding.getBonus() : building.getBonus();
 
-                if(isPopulation)
-                    cityToAddTo.addPopulation(tribe, bonusToAdd * multiplier);
-                else
-                    cityToAddTo.addProduction(bonusToAdd * multiplier);
-
+                    if (isPopulation)
+                        cityToAddTo.addPopulation(tribe, bonusToAdd * multiplier);
+                    else
+                        cityToAddTo.addProduction(bonusToAdd * multiplier);
+                }
             }
         }
     }

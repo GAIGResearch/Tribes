@@ -6,3 +6,5 @@
 img/xcf_nogit/*
 *.xcf
 save/*
+res/
+out/

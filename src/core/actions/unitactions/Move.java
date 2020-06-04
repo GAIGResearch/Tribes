@@ -28,15 +28,17 @@ public class Move extends UnitAction
     public boolean isFeasible(final GameState gs)
     {
         Unit unit = (Unit) gs.getActor(this.unitId);
+        if(unit == null)
+            return false;
         Pathfinder tp = new Pathfinder(unit.getPosition(), new StepMove(gs, unit));
 
         //If the unit can move and the destination is vacant, try to reach it.
         if(unit.canMove() && gs.getBoard().getUnitAt(destination.x, destination.y) == null) {
             ArrayList<PathNode> path = tp.findPathTo(destination);
-            if(path == null)
-            {
-                System.out.println("ERROR calculating a path (if actions was created by MoveFactory)");
-            }
+//            if(path == null)
+//            {
+//                System.out.println("ERROR calculating a path (if actions were created by MoveFactory)");
+//            }
             return path != null;
         }
         return false;

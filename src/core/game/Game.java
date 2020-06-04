@@ -132,10 +132,15 @@ public class Game {
         numPlayers = players.size();
         this.players = new Agent[numPlayers];
         this.aiStats = new AIStats[numPlayers];
+
+        ArrayList<Integer> allIds = new ArrayList<>();
+        for(int i = 0; i < numPlayers; ++i)
+            allIds.add(i);
+
         for(int i = 0; i < numPlayers; ++i)
         {
             this.players[i] = players.get(i);
-            this.players[i].setPlayerID(i);
+            this.players[i].setPlayerIDs(i, allIds);
             this.aiStats[i] = new AIStats(i);
         }
 
@@ -168,13 +173,17 @@ public class Game {
             Tribe thisTribe = tribeObjects[tribeIdx];
             core.Types.TRIBE tribeType = thisTribe.getType();
 
+            ArrayList<Integer> allIds = new ArrayList<>();
             int indexInTypes = -1;
             for(int i = 0; i < tribes.length; ++i)
-                if(tribes[i] == tribeType)
+            {
+                allIds.add(i);
+                if (tribes[i] == tribeType)
                     indexInTypes = i;
+            }
 
             this.players[tribeIdx] = players.get(indexInTypes);
-            this.players[tribeIdx].setPlayerID(tribeIdx);
+            this.players[tribeIdx].setPlayerIDs(tribeIdx, allIds);
             this.aiStats[tribeIdx] = new AIStats(tribeIdx);
         }
         this.gameStateObservations = new GameState[numPlayers];
@@ -207,8 +216,13 @@ public class Game {
                 printGameResults();
                 if(VERBOSE)
                 {
-                    for(AIStats ais : aiStats)
+                    TreeSet<TribeResult> ranking = getCurrentRanking();
+                    for(TribeResult tr : ranking)
+                    {
+                        int idx = tr.getId();
+                        AIStats ais = aiStats[idx];
                         ais.print();
+                    }
                 }
 
                 if (!VISUALS || frame == null) {
@@ -230,6 +244,7 @@ public class Game {
      */
     private void tick (GUI frame) {
 
+//        System.out.println("Tick: " + gs.getTick());
         Tribe[] tribes = gs.getTribes();
         for (int i = 0; i < numPlayers; i++) {
             Tribe tribe = tribes[i];
@@ -402,12 +417,16 @@ public class Game {
         Tribe[] tribes = gs.getBoard().getTribes();
 
         TreeSet<TribeResult> ranking = gs.getCurrentRanking();
-        System.out.println("Game Results: ");
+        System.out.println(gs.getTick() + "; Game Results: ");
         int rank = 1;
         for(TribeResult tr : ranking)
         {
             int tribeId = tr.getId();
-            System.out.print(" #" + rank + ": Tribe " + tribes[tribeId].getType() + ": " + results[tribeId] + ", " + sc[tribeId] + " points;");
+            Agent ag = players[tribeId];
+            String[] agentChunks = ag.getClass().toString().split("\\.");
+            String agentName = agentChunks[agentChunks.length-1];
+
+            System.out.print(" #" + rank + ": Tribe " + tribes[tribeId].getType() + " (" + agentName + "): " + results[tribeId] + ", " + sc[tribeId] + " points;");
             System.out.println(" #tech: " + tr.getNumTechsResearched() + ", #cities: " + tr.getNumCities() + ", production: " + tr.getProduction());
             rank++;
         }
@@ -445,6 +464,7 @@ public class Game {
         actionCounts.add(currentGameState.getTribeActions().size());
 
         aiStats.addBranchingFactor(turn, actionCounts);
+        aiStats.addActionsPerStep(turn, gs.getAllAvailableActions().size());
     }
 
     /**

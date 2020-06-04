@@ -1,10 +1,6 @@
-import core.Constants;
 import core.Types;
 import core.game.Game;
-import core.actors.Tribe;
-import core.game.TribeResult;
 import players.*;
-import players.heuristics.AlgParams;
 import players.mc.MCParams;
 import players.mc.MonteCarloAgent;
 import players.mcts.MCTSParams;
@@ -13,8 +9,8 @@ import players.oep.OEPAgent;
 import players.oep.OEPParams;
 import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
-import utils.MultiStatSummary;
-import utils.StatSummary;
+import players.rhea.RHEAAgent;
+import players.rhea.RHEAParams;
 
 import java.util.*;
 
@@ -38,6 +34,7 @@ public class Play {
         MC,
         SIMPLE,
         MCTS,
+        RHEA,
         OEP;
     }
 
@@ -56,18 +53,35 @@ public class Play {
             case OSLA:
                 OSLAParams oslaParams = new OSLAParams();
                 oslaParams.stop_type = oslaParams.STOP_FMCALLS; //Upper bound
+                oslaParams.heuristic_method = oslaParams.DIFF_HEURISTIC;
                 return new OneStepLookAheadAgent(agentSeed, oslaParams);
             case MC:
                 MCParams mcparams = new MCParams();
                 mcparams.stop_type = mcparams.STOP_FMCALLS;
 //                mcparams.stop_type = mcparams.STOP_ITERATIONS;
-                mcparams.PRIORITIZE_ROOT = false;
+                mcparams.heuristic_method = mcparams.DIFF_HEURISTIC;
+                mcparams.PRIORITIZE_ROOT = true;
+                mcparams.ROLLOUT_LENGTH = 10;
+                mcparams.FORCE_TURN_END = 5;//mcparams.ROLLOUT_LENGTH+2;
                 return new MonteCarloAgent(agentSeed, mcparams);
             case SIMPLE: return new SimpleAgent(agentSeed);
             case MCTS:
                 MCTSParams mctsParams = new MCTSParams();
                 mctsParams.stop_type = mctsParams.STOP_FMCALLS;
+                mctsParams.PRIORITIZE_ROOT = true;
+                mctsParams.heuristic_method = mctsParams.DIFF_HEURISTIC;
+                mctsParams.ROLLOUT_LENGTH = 20;
+//                mctsParams.ROLOUTS_ENABLED = false;
+                mctsParams.FORCE_TURN_END = 25;
                 return new MCTSPlayer(agentSeed, mctsParams);
+            case RHEA:
+                RHEAParams rheaParams = new RHEAParams();
+                rheaParams.stop_type = rheaParams.STOP_FMCALLS;
+                rheaParams.heuristic_method = rheaParams.DIFF_HEURISTIC;
+                rheaParams.INDIVIDUAL_LENGTH = 20;
+                rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
+                rheaParams.POP_SIZE = 1;
+                return new RHEAAgent(agentSeed, rheaParams);
             case OEP:
                 OEPParams oepParams = new OEPParams();
                 return new OEPAgent(agentSeed, oepParams);
@@ -90,8 +104,8 @@ public class Play {
 
 
         //1. Play one game with visuals using the Level Generator:
-//        AGENT_SEED = 1591455948310L; GAME_SEED = 1590563762657L;
-        play(new Types.TRIBE[]{BARDUR, OUMAJI}, -1, new PlayerType[]{PlayerType.DONOTHING, PlayerType.HUMAN}, gameMode);
+//        AGENT_SEED = 1591558056165L; GAME_SEED = 1590855640174L;
+        play(new Types.TRIBE[]{XIN_XI, IMPERIUS}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.RHEA}, gameMode);
 //        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA, PlayerType.OSLA}, gameMode);
 //        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR, OUMAJI}, -1, new PlayerType[]{PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE}, gameMode);
 
@@ -176,10 +190,14 @@ public class Play {
 
         if(RUN_VERBOSE)  System.out.println("Agents random seed: " + agentSeed);
 
+        ArrayList<Integer> allIds = new ArrayList<>();
+        for(int i = 0; i < playerTypes.length; ++i)
+            allIds.add(i);
+
         for(int i = 0; i < playerTypes.length; ++i)
         {
             Agent ag = _getAgent(playerTypes[i], agentSeed, ac);
-            ag.setPlayerID(i);
+            ag.setPlayerIDs(i, allIds);
             players.add(ag);
         }
         return players;
@@ -188,11 +206,14 @@ public class Play {
     private static Game _loadGame(PlayerType[] playerTypes, String saveGameFile, long agentSeed)
     {
         ArrayList<Agent> players = new ArrayList<>();
+        ArrayList<Integer> allIds = new ArrayList<>();
+        for(int i = 0; i < playerTypes.length; ++i)
+            allIds.add(i);
 
         for(int i = 0; i < playerTypes.length; ++i)
         {
             Agent ag = _getAgent(playerTypes[i], agentSeed, null);
-            ag.setPlayerID(i);
+            ag.setPlayerIDs(i, allIds);
             players.add(ag);
         }
 

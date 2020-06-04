@@ -1,5 +1,6 @@
 package utils;
 
+import core.Constants;
 import core.Types;
 import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.TribeAction;
@@ -311,7 +312,7 @@ public class GUI extends JFrame {
         otherInfo.setFont(textFont);
 
         JTabbedPane tribeResearchInfo = new JTabbedPane();
-        tribeView = new TribeView();
+        tribeView = new TribeView(game);
         techView = new TechView(game, ac, infoView);
         tribeResearchInfo.setPreferredSize(new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_TECH_PANEL_HEIGHT));
         tribeResearchInfo.add("Tribe Info", tribeView);
@@ -756,7 +757,8 @@ public class GUI extends JFrame {
         if (this.gs == null || this.gs.getActiveTribeID() != gs.getActiveTribeID()) {
             // Tribe change
             infoView.resetHighlight();  // Reset highlights
-            boardView.setPanToTribe(gs);  // Pan camera to tribe capital
+            if(Constants.GUI_PAN_TO_TRIBE)
+                boardView.setPanToTribe(gs);  // Pan camera to tribe capital
             ac.reset();  // Clear action queue
             otherInfo.setText("");  // Reset info
 
@@ -852,7 +854,7 @@ public class GUI extends JFrame {
         if (gs.getActiveTribe() != null) {
             activeTribe.setText("Tribe acting: " + gs.getActiveTribe().getName());
             activeTribeInfo.setText("stars: " + gs.getActiveTribe().getStars() + " (+" + gs.getActiveTribe().getMaxProduction(gs) + ")");
-            Types.RESULT winStatus = gs.getTribeWinStatus();
+            Types.RESULT winStatus = gs.getTribeWinStatus(gs.getActiveTribeID());
             if (winStatus != Types.RESULT.INCOMPLETE) {
                 otherInfo.setText("Game result: " + winStatus);
             } else if (lastExamineAction != null && lastExamineAction.getBonus() != null) {

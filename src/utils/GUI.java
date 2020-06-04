@@ -656,6 +656,10 @@ public class GUI extends JFrame {
             ArrayList<Agent> players = new ArrayList<>();
             if (nPlayers > 0) {
 
+                ArrayList<Integer> allIds = new ArrayList<>();
+                for(int i = 0; i < nPlayers; ++i)
+                    allIds.add(i);
+
                 // Set up players
                 Types.TRIBE[] tribes = new Types.TRIBE[nPlayers];
                 for (int i = 0; i < nPlayers; i++) {
@@ -664,7 +668,7 @@ public class GUI extends JFrame {
                     PlayerType type = (PlayerType) playerSelectType[i].getSelectedItem();
                     Agent a = _getAgent(type, seed, ac);
                     if (a != null) {
-                        a.setPlayerID(i);
+                        a.setPlayerIDs(i, allIds);
                         players.add(a);
                     }
                 }

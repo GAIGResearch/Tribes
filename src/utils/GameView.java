@@ -18,6 +18,7 @@ import core.game.Board;
 import core.game.Game;
 import core.game.GameState;
 import core.actions.Action;
+import players.HumanAgent;
 
 import static core.Constants.*;
 import static core.Types.TERRAIN.*;
@@ -266,7 +267,8 @@ public class GameView extends JComponent {
             for(int j = 0; j < gridSize; ++j) {
                 Types.TERRAIN t = board.getTerrainAt(i,j);
                 Types.RESOURCE r = board.getResourceAt(i,j);
-                if (!DISABLE_NON_HUMAN_ACTION_HIGHLIGHT && actionable[i][j])
+
+                if  ((!DISABLE_NON_HUMAN_ACTION_HIGHLIGHT || game.getPlayers()[gameState.getActiveTribeID()] instanceof HumanAgent) && actionable[i][j])
                     paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, shineImg, CELL_SIZE, panTranslate);
                 int imgSize = (int) (CELL_SIZE * 0.75);
                 paintImageRotated(g, j * CELL_SIZE, i * CELL_SIZE, (r == null) ? null : r.getImage(t), imgSize, panTranslate);

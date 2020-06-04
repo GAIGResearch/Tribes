@@ -461,6 +461,7 @@ public class SimpleAgent extends Agent {
                     return 5;
                 case MIND_BENDER:
                 case BOAT:
+                case SHIP:
                 case WARRIOR:
                     return 4;
             }

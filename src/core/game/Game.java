@@ -216,8 +216,13 @@ public class Game {
                 printGameResults();
                 if(VERBOSE)
                 {
-                    for(AIStats ais : aiStats)
+                    TreeSet<TribeResult> ranking = getCurrentRanking();
+                    for(TribeResult tr : ranking)
+                    {
+                        int idx = tr.getId();
+                        AIStats ais = aiStats[idx];
                         ais.print();
+                    }
                 }
 
                 if (!VISUALS || frame == null) {
@@ -412,7 +417,7 @@ public class Game {
         Tribe[] tribes = gs.getBoard().getTribes();
 
         TreeSet<TribeResult> ranking = gs.getCurrentRanking();
-        System.out.println("Game Results: ");
+        System.out.println(gs.getTick() + "; Game Results: ");
         int rank = 1;
         for(TribeResult tr : ranking)
         {
@@ -459,6 +464,7 @@ public class Game {
         actionCounts.add(currentGameState.getTribeActions().size());
 
         aiStats.addBranchingFactor(turn, actionCounts);
+        aiStats.addActionsPerStep(turn, gs.getAllAvailableActions().size());
     }
 
     /**

@@ -171,8 +171,22 @@ public class RHEAAgent extends Agent {
 
     private ArrayList<Genome> nextGeneration(GameState gs){
         ArrayList<Genome> newPop = new ArrayList<>();
+
+        if(params.ELITISM && params.POP_SIZE > 1)
+        {
+            newPop.add(pop.get(0));
+        }
+
         while (newPop.size() < params.POP_SIZE){
-            Genome g = (params.POP_SIZE > 1) ? newIndividual(gs) : mutate(pop.get(0), gs);
+            Genome g;
+            if(params.POP_SIZE > 1)
+            {
+                g = newIndividual(gs);
+            }else{
+                Genome gMut = mutate(pop.get(0), gs);
+                g = (gMut.getValue() >= pop.get(0).getValue()) ? gMut : pop.get(0);
+            }
+
             newPop.add(g);
         }
         return newPop;

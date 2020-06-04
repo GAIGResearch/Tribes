@@ -27,6 +27,9 @@ public class Recover extends UnitAction
     @Override
     public boolean execute(GameState gs) {
         Unit unit = (Unit) gs.getActor(this.unitId);
+        if(unit == null)
+            return false;
+
         int currentHP = unit.getCurrentHP();
         int addHP = RECOVER_PLUS_HP;
 

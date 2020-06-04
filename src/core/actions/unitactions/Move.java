@@ -28,6 +28,8 @@ public class Move extends UnitAction
     public boolean isFeasible(final GameState gs)
     {
         Unit unit = (Unit) gs.getActor(this.unitId);
+        if(unit == null)
+            return false;
         Pathfinder tp = new Pathfinder(unit.getPosition(), new StepMove(gs, unit));
 
         //If the unit can move and the destination is vacant, try to reach it.

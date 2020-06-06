@@ -351,7 +351,7 @@ public class Board {
                 }
 
                 if (c == null) {
-                    System.out.println("WARNING: This shouldn't happen. Trying to push an unit to a location outside all borders.");
+//                    System.out.println("WARNING: This shouldn't happen. Trying to push a unit to a location outside all borders.");
                 }
             }
 

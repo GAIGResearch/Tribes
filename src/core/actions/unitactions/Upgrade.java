@@ -61,10 +61,12 @@ public class Upgrade extends UnitAction
             //adjustments in tribe and board.
             tribe.subtractStars(nextType.getCost(nextType.getKey(), gs.getTribesConfig()));
 
+            Types.TURN_STATUS turn_status = unit.getStatus();
             //We first remove the unit, so there's space for the new one to take its place.
             board.removeUnitFromBoard(unit);
             board.removeUnitFromCity(unit, city, tribe);
             board.addUnit(city, newUnit);
+            newUnit.setStatus(turn_status);
             return true;
         }
         return false;

@@ -29,6 +29,10 @@ public class Examine extends UnitAction
     public boolean isFeasible(final GameState gs) {
         Unit unit = (Unit) gs.getActor(this.unitId);
         Vector2d unitPos = unit.getPosition();
+        Tribe t = gs.getTribe(unit.getTribeId());
+        if(t.getCitiesID().size() == 0)
+            return false;
+
         return unit.isFresh() && gs.getBoard().getResourceAt(unitPos.x, unitPos.y) == Types.RESOURCE.RUINS;
     }
 
@@ -56,7 +60,6 @@ public class Examine extends UnitAction
 
                     Vector2d spawnPos = unit.getPosition().copy();
                     Types.TERRAIN terr = board.getTerrainAt(spawnPos.x, spawnPos.y);
-
                     //instead of a super unit, in the water we create a Battleship of out a warrior
                     Types.UNIT unitType = terr.isWater() ? Types.UNIT.BATTLESHIP : Types.UNIT.SUPERUNIT;
                     Unit newUnit = Types.UNIT.createUnit(spawnPos, 0, false, -1, unit.getTribeId(), unitType,gs);
@@ -70,6 +73,8 @@ public class Examine extends UnitAction
                         gs.pushUnit(unitInCity, spawnPos.x, spawnPos.y,gs);
 
                     board.addUnit((City)gs.getActor(handlerCityId), newUnit);
+
+                    gs.getBoard().setResourceAt(spawnPos.x, spawnPos.y, null);
                     break;
 
                 case RESEARCH:
@@ -93,7 +98,9 @@ public class Examine extends UnitAction
                     break;
             }
             Vector2d unitPos = unit.getPosition();
-            gs.getBoard().setResourceAt(unitPos.x, unitPos.y, null);
+            if(bonus != SUPERUNIT)
+                gs.getBoard().setResourceAt(unitPos.x, unitPos.y, null);
+
             unit.setStatus(Types.TURN_STATUS.FINISHED);
             return true;
         }

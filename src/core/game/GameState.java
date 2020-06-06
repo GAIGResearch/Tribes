@@ -342,9 +342,11 @@ public class GameState {
                             if(board.getTribe(curActiveTribeId).getWinner() != Types.RESULT.LOSS)
                                 playerFound = true;
 
-                            if(curActiveTribeId == board.getActiveTribeID())
+                            if(curActiveTribeId == board.getActiveTribeID()) {
                                 System.out.println("ForwardModel ERROR: this shouldn't happen (all players but " +
                                         board.getActiveTribeID() + " lost, but it's not game over?)");
+                                gameOver();
+                            }
                         }
 
                         board.setActiveTribeID(curActiveTribeId);
@@ -599,6 +601,17 @@ public class GameState {
 
         //Compute the current ranking
         computeGameRanking();
+
+        if(gameMode == Types.GAME_MODE.SCORE) {
+            int numNonLoss = 0;
+            for (TribeResult tr : ranking) {
+                int tribeId = tr.getId();
+                Types.RESULT res = getTribe(tribeId).getWinner();
+                if (res != Types.RESULT.LOSS)
+                    numNonLoss++;
+            }
+            isEnded = numNonLoss <= 1;
+        }
 
         //We need to set all the winning conditions for the tribes if the game is over.
         if(isEnded || tick > maxTurns)

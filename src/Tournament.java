@@ -1,3 +1,4 @@
+import core.Constants;
 import core.Types;
 import core.game.Game;
 import core.game.TribeResult;
@@ -70,6 +71,7 @@ public class Tournament {
                 rheaParams.INDIVIDUAL_LENGTH = MAX_LENGTH;
                 rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
                 rheaParams.POP_SIZE = POP_SIZE;
+//                rheaParams.print();
                 return new RHEAAgent(agentSeed, rheaParams);
         }
         return null;
@@ -135,6 +137,7 @@ public class Tournament {
 
         boolean shiftTribes = true;
         t.setSeeds(seeds);
+        Constants.VERBOSE = true;
         t.run(nRepetitions, shiftTribes);
     }
 
@@ -240,14 +243,23 @@ public class Tournament {
                 System.out.println("] (" + (nseed*repetitions + rep + 1) + "/" + (seeds.length*repetitions) + ")");
 
                 Game game = _prepareGame(tribes, levelSeed, players, gameMode, null);
-                Run.runGame(game);
 
-                _addGameResults(game, assignment);
+                try {
+                    Run.runGame(game);
 
-                //Shift arrays for position changes.
-                if (shift) {
-                    starter = (starter + 1) % participants.size();
+                    _addGameResults(game, assignment);
+
+                    //Shift arrays for position changes.
+                    if (shift) {
+                        starter = (starter + 1) % participants.size();
+                    }
+                }catch (Exception e)
+                {
+                    e.printStackTrace();
+                    System.out.println("Error running a game, trying again.");
+                    rep--;
                 }
+
             }
 
             nseed++;

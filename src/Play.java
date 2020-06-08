@@ -32,10 +32,13 @@ public class Play {
         RANDOM,
         OSLA,
         MC,
+        BROKENMC,
+        BROKENMCTS,
         SIMPLE,
         MCTS,
         RHEA,
         OEP;
+
     }
 
 //    Game seed: 1590514560867
@@ -63,7 +66,16 @@ public class Play {
                 mcparams.PRIORITIZE_ROOT = true;
                 mcparams.ROLLOUT_LENGTH = 10;
                 mcparams.FORCE_TURN_END = 5;//mcparams.ROLLOUT_LENGTH+2;
-                return new MonteCarloAgent(agentSeed, mcparams);
+                return new MonteCarloAgent(agentSeed, mcparams,false);
+
+            case BROKENMC:
+                MCParams mcparams2 = new MCParams();
+                mcparams2.stop_type = mcparams2.STOP_FMCALLS;
+                mcparams2.heuristic_method = mcparams2.DIFF_HEURISTIC;
+                mcparams2.PRIORITIZE_ROOT = true;
+                mcparams2.ROLLOUT_LENGTH = 10;
+                mcparams2.FORCE_TURN_END = 5;//mcparams.ROLLOUT_LENGTH+2;
+                return new MonteCarloAgent(agentSeed, mcparams2,true);
             case SIMPLE: return new SimpleAgent(agentSeed);
             case MCTS:
                 MCTSParams mctsParams = new MCTSParams();
@@ -73,7 +85,16 @@ public class Play {
                 mctsParams.ROLLOUT_LENGTH = 20;
 //                mctsParams.ROLOUTS_ENABLED = false;
                 mctsParams.FORCE_TURN_END = 25;
-                return new MCTSPlayer(agentSeed, mctsParams);
+                return new MCTSPlayer(agentSeed, mctsParams,false);
+            case BROKENMCTS:
+                MCTSParams mctsParams2 = new MCTSParams();
+                mctsParams2.stop_type = mctsParams2.STOP_FMCALLS;
+                mctsParams2.PRIORITIZE_ROOT = true;
+                mctsParams2.heuristic_method = mctsParams2.DIFF_HEURISTIC;
+                mctsParams2.ROLLOUT_LENGTH = 20;
+//                mctsParams.ROLOUTS_ENABLED = false;
+                mctsParams2.FORCE_TURN_END = 25;
+                return new MCTSPlayer(agentSeed, mctsParams2,true);
             case RHEA:
                 RHEAParams rheaParams = new RHEAParams();
                 rheaParams.stop_type = rheaParams.STOP_FMCALLS;
@@ -105,7 +126,7 @@ public class Play {
 
         //1. Play one game with visuals using the Level Generator:
 //        AGENT_SEED = 1591558056165L; GAME_SEED = 1590855640174L;
-        play(new Types.TRIBE[]{XIN_XI, IMPERIUS}, -1, new PlayerType[]{PlayerType.MC, PlayerType.RHEA}, gameMode);
+        play(new Types.TRIBE[]{XIN_XI, IMPERIUS}, -1, new PlayerType[]{PlayerType.BROKENMCTS, PlayerType.MCTS}, gameMode);
 //        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA, PlayerType.OSLA}, gameMode);
 //        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR, OUMAJI}, -1, new PlayerType[]{PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE}, gameMode);
 

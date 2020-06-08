@@ -23,14 +23,16 @@ public class MonteCarloAgent extends Agent {
     private int lastTurn;
     private int actionTurnCounter;
     private int fmCalls;
+    private boolean changeFM;
 
-    public MonteCarloAgent(long seed, MCParams params)
+    public MonteCarloAgent(long seed, MCParams params, boolean changeFM)
     {
         super(seed);
         m_rnd = new Random(seed);
         this.params = params;
         this.lastTurn = -1;
         this.actionTurnCounter = 0;
+        this.changeFM = changeFM;
     }
 
     @Override
@@ -85,7 +87,7 @@ public class MonteCarloAgent extends Agent {
 //            System.out.println("----- " + gs.getTick() + ":" + actionTurnCounter + ":" + nRollouts + " ------ " + gs.getActiveTribeID());
 
             //Another rollout
-            double score = rollout(gs, act);
+            double score = rollout(gs, act, changeFM);
             nRollouts++;
 
             //Update scores and keep a reference to the action with the highest average.
@@ -120,10 +122,11 @@ public class MonteCarloAgent extends Agent {
      * @param act action to start the rollout with.
      * @return the score of the state found at the end of the rollout, as evaluated by a heuristic
      */
-    private double rollout(GameState gs, Action act)
+    private double rollout(GameState gs, Action act, boolean changeFM)
     {
         GameState gsCopy = copyGameState(gs);
-        gsCopy.changeTribesConfig(0.1);
+        if(changeFM)
+            gsCopy.changeTribesConfig(0.1);
         boolean end = false;
         int step = 0;
         int turnEndCountDown = params.FORCE_TURN_END; // We force an EndTurn action every FORCE_TURN_END actions in the rollout.

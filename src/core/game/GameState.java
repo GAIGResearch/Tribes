@@ -114,6 +114,337 @@ public class GameState {
         initGameState(lines);
     }
 
+    public void changeTribesConfig(double distance){
+        if(distance ==0)
+            return; //do nothing to change tribesconfig
+
+
+        //Set warrior values
+        if(rnd.nextDouble() <= distance)
+            tc.WARRIOR_ATTACK = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.WARRIOR_DEFENCE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.WARRIOR_MOVEMENT = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.WARRIOR_MAX_HP = rnd.nextInt();;
+//        if(rnd.nextDouble() <= distance)
+//            tc.WARRIOR_RANGE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.WARRIOR_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.WARRIOR_POINTS = rnd.nextInt();
+//
+//        //Set archer values
+//        if(rnd.nextDouble() <= distance)
+//            tc.ARCHER_ATTACK = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.ARCHER_DEFENCE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.ARCHER_MOVEMENT = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.ARCHER_MAX_HP = rnd.nextInt();;
+//        if(rnd.nextDouble() <= distance)
+//            tc.ARCHER_RANGE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.ARCHER_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.ARCHER_POINTS = rnd.nextInt();
+//
+//        //Set catapult values
+//        if(rnd.nextDouble() <= distance)
+//            tc.CATAPULT_ATTACK = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.CATAPULT_DEFENCE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.CATAPULT_MOVEMENT = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.CATAPULT_MAX_HP = rnd.nextInt();;
+//        if(rnd.nextDouble() <= distance)
+//            tc.CATAPULT_RANGE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.CATAPULT_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.CATAPULT_POINTS = rnd.nextInt();
+//
+//        //Set Swordman values
+//        if(rnd.nextDouble() <= distance)
+//            tc.SWORDMAN_ATTACK = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SWORDMAN_DEFENCE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SWORDMAN_MOVEMENT = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SWORDMAN_MAX_HP = rnd.nextInt();;
+//        if(rnd.nextDouble() <= distance)
+//            tc.SWORDMAN_RANGE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SWORDMAN_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SWORDMAN_POINTS = rnd.nextInt();
+//
+//        //Set mindbender values
+//        if(rnd.nextDouble() <= distance)
+//            tc.MINDBENDER_ATTACK = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.MINDBENDER_DEFENCE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.MINDBENDER_MOVEMENT = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.MINDBENDER_MAX_HP = rnd.nextInt();;
+//        if(rnd.nextDouble() <= distance)
+//            tc.MINDBENDER_MAX_HP = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.MINDBENDER_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.MINDBENDER_POINTS = rnd.nextInt();
+//
+//        //Set defender values
+//        if(rnd.nextDouble() <= distance)
+//            tc.DEFENDER_ATTACK = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.DEFENDER_DEFENCE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.DEFENDER_MOVEMENT = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.DEFENDER_MAX_HP = rnd.nextInt();;
+//        if(rnd.nextDouble() <= distance)
+//            tc.DEFENDER_RANGE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.DEFENDER_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.DEFENDER_POINTS = rnd.nextInt();
+//
+//        //Set Knight values
+//        if(rnd.nextDouble() <= distance)
+//            tc.KNIGHT_ATTACK = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.KNIGHT_DEFENCE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.KNIGHT_MOVEMENT = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.KNIGHT_MAX_HP = rnd.nextInt();;
+//        if(rnd.nextDouble() <= distance)
+//            tc.KNIGHT_RANGE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.KNIGHT_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.KNIGHT_POINTS = rnd.nextInt();
+//
+//        //Set Rider values
+//        if(rnd.nextDouble() <= distance)
+//            tc.RIDER_ATTACK = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.RIDER_DEFENCE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.RIDER_MOVEMENT = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.RIDER_MAX_HP = rnd.nextInt();;
+//        if(rnd.nextDouble() <= distance)
+//            tc.RIDER_RANGE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.RIDER_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.RIDER_POINTS = rnd.nextInt();
+//
+//        //Set Boat values
+//        if(rnd.nextDouble() <= distance)
+//            tc.BOAT_ATTACK = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.BOAT_DEFENCE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.BOAT_MOVEMENT = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.BOAT_RANGE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.BOAT_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.BOAT_POINTS = rnd.nextInt();
+//
+//        //Set Ship values
+//        if(rnd.nextDouble() <= distance)
+//            tc.SHIP_ATTACK = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SHIP_DEFENCE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SHIP_MOVEMENT = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SHIP_RANGE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SHIP_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SHIP_POINTS = rnd.nextInt();
+//
+//        //Set Battleship values
+//        if(rnd.nextDouble() <= distance)
+//            tc.BATTLESHIP_ATTACK = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.BATTLESHIP_DEFENCE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.BATTLESHIP_MOVEMENT = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.BATTLESHIP_RANGE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.BATTLESHIP_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.BATTLESHIP_POINTS = rnd.nextInt();
+//
+//        //Set Superunit values
+//        if(rnd.nextDouble() <= distance)
+//            tc.SUPERUNIT_ATTACK = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SUPERUNIT_DEFENCE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SUPERUNIT_MOVEMENT = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SUPERUNIT_MAX_HP = rnd.nextInt();;
+//        if(rnd.nextDouble() <= distance)
+//            tc.SUPERUNIT_RANGE = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SUPERUNIT_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SUPERUNIT_POINTS = rnd.nextInt();
+//
+//        //Explorer
+//        if(rnd.nextDouble() <= distance)
+//            tc.NUM_STEPS = rnd.nextInt();
+//
+//        //General Unit constants
+//        if(rnd.nextDouble() <= distance)
+//            tc.ATTACK_MODIFIER =  0 + (10 - 0) * rnd.nextDouble();
+//        if(rnd.nextDouble() <= distance)
+//            tc.DEFENCE = 0 + (10 - 0) * rnd.nextDouble();
+//        if(rnd.nextDouble() <= distance)
+//            tc.DEFENCE_IN_WALLS =  0 + (10 - 0) * rnd.nextDouble();
+//        if(rnd.nextDouble() <= distance)
+//            tc.VETERAN_KILLS = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.VETERAN_PLUS_HP = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.RECOVER_PLUS_HP = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.RECOVER_IN_BORDERS_PLUS_HP = rnd.nextInt();
+//
+//        /* BUILDINGS */
+//
+//        // Farm
+//        if(rnd.nextDouble() <= distance)
+//            tc.FARM_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.FARM_BONUS = rnd.nextInt();
+//       // Types.RESOURCE FARM_RES_CONSTRAINT = Types.RESOURCE.CROPS;
+//
+//        //WindMill
+//        if(rnd.nextDouble() <= distance)
+//            tc.WIND_MILL_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.WIND_MILL_BONUS = rnd.nextInt();
+//
+//        // LumberHut
+//
+//        if(rnd.nextDouble() <= distance)
+//            tc.LUMBER_HUT_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.LUMBER_HUT_BONUS = rnd.nextInt();
+//
+//        // SawMill
+//        if(rnd.nextDouble() <= distance)
+//            tc.SAW_MILL_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.SAW_MILL_BONUS = rnd.nextInt();
+//
+//        //Mine
+//        if(rnd.nextDouble() <= distance)
+//            tc.MINE_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.MINE_BONUS = rnd.nextInt();
+//     //   Types.RESOURCE MINE_RES_CONSTRAINT = Types.RESOURCE.ORE;
+//
+//        // Forge
+//        if(rnd.nextDouble() <= distance)
+//            tc.FORGE_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.FORGE_BONUS = rnd.nextInt();
+//
+//        // Port
+//        if(rnd.nextDouble() <= distance)
+//            tc.PORT_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.PORT_BONUS = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.PORT_TRADE_DISTANCE = rnd.nextInt(); //Count includes destination port.
+//
+//        // Customs House
+//        if(rnd.nextDouble() <= distance)
+//            tc.CUSTOMS_COST = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.CUSTOMS_BONUS = rnd.nextInt();
+//
+//        //Monuments
+//        if(rnd.nextDouble() <= distance)
+//            tc.MONUMENT_BONUS = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.MONUMENT_POINTS = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.EMPERORS_TOMB_STARS = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.GATE_OF_POWER_KILLS = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.GRAND_BAZAR_CITIES = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.ALTAR_OF_PEACE_TURNS = rnd.nextInt();
+//        if(rnd.nextDouble() <= distance)
+//            tc.PARK_OF_FORTUNE_LEVEL = rnd.nextInt();
+//
+//
+//        // Temple
+//        tc.TEMPLE_COST = rnd.nextInt();
+//        tc.TEMPLE_FOREST_COST = rnd.nextInt();
+//        tc.TEMPLE_BONUS = rnd.nextInt();
+//        tc.TEMPLE_TURNS_TO_SCORE = rnd.nextInt();
+//        //public int[] TEMPLE_POINTS = new int[]{100, 50, 50, 50, 150};
+//
+//        //Resources
+//        tc.ANIMAL_COST = rnd.nextInt();
+//        tc.FISH_COST = rnd.nextInt();
+//        tc.WHALES_COST = rnd.nextInt();
+//        tc.FRUIT_COST = rnd.nextInt();
+//        tc.ANIMAL_POP = rnd.nextInt();
+//        tc.FISH_POP = rnd.nextInt();
+//        tc.WHALES_STARS = rnd.nextInt();
+//        tc.FRUIT_POP = rnd.nextInt();
+//
+//        // ROAD
+//        tc.ROAD_COST = rnd.nextInt();
+//
+//        // City
+//        tc.CITY_LEVEL_UP_WORKSHOP_PROD = rnd.nextInt();
+//        tc.CITY_LEVEL_UP_RESOURCES = rnd.nextInt();
+//        tc.CITY_LEVEL_UP_POP_GROWTH = rnd.nextInt();
+//        tc.CITY_LEVEL_UP_PARK = rnd.nextInt();
+//        tc.CITY_BORDER_POINTS = rnd.nextInt();
+//        tc.PROD_CAPITAL_BONUS = rnd.nextInt();
+//        tc.EXPLORER_CLEAR_RANGE = rnd.nextInt();
+//        tc.FIRST_CITY_CLEAR_RANGE = rnd.nextInt();
+//        tc.NEW_CITY_CLEAR_RANGE = rnd.nextInt();
+//        tc.CITY_EXPANSION_TILES = rnd.nextInt();
+//        tc.POINTS_PER_POPULATION = rnd.nextInt();
+//
+//        // Research
+//        tc.TECH_BASE_COST = rnd.nextInt();
+//        //public Types.TECHNOLOGY TECH_DISCOUNT = Types.TECHNOLOGY.PHILOSOPHY;
+//        tc.TECH_DISCOUNT_VALUE = rnd.nextDouble();
+//
+//        /* TRIBES */
+//        tc.INITIAL_STARS = rnd.nextInt();//1000;
+//
+//        /* ACTIONS */
+//        tc.CLEAR_FOREST_STAR = rnd.nextInt();
+//        tc.GROW_FOREST_COST = rnd.nextInt();
+//        tc.BURN_FOREST_COST = rnd.nextInt();
+//        tc.CLEAR_VIEW_POINTS = rnd.nextInt();
+    }
+
     /**
      * Initializes a game state from a series of Strings that determine the initial level disposition
      * @param lines all components for the board in its initial state.

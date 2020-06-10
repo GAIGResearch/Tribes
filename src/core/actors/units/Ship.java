@@ -2,6 +2,7 @@ package core.actors.units;
 
 import core.TribesConfig;
 import core.Types;
+import core.game.GameState;
 import utils.Vector2d;
 
 import static core.TribesConfig.*;
@@ -28,8 +29,8 @@ public class Ship extends Unit
     }
 
     @Override
-    public Ship copy(boolean hideInfo) {
-        Ship c = new Ship(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), new TribesConfig());
+    public Ship copy(boolean hideInfo, TribesConfig tc) {
+        Ship c = new Ship(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), tc);
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

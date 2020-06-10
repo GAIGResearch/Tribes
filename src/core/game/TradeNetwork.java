@@ -49,10 +49,10 @@ class TradeNetwork
      * @param y y coordinate of the position to set.
      * @param trade true if the position must belong to the trade network
      */
-    void setTradeNetwork(Board board, int x, int y, boolean trade)
+    void setTradeNetwork(Board board, int x, int y, boolean trade, TribesConfig tc)
     {
         networkTiles[x][y] = trade;
-        computeTradeNetwork(board);
+        computeTradeNetwork(board, tc);
     }
 
 
@@ -60,11 +60,11 @@ class TradeNetwork
      * Computes the trade network for all tribes. Calls computeTradeNetworkTribe(...) on all tribes of the game.
      * @param board board of the game.
      */
-    private void computeTradeNetwork(Board board)
+    private void computeTradeNetwork(Board board, TribesConfig tc)
     {
         Tribe[] tribes = board.getTribes();
         for(Tribe tribe : tribes)
-            this.computeTradeNetworkTribe(board, tribe);
+            this.computeTradeNetworkTribe(board, tribe,tc);
     }
 
     /**
@@ -74,7 +74,7 @@ class TradeNetwork
      * @param board board of the game.
      * @param tribe tribe which network has to be computed.
      */
-    void computeTradeNetworkTribe(Board board, Tribe tribe)
+    void computeTradeNetworkTribe(Board board, Tribe tribe, TribesConfig tc)
     {
         //We only update the trade network of all tribes for the current tribe if this is not native
         if(tribe.getTribeId() != board.getActiveTribeID() && !board.isNative())
@@ -129,7 +129,7 @@ class TradeNetwork
                         Vector2d portTo = ports.get(j);
 
                         Vector2d originPortPos = new Vector2d(portFrom.x, portFrom.y);
-                        Pathfinder tp = new Pathfinder(originPortPos, new TradeWaterStep(navigable));
+                        Pathfinder tp = new Pathfinder(originPortPos, new TradeWaterStep(navigable, tc));
                         ArrayList<PathNode> path = tp.findPathTo(new Vector2d(portTo.x, portTo.y));
 
                         if (path != null) //+1 because path includes destination
@@ -143,9 +143,9 @@ class TradeNetwork
             }
 
             City capital = (City) board.getActor(tribe.getCapitalID());
-            tribe.updateNetwork(new Pathfinder(capital.getPosition(), tns), board, tribe.getTribeId() == board.getActiveTribeID());
+            tribe.updateNetwork(new Pathfinder(capital.getPosition(), tns), board, tribe.getTribeId() == board.getActiveTribeID(), tc);
         }else {
-            tribe.updateNetwork(null, board, tribe.getTribeId() == board.getActiveTribeID());
+            tribe.updateNetwork(null, board, tribe.getTribeId() == board.getActiveTribeID(), tc);
         }
     }
 
@@ -164,9 +164,12 @@ class TradeNetwork
         // technology and visibility).
         private boolean [][]navigable;
 
-        TradeWaterStep(boolean [][]navigable)
+        TribesConfig tc;
+
+        TradeWaterStep(boolean [][]navigable,TribesConfig tc)
         {
             this.navigable = navigable;
+            this.tc = tc;
         }
 
         /**
@@ -180,7 +183,7 @@ class TradeNetwork
 
             ArrayList<PathNode> neighbours = new ArrayList<>();
             double stepCost = 1.0;
-            TribesConfig tc = new TribesConfig();
+            //TribesConfig tc = new TribesConfig();
 
             for(Vector2d tile : from.neighborhood(1, 0, size)) {
                 int x = tile.x;

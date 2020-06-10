@@ -13,7 +13,6 @@ import java.util.LinkedList;
 
 public class BurnForest extends CityAction
 {
-    TribesConfig tc = new TribesConfig();
 
     public BurnForest(int cityId) {
         super.cityId = cityId;
@@ -21,6 +20,8 @@ public class BurnForest extends CityAction
 
     @Override
     public boolean isFeasible(final GameState gs) {
+        TribesConfig tc = gs.getTribesConfig();
+
         City city = (City) gs.getActor(this.cityId);
 
         Board b = gs.getBoard();
@@ -36,6 +37,7 @@ public class BurnForest extends CityAction
     public boolean execute(GameState gs) {
         City city = (City) gs.getActor(this.cityId);
         if (isFeasible(gs)){
+            TribesConfig tc = gs.getTribesConfig();
             Board b = gs.getBoard();
             Tribe t = gs.getTribe(city.getTribeId());
             b.setTerrainAt(targetPos.x, targetPos.y, Types.TERRAIN.PLAIN);

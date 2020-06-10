@@ -28,8 +28,8 @@ public class Boat extends Unit
     }
 
     @Override
-    public Boat copy(boolean hideInfo) {
-        Boat c = new Boat(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), new TribesConfig());
+    public Boat copy(boolean hideInfo, TribesConfig tc) {
+        Boat c = new Boat(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(),tc);
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

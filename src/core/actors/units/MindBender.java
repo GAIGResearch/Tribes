@@ -18,8 +18,8 @@ public class MindBender extends Unit
     }
 
     @Override
-    public MindBender copy(boolean hideInfo) {
-        MindBender c = new MindBender(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), new TribesConfig());
+    public MindBender copy(boolean hideInfo, TribesConfig tc) {
+        MindBender c = new MindBender(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), tc);
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

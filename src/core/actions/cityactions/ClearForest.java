@@ -30,7 +30,7 @@ public class ClearForest extends CityAction
 
     @Override
     public boolean execute(GameState gs) {
-        TribesConfig tc = new TribesConfig();
+        TribesConfig tc = gs.getTribesConfig();
         if (isFeasible(gs)){
             City city = (City) gs.getActor(this.cityId);
             gs.getBoard().setTerrainAt(targetPos.x, targetPos.y, Types.TERRAIN.PLAIN);

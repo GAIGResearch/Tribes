@@ -42,7 +42,6 @@ public class City extends Actor{
     //List of buildings that belong to this city.
     private LinkedList<Building> buildings = new LinkedList<>();
 
-    private TribesConfig tc = new TribesConfig();
     /**
      * Constructor of a city
      * @param x x position of the city in the grid
@@ -97,7 +96,7 @@ public class City extends Actor{
      * @param tribe tribe this city belongs to
      * @param value amount of population to add to this city.
      */
-    public void addPopulation(Tribe tribe, int value){
+    public void addPopulation(Tribe tribe, int value, TribesConfig tc){
 
         //-level is a maximum negative value.
         if(population + value < -level)
@@ -154,6 +153,7 @@ public class City extends Actor{
     {
         int multiplier = negative ? -1 : 1;
         Tribe tribe = gameState.getTribe(this.tribeId);
+        TribesConfig tc = gameState.getTribesConfig();
         switch (building.type) {
             case FARM:
             case LUMBER_HUT:
@@ -164,7 +164,7 @@ public class City extends Actor{
                 applyBonus(gameState, building, true, onlyMatching, multiplier);
                 break;
             case PORT:
-                if(!onlyMatching) addPopulation(tribe, building.type.getBonus(building.type.getKey(), gameState.getTribesConfig()) * multiplier);
+                if(!onlyMatching) addPopulation(tribe, building.type.getBonus(building.type.getKey(), gameState.getTribesConfig()) * multiplier, gameState.getTribesConfig());
                 applyBonus(gameState, building, false, onlyMatching, multiplier);
                 break;
             case CUSTOMS_HOUSE:
@@ -176,7 +176,7 @@ public class City extends Actor{
             case FOREST_TEMPLE:
                 if(!onlyMatching)
                 {
-                    addPopulation(tribe, building.type.getBonus(building.type.getKey(),gameState.getTribesConfig()) * multiplier);
+                    addPopulation(tribe, building.type.getBonus(building.type.getKey(),gameState.getTribesConfig()) * multiplier, gameState.getTribesConfig());
                 }
                 int scoreDiff = negative ? ((Temple)building).getPoints() : tc.TEMPLE_POINTS[0];
                 tribe.addScore(scoreDiff);
@@ -188,7 +188,7 @@ public class City extends Actor{
             case PARK_OF_FORTUNE:
             case TOWER_OF_WISDOM:
             case GRAND_BAZAR:
-                if(!onlyMatching) addPopulation(tribe,building.type.getBonus(building.type.getKey(), gameState.getTribesConfig()) * multiplier);
+                if(!onlyMatching) addPopulation(tribe,building.type.getBonus(building.type.getKey(), gameState.getTribesConfig()) * multiplier, gameState.getTribesConfig());
                 tribe.addScore(tc.MONUMENT_POINTS * multiplier);
                 break;
         }
@@ -212,7 +212,7 @@ public class City extends Actor{
         Tribe tribe = gameState.getTribe(this.tribeId);
 
         //Population added by the base building.
-        if(isBase && isPopulation && !onlyMatching) addPopulation(tribe, multiplier * building.getBonus(gameState.getTribesConfig()));
+        if(isBase && isPopulation && !onlyMatching) addPopulation(tribe, multiplier * building.getBonus(gameState.getTribesConfig()), gameState.getTribesConfig());
 
         //Check all buildings next to the new building position.
         for(Vector2d adjPosition : building.position.neighborhood(1, 0, board.getSize()))
@@ -240,7 +240,7 @@ public class City extends Actor{
                     bonusToAdd = isBase ? existingBuilding.getBonus(gameState.getTribesConfig()) : building.getBonus(gameState.getTribesConfig());
 
                     if (isPopulation)
-                        cityToAddTo.addPopulation(tribe, bonusToAdd * multiplier);
+                        cityToAddTo.addPopulation(tribe, bonusToAdd * multiplier, gameState.getTribesConfig());
                     else
                         cityToAddTo.addProduction(bonusToAdd * multiplier);
                 }
@@ -254,7 +254,7 @@ public class City extends Actor{
      * value. If not, it's the level + prodiction + TribesConfig.PROD_CAPITAL_BONUS (if capital)
      * @return the production of this city
      */
-    public int getProduction(){
+    public int getProduction(TribesConfig tc){
         if(population >= 0) {
             int capitalBonus = isCapital ? tc.PROD_CAPITAL_BONUS : 0;
             return level + production + capitalBonus;
@@ -355,7 +355,7 @@ public class City extends Actor{
      *                 partial observability.
      * @return a copy of this city.
      */
-    public City copy(boolean hideInfo){
+    public City copy(boolean hideInfo, TribesConfig tc){
         City c = new City(position.x, position.y, tribeId);
         c.level = level;
         c.population = hideInfo ? 0 : population;

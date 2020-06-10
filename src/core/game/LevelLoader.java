@@ -1,5 +1,6 @@
 package core.game;
 
+import core.TribesConfig;
 import core.Types;
 import core.actors.City;
 import core.actors.Tribe;
@@ -29,7 +30,7 @@ class LevelLoader
         size.width = lines.length;
         size.height = lines.length;
 
-        Tribe[] tribes = extractTribes(lines);
+        Tribe[] tribes = extractTribes(lines, gs.getTribesConfig());
         Board board = new Board();
 
         int tribeCounter = 0;
@@ -102,7 +103,7 @@ class LevelLoader
      * @param lines information
      * @return initialized array of tribes.
      */
-    private Tribe[] extractTribes(String[] lines)
+    private Tribe[] extractTribes(String[] lines, TribesConfig tc)
     {
         ArrayList<Types.TRIBE> tribes_list = new ArrayList<>();
         for (int i = 0; i < size.height; ++i) {
@@ -124,7 +125,7 @@ class LevelLoader
         int i = 0;
         for(Types.TRIBE trType : tribes_list)
         {
-            tribesArray[i++] = new Tribe(trType);
+            tribesArray[i++] = new Tribe(trType,tc);
         }
         return tribesArray;
     }

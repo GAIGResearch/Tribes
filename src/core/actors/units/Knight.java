@@ -18,8 +18,8 @@ public class Knight extends Unit
     }
 
     @Override
-    public Knight copy(boolean hideInfo) {
-        Knight c = new Knight(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), new TribesConfig());
+    public Knight copy(boolean hideInfo, TribesConfig tc) {
+        Knight c = new Knight(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), tc);
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

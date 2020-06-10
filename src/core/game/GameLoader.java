@@ -1,5 +1,6 @@
 package core.game;
 
+import core.TribesConfig;
 import core.Types;
 import core.actors.City;
 import core.actors.Tribe;
@@ -48,7 +49,7 @@ public class GameLoader
         this.game_mode = Types.GAME_MODE.getTypeByKey(gameINFO.getInt("gameMode"));
         this.gs = gs;
 
-        loadTribes();
+        loadTribes(gs.getTribesConfig());
 
         loadBoard();
 
@@ -58,7 +59,7 @@ public class GameLoader
 
     }
 
-    private void loadTribes(){
+    private void loadTribes(TribesConfig tc){
         Iterator<String> keys = JTribe.keys();
         tribes = new Tribe[JTribe.length()];
         allCapitalIds = new int[JTribe.length()];
@@ -66,7 +67,7 @@ public class GameLoader
         while (keys.hasNext()){
             String key = keys.next();
             JSONObject tribeINFO = JTribe.getJSONObject(key);
-            tribes[index] = new Tribe(Integer.parseInt(key), tribeINFO);
+            tribes[index] = new Tribe(Integer.parseInt(key), tribeINFO,tc);
             allCapitalIds[index] = tribes[index].getCapitalID();
             index++;
         }

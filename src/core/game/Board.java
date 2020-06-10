@@ -152,8 +152,8 @@ public class Board {
      * Deep copies the board and returns the copy. It's copied as full not hiding any information
      * @return copy of the current board.
      */
-    public Board copy() {
-        return copy(false, -1);
+    public Board copy(TribesConfig tc) {
+        return copy(false, -1, tc);
     }
 
     /**
@@ -162,7 +162,7 @@ public class Board {
      * @param playerId if partialObs is true, id of the player who will receive this copy.
      * @return a copy of the board
      */
-    public Board copy(boolean partialObs, int playerId) {
+    public Board copy(boolean partialObs, int playerId, TribesConfig tc) {
         Board copyBoard = new Board();
         copyBoard.size = this.size;
         copyBoard.tribes = new Tribe[this.tribes.length];
@@ -201,7 +201,7 @@ public class Board {
         // Copy tribes
         for (int i = 0; i < tribes.length; i++) {
             boolean hideInfo = (i != playerId) && partialObs;
-            copyBoard.tribes[i] = tribes[i].copy(hideInfo);
+            copyBoard.tribes[i] = tribes[i].copy(hideInfo,tc );
 
         }
 
@@ -216,7 +216,7 @@ public class Board {
             if(actTribeId == playerId || !partialObs || actorVisible)
             {
                 boolean hideInfo = (actTribeId != playerId) && partialObs;
-                Actor actorCopy = act.copy(hideInfo);
+                Actor actorCopy = act.copy(hideInfo, tc);
                 copyBoard.gameActors.put(id, actorCopy);
 
                 //If we're hiding info, the other tribes don't copy cityIDs and unitIDs by default in the arrays. But we need to copy the ones we see.
@@ -330,7 +330,7 @@ public class Board {
         Types.TERRAIN terrain = terrains[x][y];
         if (terrain == Types.TERRAIN.MOUNTAIN) {
             if (tribes[tribeId].getTechTree().isResearched(Types.TECHNOLOGY.CLIMBING)) {
-                moveUnit(toPush, startX, startY, x, y, r);
+                moveUnit(toPush, startX, startY, x, y, r, gs.getTribesConfig());
                 return true;
             } else return false; //Can't be pushed if it's a mountain and climbing is not researched.
         }
@@ -360,7 +360,7 @@ public class Board {
         }
 
         //Otherwise, no problem
-        moveUnit  (toPush, startX, startY, x, y, r);
+        moveUnit  (toPush, startX, startY, x, y, r, gs.getTribesConfig());
         return true;
     }
 
@@ -441,7 +441,7 @@ public class Board {
      * @param yF y coordinate of the ending position
      * @param r random generator
      */
-    public void moveUnit(Unit unit, int x0, int y0, int xF, int yF, Random r) {
+    public void moveUnit(Unit unit, int x0, int y0, int xF, int yF, Random r, TribesConfig tc) {
         units[x0][y0] = 0;
         units[xF][yF] = unit.getActorId();
         unit.setPosition(xF, yF);
@@ -453,7 +453,7 @@ public class Board {
         }
         boolean networkUpdate = t.clearView(xF, yF, partialObsRangeClear, r, this);
         if(networkUpdate)
-            tradeNetwork.computeTradeNetworkTribe(this, t);
+            tradeNetwork.computeTradeNetworkTribe(this, t,tc);
     }
 
     /**
@@ -481,7 +481,7 @@ public class Board {
                     currentPos.y = next.y;
                     boolean updateNetwork = tribes[tribeId].clearView(currentPos.x, currentPos.y, tc.EXPLORER_CLEAR_RANGE, rnd, this);
                     if(updateNetwork)
-                        tradeNetwork.computeTradeNetworkTribe(this, tribes[tribeId]);
+                        tradeNetwork.computeTradeNetworkTribe(this, tribes[tribeId], tc);
                 }
 
                 j++;
@@ -689,7 +689,7 @@ public class Board {
             return false;
         }
 
-        tradeNetwork.setTradeNetwork(this, x, y, true);
+        tradeNetwork.setTradeNetwork(this, x, y, true, gameState.getTribesConfig());
         return true;
     }
 
@@ -814,10 +814,10 @@ public class Board {
         tribes[c.getTribeId()].addCity(c.getActorId());
 
         //cities provide visibility, which needs updating
-        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, tc.NEW_CITY_CLEAR_RANGE, r, this.copy());
+        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, tc.NEW_CITY_CLEAR_RANGE, r, this.copy(tc));
 
         //By default, cities are considered to be roads for trade network purposes.
-        tradeNetwork.setTradeNetwork(this, c.getPosition().x, c.getPosition().y, true);
+        tradeNetwork.setTradeNetwork(this, c.getPosition().x, c.getPosition().y, true, tc);
     }
 
     /**
@@ -938,9 +938,9 @@ public class Board {
      * @param x x coordinate of the road position
      * @param y y coordinate of the road position
      */
-    public void addRoad(int x, int y)
+    public void addRoad(int x, int y, TribesConfig tc)
     {
-        tradeNetwork.setTradeNetwork(this, x, y, true);
+        tradeNetwork.setTradeNetwork(this, x, y, true,tc);
     }
 
     /**
@@ -996,9 +996,9 @@ public class Board {
      * @param x x coordinate of the port destroyed.
      * @param y y coordinate of the port destroyed.
      */
-    public void destroyPort(int x, int y)
+    public void destroyPort(int x, int y, TribesConfig tc)
     {
-        this.tradeNetwork.setTradeNetwork(this, x, y,false);
+        this.tradeNetwork.setTradeNetwork(this, x, y,false, tc);
     }
 
     /**
@@ -1006,9 +1006,9 @@ public class Board {
      * @param x x coordinate of the port added.
      * @param y y coordinate of the port added.
      */
-    public void buildPort(int x, int y)
+    public void buildPort(int x, int y, TribesConfig tc)
     {
-        this.tradeNetwork.setTradeNetwork(this, x, y,true);
+        this.tradeNetwork.setTradeNetwork(this, x, y,true,tc);
     }
 
     // Simple getters and setters

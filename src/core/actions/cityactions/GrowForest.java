@@ -13,7 +13,6 @@ import java.util.LinkedList;
 
 public class GrowForest extends CityAction
 {
-    TribesConfig tc = new TribesConfig();
 
     public GrowForest(int cityId)
     {
@@ -23,6 +22,7 @@ public class GrowForest extends CityAction
 
     @Override
     public boolean isFeasible(final GameState gs) {
+        TribesConfig tc = gs.getTribesConfig();
         City city = (City) gs.getActor(this.cityId);
         Board b = gs.getBoard();
         if(b.getTerrainAt(targetPos.x, targetPos.y) != Types.TERRAIN.PLAIN) return false;
@@ -36,6 +36,7 @@ public class GrowForest extends CityAction
     @Override
     public boolean execute(GameState gs) {
         if (isFeasible(gs)){
+            TribesConfig tc = gs.getTribesConfig();
             Board b = gs.getBoard();
             City city = (City) gs.getActor(this.cityId);
             b.setTerrainAt(targetPos.x, targetPos.y, Types.TERRAIN.FOREST);

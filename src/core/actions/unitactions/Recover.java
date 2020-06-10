@@ -11,11 +11,9 @@ import java.util.ArrayList;
 
 public class Recover extends UnitAction
 {
-    TribesConfig tc;
     public Recover(int unitId)
     {
         super.unitId = unitId;
-         tc = new TribesConfig();
     }
 
     @Override
@@ -27,6 +25,7 @@ public class Recover extends UnitAction
 
     @Override
     public boolean execute(GameState gs) {
+        TribesConfig tc = gs.getTribesConfig();
         Unit unit = (Unit) gs.getActor(this.unitId);
         if(unit == null)
             return false;

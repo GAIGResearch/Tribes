@@ -1,5 +1,6 @@
 package core.actors.units;
 
+import core.TribesConfig;
 import core.Types;
 import core.actors.Actor;
 import core.game.GameState;
@@ -209,7 +210,7 @@ public abstract class Unit extends Actor
     }
 
 
-    public abstract Unit copy(boolean hideInfo);
+    public abstract Unit copy(boolean hideInfo, TribesConfig tc);
 
 
     Unit hide()

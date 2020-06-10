@@ -44,7 +44,7 @@ public class LevelUp extends CityAction {
         City city = (City) gs.getActor(this.cityId);
         Tribe tribe = gs.getBoard().getTribe(city.getTribeId());
         Vector2d cityPos = city.getPosition();
-        TribesConfig tc = new TribesConfig();
+        TribesConfig tc = gs.getTribesConfig();
 
         if(bonus.grantsMonument(gs.getTribesConfig()))
             tribe.cityMaxedUp();
@@ -68,7 +68,7 @@ public class LevelUp extends CityAction {
                 tribe.addStars(tc.CITY_LEVEL_UP_RESOURCES);
                 break;
             case POP_GROWTH:
-                city.addPopulation(tribe, tc.CITY_LEVEL_UP_POP_GROWTH);
+                city.addPopulation(tribe, tc.CITY_LEVEL_UP_POP_GROWTH, tc);
                 break;
             case BORDER_GROWTH:
                 gs.getBoard().expandBorder(city,gs.getTribesConfig());

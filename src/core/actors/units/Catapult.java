@@ -18,8 +18,8 @@ public class Catapult extends Unit
     }
 
     @Override
-    public Catapult copy(boolean hideInfo) {
-        Catapult c = new Catapult(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), new TribesConfig());
+    public Catapult copy(boolean hideInfo, TribesConfig tc) {
+        Catapult c = new Catapult(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), tc);
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

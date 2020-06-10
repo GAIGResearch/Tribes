@@ -134,7 +134,7 @@ public class Attack extends UnitAction
     private Pair<Integer, Integer> getAttackResults(GameState gs) {
         Unit attacker = (Unit) gs.getActor(this.unitId);
         Unit target = (Unit) gs.getActor(this.targetId);
-        TribesConfig tc = new TribesConfig();
+        TribesConfig tc = gs.getTribesConfig();
         double attackForce = attacker.ATK*((double) attacker.getCurrentHP()/ attacker.getMaxHP());
         double defenceForce =target.DEF*((double)target.getCurrentHP()/target.getMaxHP());
         double accelerator = tc.ATTACK_MODIFIER;

@@ -65,22 +65,23 @@ public class Tribe extends Actor {
 
     private TribesConfig tc;
 
-    public Tribe(Types.TRIBE tribe) {
+    public Tribe(Types.TRIBE tribe, TribesConfig tc) {
+        this.tc = tc;
         this.tribe = tribe;
         init();
     }
 
-    public Tribe(int tribeID, int cityID, Types.TRIBE tribe) {
+    public Tribe(int tribeID, int cityID, Types.TRIBE tribe, TribesConfig tc) {
         this.tribeId = tribeID;
         citiesID = new ArrayList<>();
         citiesID.add(cityID);
         this.tribe = tribe;
-        tc = new TribesConfig();
+        this.tc = tc;
         init();
     }
 
-    public Tribe(int id, JSONObject obj){
-        tc = new TribesConfig();
+    public Tribe(int id, JSONObject obj, TribesConfig tc){
+        this.tc = tc;
         tribeId = id;
         citiesID = new ArrayList<>();
         JSONArray JCitiesID = obj.getJSONArray("citiesID");
@@ -123,7 +124,6 @@ public class Tribe extends Actor {
     }
 
     private void init() {
-        tc = new TribesConfig();
         techTree = new TechnologyTree();
         techTree.doResearch(tribe.getInitialTech());
         citiesID = new ArrayList<>();
@@ -146,8 +146,8 @@ public class Tribe extends Actor {
     }
 
 
-    public Tribe copy(boolean hideInfo) {
-        Tribe tribeCopy = new Tribe(this.tribe);
+    public Tribe copy(boolean hideInfo, TribesConfig tc) {
+        Tribe tribeCopy = new Tribe(this.tribe, tc);
         tribeCopy.actorId = this.actorId;
         tribeCopy.tribeId = this.tribeId;
         tribeCopy.stars = hideInfo ? 0 : this.stars;
@@ -419,7 +419,7 @@ public class Tribe extends Actor {
 
 
 
-    public void updateNetwork(Pathfinder tp, Board b, boolean thisTribesTurn) {
+    public void updateNetwork(Pathfinder tp, Board b, boolean thisTribesTurn, TribesConfig tc) {
         ArrayList<Integer> lostCities = new ArrayList<>();
         ArrayList<Integer> addedCities = new ArrayList<>();
 
@@ -472,7 +472,7 @@ public class Tribe extends Actor {
 
             //The capital gains 1 population for each city connected, -1 for each city disconnected
             int capitalGain = addedCities.size() - lostCities.size();
-            capital.addPopulation(this, capitalGain);
+            capital.addPopulation(this, capitalGain, tc);
 
             //We may be adding a new monument to the pool!
             if(connectedCities.size() >= tc.GRAND_BAZAR_CITIES && monuments.get(GRAND_BAZAR) == MONUMENT_STATUS.UNAVAILABLE) {
@@ -487,7 +487,7 @@ public class Tribe extends Actor {
             //All cities that gained connection with the capital gain 1 population.
             for (int cityId : addedCities) {
                 City nonCapitalCity = (City) b.getActor(cityId);
-                nonCapitalCity.addPopulation(this, 1);
+                nonCapitalCity.addPopulation(this, 1, tc);
             }
         }
     }
@@ -503,7 +503,7 @@ public class Tribe extends Actor {
         connectedCities.remove(cityIdx);
 
         //this city loses 1 population
-        lostCity.addPopulation(this, -1);
+        lostCity.addPopulation(this, -1, tc);
     }
 
     public int getMaxProduction(GameState gs)
@@ -511,7 +511,7 @@ public class Tribe extends Actor {
         int acumProd = 0;
         for (int cityId : citiesID) {
             City city = (City) gs.getActor(cityId);
-            acumProd += city.getProduction();
+            acumProd += city.getProduction(gs.getTribesConfig());
         }
         return acumProd;
     }

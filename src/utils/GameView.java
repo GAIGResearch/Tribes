@@ -76,7 +76,7 @@ public class GameView extends JComponent {
     GameView(Game game, InfoView inforView, Vector2d panTranslate)
     {
         this.game = game;
-        this.board = game.getBoard().copy();
+        this.board = game.getBoard().copy(gameState.getTribesConfig());
         this.infoView = inforView;
         this.panTranslate = panTranslate;
 
@@ -541,7 +541,7 @@ public class GameView extends JComponent {
 
                         // Draw capital img + city name/ID + number of stars
                         String cityName = "" + cityID;
-                        String production = "" + c.getProduction();
+                        String production = "" + c.getProduction(gameState.getTribesConfig());
 
                         int sections = 2;
                         if (c.isCapital()) {

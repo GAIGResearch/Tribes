@@ -291,7 +291,7 @@ public class InfoView extends JComponent {
             sb.append("<ul>");
             sb.append("<li><b>Is Capital:</b> " + c.isCapital() + "</li>");
             sb.append("<li><b>Points:</b> " + c.getPointsWorth() + "</li>");
-            sb.append("<li><b>Production:</b> " + c.getProduction() + "</li>");
+            sb.append("<li><b>Production:</b> " + c.getProduction(gs.getTribesConfig()) + "</li>");
             sb.append("</ul>");
 //            sb.append("</td></tr></table>");
         }

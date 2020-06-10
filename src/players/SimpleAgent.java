@@ -1,5 +1,6 @@
 package players;
 
+import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actions.cityactions.*;
@@ -176,13 +177,13 @@ public class SimpleAgent extends Agent {
     {
         ResourceGathering rg = (ResourceGathering) a;
         City c = (City) gs.getActor(rg.getCityId());
-        int neededToLevelUp = neededToLevelUp(c);
+        int neededToLevelUp = neededToLevelUp(c, gs.getTribesConfig());
         return Math.min(5, Math.max(0, 5-neededToLevelUp));
     }
 
-    private int neededToLevelUp(City c)
+    private int neededToLevelUp(City c, TribesConfig tc)
     {
-        return c.getLevel() + 1 - c.getProduction();
+        return c.getLevel() + 1 - c.getProduction(tc);
     }
 
     //Evaluate an action for building a road
@@ -375,7 +376,7 @@ public class SimpleAgent extends Agent {
         }
 
         City c = (City) gs.getActor(((Build)a).getCityId());
-        int neededToLevelUp = neededToLevelUp(c);
+        int neededToLevelUp = neededToLevelUp(c, gs.getTribesConfig());
         return Math.min(5, Math.max(0, score+5-neededToLevelUp));
     }
 

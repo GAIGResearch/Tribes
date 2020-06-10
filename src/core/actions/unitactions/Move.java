@@ -53,7 +53,7 @@ public class Move extends UnitAction
             Tribe tribe = gs.getTribe(unit.getTribeId());
             Types.TERRAIN destinationTerrain = board.getTerrainAt(destination.x, destination.y);
 
-            board.moveUnit(unit, unit.getPosition().x, unit.getPosition().y, destination.x, destination.y, gs.getRandomGenerator());
+            board.moveUnit(unit, unit.getPosition().x, unit.getPosition().y, destination.x, destination.y, gs.getRandomGenerator(), gs.getTribesConfig());
 
             if(unit.getType().isWaterUnit()){
                 if(destinationTerrain != Types.TERRAIN.SHALLOW_WATER && destinationTerrain != Types.TERRAIN.DEEP_WATER){ // && destinationTerrain != Types.TERRAIN.CITY){

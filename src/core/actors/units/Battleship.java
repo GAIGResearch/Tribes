@@ -2,6 +2,7 @@ package core.actors.units;
 
 import core.TribesConfig;
 import core.Types;
+import core.actors.Tribe;
 import utils.Vector2d;
 
 import static core.TribesConfig.*;
@@ -28,8 +29,8 @@ public class Battleship extends Unit
     }
 
     @Override
-    public Battleship copy(boolean hideInfo) {
-        Battleship c = new Battleship(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), new TribesConfig());
+    public Battleship copy(boolean hideInfo, TribesConfig tc) {
+        Battleship c = new Battleship(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), tc);
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

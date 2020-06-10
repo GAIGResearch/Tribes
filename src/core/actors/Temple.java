@@ -13,7 +13,7 @@ public class Temple extends Building
     private int turnsToScore;
 
     //TribesConfig Object
-    private TribesConfig tc = new TribesConfig();
+    private TribesConfig tc;
 
     /**
      * Creates a new temple
@@ -22,8 +22,9 @@ public class Temple extends Building
      * @param type type of temple
      * @param cityId id of the city that owns this temple.
      */
-    public Temple(int x, int y, Types.BUILDING type, int cityId) {
+    public Temple(int x, int y, Types.BUILDING type, int cityId, TribesConfig tc) {
         super(x, y, type, cityId);
+        this.tc = tc;
         levelUp();
     }
 
@@ -81,9 +82,9 @@ public class Temple extends Building
      * Returns a copy of this temple
      * @return a copy of this temple
      */
-    public Temple copy()
+    public Temple copy(TribesConfig tc)
     {
-        Temple t = new Temple(position.x, position.y, type, cityId);
+        Temple t = new Temple(position.x, position.y, type, cityId, tc);
         t.turnsToScore = this.turnsToScore;
         t.level = this.level;
         return t;

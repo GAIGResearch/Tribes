@@ -755,7 +755,7 @@ public class GameState {
             }
 
             if (produces)
-                acumProd += city.getProduction();
+                acumProd += city.getProduction(tc);
 
             allTribeUnits.addAll(city.getUnitsID());
 
@@ -846,7 +846,7 @@ public class GameState {
     {
 //        GameState copy = new GameState(this.rnd, this.gameMode); //use this for a 100% repetition of the game based on random seed and game seed.
         GameState copy = new GameState(new Random(), this.gameMode); //copies of the game state can't have the same random generator.
-        copy.board = board.copy(playerIdx!=-1, playerIdx);
+        copy.board = board.copy(playerIdx!=-1, playerIdx, tc);
         copy.tick = this.tick;
         copy.turnMustEnd = turnMustEnd;
         copy.gameIsOver = gameIsOver;

@@ -1,5 +1,6 @@
 package core.actors;
 
+import core.TribesConfig;
 import utils.Vector2d;
 
 public abstract class Actor {
@@ -25,7 +26,7 @@ public abstract class Actor {
      *                 partial observability.
      * @return new copy fo the Actor
      */
-    public abstract Actor copy(boolean hideInfo);
+    public abstract Actor copy(boolean hideInfo, TribesConfig tc);
 
     public void setActorId(int actorID)
     {

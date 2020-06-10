@@ -43,7 +43,7 @@ public class HealOthers extends UnitAction
         if (isFeasible(gs)) {
             Unit unit = (Unit) gs.getActor(this.unitId);
             ArrayList<Unit> targets = getTargets(gs);
-            TribesConfig tc = new TribesConfig();
+            TribesConfig tc = gs.getTribesConfig();
 
             for (Unit target: targets) {
                 target.setCurrentHP(Math.min(target.getCurrentHP() + tc.MINDBENDER_HEAL, target.getMaxHP()));

@@ -35,12 +35,12 @@ public class BuildRoad extends TribeAction {
 
     @Override
     public boolean execute(GameState gs) {
-        TribesConfig tc = new TribesConfig();
+        TribesConfig tc = gs.getTribesConfig();
         if(isFeasible(gs))
         {
             Tribe tribe = gs.getTribe(tribeId);
             tribe.subtractStars(tc.ROAD_COST);
-            gs.getBoard().addRoad(position.x, position.y);
+            gs.getBoard().addRoad(position.x, position.y, gs.getTribesConfig());
             return true;
         }
         return false;

@@ -85,7 +85,7 @@ public class Examine extends UnitAction
 
                 case POP_GROWTH:
                     City c = (City) gs.getActor(handlerCityId);
-                    c.addPopulation(t, bonus.getBonus());
+                    c.addPopulation(t, bonus.getBonus(), gs.getTribesConfig());
                     break;
 
                 case EXPLORER:

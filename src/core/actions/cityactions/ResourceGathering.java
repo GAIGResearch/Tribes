@@ -61,7 +61,7 @@ public class ResourceGathering extends CityAction
                 case FISH:
                 case ANIMAL:
                 case FRUIT:
-                    city.addPopulation(tribe, this.resource.getBonus(this.resource.getKey(),gs.getTribesConfig()));
+                    city.addPopulation(tribe, this.resource.getBonus(this.resource.getKey(),gs.getTribesConfig()), gs.getTribesConfig());
                     return true;
                 case WHALES: //Whaling is the only resource which provides extra stars
                     Board b = gs.getBoard();

@@ -1,6 +1,7 @@
 package utils;
 
 import core.Constants;
+import core.TribesConfig;
 import core.Types;
 import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.TribeAction;
@@ -59,7 +60,7 @@ public class GUI extends JFrame {
      * Constructor
      * @param title Title of the window.
      */
-    public GUI(Game game, String title, KeyController ki, WindowInput wi, ActionController ac, boolean closeAppOnClosingWindow) {
+    public GUI(Game game, String title, KeyController ki, WindowInput wi, ActionController ac, boolean closeAppOnClosingWindow, TribesConfig tc) {
         super(title);
 
         try {
@@ -93,7 +94,7 @@ public class GUI extends JFrame {
 
         infoView = new InfoView(ac);
         panTranslate = new Vector2d(0,0);
-        boardView = new GameView(game, infoView, panTranslate);
+        boardView = new GameView(game, infoView, panTranslate, tc);
 
         // Create frame layout
         GridBagLayout gbl = new GridBagLayout();

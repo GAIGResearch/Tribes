@@ -146,7 +146,7 @@ public class Play {
         ActionController ac = new ActionController();
 
         Game game = _prepareGame(tribes, levelSeed, playerTypes, gameMode, ac);
-        Run.runGame(game, ki, ac);
+        Run.runGame(game, ki, ac, game.getGameState().getTribesConfig());
     }
 
     private static void play(String levelFile, PlayerType[] playerTypes, Types.GAME_MODE gameMode)
@@ -155,7 +155,7 @@ public class Play {
         ActionController ac = new ActionController();
 
         Game game = _prepareGame(levelFile, playerTypes, gameMode, ac);
-        Run.runGame(game, ki, ac);
+        Run.runGame(game, ki, ac, game.getGameState().getTribesConfig());
     }
 
 
@@ -167,7 +167,7 @@ public class Play {
         long agentSeed = AGENT_SEED == -1 ? System.currentTimeMillis() + new Random().nextInt() : AGENT_SEED;
 
         Game game = _loadGame(playerTypes, saveGameFile, agentSeed);
-        Run.runGame(game, ki, ac);
+        Run.runGame(game, ki, ac, game.getGameState().getTribesConfig());
     }
 
 

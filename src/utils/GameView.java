@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 
+import core.TribesConfig;
 import core.Types;
 import core.actions.cityactions.CityAction;
 import core.actions.cityactions.ResourceGathering;
@@ -73,10 +74,10 @@ public class GameView extends JComponent {
     public static Dimension dimension;
     private static double isometricAngle = -45;
 
-    GameView(Game game, InfoView inforView, Vector2d panTranslate)
+    GameView(Game game, InfoView inforView, Vector2d panTranslate, TribesConfig tc)
     {
         this.game = game;
-        this.board = game.getBoard().copy(gameState.getTribesConfig());
+        this.board = game.getBoard().copy(tc);
         this.infoView = inforView;
         this.panTranslate = panTranslate;
 

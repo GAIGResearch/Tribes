@@ -556,4 +556,6 @@ public class Game {
     public TreeSet<TribeResult> getCurrentRanking() {
         return gs.getCurrentRanking();
     }
+
+    public GameState getGameState(){return this.gs;}
 }

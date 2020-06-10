@@ -1,3 +1,4 @@
+import core.TribesConfig;
 import core.game.Game;
 import players.ActionController;
 import players.KeyController;
@@ -14,13 +15,13 @@ class Run {
      * @param ki - Key controller
      * @param ac - Action controller
      */
-    static void runGame(Game g, KeyController ki, ActionController ac) {
+    static void runGame(Game g, KeyController ki, ActionController ac, TribesConfig tc) {
         WindowInput wi = null;
         GUI frame = null;
         if (VISUALS) {
             wi = new WindowInput();
             wi.windowClosed = false;
-            frame = new GUI(g, "Tribes", ki, wi, ac, false);
+            frame = new GUI(g, "Tribes", ki, wi, ac, false, tc);
             frame.addWindowListener(wi);
             frame.addKeyListener(ki);
         }

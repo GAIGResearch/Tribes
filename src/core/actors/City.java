@@ -174,12 +174,14 @@ public class City extends Actor{
             case WATER_TEMPLE:
             case MOUNTAIN_TEMPLE:
             case FOREST_TEMPLE:
-                if(!onlyMatching)
-                {
-                    addPopulation(tribe, building.type.getBonus(building.type.getKey(),gameState.getTribesConfig()) * multiplier, gameState.getTribesConfig());
+                if(building instanceof  Temple) {
+                    if (!onlyMatching) {
+                        addPopulation(tribe, building.type.getBonus(building.type.getKey(), gameState.getTribesConfig()) * multiplier, gameState.getTribesConfig());
+                    }
+
+                    int scoreDiff = negative ? ((Temple) building).getPoints() : tc.TEMPLE_POINTS[0];
+                    tribe.addScore(scoreDiff);
                 }
-                int scoreDiff = negative ? ((Temple)building).getPoints() : tc.TEMPLE_POINTS[0];
-                tribe.addScore(scoreDiff);
                 break;
             case ALTAR_OF_PEACE:
             case EMPERORS_TOMB:

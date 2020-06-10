@@ -762,7 +762,7 @@ public class GameState {
             //All temples grow;
             for(Building b : city.getBuildings())
             {
-                if(b.type.isTemple()) {
+                if(b instanceof Temple) {
                     int templePoints = ((Temple) b).newTurn();
                     tribe.addScore(templePoints);
                     city.addPointsWorth(templePoints);

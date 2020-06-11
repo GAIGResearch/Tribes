@@ -100,7 +100,7 @@ public class GameState {
     void init(long levelgen_seed, Types.TRIBE[] tribes) {
 
         LevelGenerator levelGen = new LevelGenerator(levelgen_seed);
-        levelGen.init(TribesConfig.DEFAULT_MAP_SIZE[tribes.length-1], 3, 4, 0.5, tribes);
+        levelGen.init(tc.DEFAULT_MAP_SIZE[tribes.length-1], 3, 4, 0.5, tribes);
         levelGen.generate();
         String[] lines = levelGen.gelLevelLines();
         initGameState(lines);

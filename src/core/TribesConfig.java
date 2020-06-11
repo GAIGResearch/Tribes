@@ -443,6 +443,6 @@ public class TribesConfig
 
 
     // MAP
-    public static final int[] DEFAULT_MAP_SIZE = new int[]{-1, 11, 14, 16};
+    public final int[] DEFAULT_MAP_SIZE = new int[]{-1, 11, 14, 16};
 
 }

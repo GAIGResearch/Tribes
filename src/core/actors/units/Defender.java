@@ -10,7 +10,7 @@ public class Defender extends Unit
 {
 
     public Defender(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId, TribesConfig tc) {
-        super(tc.DEFENDER_ATTACK, tc.DEFENDER_DEFENCE, tc.DEFENDER_MOVEMENT, tc.DEFENDER_MAX_HP, tc.DEFENDER_RANGE, tc.DEFENDER_COST, pos, kills, isVeteran, cityId, tribeId);
+        super(tc.DEFENDER_ATTACK, tc.DEFENDER_DEFENCE, tc.DEFENDER_MOVEMENT, tc.DEFENDER_MAX_HP, tc.DEFENDER_RANGE, tc.DEFENDER_COST, pos, kills, isVeteran, cityId, tribeId,tc);
     }
 
     @Override
@@ -19,7 +19,7 @@ public class Defender extends Unit
     }
 
     @Override
-    public Defender copy(boolean hideInfo, TribesConfig tc) {
+    public Defender copy(boolean hideInfo) {
         Defender c = new Defender(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(),tc);
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());

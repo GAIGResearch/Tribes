@@ -70,7 +70,7 @@ class LevelLoader
                     }else
                     {
                         //A city to create. Add it and assign it to the next tribe.
-                        City c = new City(i, j, tribeID);
+                        City c = new City(i, j, tribeID, gs.getTribesConfig());
                         c.setCapital(true);
                         board.addCityToTribe(c,rnd, gs.getTribesConfig());
 

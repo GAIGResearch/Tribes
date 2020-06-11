@@ -12,7 +12,7 @@ public class Ship extends Unit
     private Types.UNIT baseLandUnit;
 
     public Ship(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId, TribesConfig tc) {
-        super(tc.SHIP_ATTACK, tc.SHIP_DEFENCE, tc.SHIP_MOVEMENT, -1, tc.SHIP_RANGE, tc.SHIP_COST, pos, kills, isVeteran, cityId, tribeId);
+        super(tc.SHIP_ATTACK, tc.SHIP_DEFENCE, tc.SHIP_MOVEMENT, -1, tc.SHIP_RANGE, tc.SHIP_COST, pos, kills, isVeteran, cityId, tribeId, tc);
     }
 
     public Types.UNIT getBaseLandUnit() {
@@ -29,7 +29,7 @@ public class Ship extends Unit
     }
 
     @Override
-    public Ship copy(boolean hideInfo, TribesConfig tc) {
+    public Ship copy(boolean hideInfo) {
         Ship c = new Ship(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), tc);
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());

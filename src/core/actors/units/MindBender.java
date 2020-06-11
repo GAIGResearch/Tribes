@@ -9,7 +9,7 @@ import static core.TribesConfig.*;
 public class MindBender extends Unit
 {
     public MindBender(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId, TribesConfig tc) {
-        super(tc.MINDBENDER_ATTACK, tc.MINDBENDER_DEFENCE, tc.MINDBENDER_MOVEMENT, tc.MINDBENDER_MAX_HP, tc.MINDBENDER_RANGE, tc.MINDBENDER_COST, pos, kills, isVeteran, cityId, tribeId);
+        super(tc.MINDBENDER_ATTACK, tc.MINDBENDER_DEFENCE, tc.MINDBENDER_MOVEMENT, tc.MINDBENDER_MAX_HP, tc.MINDBENDER_RANGE, tc.MINDBENDER_COST, pos, kills, isVeteran, cityId, tribeId,tc);
     }
 
     @Override
@@ -18,7 +18,7 @@ public class MindBender extends Unit
     }
 
     @Override
-    public MindBender copy(boolean hideInfo, TribesConfig tc) {
+    public MindBender copy(boolean hideInfo) {
         MindBender c = new MindBender(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), tc);
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());

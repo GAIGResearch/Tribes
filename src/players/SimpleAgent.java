@@ -177,13 +177,13 @@ public class SimpleAgent extends Agent {
     {
         ResourceGathering rg = (ResourceGathering) a;
         City c = (City) gs.getActor(rg.getCityId());
-        int neededToLevelUp = neededToLevelUp(c, gs.getTribesConfig());
+        int neededToLevelUp = neededToLevelUp(c);
         return Math.min(5, Math.max(0, 5-neededToLevelUp));
     }
 
-    private int neededToLevelUp(City c, TribesConfig tc)
+    private int neededToLevelUp(City c)
     {
-        return c.getLevel() + 1 - c.getProduction(tc);
+        return c.getLevel() + 1 - c.getProduction();
     }
 
     //Evaluate an action for building a road
@@ -376,7 +376,7 @@ public class SimpleAgent extends Agent {
         }
 
         City c = (City) gs.getActor(((Build)a).getCityId());
-        int neededToLevelUp = neededToLevelUp(c, gs.getTribesConfig());
+        int neededToLevelUp = neededToLevelUp(c);
         return Math.min(5, Math.max(0, score+5-neededToLevelUp));
     }
 

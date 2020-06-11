@@ -68,7 +68,7 @@ public class LevelUp extends CityAction {
                 tribe.addStars(tc.CITY_LEVEL_UP_RESOURCES);
                 break;
             case POP_GROWTH:
-                city.addPopulation(tribe, tc.CITY_LEVEL_UP_POP_GROWTH, tc);
+                city.addPopulation(tribe, tc.CITY_LEVEL_UP_POP_GROWTH);
                 break;
             case BORDER_GROWTH:
                 gs.getBoard().expandBorder(city,gs.getTribesConfig());

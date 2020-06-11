@@ -28,8 +28,10 @@ public abstract class Unit extends Actor
 
     GameState gs;
 
+    TribesConfig tc;
 
-    public Unit(int atk, int def, int mov, int max_hp, int range, int cost, Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeID){
+
+    public Unit(int atk, int def, int mov, int max_hp, int range, int cost, Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeID, TribesConfig tc){
         this.ATK = atk;
         this.DEF = def;
         this.MOV = mov;
@@ -44,6 +46,7 @@ public abstract class Unit extends Actor
         this.cityId = cityId;
         this.tribeId = tribeID;
         this.status = FINISHED;
+        this.tc = tc;
     }
 
     public void setCurrentHP(int hp){
@@ -210,7 +213,7 @@ public abstract class Unit extends Actor
     }
 
 
-    public abstract Unit copy(boolean hideInfo, TribesConfig tc);
+    public abstract Unit copy(boolean hideInfo);
 
 
     Unit hide()

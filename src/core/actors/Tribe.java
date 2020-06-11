@@ -146,7 +146,7 @@ public class Tribe extends Actor {
     }
 
 
-    public Tribe copy(boolean hideInfo, TribesConfig tc) {
+    public Tribe copy(boolean hideInfo) {
         Tribe tribeCopy = new Tribe(this.tribe, tc);
         tribeCopy.actorId = this.actorId;
         tribeCopy.tribeId = this.tribeId;
@@ -472,7 +472,7 @@ public class Tribe extends Actor {
 
             //The capital gains 1 population for each city connected, -1 for each city disconnected
             int capitalGain = addedCities.size() - lostCities.size();
-            capital.addPopulation(this, capitalGain, tc);
+            capital.addPopulation(this, capitalGain);
 
             //We may be adding a new monument to the pool!
             if(connectedCities.size() >= tc.GRAND_BAZAR_CITIES && monuments.get(GRAND_BAZAR) == MONUMENT_STATUS.UNAVAILABLE) {
@@ -487,7 +487,7 @@ public class Tribe extends Actor {
             //All cities that gained connection with the capital gain 1 population.
             for (int cityId : addedCities) {
                 City nonCapitalCity = (City) b.getActor(cityId);
-                nonCapitalCity.addPopulation(this, 1, tc);
+                nonCapitalCity.addPopulation(this, 1);
             }
         }
     }
@@ -503,7 +503,7 @@ public class Tribe extends Actor {
         connectedCities.remove(cityIdx);
 
         //this city loses 1 population
-        lostCity.addPopulation(this, -1, tc);
+        lostCity.addPopulation(this, -1);
     }
 
     public int getMaxProduction(GameState gs)
@@ -511,7 +511,7 @@ public class Tribe extends Actor {
         int acumProd = 0;
         for (int cityId : citiesID) {
             City city = (City) gs.getActor(cityId);
-            acumProd += city.getProduction(gs.getTribesConfig());
+            acumProd += city.getProduction();
         }
         return acumProd;
     }

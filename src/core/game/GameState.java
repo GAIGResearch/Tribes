@@ -755,14 +755,14 @@ public class GameState {
             }
 
             if (produces)
-                acumProd += city.getProduction(tc);
+                acumProd += city.getProduction();
 
             allTribeUnits.addAll(city.getUnitsID());
 
             //All temples grow;
             for(Building b : city.getBuildings())
             {
-                if(b instanceof Temple) {
+                if(b.type.isTemple()) {
                     int templePoints = ((Temple) b).newTurn();
                     tribe.addScore(templePoints);
                     city.addPointsWorth(templePoints);

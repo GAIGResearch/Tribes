@@ -9,7 +9,7 @@ import static core.TribesConfig.*;
 public class Archer extends Unit
 {
     public Archer(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId, TribesConfig tc) {
-        super(tc.ARCHER_ATTACK, tc.ARCHER_DEFENCE, tc.ARCHER_MOVEMENT, tc.ARCHER_MAX_HP, tc.ARCHER_RANGE, tc.ARCHER_COST, pos, kills, isVeteran, cityId, tribeId);
+        super(tc.ARCHER_ATTACK, tc.ARCHER_DEFENCE, tc.ARCHER_MOVEMENT, tc.ARCHER_MAX_HP, tc.ARCHER_RANGE, tc.ARCHER_COST, pos, kills, isVeteran, cityId, tribeId,tc);
     }
 
     @Override
@@ -18,7 +18,7 @@ public class Archer extends Unit
     }
 
     @Override
-    public Archer copy(boolean hideInfo, TribesConfig tc) {
+    public Archer copy(boolean hideInfo) {
         Archer c = new Archer(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(),tc);
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());

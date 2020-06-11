@@ -11,7 +11,7 @@ public class Boat extends Unit
     private Types.UNIT baseLandUnit;
 
     public Boat(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId, TribesConfig tc) {
-        super(tc.BOAT_ATTACK, tc.BOAT_DEFENCE, tc.BOAT_MOVEMENT, -1, tc.BOAT_RANGE, tc.BOAT_COST, pos, kills, isVeteran, cityId, tribeId);
+        super(tc.BOAT_ATTACK, tc.BOAT_DEFENCE, tc.BOAT_MOVEMENT, -1, tc.BOAT_RANGE, tc.BOAT_COST, pos, kills, isVeteran, cityId, tribeId,tc);
     }
 
     public Types.UNIT getBaseLandUnit() {
@@ -28,7 +28,7 @@ public class Boat extends Unit
     }
 
     @Override
-    public Boat copy(boolean hideInfo, TribesConfig tc) {
+    public Boat copy(boolean hideInfo) {
         Boat c = new Boat(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(),tc);
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());

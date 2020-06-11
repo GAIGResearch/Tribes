@@ -26,7 +26,7 @@ public abstract class Actor {
      *                 partial observability.
      * @return new copy fo the Actor
      */
-    public abstract Actor copy(boolean hideInfo, TribesConfig tc);
+    public abstract Actor copy(boolean hideInfo);
 
     public void setActorId(int actorID)
     {

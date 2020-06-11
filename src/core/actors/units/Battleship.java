@@ -12,7 +12,7 @@ public class Battleship extends Unit
     private Types.UNIT baseLandUnit;
 
     public Battleship(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId, TribesConfig tc) {
-        super(tc.BATTLESHIP_ATTACK, tc.BATTLESHIP_DEFENCE, tc.BATTLESHIP_MOVEMENT, -1, tc.BATTLESHIP_RANGE, tc.BATTLESHIP_COST, pos, kills, isVeteran, cityId, tribeId);
+        super(tc.BATTLESHIP_ATTACK, tc.BATTLESHIP_DEFENCE, tc.BATTLESHIP_MOVEMENT, -1, tc.BATTLESHIP_RANGE, tc.BATTLESHIP_COST, pos, kills, isVeteran, cityId, tribeId, tc);
     }
 
     public Types.UNIT getBaseLandUnit() {
@@ -29,7 +29,7 @@ public class Battleship extends Unit
     }
 
     @Override
-    public Battleship copy(boolean hideInfo, TribesConfig tc) {
+    public Battleship copy(boolean hideInfo) {
         Battleship c = new Battleship(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), tc);
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());

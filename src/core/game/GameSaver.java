@@ -138,7 +138,7 @@ class GameSaver {
                 cInfo.put("level", c.getLevel());
                 cInfo.put("isCapital", c.isCapital());
                 cInfo.put("population", c.getPopulation());
-                cInfo.put("production", c.getProduction(gs.getTribesConfig()));
+                cInfo.put("production", c.getProduction());
                 cInfo.put("hasWalls", c.hasWalls());
                 cInfo.put("pointsWorth", c.getPointsWorth());
                 // Save Buildings INFO

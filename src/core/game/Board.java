@@ -201,7 +201,7 @@ public class Board {
         // Copy tribes
         for (int i = 0; i < tribes.length; i++) {
             boolean hideInfo = (i != playerId) && partialObs;
-            copyBoard.tribes[i] = tribes[i].copy(hideInfo,tc );
+            copyBoard.tribes[i] = tribes[i].copy(hideInfo);
 
         }
 
@@ -216,7 +216,7 @@ public class Board {
             if(actTribeId == playerId || !partialObs || actorVisible)
             {
                 boolean hideInfo = (actTribeId != playerId) && partialObs;
-                Actor actorCopy = act.copy(hideInfo, tc);
+                Actor actorCopy = act.copy(hideInfo);
                 copyBoard.gameActors.put(id, actorCopy);
 
                 //If we're hiding info, the other tribes don't copy cityIDs and unitIDs by default in the arrays. But we need to copy the ones we see.
@@ -648,7 +648,7 @@ public class Board {
         if(ter == Types.TERRAIN.VILLAGE)
         {
             //Not a city. Needs to be created, assigned and its border calculated.
-            City newCity = new City(x, y, capturingTribe.getTribeId());
+            City newCity = new City(x, y, capturingTribe.getTribeId(), gameState.getTribesConfig());
 
             //Add city to board and set its borders
             addCityToTribe(newCity,gameState.getRandomGenerator(), gameState.getTribesConfig());

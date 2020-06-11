@@ -9,7 +9,7 @@ import static core.TribesConfig.*;
 public class Rider extends Unit
 {
     public Rider(Vector2d pos, int kills, boolean isVeteran, int cityId, int tribeId, TribesConfig tc) {
-        super(tc.RIDER_ATTACK, tc.RIDER_DEFENCE, tc.RIDER_MOVEMENT, tc.RIDER_MAX_HP, tc.RIDER_RANGE, tc.RIDER_COST, pos, kills, isVeteran, cityId, tribeId);
+        super(tc.RIDER_ATTACK, tc.RIDER_DEFENCE, tc.RIDER_MOVEMENT, tc.RIDER_MAX_HP, tc.RIDER_RANGE, tc.RIDER_COST, pos, kills, isVeteran, cityId, tribeId,tc);
     }
 
     @Override
@@ -18,7 +18,7 @@ public class Rider extends Unit
     }
 
     @Override
-    public Rider copy(boolean hideInfo, TribesConfig tc) {
+    public Rider copy(boolean hideInfo) {
         Rider c = new Rider(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(),tc);
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());

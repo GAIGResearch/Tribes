@@ -542,7 +542,7 @@ public class GameView extends JComponent {
 
                         // Draw capital img + city name/ID + number of stars
                         String cityName = "" + cityID;
-                        String production = "" + c.getProduction(gameState.getTribesConfig());
+                        String production = "" + c.getProduction();
 
                         int sections = 2;
                         if (c.isCapital()) {

@@ -1,7 +1,6 @@
 package core.actions.cityactions;
 
 import core.TechnologyTree;
-import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
 import core.actors.Building;
@@ -84,7 +83,7 @@ public class Build extends CityAction
             if(buildingType.isTemple())
                 city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, buildingType, this.cityId, gs.getTribesConfig()));
             else
-                city.addBuilding(gs, new Building(targetPos.x, targetPos.y, buildingType, this.cityId));
+                city.addBuilding(gs, new Building(targetPos.x, targetPos.y, buildingType, this.cityId,gs.getTribesConfig()));
 
             if(buildingType == Types.BUILDING.PORT)
                 board.buildPort(targetPos.x, targetPos.y, gs.getTribesConfig());

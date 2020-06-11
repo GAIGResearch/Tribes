@@ -23,7 +23,7 @@ public class Temple extends Building
      * @param cityId id of the city that owns this temple.
      */
     public Temple(int x, int y, Types.BUILDING type, int cityId, TribesConfig tc) {
-        super(x, y, type, cityId);
+        super(x, y, type, cityId,tc);
         this.tc = tc;
         levelUp();
     }
@@ -33,8 +33,8 @@ public class Temple extends Building
      * @param obj JSON object to read the temple details from.
      * @param cityID id of the city this temple belongs to.
      */
-    public Temple(JSONObject obj, int cityID){
-        super(obj.getInt("x"), obj.getInt("y"), Types.BUILDING.getTypeByKey(obj.getInt("type")), cityID);
+    public Temple(JSONObject obj, int cityID, TribesConfig tc){
+        super(obj.getInt("x"), obj.getInt("y"), Types.BUILDING.getTypeByKey(obj.getInt("type")), cityID, tc);
         level = obj.getInt("level");
         turnsToScore = obj.getInt("turnsToScore");
     }
@@ -82,7 +82,7 @@ public class Temple extends Building
      * Returns a copy of this temple
      * @return a copy of this temple
      */
-    public Temple copy(TribesConfig tc)
+    public Temple copy()
     {
         Temple t = new Temple(position.x, position.y, type, cityId, tc);
         t.turnsToScore = this.turnsToScore;

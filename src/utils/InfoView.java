@@ -58,9 +58,9 @@ public class InfoView extends JComponent {
 
     private GameState gs;
 
-    InfoView(ActionController ac)
+    InfoView(ActionController ac,TribesConfig tc)
     {
-        tc=new TribesConfig();
+        this.tc=tc;
         this.size = new Dimension(GUI_SIDE_PANEL_WIDTH, GUI_INFO_PANEL_HEIGHT);
         this.ac = ac;
         int scrollBarSize = (Integer) UIManager.get("ScrollBar.width");

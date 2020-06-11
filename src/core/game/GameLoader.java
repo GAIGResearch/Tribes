@@ -55,7 +55,7 @@ public class GameLoader
 
         loadUnits(gs);
 
-        loadCities();
+        loadCities(gs.getTribesConfig());
 
     }
 
@@ -99,12 +99,12 @@ public class GameLoader
         }
     }
 
-    private void loadCities(){
+    private void loadCities(TribesConfig tc){
         Iterator<String> keys = JCity.keys();
         while (keys.hasNext()){
             String key = keys.next();
             JSONObject cityINFO = JCity.getJSONObject(key);
-            City city = new City(cityINFO, Integer.parseInt(key));
+            City city = new City(cityINFO, Integer.parseInt(key), tc);
             board.addActor(city, Integer.parseInt(key));
         }
     }

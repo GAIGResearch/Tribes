@@ -16,6 +16,8 @@ public class Building {
     //ID this building belongs to
     public int cityId;
 
+    private TribesConfig tc;
+
     /**
      * Creates a new building
      * @param x x position of this building
@@ -23,10 +25,11 @@ public class Building {
      * @param type type of this new building.
      * @param cityId id of the city this building belongs to
      */
-    public Building(int x, int y, Types.BUILDING type, int cityId) {
+    public Building(int x, int y, Types.BUILDING type, int cityId,TribesConfig tc) {
         this.position = new Vector2d(x, y);
         this.type = type;
         this.cityId = cityId;
+        this.tc = tc;
     }
 
     /**
@@ -34,10 +37,11 @@ public class Building {
      * @param obj object to read the building from
      * @param cityID id of the city
      */
-    public Building(JSONObject obj, int cityID){
+    public Building(JSONObject obj, int cityID, TribesConfig tc){
         this.position = new Vector2d(obj.getInt("x"), obj.getInt("y"));
         this.type = Types.BUILDING.getTypeByKey(obj.getInt("type"));
         this.cityId = cityID;
+        this.tc = tc;
     }
 
     /**
@@ -46,7 +50,7 @@ public class Building {
      */
     public Building copy()
     {
-        return new Building(position.x, position.y, type, cityId);
+        return new Building(position.x, position.y, type, cityId, tc);
     }
 
     /**
@@ -54,7 +58,7 @@ public class Building {
      * production or population.
      * @return the bonus this building provides to the city.
      */
-    int getBonus(TribesConfig tc){
+    int getBonus(){
         return type.getBonus(type.getKey(),tc );
     }
 }

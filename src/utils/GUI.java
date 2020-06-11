@@ -92,7 +92,7 @@ public class GUI extends JFrame {
         this.stateHistory = new ArrayList<>();
         this.replayer = new ActionController();
 
-        infoView = new InfoView(ac);
+        infoView = new InfoView(ac,tc);
         panTranslate = new Vector2d(0,0);
         boardView = new GameView(game, infoView, panTranslate, tc);
 

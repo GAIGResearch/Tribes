@@ -63,7 +63,7 @@ public class City extends Actor{
      * @param obj object to create the city from
      * @param cityID id of this city.
      */
-    public City(JSONObject obj, int cityID){
+    public City(JSONObject obj, int cityID, TribesConfig tc){
         level = obj.getInt("level");
         population = obj.getInt("population");
         population_need = obj.getInt("population_need");
@@ -84,9 +84,9 @@ public class City extends Actor{
             JSONObject buildingINFO = jBuildings.getJSONObject(i);
             Types.BUILDING type = Types.BUILDING.getTypeByKey(buildingINFO.getInt("type"));
             if (type != null && type.isTemple()){
-                buildings.add(new Temple(buildingINFO, cityID));
+                buildings.add(new Temple(buildingINFO, cityID,tc));
             }else{
-                buildings.add(new Building(buildingINFO, cityID));
+                buildings.add(new Building(buildingINFO, cityID, tc));
             }
         }
     }
@@ -214,7 +214,7 @@ public class City extends Actor{
         Tribe tribe = gameState.getTribe(this.tribeId);
 
         //Population added by the base building.
-        if(isBase && isPopulation && !onlyMatching) addPopulation(tribe, multiplier * building.getBonus(gameState.getTribesConfig()), gameState.getTribesConfig());
+        if(isBase && isPopulation && !onlyMatching) addPopulation(tribe, multiplier * building.getBonus(), gameState.getTribesConfig());
 
         //Check all buildings next to the new building position.
         for(Vector2d adjPosition : building.position.neighborhood(1, 0, board.getSize()))
@@ -239,7 +239,7 @@ public class City extends Actor{
                 }else return; //This may happen if the building belongs to a city from another tribe.
 
                 if(existingBuilding != null) {
-                    bonusToAdd = isBase ? existingBuilding.getBonus(gameState.getTribesConfig()) : building.getBonus(gameState.getTribesConfig());
+                    bonusToAdd = isBase ? existingBuilding.getBonus() : building.getBonus();
 
                     if (isPopulation)
                         cityToAddTo.addPopulation(tribe, bonusToAdd * multiplier, gameState.getTribesConfig());

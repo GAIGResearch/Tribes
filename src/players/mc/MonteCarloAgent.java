@@ -126,7 +126,7 @@ public class MonteCarloAgent extends Agent {
     {
         GameState gsCopy = copyGameState(gs);
         if(changeFM)
-            gsCopy.changeTribesConfig(0.1);
+            gsCopy.changeTribesConfig(0.1, seed);
         boolean end = false;
         int step = 0;
         int turnEndCountDown = params.FORCE_TURN_END; // We force an EndTurn action every FORCE_TURN_END actions in the rollout.

@@ -362,7 +362,7 @@ public class City extends Actor{
      * @return a copy of this city.
      */
     public City copy(boolean hideInfo){
-        City c = new City(position.x, position.y, tribeId, tc);
+        City c = new City(position.x, position.y, tribeId, tc.copy());
         c.level = level;
         c.population = hideInfo ? 0 : population;
         c.population_need = population_need;

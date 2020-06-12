@@ -19,7 +19,7 @@ public class Archer extends Unit
 
     @Override
     public Archer copy(boolean hideInfo) {
-        Archer c = new Archer(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(),tc);
+        Archer c = new Archer(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(),tc.copy());
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

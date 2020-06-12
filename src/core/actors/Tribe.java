@@ -147,7 +147,7 @@ public class Tribe extends Actor {
 
 
     public Tribe copy(boolean hideInfo) {
-        Tribe tribeCopy = new Tribe(this.tribe, tc);
+        Tribe tribeCopy = new Tribe(this.tribe, tc.copy());
         tribeCopy.actorId = this.actorId;
         tribeCopy.tribeId = this.tribeId;
         tribeCopy.stars = hideInfo ? 0 : this.stars;

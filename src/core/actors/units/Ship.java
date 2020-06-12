@@ -30,7 +30,7 @@ public class Ship extends Unit
 
     @Override
     public Ship copy(boolean hideInfo) {
-        Ship c = new Ship(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), tc);
+        Ship c = new Ship(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), tc.copy());
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

@@ -19,7 +19,7 @@ public class SuperUnit extends Unit
 
     @Override
     public SuperUnit copy(boolean hideInfo) {
-        SuperUnit c = new SuperUnit(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), tc);
+        SuperUnit c = new SuperUnit(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(), tc.copy());
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

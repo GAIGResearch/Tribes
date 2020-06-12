@@ -20,7 +20,7 @@ public class Defender extends Unit
 
     @Override
     public Defender copy(boolean hideInfo) {
-        Defender c = new Defender(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(),tc);
+        Defender c = new Defender(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(),tc.copy());
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

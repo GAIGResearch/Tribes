@@ -152,8 +152,8 @@ public class Board {
      * Deep copies the board and returns the copy. It's copied as full not hiding any information
      * @return copy of the current board.
      */
-    public Board copy(TribesConfig tc) {
-        return copy(false, -1, tc);
+    public Board copy() {
+        return copy(false, -1);
     }
 
     /**
@@ -162,7 +162,7 @@ public class Board {
      * @param playerId if partialObs is true, id of the player who will receive this copy.
      * @return a copy of the board
      */
-    public Board copy(boolean partialObs, int playerId, TribesConfig tc) {
+    public Board copy(boolean partialObs, int playerId) {
         Board copyBoard = new Board();
         copyBoard.size = this.size;
         copyBoard.tribes = new Tribe[this.tribes.length];
@@ -814,7 +814,7 @@ public class Board {
         tribes[c.getTribeId()].addCity(c.getActorId());
 
         //cities provide visibility, which needs updating
-        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, tc.NEW_CITY_CLEAR_RANGE, r, this.copy(tc));
+        tribes[c.getTribeId()].clearView(c.getPosition().x, c.getPosition().y, tc.NEW_CITY_CLEAR_RANGE, r, this.copy());
 
         //By default, cities are considered to be roads for trade network purposes.
         tradeNetwork.setTradeNetwork(this, c.getPosition().x, c.getPosition().y, true, tc);

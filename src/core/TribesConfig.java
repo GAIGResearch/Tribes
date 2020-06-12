@@ -441,6 +441,228 @@ public class TribesConfig
         }
     }
 
+    //TODO: Copy method
+
+    public TribesConfig copy(){
+        TribesConfig tc = new TribesConfig();
+        /* UNITS */
+
+        // Warrior
+        tc.WARRIOR_ATTACK = WARRIOR_ATTACK;
+        tc.WARRIOR_DEFENCE = WARRIOR_DEFENCE;
+        tc.WARRIOR_MOVEMENT = WARRIOR_MOVEMENT;
+        tc.WARRIOR_MAX_HP = WARRIOR_MAX_HP;
+        tc.WARRIOR_RANGE = WARRIOR_RANGE;
+        tc.WARRIOR_COST = WARRIOR_COST;
+        tc.WARRIOR_POINTS = WARRIOR_POINTS;
+
+        //Archer
+        tc.ARCHER_ATTACK = ARCHER_ATTACK;
+        tc.ARCHER_DEFENCE = ARCHER_DEFENCE;
+        tc.ARCHER_MOVEMENT = ARCHER_MOVEMENT;
+        tc.ARCHER_MAX_HP = ARCHER_MAX_HP;
+        tc.ARCHER_RANGE = ARCHER_RANGE;
+        tc.ARCHER_COST = ARCHER_COST;
+        tc.ARCHER_POINTS = ARCHER_POINTS;
+
+        //Catapult
+        tc.CATAPULT_ATTACK = CATAPULT_ATTACK;
+        tc.CATAPULT_DEFENCE = CATAPULT_DEFENCE;
+        tc.CATAPULT_MOVEMENT = CATAPULT_MOVEMENT;
+        tc.CATAPULT_MAX_HP = CATAPULT_MAX_HP;
+        tc.CATAPULT_RANGE = CATAPULT_RANGE;
+        tc.CATAPULT_COST = CATAPULT_COST;
+        tc.CATAPULT_POINTS = CATAPULT_POINTS;
+
+        //Swordsman
+        tc.SWORDMAN_ATTACK = SWORDMAN_ATTACK;
+        tc.SWORDMAN_DEFENCE = SWORDMAN_DEFENCE;
+        tc.SWORDMAN_MOVEMENT = SWORDMAN_MOVEMENT;
+        tc.SWORDMAN_MAX_HP = SWORDMAN_MAX_HP;
+        tc.SWORDMAN_RANGE = SWORDMAN_RANGE;
+        tc.SWORDMAN_COST = SWORDMAN_COST;
+        tc.SWORDMAN_POINTS = SWORDMAN_POINTS;
+
+        //MindBender
+        tc.MINDBENDER_ATTACK = MINDBENDER_ATTACK;
+        tc.MINDBENDER_DEFENCE = MINDBENDER_DEFENCE;
+        tc.MINDBENDER_MOVEMENT = MINDBENDER_MOVEMENT;
+        tc.MINDBENDER_MAX_HP = MINDBENDER_MAX_HP;
+        tc.MINDBENDER_RANGE = MINDBENDER_RANGE;
+        tc.MINDBENDER_COST = MINDBENDER_COST;
+        tc.MINDBENDER_HEAL = MINDBENDER_HEAL;
+        tc.MINDBENDER_POINTS = MINDBENDER_POINTS;
+
+        //Defender
+        tc.DEFENDER_ATTACK = DEFENDER_ATTACK;
+        tc.DEFENDER_DEFENCE = DEFENDER_DEFENCE;
+        tc.DEFENDER_MOVEMENT = DEFENDER_MOVEMENT;
+        tc.DEFENDER_MAX_HP = DEFENDER_MAX_HP;
+        tc.DEFENDER_RANGE = DEFENDER_RANGE;
+        tc.DEFENDER_COST = DEFENDER_COST;
+        tc.DEFENDER_POINTS = DEFENDER_POINTS;
+
+        //Knight
+        tc.KNIGHT_ATTACK = KNIGHT_ATTACK;
+        tc.KNIGHT_DEFENCE = KNIGHT_DEFENCE;
+        tc.KNIGHT_MOVEMENT = KNIGHT_MOVEMENT;
+        tc.KNIGHT_MAX_HP = KNIGHT_MAX_HP;
+        tc.KNIGHT_RANGE = KNIGHT_RANGE;
+        tc.KNIGHT_COST = KNIGHT_COST;
+        tc.KNIGHT_POINTS = KNIGHT_POINTS;
+
+        //Rider
+        tc.RIDER_ATTACK = RIDER_ATTACK;
+        tc.RIDER_DEFENCE = RIDER_DEFENCE;
+        tc.RIDER_MOVEMENT = RIDER_MOVEMENT;
+        tc.RIDER_MAX_HP = RIDER_MAX_HP;
+        tc.RIDER_RANGE = RIDER_RANGE;
+        tc.RIDER_COST = RIDER_COST;
+        tc.RIDER_POINTS = RIDER_POINTS;
+
+        // Boat
+        tc.BOAT_ATTACK = BOAT_ATTACK;
+        tc.BOAT_DEFENCE = BOAT_DEFENCE;
+        tc.BOAT_MOVEMENT = BOAT_MOVEMENT;
+        tc.BOAT_RANGE = BOAT_RANGE;
+        tc.BOAT_COST = BOAT_COST;
+        tc.BOAT_POINTS = BOAT_POINTS;
+
+        // Ship
+        tc.SHIP_ATTACK = SHIP_ATTACK;
+        tc.SHIP_DEFENCE = SHIP_DEFENCE;
+        tc.SHIP_MOVEMENT = SHIP_MOVEMENT;
+        tc.SHIP_RANGE = SHIP_RANGE;
+        tc.SHIP_COST = SHIP_COST;
+        tc.SHIP_POINTS = SHIP_POINTS;
+
+        // Battleship
+        tc.BATTLESHIP_ATTACK = BATTLESHIP_ATTACK;
+        tc.BATTLESHIP_DEFENCE = BATTLESHIP_DEFENCE;
+        tc.BATTLESHIP_MOVEMENT = BATTLESHIP_MOVEMENT;
+        tc.BATTLESHIP_RANGE = BATTLESHIP_RANGE;
+        tc.BATTLESHIP_COST = BATTLESHIP_COST;
+        tc.BATTLESHIP_POINTS = BATTLESHIP_POINTS;
+
+        //Superunit
+        tc.SUPERUNIT_ATTACK = 5;
+        tc.SUPERUNIT_DEFENCE = 4;
+        tc.SUPERUNIT_MOVEMENT = 1;
+        tc.SUPERUNIT_MAX_HP = 40;
+        tc.SUPERUNIT_RANGE = 1;
+        tc.SUPERUNIT_COST = 10; //Useful for when unit is disbanded.
+        tc.SUPERUNIT_POINTS = 50;
+
+        //Explorer
+        tc.NUM_STEPS = 15;
+
+        //General Unit constants
+        tc.ATTACK_MODIFIER = 4.5;
+        tc.DEFENCE = 1.5;
+        tc.DEFENCE_IN_WALLS = 4.0;
+        tc.VETERAN_KILLS = 3;
+        tc.VETERAN_PLUS_HP = 5;
+        tc.RECOVER_PLUS_HP = 2;
+        tc.RECOVER_IN_BORDERS_PLUS_HP = 2;
+
+        /* BUILDINGS */
+
+        // Farm
+        tc.FARM_COST = 5;
+        tc.FARM_BONUS = 2;
+        tc.FARM_RES_CONSTRAINT = Types.RESOURCE.CROPS;
+
+        //WindMill
+        tc.WIND_MILL_COST = 5;
+        tc.WIND_MILL_BONUS = 1;
+
+        // LumberHut
+        tc.LUMBER_HUT_COST = 2;
+        tc.LUMBER_HUT_BONUS = 1;
+
+        // SawMill
+        tc.SAW_MILL_COST = 5;
+        tc.SAW_MILL_BONUS = 1;
+
+        //Mine
+        tc.MINE_COST = 5;
+        tc.MINE_BONUS = 2;
+        tc.MINE_RES_CONSTRAINT = Types.RESOURCE.ORE;
+
+        // Forge
+        tc.FORGE_COST = 5;
+        tc.FORGE_BONUS = 2;
+
+        // Port
+        tc.PORT_COST = 10;
+        tc.PORT_BONUS = 2;
+        tc.PORT_TRADE_DISTANCE = 4; //Count includes destination port.
+
+        // Customs House
+        tc.CUSTOMS_COST = 5;
+        tc.CUSTOMS_BONUS = 2;
+
+        //Monuments
+        tc.MONUMENT_BONUS = 3;
+        tc.MONUMENT_POINTS = 400;
+        tc.EMPERORS_TOMB_STARS = 100;
+        tc.GATE_OF_POWER_KILLS = 10;
+        tc.GRAND_BAZAR_CITIES = 5;
+        tc.ALTAR_OF_PEACE_TURNS = 5;
+        tc.PARK_OF_FORTUNE_LEVEL = 5;
+
+
+        // Temple
+        tc.TEMPLE_COST = 20;
+        tc.TEMPLE_FOREST_COST = 15;
+        tc.TEMPLE_BONUS = 1;
+        tc.TEMPLE_TURNS_TO_SCORE = 3;
+        tc.TEMPLE_POINTS = TEMPLE_POINTS;
+
+        //Resources
+        tc.ANIMAL_COST = ANIMAL_COST;
+        tc.FISH_COST = FISH_COST;
+        tc.WHALES_COST = WHALES_COST;
+        tc.FRUIT_COST = FRUIT_COST;
+        tc.ANIMAL_POP = ANIMAL_POP;
+        tc.FISH_POP = FISH_POP;
+        tc.WHALES_STARS = WHALES_STARS;
+        tc.FRUIT_POP = FRUIT_POP;
+
+        // ROAD
+        tc.ROAD_COST = ROAD_COST;
+
+        // City
+        tc.CITY_LEVEL_UP_WORKSHOP_PROD = CITY_LEVEL_UP_WORKSHOP_PROD;
+        tc.CITY_LEVEL_UP_RESOURCES = CITY_LEVEL_UP_RESOURCES;
+        tc.CITY_LEVEL_UP_POP_GROWTH = CITY_LEVEL_UP_POP_GROWTH;
+        tc.CITY_LEVEL_UP_PARK = CITY_LEVEL_UP_PARK;
+        tc.CITY_BORDER_POINTS = CITY_BORDER_POINTS;
+        tc.PROD_CAPITAL_BONUS = PROD_CAPITAL_BONUS;
+        tc.EXPLORER_CLEAR_RANGE = EXPLORER_CLEAR_RANGE;
+        tc.FIRST_CITY_CLEAR_RANGE = FIRST_CITY_CLEAR_RANGE;
+        tc.NEW_CITY_CLEAR_RANGE = NEW_CITY_CLEAR_RANGE;
+        tc.CITY_EXPANSION_TILES = CITY_EXPANSION_TILES;
+        tc.POINTS_PER_POPULATION = POINTS_PER_POPULATION;
+
+        // Research
+        tc.TECH_BASE_COST = TECH_BASE_COST;
+        tc.TECH_DISCOUNT = Types.TECHNOLOGY.PHILOSOPHY;
+        tc.TECH_DISCOUNT_VALUE = TECH_DISCOUNT_VALUE;
+
+        /* TRIBES */
+        tc.INITIAL_STARS = INITIAL_STARS;//1000;
+
+        /* ACTIONS */
+        tc.CLEAR_FOREST_STAR = CLEAR_FOREST_STAR;
+        tc.GROW_FOREST_COST = GROW_FOREST_COST;
+        tc.BURN_FOREST_COST = BURN_FOREST_COST;
+        tc.CLEAR_VIEW_POINTS = CLEAR_VIEW_POINTS;
+
+        return tc;
+
+
+    }
 
     // MAP
     public final int[] DEFAULT_MAP_SIZE = new int[]{-1, 11, 14, 16};

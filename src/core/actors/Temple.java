@@ -84,7 +84,7 @@ public class Temple extends Building
      */
     public Temple copy()
     {
-        Temple t = new Temple(position.x, position.y, type, cityId, tc);
+        Temple t = new Temple(position.x, position.y, type, cityId, tc.copy());
         t.turnsToScore = this.turnsToScore;
         t.level = this.level;
         return t;

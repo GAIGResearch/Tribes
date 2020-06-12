@@ -94,7 +94,7 @@ public class GUI extends JFrame {
 
         infoView = new InfoView(ac,tc);
         panTranslate = new Vector2d(0,0);
-        boardView = new GameView(game, infoView, panTranslate, tc);
+        boardView = new GameView(game, infoView, panTranslate);
 
         // Create frame layout
         GridBagLayout gbl = new GridBagLayout();

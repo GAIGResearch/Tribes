@@ -114,11 +114,12 @@ public class GameState {
         initGameState(lines);
     }
 
-    public void changeTribesConfig(double distance){
+    public void changeTribesConfig(double distance, long seed){
         if(distance ==0)
             return; //do nothing to change tribesconfig
 
 
+        rnd.setSeed(seed);
         //Set warrior values
         if(rnd.nextDouble() <= distance)
             tc.WARRIOR_ATTACK = rnd.nextInt();
@@ -846,10 +847,13 @@ public class GameState {
     {
 //        GameState copy = new GameState(this.rnd, this.gameMode); //use this for a 100% repetition of the game based on random seed and game seed.
         GameState copy = new GameState(new Random(), this.gameMode); //copies of the game state can't have the same random generator.
-        copy.board = board.copy(playerIdx!=-1, playerIdx, tc);
+        copy.board = board.copy(playerIdx!=-1, playerIdx);
         copy.tick = this.tick;
         copy.turnMustEnd = turnMustEnd;
         copy.gameIsOver = gameIsOver;
+        copy.tc = tc.copy();
+        long seed = rnd.nextLong();
+        copy.changeTribesConfig(0.2,seed);
 
         int numTribes = getTribes().length;
         copy.canEndTurn = new boolean[numTribes];

@@ -74,10 +74,10 @@ public class GameView extends JComponent {
     public static Dimension dimension;
     private static double isometricAngle = -45;
 
-    GameView(Game game, InfoView inforView, Vector2d panTranslate, TribesConfig tc)
+    GameView(Game game, InfoView inforView, Vector2d panTranslate)
     {
         this.game = game;
-        this.board = game.getBoard().copy(tc);
+        this.board = game.getBoard().copy();
         this.infoView = inforView;
         this.panTranslate = panTranslate;
 

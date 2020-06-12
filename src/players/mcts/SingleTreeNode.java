@@ -254,8 +254,8 @@ class SingleTreeNode
     {
         if(params.ROLOUTS_ENABLED) {
             GameState rolloutState = state.copy();
-            if(changeFM)
-                rolloutState.changeTribesConfig(0.1);
+            //if(changeFM)
+            //    rolloutState.changeTribesConfig(0.1,seed);
             int thisDepth = this.m_depth;
             while (!finishRollout(rolloutState, thisDepth)) {
                 EndTurn endTurn = new EndTurn(rolloutState.getActiveTribeID());

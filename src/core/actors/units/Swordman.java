@@ -19,7 +19,7 @@ public class Swordman extends Unit
 
     @Override
     public Swordman copy(boolean hideInfo) {
-        Swordman c = new Swordman(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(),tc);
+        Swordman c = new Swordman(getPosition(), getKills(), isVeteran(), getCityId(), getTribeId(),tc.copy());
         c.setCurrentHP(getCurrentHP());
         c.setMaxHP(getMaxHP());
         c.setActorId(getActorId());

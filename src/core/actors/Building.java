@@ -50,7 +50,7 @@ public class Building {
      */
     public Building copy()
     {
-        return new Building(position.x, position.y, type, cityId, tc);
+        return new Building(position.x, position.y, type, cityId, tc.copy());
     }
 
     /**

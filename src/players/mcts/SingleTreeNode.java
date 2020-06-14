@@ -33,15 +33,14 @@ class SingleTreeNode
 
     private GameState rootState;
     private StateHeuristic rootStateHeuristic;
-    private boolean changeFM;
 
     //From MCTSPlayer
-    SingleTreeNode(MCTSParams p, Random rnd, int num_actions, ArrayList<Action> actions, int playerID, boolean changeFM) {
-        this(p, null, rnd, num_actions, actions, null, playerID, null, null, changeFM);
+    SingleTreeNode(MCTSParams p, Random rnd, int num_actions, ArrayList<Action> actions, int playerID) {
+        this(p, null, rnd, num_actions, actions, null, playerID, null, null);
     }
 
     private SingleTreeNode(MCTSParams p, SingleTreeNode parent, Random rnd, int num_actions,
-                           ArrayList<Action> actions, StateHeuristic sh, int playerID, SingleTreeNode root, GameState state, boolean changeFM) {
+                           ArrayList<Action> actions, StateHeuristic sh, int playerID, SingleTreeNode root, GameState state) {
         this.params = p;
         this.fmCallsCount = 0;
         this.parent = parent;
@@ -59,7 +58,6 @@ class SingleTreeNode
         else {
             m_depth = 0;
         }
-        this.changeFM = changeFM;
 
     }
 
@@ -86,7 +84,7 @@ class SingleTreeNode
 //            System.out.println("------- " + root.actions.size() + " -------");
             ElapsedCpuTimer elapsedTimerIteration = new ElapsedCpuTimer();
             SingleTreeNode selected = treePolicy();
-            double delta = selected.rollOut(changeFM);
+            double delta = selected.rollOut();
             backUp(selected, delta);
             numIters++;
 
@@ -166,7 +164,7 @@ class SingleTreeNode
         ArrayList<Action> availableActions = m_depth == 0 && params.PRIORITIZE_ROOT ? actions : nextState.getAllAvailableActions();
         ArrayList<Action> nextActions = advance(nextState, availableActions.get(bestAction), true);
         SingleTreeNode tn = new SingleTreeNode(params, this, this.m_rnd, nextActions.size(),
-                null, rootStateHeuristic, this.playerID, this.m_depth == 0 ? this : this.root, nextState, changeFM);
+                null, rootStateHeuristic, this.playerID, this.m_depth == 0 ? this : this.root, nextState);
         children[bestAction] = tn;
         return tn;
     }
@@ -250,12 +248,11 @@ class SingleTreeNode
         return selected;
     }
 
-    private double rollOut(boolean changeFM)
+    private double rollOut()
     {
         if(params.ROLOUTS_ENABLED) {
             GameState rolloutState = state.copy();
-            //if(changeFM)
-            //    rolloutState.changeTribesConfig(0.1,seed);
+
             int thisDepth = this.m_depth;
             while (!finishRollout(rolloutState, thisDepth)) {
                 EndTurn endTurn = new EndTurn(rolloutState.getActiveTribeID());

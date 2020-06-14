@@ -51,16 +51,8 @@ public class Tournament {
                 mcparams.PRIORITIZE_ROOT = true;
                 mcparams.ROLLOUT_LENGTH = MAX_LENGTH;
                 mcparams.FORCE_TURN_END = FORCE_TURN_END ? 5 : mcparams.ROLLOUT_LENGTH + 1;
-                return new MonteCarloAgent(agentSeed, mcparams,false);
+                return new MonteCarloAgent(agentSeed, mcparams);
 
-            case BROKENMC:
-                MCParams mcparams2 = new MCParams();
-                mcparams2.stop_type = mcparams2.STOP_FMCALLS;
-                mcparams2.heuristic_method = mcparams2.DIFF_HEURISTIC;
-                mcparams2.PRIORITIZE_ROOT = true;
-                mcparams2.ROLLOUT_LENGTH = MAX_LENGTH;
-                mcparams2.FORCE_TURN_END = FORCE_TURN_END ? 5 : mcparams2.ROLLOUT_LENGTH + 1;
-                return new MonteCarloAgent(agentSeed, mcparams2,true);
             case MCTS:
                 MCTSParams mctsParams = new MCTSParams();
                 mctsParams.stop_type = mctsParams.STOP_FMCALLS;
@@ -69,16 +61,8 @@ public class Tournament {
                 mctsParams.ROLLOUT_LENGTH = MAX_LENGTH;
                 mctsParams.FORCE_TURN_END = FORCE_TURN_END ? 5 : mctsParams.ROLLOUT_LENGTH + 1;
                 mctsParams.ROLOUTS_ENABLED = MCTS_ROLLOUTS;
-                return new MCTSPlayer(agentSeed, mctsParams,false);
-            case BROKENMCTS:
-                MCTSParams mctsParams2 = new MCTSParams();
-                mctsParams2.stop_type = mctsParams2.STOP_FMCALLS;
-                mctsParams2.heuristic_method = mctsParams2.DIFF_HEURISTIC;
-                mctsParams2.PRIORITIZE_ROOT = true;
-                mctsParams2.ROLLOUT_LENGTH = MAX_LENGTH;
-                mctsParams2.FORCE_TURN_END = FORCE_TURN_END ? 5 : mctsParams2.ROLLOUT_LENGTH + 1;
-                mctsParams2.ROLOUTS_ENABLED = MCTS_ROLLOUTS;
-                return new MCTSPlayer(agentSeed, mctsParams2,true);
+                return new MCTSPlayer(agentSeed, mctsParams);
+
             case OEP:
                 OEPParams oepParams = new OEPParams();
                 return new OEPAgent(agentSeed, oepParams);
@@ -120,7 +104,7 @@ public class Tournament {
         int nRepetitions = 4;
         if(args.length == 0)
         {
-            t.setPlayers(new PlayerType[]{PlayerType.MC, PlayerType.BROKENMC});
+            t.setPlayers(new PlayerType[]{PlayerType.MC, PlayerType.MC});
             t.setTribes(new Types.TRIBE[]{XIN_XI, IMPERIUS});
         }else
         {

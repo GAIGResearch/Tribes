@@ -118,33 +118,33 @@ public class GameState {
         if(distance ==0)
             return; //do nothing to change tribesconfig
 
-
-        rnd.setSeed(seed);
+        Random random = new Random();
+        random.setSeed(seed);
         //Set warrior values
-        if(rnd.nextDouble() <= distance)
-            tc.WARRIOR_ATTACK = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.WARRIOR_DEFENCE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.WARRIOR_MOVEMENT = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.WARRIOR_MAX_HP = rnd.nextInt();;
-//        if(rnd.nextDouble() <= distance)
-//            tc.WARRIOR_RANGE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.WARRIOR_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.WARRIOR_POINTS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.WARRIOR_ATTACK = random.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.WARRIOR_DEFENCE = random.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.WARRIOR_MOVEMENT = random.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.WARRIOR_MAX_HP = random.nextInt();;
+        if(random.nextDouble() <= distance)
+            tc.WARRIOR_RANGE = random.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.WARRIOR_COST = random.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.WARRIOR_POINTS = random.nextInt();
 //
 //        //Set archer values
-//        if(rnd.nextDouble() <= distance)
-//            tc.ARCHER_ATTACK = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.ARCHER_DEFENCE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.ARCHER_MOVEMENT = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.ARCHER_MAX_HP = rnd.nextInt();;
+//        if(random.nextDouble() <= distance)
+//            tc.ARCHER_ATTACK = random.nextInt();
+//        if(random.nextDouble() <= distance)
+//            tc.ARCHER_DEFENCE = random.nextInt();
+//        if(random.nextDouble() <= distance)
+//            tc.ARCHER_MOVEMENT = random.nextInt();
+//        if(random.nextDouble() <= distance)
+//            tc.ARCHER_MAX_HP = random.nextInt();;
 //        if(rnd.nextDouble() <= distance)
 //            tc.ARCHER_RANGE = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)

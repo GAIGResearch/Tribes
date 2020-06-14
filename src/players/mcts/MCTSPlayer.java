@@ -16,18 +16,16 @@ public class MCTSPlayer extends Agent {
 
     private Random m_rnd;
     private MCTSParams params;
-    private boolean changeFM;
 
-    public MCTSPlayer(long seed, boolean changeFM)
+    public MCTSPlayer(long seed)
     {
         super(seed);
         m_rnd = new Random(seed);
         this.params = new MCTSParams();
-        this.changeFM = changeFM;
     }
 
-    public MCTSPlayer(long seed, MCTSParams params, boolean changeFM) {
-        this(seed, changeFM);
+    public MCTSPlayer(long seed, MCTSParams params) {
+        this(seed);
         this.params = params;
     }
 
@@ -42,7 +40,7 @@ public class MCTSPlayer extends Agent {
         if(rootActions == null)
             return new EndTurn();
 
-        SingleTreeNode m_root = new SingleTreeNode(params, m_rnd, rootActions.size(), rootActions, this.playerID, changeFM);
+        SingleTreeNode m_root = new SingleTreeNode(params, m_rnd, rootActions.size(), rootActions, this.playerID);
         m_root.setRootGameState(m_root, gs, allPlayerIDs);
 
         m_root.mctsSearch(ect);
@@ -51,9 +49,6 @@ public class MCTSPlayer extends Agent {
 
     }
 
-    public boolean isChangeFM(){
-        return changeFM;
-    }
 
 
     @Override

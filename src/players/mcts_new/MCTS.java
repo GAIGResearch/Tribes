@@ -31,52 +31,43 @@ public class MCTS {
         this.rootStateHeuristic = params.getHeuristic(playerID, allIDs);
         root = new TreeNode(actions, rootState.copy(), playerID, params);
 
-        System.out.println("----------------------------------");
-        expand(root);
-        expand(root);
-        System.out.println(root.toString());
-        expand(root.getExploredNodes().get(0));
-        expand(root.getExploredNodes().get(1));
-
-        root.setnVisits(5);
-        root.getExploredNodes().get(0).setnVisits(3);
-        root.getExploredNodes().get(1).setnVisits(2);
-        uct(root);
-
-        System.out.println(root.getExploredNodes().get(0));
-        System.out.println(root.getExploredNodes().get(1));
     }
 
     public void search(ElapsedCpuTimer ect){
 
         double avgTimeTaken;
         double acumTimeTaken = 0;
-        long remaining;
+        long remaining = 0;
         int numIters = 0;
 
         int remainingLimit = 5;
         boolean stop = false;
 
-        while(!stop){
+        while(numIters < 500){
+
             ElapsedCpuTimer elapsedTimerIteration = new ElapsedCpuTimer();
             TreeNode selected = treePolicy();
             double delta = rollOut(selected);
-//            backUp(selected, delta);
+            backUp(selected, delta);
             numIters++;
 
-            //Stopping condition
-            if(params.stop_type == params.STOP_TIME) {
-                acumTimeTaken += (elapsedTimerIteration.elapsedMillis()) ;
-                avgTimeTaken  = acumTimeTaken/numIters;
-                remaining = ect.remainingTimeMillis();
-                stop = remaining <= 2 * avgTimeTaken || remaining <= remainingLimit;
-            }else if(params.stop_type == params.STOP_ITERATIONS) {
-                stop = numIters >= params.num_iterations;
-            }else if(params.stop_type == params.STOP_FMCALLS)
-            {
-                stop = fmCallsCount > params.num_fmcalls;
-            }
+//            //Stopping condition
+//            if(params.stop_type == params.STOP_TIME) {
+//                acumTimeTaken += (elapsedTimerIteration.elapsedMillis()) ;
+//                avgTimeTaken  = acumTimeTaken/numIters;
+//                remaining = ect.remainingTimeMillis();
+//                stop = remaining <= 2 * avgTimeTaken || remaining <= remainingLimit;
+//            }else if(params.stop_type == params.STOP_ITERATIONS) {
+//                stop = numIters >= params.num_iterations;
+//            }else if(params.stop_type == params.STOP_FMCALLS)
+//            {
+//                stop = fmCallsCount > params.num_fmcalls;
+//            }
         }
+    }
+
+    public Action mostVisitedAction(){
+        return root.mostVisitedAction();
     }
 
     private TreeNode treePolicy() {
@@ -103,14 +94,180 @@ public class MCTS {
 
     private TreeNode uct(TreeNode currentNode){
 
-        Collections.sort(currentNode.getExploredNodes());
-        return currentNode.getExploredNodes().get(0);
+        TreeNode bestNode = currentNode.getExploredNodes().get(0);
+        if (currentNode.isMyTurn()){
+            for (TreeNode t : currentNode.getExploredNodes()){
+                if (t.uctValue() > bestNode.uctValue()){
+                    bestNode = t;
+                }
+            }
+        }else{
+            for (TreeNode t : currentNode.getExploredNodes()){
+                if (t.uctValue() < bestNode.uctValue()){
+                    bestNode = t;
+                }
+            }
+        }
+
+        return bestNode;
 
     }
 
     private double rollOut(TreeNode currentNode){
+        GameState simulation_state = currentNode.getGameState().copy();
 
-        return 0;
+        int simulation_time = 0;
+        while (!simulation_state.isGameOver() && simulation_time++ < params.ROLLOUT_LENGTH){
+            ArrayList<Action> allAvailableActions = simulation_state.getAllAvailableActions();
+            simulation_state.advance(allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size())), true);
+        }
+        return normalise(rootStateHeuristic.evaluateState(rootState, simulation_state), 0, 1);
+    }
+
+    private void backUp(TreeNode node, double result)
+    {
+        TreeNode n = node;
+        while(n != null)
+        {
+            n.setnVisits(n.getnVisits() + 1);
+            n.setTotValue(n.getTotValue() + result);
+
+            if (result < bounds[0]) {
+                bounds[0] = result;
+            }
+            if (result > bounds[1]) {
+                bounds[1] = result;
+            }
+
+            n = n.getParent();
+        }
+    }
+
+    private double normalise(double a_value, double a_min, double a_max)
+    {
+        if(a_min < a_max)
+            return (a_value - a_min)/(a_max - a_min);
+        else    // if bounds are invalid, then return same value
+            return a_value;
+    }
+
+    @Override
+    public String toString() {
+        System.out.println("--------------------------------------------------");
+        System.out.println(traversePreOrder());
+        return "";
+    }
+
+    // Print the Tree Structure
+    public String traversePreOrder() {
+
+        if(root == null){
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(root.toString());
+
+        String pointEnd = "└──";
+        String point = "├──";
+
+        int count = 0;
+        Collections.sort(root.getExploredNodes());
+        for (TreeNode child: root.getExploredNodes()) {
+            if (root.getUnexploredNodes().size() + root.getInvalidNodes().size() > 0){
+                traverseNodes(sb, "", point, child, true);
+            }else{
+                if (count == root.getExploredNodes().size() - 1){
+                    traverseNodes(sb, "", pointEnd, child, false);
+                }else{
+                    traverseNodes(sb, "", point, child, true);
+                }
+                count++;
+            }
+
+        }
+
+        count = 0;
+        for (TreeNode child: root.getUnexploredNodes()) {
+            if (root.getInvalidNodes().size() > 0){
+                traverseNodes(sb, "", point, child, true);
+            }else{
+                if (count == root.getUnexploredNodes().size() - 1){
+                    traverseNodes(sb, "", pointEnd, child, false);
+                }else{
+                    traverseNodes(sb, "", point, child, true);
+                }
+                count++;
+            }
+        }
+        for (TreeNode child: root.getInvalidNodes()) {
+            if (count == root.getInvalidNodes().size() - 1){
+                traverseNodes(sb, "", pointEnd, child, false);
+            }else{
+                traverseNodes(sb, "", point, child, true);
+            }
+            count++;
+        }
+
+        return sb.toString();
+    }
+
+    public void traverseNodes(StringBuilder sb, String padding, String pointer, TreeNode node, boolean hasRightSibling) {
+        if (node != null) {
+            sb.append("\n");
+            sb.append(padding);
+            sb.append(pointer);
+            sb.append(node.toString());
+
+            StringBuilder paddingBuilder = new StringBuilder(padding);
+            if (hasRightSibling) {
+                paddingBuilder.append("│  ");
+            } else {
+                paddingBuilder.append("   ");
+            }
+
+            String paddingForBoth = paddingBuilder.toString();
+            String pointEnd = "└──";
+            String point = "├──";
+
+            Collections.sort(node.getExploredNodes());
+            int count = 0;
+            for (TreeNode child: node.getExploredNodes()) {
+                if (node.getUnexploredNodes().size() + node.getInvalidNodes().size() > 0){
+                    traverseNodes(sb, paddingForBoth, point, child, true);
+                }else{
+                    if (count == node.getExploredNodes().size() - 1){
+                        traverseNodes(sb, paddingForBoth, pointEnd, child, false);
+                    }else{
+                        traverseNodes(sb, paddingForBoth, point, child, true);
+                    }
+                    count++;
+                }
+
+            }
+
+            count = 0;
+            for (TreeNode child: node.getUnexploredNodes()) {
+                if (node.getInvalidNodes().size() > 0){
+                    traverseNodes(sb, paddingForBoth, point, child, true);
+                }else{
+                    if (count == node.getUnexploredNodes().size() - 1){
+                        traverseNodes(sb, paddingForBoth, pointEnd, child, false);
+                    }else{
+                        traverseNodes(sb, paddingForBoth, point, child, true);
+                    }
+                    count++;
+                }
+            }
+            for (TreeNode child: node.getInvalidNodes()) {
+                if (count == node.getInvalidNodes().size() - 1){
+                    traverseNodes(sb, paddingForBoth, pointEnd, child, false);
+                }else{
+                    traverseNodes(sb, paddingForBoth, point, child, true);
+                }
+                count++;
+            }
+        }
     }
 
 }

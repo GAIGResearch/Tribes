@@ -1,6 +1,7 @@
 package players.mcts_new;
 
 import core.actions.Action;
+import core.actions.tribeactions.EndTurn;
 import core.game.GameState;
 import players.mcts.MCTSParams;
 
@@ -163,11 +164,14 @@ public class TreeNode implements Comparable<TreeNode>{
 
     // Check if it is my turn or not
     public boolean isMyTurn(){
+        if (action instanceof EndTurn){
+            return !(gameState.getActiveTribeID() == playerID);
+        }
         return gameState.getActiveTribeID() == playerID;
     }
 
     public double value(){
-        return nVisits > 0 ? totValue/nVisits: 0;
+        return nVisits > 0 ? totValue/nVisits : 0;
     }
 
     public double uctValue(){
@@ -176,6 +180,24 @@ public class TreeNode implements Comparable<TreeNode>{
 
     public ArrayList<TreeNode> getExploredNodes() {
         return exploredNodes;
+    }
+
+    public ArrayList<TreeNode> getUnexploredNodes() {
+        return unexploredNodes;
+    }
+
+    public ArrayList<TreeNode> getInvalidNodes() {
+        return invalidNodes;
+    }
+
+    public Action mostVisitedAction(){
+        TreeNode mostVisitNode = exploredNodes.get(0);
+        for (TreeNode t : exploredNodes){
+            if (t.getnVisits() > mostVisitNode.getnVisits()){
+                mostVisitNode = t;
+            }
+        }
+        return mostVisitNode.getAction();
     }
 
     public void setTotValue(double totValue) {
@@ -208,13 +230,14 @@ public class TreeNode implements Comparable<TreeNode>{
                     ", invalidNodes: " + invalidNodes.size() +
                     "}";
         }else{
-            return action.toString() + "["+ nodeStatus +"]{" +
+            return action.toString() + "["+ nodeStatus +"]"+ (isMyTurn() ? "":"[EnemyTurn]") +"{" +
                     "depth: " + depth +
                     ", total_actions: " + totalAction() +
                     ", exploredNodes: " + exploredNodes.size() +
                     ", unexploredNodes: " + unexploredNodes.size() +
                     ", invalidNodes: " + invalidNodes.size() +
                     ", visited_time: " + nVisits +
+                    ", value: " + value() +
                     ", UCT_value: " + uctValue() +
                     "}";
         }

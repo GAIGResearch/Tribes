@@ -43,7 +43,7 @@ public class MCTS {
         int remainingLimit = 5;
         boolean stop = false;
 
-        while(numIters < 500){
+        while(!stop){
 
             ElapsedCpuTimer elapsedTimerIteration = new ElapsedCpuTimer();
             TreeNode selected = treePolicy();
@@ -51,18 +51,18 @@ public class MCTS {
             backUp(selected, delta);
             numIters++;
 
-//            //Stopping condition
-//            if(params.stop_type == params.STOP_TIME) {
-//                acumTimeTaken += (elapsedTimerIteration.elapsedMillis()) ;
-//                avgTimeTaken  = acumTimeTaken/numIters;
-//                remaining = ect.remainingTimeMillis();
-//                stop = remaining <= 2 * avgTimeTaken || remaining <= remainingLimit;
-//            }else if(params.stop_type == params.STOP_ITERATIONS) {
-//                stop = numIters >= params.num_iterations;
-//            }else if(params.stop_type == params.STOP_FMCALLS)
-//            {
-//                stop = fmCallsCount > params.num_fmcalls;
-//            }
+            //Stopping condition
+            if(params.stop_type == params.STOP_TIME) {
+                acumTimeTaken += (elapsedTimerIteration.elapsedMillis()) ;
+                avgTimeTaken  = acumTimeTaken/numIters;
+                remaining = ect.remainingTimeMillis();
+                stop = remaining <= 2 * avgTimeTaken || remaining <= remainingLimit;
+            }else if(params.stop_type == params.STOP_ITERATIONS) {
+                stop = numIters >= params.num_iterations;
+            }else if(params.stop_type == params.STOP_FMCALLS)
+            {
+                stop = fmCallsCount > params.num_fmcalls;
+            }
         }
     }
 
@@ -76,6 +76,7 @@ public class MCTS {
 
         while (!currentNode.getGameState().isGameOver() && currentNode.getDepth() < params.ROLLOUT_LENGTH) {
             if (currentNode.isExpandable()) {
+
                 return expand(currentNode);
             } else {
                 currentNode = uct(currentNode);
@@ -87,7 +88,7 @@ public class MCTS {
 
     private TreeNode expand(TreeNode currentNode){
         if (currentNode.totalAction() == 0){
-            currentNode.action2Node();
+            fmCallsCount += currentNode.action2Node();
         }
         return currentNode.explore(m_rnd.nextInt(currentNode.getUnexploredNodeNum()));
     }
@@ -115,12 +116,23 @@ public class MCTS {
 
     private double rollOut(TreeNode currentNode){
         GameState simulation_state = currentNode.getGameState().copy();
-
-        int simulation_time = 0;
-        while (!simulation_state.isGameOver() && simulation_time++ < params.ROLLOUT_LENGTH){
-            ArrayList<Action> allAvailableActions = simulation_state.getAllAvailableActions();
-            simulation_state.advance(allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size())), true);
+        for (int i=currentNode.getDepth(); i<params.ROLLOUT_LENGTH; i++){
+            if (!simulation_state.isGameOver()){
+                ArrayList<Action> allAvailableActions = simulation_state.getAllAvailableActions();
+                simulation_state.advance(allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size())), true);
+                fmCallsCount += 1;
+            }else{
+                break;
+            }
         }
+
+//        int simulation_time = 0;
+//        while (!simulation_state.isGameOver() && simulation_time++ < params.ROLLOUT_LENGTH){
+//            ArrayList<Action> allAvailableActions = simulation_state.getAllAvailableActions();
+//            simulation_state.advance(allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size())), true);
+//            fmCallsCount += 1;
+//        }
+
         return normalise(rootStateHeuristic.evaluateState(rootState, simulation_state), 0, 1);
     }
 

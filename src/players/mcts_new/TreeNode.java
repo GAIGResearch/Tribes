@@ -45,17 +45,17 @@ public class TreeNode implements Comparable<TreeNode>{
         this.playerID = playerID;
         this.gameState = gameState;
         this.params = params;
-        action2Node(actions);
     }
 
 
 
     // Transfer action to node and classify it to unexplored or invalid node
-    public void action2Node(){
-        action2Node(gameState.getAllAvailableActions());
+    public int action2Node(){
+        return action2Node(gameState.getAllAvailableActions());
     }
 
-    public void action2Node(ArrayList<Action> actions){
+    public int action2Node(ArrayList<Action> actions){
+        int fm_call = 0;
         for (Action action: actions) {
             TreeNode node = new TreeNode();
             node.setAction(action);
@@ -66,6 +66,7 @@ public class TreeNode implements Comparable<TreeNode>{
                 node.is_legal = true;
                 GameState child_gs = gameState.copy();
                 child_gs.advance(action, true);
+                fm_call += 1;
                 node.setGameState(child_gs);
                 node.setParams(params);
                 unexploredNodes.add(node);
@@ -74,6 +75,7 @@ public class TreeNode implements Comparable<TreeNode>{
                 invalidNodes.add(node);
             }
         }
+        return fm_call;
     }
 
     // Explore node

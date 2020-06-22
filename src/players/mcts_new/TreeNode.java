@@ -6,6 +6,7 @@ import core.game.GameState;
 import players.mcts.MCTSParams;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class TreeNode implements Comparable<TreeNode>{
 
@@ -17,6 +18,7 @@ public class TreeNode implements Comparable<TreeNode>{
 
     private Action action;
     private GameState gameState;
+    private ArrayList<Action> rootActions = new ArrayList<>();
     private ArrayList<TreeNode> exploredNodes = new ArrayList<>();
     private ArrayList<TreeNode> unexploredNodes  = new ArrayList<>();
     private ArrayList<TreeNode> invalidNodes  = new ArrayList<>();
@@ -45,12 +47,16 @@ public class TreeNode implements Comparable<TreeNode>{
         this.playerID = playerID;
         this.gameState = gameState;
         this.params = params;
+        rootActions = actions;
     }
 
 
 
     // Transfer action to node and classify it to unexplored or invalid node
     public int action2Node(){
+        if (is_root && params.PRIORITIZE_ROOT){
+            return action2Node(rootActions);
+        }
         return action2Node(gameState.getAllAvailableActions());
     }
 
@@ -166,19 +172,44 @@ public class TreeNode implements Comparable<TreeNode>{
 
     // Check if it is my turn or not
     public boolean isMyTurn(){
-        if (action instanceof EndTurn){
-            return !(gameState.getActiveTribeID() == playerID);
-        }
         return gameState.getActiveTribeID() == playerID;
     }
 
+
     public double value(){
-        return nVisits > 0 ? totValue/nVisits : 0;
+        return totValue / (nVisits + params.epsilon);
     }
 
     public double uctValue(){
-        return value() + (nVisits > 0 ? params.K *  Math.sqrt(Math.log(parent.getnVisits() + 1) / nVisits) : 0);
+        return value() + params.K * Math.sqrt(Math.log(parent.getnVisits() + 1) / (nVisits + params.epsilon));
     }
+
+    public double uctValue(double[] bounds, Random m_rnd){
+        double uctValue = normalise(value(), bounds[0], bounds[1]) +  params.K * Math.sqrt(Math.log(parent.getnVisits() + 1) / (nVisits + params.epsilon));
+        return noise(uctValue, params.epsilon, m_rnd.nextDouble());
+    }
+
+    public double normaliseValue(double[] bounds){
+        return normalise(value(), bounds[0], bounds[1]);
+    }
+
+    public double uctValueWithoutNoise(double[] bounds){
+        return normalise(value(), bounds[0], bounds[1]) +  params.K * Math.sqrt(Math.log(parent.getnVisits() + 1) / (nVisits + params.epsilon));
+    }
+
+    private double noise(double input, double epsilon, double random)
+    {
+        return (input + epsilon) * (1.0 + epsilon * (random - 0.5));
+    }
+
+    private double normalise(double a_value, double a_min, double a_max)
+    {
+        if(a_min < a_max)
+            return (a_value - a_min)/(a_max - a_min);
+        else    // if bounds are invalid, then return same value
+            return a_value;
+    }
+
 
     public ArrayList<TreeNode> getExploredNodes() {
         return exploredNodes;
@@ -192,14 +223,22 @@ public class TreeNode implements Comparable<TreeNode>{
         return invalidNodes;
     }
 
-    public Action mostVisitedAction(){
-        TreeNode mostVisitNode = exploredNodes.get(0);
+    public Action mostVisitedAction(double[] bounds, Random m_rnd){
+        return mostVisitedTreeNode(bounds, m_rnd).getAction();
+    }
+
+    public TreeNode mostVisitedTreeNode(double[] bounds, Random m_rnd){
+        TreeNode mostVisitedNode = exploredNodes.get(0);
         for (TreeNode t : exploredNodes){
-            if (t.getnVisits() > mostVisitNode.getnVisits()){
-                mostVisitNode = t;
+            if (t.getnVisits() > mostVisitedNode.getnVisits()){
+                mostVisitedNode = t;
+            }else if(t.getnVisits() == mostVisitedNode.getnVisits()){
+                if (t.uctValue(bounds, m_rnd) >  mostVisitedNode.uctValue(bounds, m_rnd)){
+                    mostVisitedNode = t;
+                }
             }
         }
-        return mostVisitNode.getAction();
+        return mostVisitedNode;
     }
 
     public void setTotValue(double totValue) {

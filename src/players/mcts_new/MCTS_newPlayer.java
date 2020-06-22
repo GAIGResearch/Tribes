@@ -42,6 +42,7 @@ public class MCTS_newPlayer extends Agent {
 
         MCTS mcts = new MCTS(params, playerID, gs.copy(), m_rnd, allPlayerIDs, rootActions);
         mcts.search(ect);
+
         return mcts.mostVisitedAction();
 
     }

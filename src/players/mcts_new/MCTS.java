@@ -4,6 +4,7 @@ import core.actions.Action;
 import core.game.GameState;
 import players.heuristics.StateHeuristic;
 import players.mcts.MCTSParams;
+import sun.reflect.generics.tree.Tree;
 import utils.ElapsedCpuTimer;
 
 import java.util.ArrayList;
@@ -16,6 +17,12 @@ public class MCTS {
     private int playerID;
     private Random m_rnd;
     private int fmCallsCount;
+
+//    Statistic Parameter
+    private int numIters = 0;
+    private int depth;
+    private int invalidActions = 0;
+    private int numNodes = 1;
 
     private double[] bounds = new double[]{Double.MAX_VALUE, -Double.MAX_VALUE};
 
@@ -38,7 +45,7 @@ public class MCTS {
         double avgTimeTaken;
         double acumTimeTaken = 0;
         long remaining = 0;
-        int numIters = 0;
+        numIters = 0;
 
         int remainingLimit = 5;
         boolean stop = false;
@@ -67,7 +74,9 @@ public class MCTS {
     }
 
     public Action mostVisitedAction(){
-        return root.mostVisitedAction();
+        TreeNode mostVisitedNode = root.mostVisitedTreeNode(bounds, m_rnd);
+        report(mostVisitedNode);
+        return mostVisitedNode.getAction();
     }
 
     private TreeNode treePolicy() {
@@ -76,7 +85,6 @@ public class MCTS {
 
         while (!currentNode.getGameState().isGameOver() && currentNode.getDepth() < params.ROLLOUT_LENGTH) {
             if (currentNode.isExpandable()) {
-
                 return expand(currentNode);
             } else {
                 currentNode = uct(currentNode);
@@ -88,9 +96,32 @@ public class MCTS {
 
     private TreeNode expand(TreeNode currentNode){
         if (currentNode.totalAction() == 0){
-            fmCallsCount += currentNode.action2Node();
+            int newChildrenNum = currentNode.action2Node();
+            fmCallsCount += newChildrenNum;
+            numNodes += newChildrenNum;
+            if (currentNode.getInvalidNodes().size() > 0){
+                invalidActions += currentNode.getInvalidNodes().size();
+            }
         }
-        return currentNode.explore(m_rnd.nextInt(currentNode.getUnexploredNodeNum()));
+
+        double bestValue = -1;
+        int bestIndex = 0;
+
+        for (int i = 0; i < currentNode.getUnexploredNodes().size(); i++) {
+            double x = m_rnd.nextDouble();
+            if (x > bestValue) {
+                bestValue = x;
+                bestIndex = i;
+            }
+        }
+
+        TreeNode exploredNode = currentNode.explore(bestIndex);
+
+        if (exploredNode.getDepth() > depth){
+            depth = exploredNode.getDepth();
+        }
+
+        return exploredNode;
     }
 
     private TreeNode uct(TreeNode currentNode){
@@ -98,25 +129,26 @@ public class MCTS {
         TreeNode bestNode = currentNode.getExploredNodes().get(0);
         if (currentNode.isMyTurn()){
             for (TreeNode t : currentNode.getExploredNodes()){
-                if (t.uctValue() > bestNode.uctValue()){
+                if (t.uctValue(bounds, m_rnd) > bestNode.uctValue(bounds, m_rnd)){
                     bestNode = t;
                 }
             }
         }else{
             for (TreeNode t : currentNode.getExploredNodes()){
-                if (t.uctValue() < bestNode.uctValue()){
+                if (t.uctValue(bounds, m_rnd) < bestNode.uctValue(bounds, m_rnd)){
                     bestNode = t;
                 }
             }
         }
 
-        return bestNode;
+        fmCallsCount++;
 
+        return bestNode;
     }
 
     private double rollOut(TreeNode currentNode){
         GameState simulation_state = currentNode.getGameState().copy();
-        for (int i=currentNode.getDepth(); i<params.ROLLOUT_LENGTH; i++){
+        for (int i=currentNode.getDepth(); i < params.ROLLOUT_LENGTH; i++){
             if (!simulation_state.isGameOver()){
                 ArrayList<Action> allAvailableActions = simulation_state.getAllAvailableActions();
                 simulation_state.advance(allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size())), true);
@@ -162,6 +194,27 @@ public class MCTS {
         else    // if bounds are invalid, then return same value
             return a_value;
     }
+
+    public void report(TreeNode node){
+        System.out.println("--------------------------------------");
+        System.out.println("Turn: " + rootState.getTick());
+        System.out.println("Iteration: " + numIters);
+        System.out.println("Root Action Number: " + root.totalAction());
+        System.out.println("Root Node expandable: " + root.isExpandable());
+        System.out.println("Root Node explored actions: " + root.getExploredNodes().size());
+        System.out.println("Root Node unexplored actions: " + root.getUnexploredNodes().size());
+        System.out.println("Depth of Tree: " + depth);
+        System.out.println("Total Nodes of Tree: " + numNodes);
+
+        System.out.println("Best Action: " + node.getAction());
+        System.out.println("Best Action Node expandable: " + node.isExpandable());
+        System.out.println("Best Action Node visited time: " + node.getnVisits());
+        System.out.println("Best Action Node explored actions: " + node.getExploredNodes().size());
+        System.out.println("Best Action Node unexplored actions: " + node.getUnexploredNodes().size());
+        System.out.println("Best Action Value (Normalised): " + node.normaliseValue(bounds));
+        System.out.println("Best Action UCT Value (Without Noise): " + node.uctValueWithoutNoise(bounds));
+    }
+
 
     @Override
     public String toString() {

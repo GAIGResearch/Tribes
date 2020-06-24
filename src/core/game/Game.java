@@ -233,7 +233,7 @@ public class Game {
             if (!gameOver) {
                 tick(frame);
             } else {
-                frame.update(getGameState(-1), null);
+                frame.update(getGameState(-1,0), null);
             }
         }
     }
@@ -368,7 +368,7 @@ public class Game {
             if (VISUALS && frame != null) {
                 boolean showAllBoard = Constants.GUI_FORCE_FULL_OBS || Constants.PLAY_WITH_FULL_OBS;
 
-                if (showAllBoard) frame.update(getGameState(-1), action);  // Full Obs
+                if (showAllBoard) frame.update(getGameState(-1,0), action);  // Full Obs
                 else frame.update(gameStateObservations[gs.getActiveTribeID()], action);        // Partial Obs
 
                 // Turn should be ending, start timer for delay of next action and show all updates
@@ -505,8 +505,9 @@ public class Game {
     private void updateAssignedGameStates() {
 
         //TODO: Probably we don't need to do this for all players, just the active one.
+        double[] distance ={0.1, 0.4,0,0};
         for (int i = 0; i < numPlayers; i++) {
-            gameStateObservations[i] = getGameState(i);
+            gameStateObservations[i] = getGameState(i,distance[i]);
         }
     }
 
@@ -516,8 +517,10 @@ public class Game {
      * @param playerIdx index of the player for which the game state is generated.
      * @return the game state.
      */
-    private GameState getGameState(int playerIdx) {
-        return gs.copy(playerIdx);
+    private GameState getGameState(int playerIdx, double distance) {
+        //Initial experiments, MCTS1 vs Simple Agent, vs MCTS2 vs Simple Agent
+        //MCTS 1 had distance 0.01, MCTS 2 has distance 0.1 or something
+        return gs.copy(playerIdx, distance);
     }
 
     /**

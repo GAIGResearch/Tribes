@@ -115,27 +115,27 @@ public class GameState {
     }
 
     public void changeTribesConfig(double distance, long seed){
-        if(distance ==0)
+        if(distance ==0d)
             return; //do nothing to change tribesconfig
 
         Random random = new Random();
         random.setSeed(seed);
         //Set warrior values
         if(random.nextDouble() <= distance)
-            tc.WARRIOR_ATTACK = random.nextInt();
+            tc.WARRIOR_ATTACK = random.nextInt(10);
         if(random.nextDouble() <= distance)
-            tc.WARRIOR_DEFENCE = random.nextInt();
+            tc.WARRIOR_DEFENCE = random.nextInt(10);
         if(random.nextDouble() <= distance)
-            tc.WARRIOR_MOVEMENT = random.nextInt();
+            tc.WARRIOR_MOVEMENT = random.nextInt(10);
         if(random.nextDouble() <= distance)
-            tc.WARRIOR_MAX_HP = random.nextInt();;
+            tc.WARRIOR_MAX_HP = random.nextInt(10);;
         if(random.nextDouble() <= distance)
-            tc.WARRIOR_RANGE = random.nextInt();
+            tc.WARRIOR_RANGE = random.nextInt(10);
         if(random.nextDouble() <= distance)
-            tc.WARRIOR_COST = random.nextInt();
+            tc.WARRIOR_COST = random.nextInt(10);
         if(random.nextDouble() <= distance)
-            tc.WARRIOR_POINTS = random.nextInt();
-//
+            tc.WARRIOR_POINTS = random.nextInt(10);
+
 //        //Set archer values
 //        if(random.nextDouble() <= distance)
 //            tc.ARCHER_ATTACK = random.nextInt();
@@ -151,7 +151,7 @@ public class GameState {
 //            tc.ARCHER_COST = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.ARCHER_POINTS = rnd.nextInt();
-//
+
 //        //Set catapult values
 //        if(rnd.nextDouble() <= distance)
 //            tc.CATAPULT_ATTACK = rnd.nextInt();
@@ -167,7 +167,7 @@ public class GameState {
 //            tc.CATAPULT_COST = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.CATAPULT_POINTS = rnd.nextInt();
-//
+
 //        //Set Swordman values
 //        if(rnd.nextDouble() <= distance)
 //            tc.SWORDMAN_ATTACK = rnd.nextInt();
@@ -183,7 +183,7 @@ public class GameState {
 //            tc.SWORDMAN_COST = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.SWORDMAN_POINTS = rnd.nextInt();
-//
+
 //        //Set mindbender values
 //        if(rnd.nextDouble() <= distance)
 //            tc.MINDBENDER_ATTACK = rnd.nextInt();
@@ -199,7 +199,7 @@ public class GameState {
 //            tc.MINDBENDER_COST = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.MINDBENDER_POINTS = rnd.nextInt();
-//
+
 //        //Set defender values
 //        if(rnd.nextDouble() <= distance)
 //            tc.DEFENDER_ATTACK = rnd.nextInt();
@@ -215,7 +215,7 @@ public class GameState {
 //            tc.DEFENDER_COST = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.DEFENDER_POINTS = rnd.nextInt();
-//
+
 //        //Set Knight values
 //        if(rnd.nextDouble() <= distance)
 //            tc.KNIGHT_ATTACK = rnd.nextInt();
@@ -231,7 +231,7 @@ public class GameState {
 //            tc.KNIGHT_COST = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.KNIGHT_POINTS = rnd.nextInt();
-//
+
 //        //Set Rider values
 //        if(rnd.nextDouble() <= distance)
 //            tc.RIDER_ATTACK = rnd.nextInt();
@@ -261,7 +261,7 @@ public class GameState {
 //            tc.BOAT_COST = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.BOAT_POINTS = rnd.nextInt();
-//
+
 //        //Set Ship values
 //        if(rnd.nextDouble() <= distance)
 //            tc.SHIP_ATTACK = rnd.nextInt();
@@ -275,7 +275,7 @@ public class GameState {
 //            tc.SHIP_COST = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.SHIP_POINTS = rnd.nextInt();
-//
+
 //        //Set Battleship values
 //        if(rnd.nextDouble() <= distance)
 //            tc.BATTLESHIP_ATTACK = rnd.nextInt();
@@ -289,7 +289,7 @@ public class GameState {
 //            tc.BATTLESHIP_COST = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.BATTLESHIP_POINTS = rnd.nextInt();
-//
+
 //        //Set Superunit values
 //        if(rnd.nextDouble() <= distance)
 //            tc.SUPERUNIT_ATTACK = rnd.nextInt();
@@ -305,11 +305,11 @@ public class GameState {
 //            tc.SUPERUNIT_COST = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.SUPERUNIT_POINTS = rnd.nextInt();
-//
+
 //        //Explorer
 //        if(rnd.nextDouble() <= distance)
 //            tc.NUM_STEPS = rnd.nextInt();
-//
+
 //        //General Unit constants
 //        if(rnd.nextDouble() <= distance)
 //            tc.ATTACK_MODIFIER =  0 + (10 - 0) * rnd.nextDouble();
@@ -325,9 +325,9 @@ public class GameState {
 //            tc.RECOVER_PLUS_HP = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.RECOVER_IN_BORDERS_PLUS_HP = rnd.nextInt();
-//
+
 //        /* BUILDINGS */
-//
+
 //        // Farm
 //        if(rnd.nextDouble() <= distance)
 //            tc.FARM_COST = rnd.nextInt();
@@ -347,26 +347,26 @@ public class GameState {
 //            tc.LUMBER_HUT_COST = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.LUMBER_HUT_BONUS = rnd.nextInt();
-//
+
 //        // SawMill
 //        if(rnd.nextDouble() <= distance)
 //            tc.SAW_MILL_COST = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.SAW_MILL_BONUS = rnd.nextInt();
-//
+
 //        //Mine
 //        if(rnd.nextDouble() <= distance)
 //            tc.MINE_COST = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.MINE_BONUS = rnd.nextInt();
 //     //   Types.RESOURCE MINE_RES_CONSTRAINT = Types.RESOURCE.ORE;
-//
+
 //        // Forge
 //        if(rnd.nextDouble() <= distance)
 //            tc.FORGE_COST = rnd.nextInt();
 //        if(rnd.nextDouble() <= distance)
 //            tc.FORGE_BONUS = rnd.nextInt();
-//
+
 //        // Port
 //        if(rnd.nextDouble() <= distance)
 //            tc.PORT_COST = rnd.nextInt();
@@ -834,7 +834,7 @@ public class GameState {
      * @return a copy of the current game state.
      */
     public GameState copy() {
-        return copy(-1);  // No reduction happening if no index specified
+        return copy(-1, 0d);  // No reduction happening if no index specified
     }
 
     /**
@@ -843,7 +843,7 @@ public class GameState {
      * @param playerIdx player index that indicates who is this copy for.
      * @return a copy of this game state.
      */
-    public GameState copy(int playerIdx)
+    public GameState copy(int playerIdx, double distance)
     {
 //        GameState copy = new GameState(this.rnd, this.gameMode); //use this for a 100% repetition of the game based on random seed and game seed.
         GameState copy = new GameState(new Random(), this.gameMode); //copies of the game state can't have the same random generator.
@@ -852,8 +852,8 @@ public class GameState {
         copy.turnMustEnd = turnMustEnd;
         copy.gameIsOver = gameIsOver;
         copy.tc = tc.copy();
-        long seed = rnd.nextLong();
-        copy.changeTribesConfig(0.2,seed);
+        long seed = 1860142121111L;
+        copy.changeTribesConfig(distance,seed);
 
         int numTribes = getTribes().length;
         copy.canEndTurn = new boolean[numTribes];

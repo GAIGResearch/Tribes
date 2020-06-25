@@ -131,7 +131,7 @@ public class Attack extends UnitAction
      * @param gs - current game state
      * @return Pair, where first element is the attack power (attackResult) and second is defence power (defenceResult)
      */
-    public Pair<Integer, Integer> getAttackResults(GameState gs) {
+    private Pair<Integer, Integer> getAttackResults(GameState gs) {
         Unit attacker = (Unit) gs.getActor(this.unitId);
         Unit target = (Unit) gs.getActor(this.targetId);
 

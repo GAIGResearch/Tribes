@@ -1,6 +1,7 @@
 package core.game;
 
 import core.Constants;
+import core.FMLearner.NeuralNetwork;
 import core.Types;
 import core.actions.Action;
 import core.actions.tribeactions.EndTurn;
@@ -8,6 +9,7 @@ import core.actions.unitactions.Attack;
 import core.actors.Tribe;
 import players.Agent;
 import players.HumanAgent;
+import players.mc.MonteCarloAgent;
 import utils.*;
 
 import java.util.*;
@@ -39,6 +41,13 @@ public class Game {
 
     // AI stats for each player.
     private AIStats[] aiStats;
+
+    private NeuralNetwork nn;
+
+    ArrayList<Float> warriorDamage_test = new ArrayList<>();
+    ArrayList<Float> warriorCost_test = new ArrayList<>();
+    ArrayList<Float> warriorDamage_train = new ArrayList<>();
+    ArrayList<Float> warriorCost_train = new ArrayList<>();
 
     /**
      * Constructor of the game
@@ -505,10 +514,37 @@ public class Game {
     private void updateAssignedGameStates() {
 
         //TODO: Probably we don't need to do this for all players, just the active one.
-        double[] distance ={0.1, 0.4,0,0};
+        double[] distance ={0.7, 0.4,0,0};
         for (int i = 0; i < numPlayers; i++) {
             gameStateObservations[i] = getGameState(i,distance[i]);
         }
+
+        for (Agent a: players
+             ) {
+
+                warriorCost_train.add( (float) gameStateObservations[a.getPlayerID()].getTribesConfig().WARRIOR_COST);
+                warriorDamage_train.add( (float) gameStateObservations[a.getPlayerID()].getTribesConfig().WARRIOR_ATTACK);
+
+                warriorCost_test.add((float) gs.getTribesConfig().WARRIOR_COST);
+                warriorDamage_test.add((float)gs.getTribesConfig().WARRIOR_ATTACK);
+
+
+        }
+
+        Float[][] trainData = new Float[warriorDamage_train.size()][2];
+        Float[][] testData = new Float[warriorDamage_test.size()][2];
+
+        for(int i =0; i< warriorCost_train.size(); i++){
+                trainData[i][0] = warriorDamage_train.get(i);
+                trainData[i][1]= warriorCost_train.get(i);
+                testData[i][0] = warriorDamage_test.get(i);
+                testData[i][1]= warriorCost_test.get(i);
+        }
+
+        if(warriorDamage_train.size()>100 && warriorCost_train.size()>100)
+            nn = new NeuralNetwork(trainData,testData);
+
+
     }
 
     /**

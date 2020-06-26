@@ -1,14 +1,10 @@
 package players.mc;
 
-import core.FMLearner.FMLearner;
-import core.TechnologyTree;
 import core.Types;
 import core.actions.Action;
-import core.actions.cityactions.Destroy;
 import core.actions.cityactions.Spawn;
 import core.actions.tribeactions.EndTurn;
 import core.actions.unitactions.Attack;
-import core.actions.unitactions.Disband;
 import core.actors.Tribe;
 import core.actors.units.Unit;
 import core.game.GameState;
@@ -28,11 +24,8 @@ public class MonteCarloAgent extends Agent {
     private int lastTurn;
     private int actionTurnCounter;
     private int fmCalls;
-    private ArrayList<Integer> warriorDamage_train;
-    private ArrayList<Integer> warriorCost_train;
-    private ArrayList<Integer> warriorDamage_test;
-    private ArrayList<Integer> warriorCost_test;
-    private FMLearner fmLearner;
+
+   // private FMLearner fmLearner;
 
     public MonteCarloAgent(long seed, MCParams params)
     {
@@ -41,10 +34,9 @@ public class MonteCarloAgent extends Agent {
         this.params = params;
         this.lastTurn = -1;
         this.actionTurnCounter = 0;
-        this.warriorDamage_train = new ArrayList<>();
-        this.warriorCost_train = new ArrayList<>();
-        this.warriorDamage_test = new ArrayList<>();
-        this.warriorCost_test = new ArrayList<>();
+
+
+        //fmLearner = new FMLearner();
     }
 
     @Override
@@ -196,17 +188,6 @@ public class MonteCarloAgent extends Agent {
                         int actIdx = m_rnd.nextInt(numActions);
                         act = allActions.get(actIdx);
                         //Gather train data for forward model learner
-                        if(act instanceof Attack){
-                            Unit attacker = (Unit) gsCopy.getActor(((Attack) act).getUnitId());
-
-                            if(attacker.getType() == Types.UNIT.WARRIOR){
-                                warriorDamage_train.add(((Attack) act).getAttackResults(gsCopy).getFirst());
-                            }
-                        }else if(act instanceof Spawn){
-                            if(((Spawn) act).getUnitType() == Types.UNIT.WARRIOR){
-                                warriorCost_train.add(Types.UNIT.WARRIOR.getCost());
-                            }
-                        }
 
                     }  while(act instanceof EndTurn);
                 }
@@ -259,4 +240,6 @@ public class MonteCarloAgent extends Agent {
     public Agent copy() {
         return null; //not needed.
     }
+
+
 }

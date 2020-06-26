@@ -10,6 +10,8 @@ import java.util.Random;
 
 public class TreeNode implements Comparable<TreeNode>{
 
+    private boolean is_prune = false;
+
     private boolean is_root;
     private boolean is_legal;
     private int depth;
@@ -90,6 +92,40 @@ public class TreeNode implements Comparable<TreeNode>{
         exploredNodes.add(exploreNode);
         unexploredNodes.remove(index);
         return exploreNode;
+    }
+
+    // Sort based on value
+    public void sort(){
+        for (int i=0; i<exploredNodes.size(); i++){
+            double value = exploredNodes.get(i).value();
+            int index = i;
+            for (int j=i+1; j<exploredNodes.size(); j++){
+                if (isMyTurn()){
+                    if (exploredNodes.get(j).value() > value){
+                        value = exploredNodes.get(j).value();
+                        index = j;
+                    }
+                }else{
+                    if (exploredNodes.get(j).value() < value){
+                        value = exploredNodes.get(j).value();
+                        index = j;
+                    }
+                }
+            }
+
+            TreeNode temp = exploredNodes.get(i);
+            exploredNodes.set(i, exploredNodes.get(index));
+            exploredNodes.set(index, temp);
+        }
+    }
+
+    public void prune(int amount){
+        while (getExploredNodes().size() > amount){
+            invalidNodes.add(getExploredNodes().remove(getExploredNodes().size()-1));
+        }
+        // Clear unexploredNodes
+        invalidNodes.addAll(unexploredNodes);
+        unexploredNodes = new ArrayList<>();
     }
 
     public int getUnexploredNodeNum(){
@@ -247,6 +283,14 @@ public class TreeNode implements Comparable<TreeNode>{
 
     public void setnVisits(int nVisits) {
         this.nVisits = nVisits;
+    }
+
+    public boolean isIs_prune() {
+        return is_prune;
+    }
+
+    public void setIs_prune(boolean is_prune) {
+        this.is_prune = is_prune;
     }
 
     @Override

@@ -4,7 +4,6 @@ import core.actions.Action;
 import core.game.GameState;
 import players.heuristics.StateHeuristic;
 import players.mcts.MCTSParams;
-import sun.reflect.generics.tree.Tree;
 import utils.ElapsedCpuTimer;
 
 import java.util.ArrayList;
@@ -18,10 +17,21 @@ public class MCTS {
     private Random m_rnd;
     private int fmCallsCount;
 
+    // Prune Parameter
+    private boolean prune_enabled = true;
+    private boolean pruning_flexible = true;
+    private int visitedLimit = 20;
+    private int remainingNode = 5;
+    private int remainingNodeMinimum = 5;
+    private double remainingRatio = 0.1;
+    private boolean prune_visitAll = false;
+
+    // Rollout
+    private boolean rollout_strategy = true;
+
 //    Statistic Parameter
     private int numIters = 0;
     private int depth;
-    private int invalidActions = 0;
     private int numNodes = 1;
 
     private double[] bounds = new double[]{Double.MAX_VALUE, -Double.MAX_VALUE};
@@ -74,8 +84,10 @@ public class MCTS {
     }
 
     public Action mostVisitedAction(){
+
         TreeNode mostVisitedNode = root.mostVisitedTreeNode(bounds, m_rnd);
         report(mostVisitedNode);
+
         return mostVisitedNode.getAction();
     }
 
@@ -84,6 +96,30 @@ public class MCTS {
         TreeNode currentNode = root;
 
         while (!currentNode.getGameState().isGameOver() && currentNode.getDepth() < params.ROLLOUT_LENGTH) {
+
+            // Pruning
+            if (prune_visitAll) {
+                if (prune_enabled && !currentNode.isIs_prune() && currentNode.getUnexploredNodes().size() == 0 && currentNode.getnVisits() > visitedLimit) {
+                    currentNode.sort();
+                    if (pruning_flexible) {
+                        remainingNode = (int) (currentNode.totalAction() * remainingRatio);
+                        remainingNode = remainingNode > 5 ? remainingNode : remainingNodeMinimum;
+                    }
+                    currentNode.prune(remainingNode);
+                    currentNode.setIs_prune(true);
+                }
+            }else{
+                if (prune_enabled && !currentNode.isIs_prune() && currentNode.getnVisits() > visitedLimit) {
+                    currentNode.sort();
+                    if (pruning_flexible) {
+                        remainingNode = (int) (currentNode.totalAction() * remainingRatio);
+                        remainingNode = remainingNode > 5 ? remainingNode : remainingNodeMinimum;
+                    }
+                    currentNode.prune(remainingNode);
+                    currentNode.setIs_prune(true);
+                }
+            }
+
             if (currentNode.isExpandable()) {
                 return expand(currentNode);
             } else {
@@ -99,9 +135,6 @@ public class MCTS {
             int newChildrenNum = currentNode.action2Node();
             fmCallsCount += newChildrenNum;
             numNodes += newChildrenNum;
-            if (currentNode.getInvalidNodes().size() > 0){
-                invalidActions += currentNode.getInvalidNodes().size();
-            }
         }
 
         double bestValue = -1;
@@ -147,25 +180,44 @@ public class MCTS {
     }
 
     private double rollOut(TreeNode currentNode){
-        GameState simulation_state = currentNode.getGameState().copy();
-        for (int i=currentNode.getDepth(); i < params.ROLLOUT_LENGTH; i++){
-            if (!simulation_state.isGameOver()){
-                ArrayList<Action> allAvailableActions = simulation_state.getAllAvailableActions();
-                simulation_state.advance(allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size())), true);
-                fmCallsCount += 1;
-            }else{
-                break;
+        if (params.ROLOUTS_ENABLED) {
+            GameState simulation_state = currentNode.getGameState().copy();
+            for (int i = currentNode.getDepth(); i < params.ROLLOUT_LENGTH; i++) {
+                if (!simulation_state.isGameOver()) {
+                    ArrayList<Action> allAvailableActions = simulation_state.getAllAvailableActions();
+                    // Choose Action gives the highest immediate reward (score)
+                    if (rollout_strategy){
+                        GameState best_state = simulation_state.copy();
+                        best_state.advance(allAvailableActions.get(0), true);
+                        fmCallsCount += 1;
+                        for (int j=1; j<allAvailableActions.size(); j++){
+                            GameState simulation__strategy_state = simulation_state.copy();
+                            simulation__strategy_state.advance(allAvailableActions.get(j), true);
+                            fmCallsCount += 1;
+                            if (simulation__strategy_state.getActiveTribeID() == playerID){
+                                if (simulation__strategy_state.getScore(playerID) > best_state.getScore(playerID)){
+                                    best_state = simulation__strategy_state;
+                                }
+                            }else{
+                                if (simulation__strategy_state.getScore(playerID) < best_state.getScore(playerID)){
+                                    best_state = simulation__strategy_state;
+                                }
+                            }
+                        }
+                        simulation_state = best_state;
+
+                    }else {
+                        simulation_state.advance(allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size())), true);
+                        fmCallsCount += 1;
+                    }
+                } else {
+                    break;
+                }
             }
+
+            return normalise(rootStateHeuristic.evaluateState(rootState, simulation_state), 0, 1);
         }
-
-//        int simulation_time = 0;
-//        while (!simulation_state.isGameOver() && simulation_time++ < params.ROLLOUT_LENGTH){
-//            ArrayList<Action> allAvailableActions = simulation_state.getAllAvailableActions();
-//            simulation_state.advance(allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size())), true);
-//            fmCallsCount += 1;
-//        }
-
-        return normalise(rootStateHeuristic.evaluateState(rootState, simulation_state), 0, 1);
+        return normalise(rootStateHeuristic.evaluateState(rootState, currentNode.getGameState()), 0, 1);
     }
 
     private void backUp(TreeNode node, double result)

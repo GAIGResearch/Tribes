@@ -1,5 +1,4 @@
 package core.FMLearner;
-
 public class Layer {
     public Neuron[] neurons;
 

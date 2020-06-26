@@ -531,8 +531,8 @@ public class Game {
 
         }
 
-        Float[][] trainData = new Float[warriorDamage_train.size()][2];
-        Float[][] testData = new Float[warriorDamage_test.size()][2];
+        float[][] trainData = new float[warriorDamage_train.size()][2];
+        float[][] testData = new float[warriorDamage_test.size()][2];
 
         for(int i =0; i< warriorCost_train.size(); i++){
                 trainData[i][0] = warriorDamage_train.get(i);

@@ -104,7 +104,7 @@ public class Tournament {
         int nRepetitions = 4;
         if(args.length == 0)
         {
-            t.setPlayers(new PlayerType[]{PlayerType.MC, PlayerType.MC});
+            t.setPlayers(new PlayerType[]{PlayerType.SIMPLE, PlayerType.OEP});
             t.setTribes(new Types.TRIBE[]{XIN_XI, IMPERIUS});
         }else
         {
@@ -499,8 +499,6 @@ public class Tournament {
         RANDOM,
         OSLA,
         MC,
-        BROKENMC,
-        BROKENMCTS,
         SIMPLE,
         MCTS,
         RHEA,

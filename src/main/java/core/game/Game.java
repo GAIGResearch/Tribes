@@ -1,13 +1,18 @@
 package core.game;
 
 import core.Constants;
-import core.FMLearner.NeuralNetwork;
+import core.FMLearner.NN;
 import core.Types;
 import core.actions.Action;
 import core.actions.tribeactions.EndTurn;
 import core.actions.unitactions.Attack;
 import core.actors.Tribe;
 import players.Agent;
+
+import players.rhea.RHEAAgent;
+import players.osla.OneStepLookAheadAgent;
+import players.oep.OEPAgent;
+import players.mcts.MCTSPlayer;
 import players.HumanAgent;
 import players.mc.MonteCarloAgent;
 import utils.*;
@@ -42,7 +47,7 @@ public class Game {
     // AI stats for each player.
     private AIStats[] aiStats;
 
-    private NeuralNetwork nn;
+    private NN nn;
 
     ArrayList<Float> warriorDamage_test = new ArrayList<>();
     ArrayList<Float> warriorCost_test = new ArrayList<>();
@@ -514,35 +519,39 @@ public class Game {
     private void updateAssignedGameStates() {
 
         //TODO: Probably we don't need to do this for all players, just the active one.
-        double[] distance ={0.7, 0.4,0,0};
+        //double[] distance ={0.1, 0.02,0,0};
         for (int i = 0; i < numPlayers; i++) {
-            gameStateObservations[i] = getGameState(i,distance[i]);
+            //Todo check instance of agent
+            if(players[i] instanceof MonteCarloAgent|| players[i] instanceof RHEAAgent || players[i] instanceof OneStepLookAheadAgent|| players[i] instanceof OEPAgent || players[i] instanceof MCTSPlayer)
+                gameStateObservations[i] = getGameState(i,0.1);
+            else
+                gameStateObservations[i] = getGameState(i,0.0);
         }
 
-        for (Agent a: players
-             ) {
-
-                warriorCost_train.add( (float) gameStateObservations[a.getPlayerID()].getTribesConfig().WARRIOR_COST);
-                warriorDamage_train.add( (float) gameStateObservations[a.getPlayerID()].getTribesConfig().WARRIOR_ATTACK);
-
-                warriorCost_test.add((float) gs.getTribesConfig().WARRIOR_COST);
-                warriorDamage_test.add((float)gs.getTribesConfig().WARRIOR_ATTACK);
-
-
-        }
-
-        float[][] trainData = new float[warriorDamage_train.size()][2];
-        float[][] testData = new float[warriorDamage_test.size()][2];
-
-        for(int i =0; i< warriorCost_train.size(); i++){
-                trainData[i][0] = warriorDamage_train.get(i);
-                trainData[i][1]= warriorCost_train.get(i);
-                testData[i][0] = warriorDamage_test.get(i);
-                testData[i][1]= warriorCost_test.get(i);
-        }
-
-        if(warriorDamage_train.size()>100 && warriorCost_train.size()>100)
-            nn = new NeuralNetwork(trainData,testData);
+//        for (Agent a: players
+//             ) {
+//
+//                warriorCost_train.add( (float) gameStateObservations[a.getPlayerID()].getTribesConfig().WARRIOR_COST);
+//                warriorDamage_train.add( (float) gameStateObservations[a.getPlayerID()].getTribesConfig().WARRIOR_ATTACK);
+//
+//                warriorCost_test.add((float) gs.getTribesConfig().WARRIOR_COST);
+//                warriorDamage_test.add((float)gs.getTribesConfig().WARRIOR_ATTACK);
+//
+//
+//        }
+//
+//        float[][] trainData = new float[warriorDamage_train.size()][2];
+//        float[][] testData = new float[warriorDamage_test.size()][2];
+//
+//        for(int i =0; i< warriorCost_train.size(); i++){
+//                trainData[i][0] = warriorDamage_train.get(i);
+//                trainData[i][1]= warriorCost_train.get(i);
+//                testData[i][0] = warriorDamage_test.get(i);
+//                testData[i][1]= warriorCost_test.get(i);
+//        }
+//
+//        if(warriorDamage_train.size()>100 && warriorCost_train.size()>100)
+//            nn = new NN(trainData,testData);
 
 
     }

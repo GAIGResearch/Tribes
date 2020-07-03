@@ -137,313 +137,345 @@ public class GameState {
             tc.WARRIOR_POINTS = random.nextInt(10);
 
 //        //Set archer values
-//        if(random.nextDouble() <= distance)
-//            tc.ARCHER_ATTACK = random.nextInt();
-//        if(random.nextDouble() <= distance)
-//            tc.ARCHER_DEFENCE = random.nextInt();
-//        if(random.nextDouble() <= distance)
-//            tc.ARCHER_MOVEMENT = random.nextInt();
-//        if(random.nextDouble() <= distance)
-//            tc.ARCHER_MAX_HP = random.nextInt();;
-//        if(rnd.nextDouble() <= distance)
-//            tc.ARCHER_RANGE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.ARCHER_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.ARCHER_POINTS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.ARCHER_ATTACK = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.ARCHER_DEFENCE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.ARCHER_MOVEMENT = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.ARCHER_MAX_HP = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.ARCHER_RANGE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.ARCHER_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.ARCHER_POINTS = random.nextInt(10);
 
 //        //Set catapult values
-//        if(rnd.nextDouble() <= distance)
-//            tc.CATAPULT_ATTACK = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.CATAPULT_DEFENCE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.CATAPULT_MOVEMENT = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.CATAPULT_MAX_HP = rnd.nextInt();;
-//        if(rnd.nextDouble() <= distance)
-//            tc.CATAPULT_RANGE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.CATAPULT_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.CATAPULT_POINTS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.CATAPULT_ATTACK = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.CATAPULT_DEFENCE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.CATAPULT_MOVEMENT = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.CATAPULT_MAX_HP = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.CATAPULT_RANGE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.CATAPULT_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.CATAPULT_POINTS = random.nextInt(10);
 
 //        //Set Swordman values
-//        if(rnd.nextDouble() <= distance)
-//            tc.SWORDMAN_ATTACK = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SWORDMAN_DEFENCE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SWORDMAN_MOVEMENT = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SWORDMAN_MAX_HP = rnd.nextInt();;
-//        if(rnd.nextDouble() <= distance)
-//            tc.SWORDMAN_RANGE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SWORDMAN_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SWORDMAN_POINTS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.SWORDMAN_ATTACK = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SWORDMAN_DEFENCE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SWORDMAN_MOVEMENT = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SWORDMAN_MAX_HP = random.nextInt(10);;
+        if(random.nextDouble() <= distance)
+            tc.SWORDMAN_RANGE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SWORDMAN_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SWORDMAN_POINTS = random.nextInt(10);
 
 //        //Set mindbender values
-//        if(rnd.nextDouble() <= distance)
-//            tc.MINDBENDER_ATTACK = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.MINDBENDER_DEFENCE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.MINDBENDER_MOVEMENT = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.MINDBENDER_MAX_HP = rnd.nextInt();;
-//        if(rnd.nextDouble() <= distance)
-//            tc.MINDBENDER_MAX_HP = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.MINDBENDER_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.MINDBENDER_POINTS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.MINDBENDER_ATTACK = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.MINDBENDER_DEFENCE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.MINDBENDER_MOVEMENT = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.MINDBENDER_MAX_HP = random.nextInt(10);;
+        if(random.nextDouble() <= distance)
+            tc.MINDBENDER_MAX_HP = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.MINDBENDER_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.MINDBENDER_POINTS = random.nextInt(10);
 
 //        //Set defender values
-//        if(rnd.nextDouble() <= distance)
-//            tc.DEFENDER_ATTACK = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.DEFENDER_DEFENCE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.DEFENDER_MOVEMENT = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.DEFENDER_MAX_HP = rnd.nextInt();;
-//        if(rnd.nextDouble() <= distance)
-//            tc.DEFENDER_RANGE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.DEFENDER_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.DEFENDER_POINTS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.DEFENDER_ATTACK = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.DEFENDER_DEFENCE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.DEFENDER_MOVEMENT = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.DEFENDER_MAX_HP = random.nextInt(10);;
+        if(random.nextDouble() <= distance)
+            tc.DEFENDER_RANGE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.DEFENDER_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.DEFENDER_POINTS = random.nextInt(10);
 
 //        //Set Knight values
-//        if(rnd.nextDouble() <= distance)
-//            tc.KNIGHT_ATTACK = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.KNIGHT_DEFENCE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.KNIGHT_MOVEMENT = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.KNIGHT_MAX_HP = rnd.nextInt();;
-//        if(rnd.nextDouble() <= distance)
-//            tc.KNIGHT_RANGE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.KNIGHT_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.KNIGHT_POINTS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.KNIGHT_ATTACK = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.KNIGHT_DEFENCE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.KNIGHT_MOVEMENT = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.KNIGHT_MAX_HP = random.nextInt(10);;
+        if(random.nextDouble() <= distance)
+            tc.KNIGHT_RANGE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.KNIGHT_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.KNIGHT_POINTS = random.nextInt(10);
 
 //        //Set Rider values
-//        if(rnd.nextDouble() <= distance)
-//            tc.RIDER_ATTACK = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.RIDER_DEFENCE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.RIDER_MOVEMENT = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.RIDER_MAX_HP = rnd.nextInt();;
-//        if(rnd.nextDouble() <= distance)
-//            tc.RIDER_RANGE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.RIDER_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.RIDER_POINTS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.RIDER_ATTACK = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.RIDER_DEFENCE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.RIDER_MOVEMENT = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.RIDER_MAX_HP = random.nextInt(10);;
+        if(random.nextDouble() <= distance)
+            tc.RIDER_RANGE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.RIDER_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.RIDER_POINTS = random.nextInt(10);
 //
 //        //Set Boat values
-//        if(rnd.nextDouble() <= distance)
-//            tc.BOAT_ATTACK = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.BOAT_DEFENCE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.BOAT_MOVEMENT = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.BOAT_RANGE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.BOAT_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.BOAT_POINTS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.BOAT_ATTACK = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.BOAT_DEFENCE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.BOAT_MOVEMENT = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.BOAT_RANGE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.BOAT_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.BOAT_POINTS = random.nextInt(10);
 
 //        //Set Ship values
-//        if(rnd.nextDouble() <= distance)
-//            tc.SHIP_ATTACK = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SHIP_DEFENCE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SHIP_MOVEMENT = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SHIP_RANGE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SHIP_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SHIP_POINTS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.SHIP_ATTACK = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SHIP_DEFENCE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SHIP_MOVEMENT = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SHIP_RANGE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SHIP_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SHIP_POINTS = random.nextInt(10);
 
 //        //Set Battleship values
-//        if(rnd.nextDouble() <= distance)
-//            tc.BATTLESHIP_ATTACK = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.BATTLESHIP_DEFENCE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.BATTLESHIP_MOVEMENT = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.BATTLESHIP_RANGE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.BATTLESHIP_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.BATTLESHIP_POINTS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.BATTLESHIP_ATTACK = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.BATTLESHIP_DEFENCE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.BATTLESHIP_MOVEMENT = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.BATTLESHIP_RANGE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.BATTLESHIP_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.BATTLESHIP_POINTS = random.nextInt(10);
 
 //        //Set Superunit values
-//        if(rnd.nextDouble() <= distance)
-//            tc.SUPERUNIT_ATTACK = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SUPERUNIT_DEFENCE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SUPERUNIT_MOVEMENT = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SUPERUNIT_MAX_HP = rnd.nextInt();;
-//        if(rnd.nextDouble() <= distance)
-//            tc.SUPERUNIT_RANGE = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SUPERUNIT_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SUPERUNIT_POINTS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.SUPERUNIT_ATTACK = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SUPERUNIT_DEFENCE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SUPERUNIT_MOVEMENT = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SUPERUNIT_MAX_HP = random.nextInt(10);;
+        if(random.nextDouble() <= distance)
+            tc.SUPERUNIT_RANGE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SUPERUNIT_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SUPERUNIT_POINTS = random.nextInt(10);
 
 //        //Explorer
-//        if(rnd.nextDouble() <= distance)
-//            tc.NUM_STEPS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.NUM_STEPS = random.nextInt();
 
 //        //General Unit constants
-//        if(rnd.nextDouble() <= distance)
-//            tc.ATTACK_MODIFIER =  0 + (10 - 0) * rnd.nextDouble();
-//        if(rnd.nextDouble() <= distance)
-//            tc.DEFENCE = 0 + (10 - 0) * rnd.nextDouble();
-//        if(rnd.nextDouble() <= distance)
-//            tc.DEFENCE_IN_WALLS =  0 + (10 - 0) * rnd.nextDouble();
-//        if(rnd.nextDouble() <= distance)
-//            tc.VETERAN_KILLS = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.VETERAN_PLUS_HP = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.RECOVER_PLUS_HP = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.RECOVER_IN_BORDERS_PLUS_HP = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.ATTACK_MODIFIER =  0 + (10 - 0) * random.nextDouble();
+        if(random.nextDouble() <= distance)
+            tc.DEFENCE = 0 + (10 - 0) * random.nextDouble();
+        if(random.nextDouble() <= distance)
+            tc.DEFENCE_IN_WALLS =  0 + (10 - 0) * random.nextDouble();
+        if(random.nextDouble() <= distance)
+            tc.VETERAN_KILLS = random.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.VETERAN_PLUS_HP = random.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.RECOVER_PLUS_HP = random.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.RECOVER_IN_BORDERS_PLUS_HP = random.nextInt(10);
 
 //        /* BUILDINGS */
 
 //        // Farm
-//        if(rnd.nextDouble() <= distance)
-//            tc.FARM_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.FARM_BONUS = rnd.nextInt();
-//       // Types.RESOURCE FARM_RES_CONSTRAINT = Types.RESOURCE.CROPS;
-//
+        if(random.nextDouble() <= distance)
+            tc.FARM_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.FARM_BONUS = random.nextInt();
+       // Types.RESOURCE FARM_RES_CONSTRAINT = Types.RESOURCE.CROPS;
+
 //        //WindMill
-//        if(rnd.nextDouble() <= distance)
-//            tc.WIND_MILL_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.WIND_MILL_BONUS = rnd.nextInt();
-//
+        if(random.nextDouble() <= distance)
+            tc.WIND_MILL_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.WIND_MILL_BONUS = random.nextInt(10);
+
 //        // LumberHut
 //
-//        if(rnd.nextDouble() <= distance)
-//            tc.LUMBER_HUT_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.LUMBER_HUT_BONUS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.LUMBER_HUT_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.LUMBER_HUT_BONUS = random.nextInt(10);
 
 //        // SawMill
-//        if(rnd.nextDouble() <= distance)
-//            tc.SAW_MILL_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.SAW_MILL_BONUS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.SAW_MILL_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.SAW_MILL_BONUS = random.nextInt(10);
 
 //        //Mine
-//        if(rnd.nextDouble() <= distance)
-//            tc.MINE_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.MINE_BONUS = rnd.nextInt();
-//     //   Types.RESOURCE MINE_RES_CONSTRAINT = Types.RESOURCE.ORE;
+        if(random.nextDouble() <= distance)
+            tc.MINE_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.MINE_BONUS = random.nextInt(10);
+     //   Types.RESOURCE MINE_RES_CONSTRAINT = Types.RESOURCE.ORE;
 
 //        // Forge
-//        if(rnd.nextDouble() <= distance)
-//            tc.FORGE_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.FORGE_BONUS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.FORGE_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.FORGE_BONUS = random.nextInt(10);
 
 //        // Port
-//        if(rnd.nextDouble() <= distance)
-//            tc.PORT_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.PORT_BONUS = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.PORT_TRADE_DISTANCE = rnd.nextInt(); //Count includes destination port.
-//
+        if(random.nextDouble() <= distance)
+            tc.PORT_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.PORT_BONUS = random.nextInt(50);
+        if(random.nextDouble() <= distance)
+            tc.PORT_TRADE_DISTANCE = random.nextInt(10); //Count includes destination port.
+
 //        // Customs House
-//        if(rnd.nextDouble() <= distance)
-//            tc.CUSTOMS_COST = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.CUSTOMS_BONUS = rnd.nextInt();
-//
+        if(random.nextDouble() <= distance)
+            tc.CUSTOMS_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.CUSTOMS_BONUS = random.nextInt(10);
+
 //        //Monuments
-//        if(rnd.nextDouble() <= distance)
-//            tc.MONUMENT_BONUS = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.MONUMENT_POINTS = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.EMPERORS_TOMB_STARS = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.GATE_OF_POWER_KILLS = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.GRAND_BAZAR_CITIES = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.ALTAR_OF_PEACE_TURNS = rnd.nextInt();
-//        if(rnd.nextDouble() <= distance)
-//            tc.PARK_OF_FORTUNE_LEVEL = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.MONUMENT_BONUS = random.nextInt(50);
+        if(random.nextDouble() <= distance)
+            tc.MONUMENT_POINTS = random.nextInt(250);
+        if(random.nextDouble() <= distance)
+            tc.EMPERORS_TOMB_STARS = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.GATE_OF_POWER_KILLS = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.GRAND_BAZAR_CITIES = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.ALTAR_OF_PEACE_TURNS = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.PARK_OF_FORTUNE_LEVEL = random.nextInt(10);
 //
 //
 //        // Temple
-//        tc.TEMPLE_COST = rnd.nextInt();
-//        tc.TEMPLE_FOREST_COST = rnd.nextInt();
-//        tc.TEMPLE_BONUS = rnd.nextInt();
-//        tc.TEMPLE_TURNS_TO_SCORE = rnd.nextInt();
-//        //public int[] TEMPLE_POINTS = new int[]{100, 50, 50, 50, 150};
+        if(random.nextDouble() <= distance)
+            tc.TEMPLE_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.TEMPLE_FOREST_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.TEMPLE_BONUS = random.nextInt(50);
+        if(random.nextDouble() <= distance)
+            tc.TEMPLE_TURNS_TO_SCORE = random.nextInt(50);
+         tc.TEMPLE_POINTS = new int[]{random.nextInt(100), random.nextInt(50), random.nextInt(50), random.nextInt(50), random.nextInt(150)};
 //
 //        //Resources
-//        tc.ANIMAL_COST = rnd.nextInt();
-//        tc.FISH_COST = rnd.nextInt();
-//        tc.WHALES_COST = rnd.nextInt();
-//        tc.FRUIT_COST = rnd.nextInt();
-//        tc.ANIMAL_POP = rnd.nextInt();
-//        tc.FISH_POP = rnd.nextInt();
-//        tc.WHALES_STARS = rnd.nextInt();
-//        tc.FRUIT_POP = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.ANIMAL_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.FISH_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.WHALES_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.FRUIT_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.ANIMAL_POP = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.FISH_POP = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.WHALES_STARS = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.FRUIT_POP = random.nextInt(10);
 //
 //        // ROAD
-//        tc.ROAD_COST = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.ROAD_COST = random.nextInt(10);
 //
 //        // City
-//        tc.CITY_LEVEL_UP_WORKSHOP_PROD = rnd.nextInt();
-//        tc.CITY_LEVEL_UP_RESOURCES = rnd.nextInt();
-//        tc.CITY_LEVEL_UP_POP_GROWTH = rnd.nextInt();
-//        tc.CITY_LEVEL_UP_PARK = rnd.nextInt();
-//        tc.CITY_BORDER_POINTS = rnd.nextInt();
-//        tc.PROD_CAPITAL_BONUS = rnd.nextInt();
-//        tc.EXPLORER_CLEAR_RANGE = rnd.nextInt();
-//        tc.FIRST_CITY_CLEAR_RANGE = rnd.nextInt();
-//        tc.NEW_CITY_CLEAR_RANGE = rnd.nextInt();
-//        tc.CITY_EXPANSION_TILES = rnd.nextInt();
-//        tc.POINTS_PER_POPULATION = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.CITY_LEVEL_UP_WORKSHOP_PROD = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.CITY_LEVEL_UP_RESOURCES = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.CITY_LEVEL_UP_POP_GROWTH = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.CITY_LEVEL_UP_PARK = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.CITY_BORDER_POINTS = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.PROD_CAPITAL_BONUS = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.EXPLORER_CLEAR_RANGE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.FIRST_CITY_CLEAR_RANGE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.NEW_CITY_CLEAR_RANGE = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.CITY_EXPANSION_TILES = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.POINTS_PER_POPULATION = random.nextInt(10);
+
 //
 //        // Research
-//        tc.TECH_BASE_COST = rnd.nextInt();
-//        //public Types.TECHNOLOGY TECH_DISCOUNT = Types.TECHNOLOGY.PHILOSOPHY;
-//        tc.TECH_DISCOUNT_VALUE = rnd.nextDouble();
+        if(random.nextDouble() <= distance)
+            tc.TECH_BASE_COST = random.nextInt(10);
+        //public Types.TECHNOLOGY TECH_DISCOUNT = Types.TECHNOLOGY.PHILOSOPHY;
+        if(random.nextDouble() <= distance)
+            tc.TECH_DISCOUNT_VALUE = random.nextDouble();
 //
 //        /* TRIBES */
-//        tc.INITIAL_STARS = rnd.nextInt();//1000;
+        if(random.nextDouble() <= distance)
+            tc.INITIAL_STARS = random.nextInt(10);//1000;
 //
 //        /* ACTIONS */
-//        tc.CLEAR_FOREST_STAR = rnd.nextInt();
-//        tc.GROW_FOREST_COST = rnd.nextInt();
-//        tc.BURN_FOREST_COST = rnd.nextInt();
-//        tc.CLEAR_VIEW_POINTS = rnd.nextInt();
+        if(random.nextDouble() <= distance)
+            tc.CLEAR_FOREST_STAR = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.GROW_FOREST_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.BURN_FOREST_COST = random.nextInt(10);
+        if(random.nextDouble() <= distance)
+            tc.CLEAR_VIEW_POINTS = random.nextInt(10);
     }
 
     /**
@@ -622,7 +654,7 @@ public class GameState {
             boolean executed = action.execute(this);
 
             if(!executed) {
-                System.out.println("Tick: " + this.tick + "; action [" + action + "] couldn't execute?");
+              //  System.out.println("Tick: " + this.tick + "; action [" + action + "] couldn't execute?");
                 action.execute(this);
             }
 
@@ -647,7 +679,7 @@ public class GameState {
             boolean executed = action.execute(this);
 
             if(!executed) {
-                System.out.println("FM: Action [" + action + "] couldn't execute?");
+            //    System.out.println("FM: Action [" + action + "] couldn't execute?");
                 action.execute(this);
             }
 

@@ -493,7 +493,7 @@ public class Board {
                 System.out.println("WARNING: explorer stuck, " + j + " steps without moving.");
               //  break outer;
             }
-            if (moved)
+            if (moved && j < tc.NUM_STEPS * 3)
                 break outer;
 
         }

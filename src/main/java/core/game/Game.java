@@ -521,9 +521,8 @@ public class Game {
         //TODO: Probably we don't need to do this for all players, just the active one.
         //double[] distance ={0.1, 0.02,0,0};
         for (int i = 0; i < numPlayers; i++) {
-            //Todo check instance of agent
             if(players[i] instanceof MonteCarloAgent|| players[i] instanceof RHEAAgent || players[i] instanceof OneStepLookAheadAgent|| players[i] instanceof OEPAgent || players[i] instanceof MCTSPlayer)
-                gameStateObservations[i] = getGameState(i,0.1);
+                gameStateObservations[i] = getGameState(i,0.4);
             else
                 gameStateObservations[i] = getGameState(i,0.0);
         }

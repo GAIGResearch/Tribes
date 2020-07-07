@@ -475,7 +475,7 @@ public class GameState {
         if(random.nextDouble() <= distance)
             tc.BURN_FOREST_COST = random.nextInt(10);
         if(random.nextDouble() <= distance)
-            tc.CLEAR_VIEW_POINTS = random.nextInt(10);
+            tc.CLEAR_VIEW_POINTS = random.nextInt(100);
     }
 
     /**

@@ -470,7 +470,7 @@ public class Board {
         for (int i = 0; i < tc.NUM_STEPS; ++i) {
             int j = 0;
             boolean moved = false;
-
+            int x = 0;
             while (!moved && j < tc.NUM_STEPS * 3) {
                 //Pick a neighbour tile at random
                 LinkedList<Vector2d> neighs = currentPos.neighborhood(1,0, size);
@@ -491,10 +491,12 @@ public class Board {
             if (!moved) {
                 //couldn't move in many steps. Let's just warn and progress from now.
                 System.out.println("WARNING: explorer stuck, " + j + " steps without moving.");
-              //  break outer;
+                break;
             }
             if (moved && j < tc.NUM_STEPS * 3)
-                break outer;
+                x++;
+                if(x>10)
+                    break outer;
 
         }
 

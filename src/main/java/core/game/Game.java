@@ -1,7 +1,7 @@
 package core.game;
 
 import core.Constants;
-import core.FMLearner.NN;
+//import core.FMLearner.NN;
 import core.Types;
 import core.actions.Action;
 import core.actions.tribeactions.EndTurn;
@@ -47,7 +47,7 @@ public class Game {
     // AI stats for each player.
     private AIStats[] aiStats;
 
-    private NN nn;
+//    private NN nn;
 
     ArrayList<Float> warriorDamage_test = new ArrayList<>();
     ArrayList<Float> warriorCost_test = new ArrayList<>();

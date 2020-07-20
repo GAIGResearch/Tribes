@@ -8,6 +8,7 @@ import core.actions.cityactions.factory.CityActionBuilder;
 import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.factory.TribeActionBuilder;
 import core.actions.unitactions.Recover;
+import core.actions.unitactions.Attack;
 import core.actions.unitactions.factory.RecoverFactory;
 import core.actions.unitactions.factory.UnitActionBuilder;
 import core.actors.*;
@@ -15,6 +16,9 @@ import core.actors.units.Unit;
 import core.levelgen.LevelGenerator;
 import utils.IO;
 import utils.Vector2d;
+import core.FMLearner.NN;
+import core.Types;
+
 
 import java.util.*;
 
@@ -62,8 +66,11 @@ public class GameState {
     //Ranking of the game
     private TreeSet<TribeResult> ranking;
 
+    public boolean isCopy;
+
+
     //Constructor.
-    public GameState(Random rnd, Types.GAME_MODE gameMode) {
+    public GameState(Random rnd, Types.GAME_MODE gameMode, boolean isCopy) {
         this.rnd = rnd;
         this.gameMode = gameMode;
         computedActionTribeIdFlag = -1;
@@ -73,11 +80,12 @@ public class GameState {
         this.ranking = new TreeSet<>();
         this.turnMustEnd = false;
         this.gameIsOver = false;
+        this.isCopy = isCopy;
     }
 
     //This Constructor is used when loading from a savegame.
     public GameState(Random rnd, Types.GAME_MODE gameMode, Tribe[] tribes, Board board, int tick){
-        this(rnd, gameMode);
+        this(rnd, gameMode, false);
         this.tick = tick;
         this.board = board;
         board.setTribes(tribes);
@@ -92,6 +100,7 @@ public class GameState {
         canEndTurn = new boolean[tribes.length];
 
         computePlayerActions(tribes[board.getActiveTribeID()]);
+        this.isCopy = false;
     }
 
     /**
@@ -308,7 +317,7 @@ public class GameState {
 
 //        //Explorer
         if(random.nextDouble() <= distance)
-            tc.NUM_STEPS = random.nextInt();
+            tc.NUM_STEPS = random.nextInt(getBoard().getSize());
 
 //        //General Unit constants
         if(random.nextDouble() <= distance)
@@ -318,9 +327,9 @@ public class GameState {
         if(random.nextDouble() <= distance)
             tc.DEFENCE_IN_WALLS =  0 + (10 - 0) * random.nextDouble();
         if(random.nextDouble() <= distance)
-            tc.VETERAN_KILLS = random.nextInt();
+            tc.VETERAN_KILLS = random.nextInt(50);
         if(random.nextDouble() <= distance)
-            tc.VETERAN_PLUS_HP = random.nextInt();
+            tc.VETERAN_PLUS_HP = random.nextInt(10);
         if(random.nextDouble() <= distance)
             tc.RECOVER_PLUS_HP = random.nextInt();
         if(random.nextDouble() <= distance)
@@ -651,6 +660,25 @@ public class GameState {
     {
         if(action != null)
         {
+            if(action instanceof Attack){
+
+                    //add test data
+                    try {
+                        Unit attacker = (Unit) this.getActor(((Attack) action).getUnitId());
+                        Unit defender = (Unit) this.getActor(((Attack) action).getTargetId());
+                        if(attacker.getType() == Types.UNIT.WARRIOR && defender.getType() == Types.UNIT.WARRIOR) {
+                            NN.expectedValues.add((float) ((Attack) action).getAttackResults(this).getFirst());
+                            NN.testDataCounter++;
+                        }
+                      //  System.out.println(NN.expectedValues);
+
+                    }catch (NullPointerException e){
+
+                    }
+
+
+            }
+
             boolean executed = action.execute(this);
 
             if(!executed) {
@@ -718,6 +746,32 @@ public class GameState {
                         //Start the turn for the next tribe
                         this.initTurn(getActiveTribe());
                     }
+
+                }
+
+                if(action instanceof Attack){
+
+
+                        if (this.isCopy) {
+                            //add training data
+                            try {
+                                if(NN.testDataCounter == NN.trainDataCounter){
+                                    NN.test((float) ((Attack) action).getAttackResults(this).getFirst());
+                                }
+                                if(NN.trainDataCounter!= NN.testDataCounter) {
+                                    Unit attacker = (Unit) this.getActor(((Attack) action).getUnitId());
+                                    Unit defender = (Unit) this.getActor(((Attack) action).getTargetId());
+                                    if(attacker.getType() == Types.UNIT.WARRIOR && attacker.getType() == Types.UNIT.WARRIOR) {
+                                        NN.trainingData.add((float) ((Attack) action).getAttackResults(this).getFirst());
+                                        NN.trainDataCounter++;
+                                        System.out.println(NN.trainingData);
+                                    }
+
+                                }
+                            }catch (NullPointerException e){
+
+                            }
+                        }
 
                 }
 
@@ -878,14 +932,15 @@ public class GameState {
     public GameState copy(int playerIdx, double distance)
     {
 //        GameState copy = new GameState(this.rnd, this.gameMode); //use this for a 100% repetition of the game based on random seed and game seed.
-        GameState copy = new GameState(new Random(), this.gameMode); //copies of the game state can't have the same random generator.
+        GameState copy = new GameState(new Random(), this.gameMode, true); //copies of the game state can't have the same random generator.
         copy.board = board.copy(playerIdx!=-1, playerIdx);
         copy.tick = this.tick;
         copy.turnMustEnd = turnMustEnd;
         copy.gameIsOver = gameIsOver;
         copy.tc = tc.copy();
-        long seed = 1860142121111L;
+        long seed = 1860142121111L; //possibly different seeds
         copy.changeTribesConfig(distance,seed);
+        copy.isCopy = true;
 
         int numTribes = getTribes().length;
         copy.canEndTurn = new boolean[numTribes];

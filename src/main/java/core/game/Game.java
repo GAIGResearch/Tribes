@@ -1,7 +1,7 @@
 package core.game;
 
 import core.Constants;
-//import core.FMLearner.NN;
+import core.FMLearner.NN;
 import core.Types;
 import core.actions.Action;
 import core.actions.tribeactions.EndTurn;
@@ -78,7 +78,7 @@ public class Game {
         //Initiate the bare bones of the main game classes
         this.seed = seed;
         this.rnd = new Random(seed);
-        this.gs = new GameState(rnd, gameMode);
+        this.gs = new GameState(rnd, gameMode,false);
 
         this.gs.init(filename);
         initGameStructures(players, this.gs.getTribes().length);
@@ -104,7 +104,7 @@ public class Game {
         //Initiate the bare bones of the main game classes
         this.seed = seed;
         this.rnd = new Random(seed);
-        this.gs = new GameState(rnd, gameMode);
+        this.gs = new GameState(rnd, gameMode, false);
 
         this.gs.init(levelgen_seed, tribes);
         initGameStructures(players, tribes);
@@ -522,11 +522,11 @@ public class Game {
         //double[] distance ={0.1, 0.02,0,0};
         for (int i = 0; i < numPlayers; i++) {
             if(players[i] instanceof MonteCarloAgent|| players[i] instanceof RHEAAgent || players[i] instanceof OneStepLookAheadAgent|| players[i] instanceof OEPAgent || players[i] instanceof MCTSPlayer)
-                gameStateObservations[i] = getGameState(i,0.4);
+                gameStateObservations[i] = getGameState(i,1.0);
             else
                 gameStateObservations[i] = getGameState(i,0.0);
         }
-
+        //TODO: constant/static NN, Data struct of training data
 //        for (Agent a: players
 //             ) {
 //

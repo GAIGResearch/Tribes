@@ -2,6 +2,7 @@ import core.Constants;
 import core.Types;
 import core.game.Game;
 import core.game.TribeResult;
+import org.neuroph.core.NeuralNetwork;
 import players.*;
 import players.mc.MCParams;
 import players.mc.MonteCarloAgent;
@@ -14,6 +15,7 @@ import players.osla.OneStepLookAheadAgent;
 import players.rhea.RHEAAgent;
 import players.rhea.RHEAParams;
 import utils.MultiStatSummary;
+import core.FMLearner.NN;
 
 import javax.swing.plaf.metal.MetalBorders;
 import java.util.*;
@@ -30,6 +32,7 @@ public class Tournament {
     private static boolean FORCE_TURN_END;
     private static boolean MCTS_ROLLOUTS;
     private static int POP_SIZE;
+    //public static NN nn = new NN();
 
     private static Agent _getAgent(PlayerType playerType, long agentSeed, ActionController ac)
     {
@@ -72,7 +75,7 @@ public class Tournament {
                 rheaParams.heuristic_method = rheaParams.DIFF_HEURISTIC;
                 rheaParams.INDIVIDUAL_LENGTH = MAX_LENGTH;
                 rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
-                rheaParams.POP_SIZE = POP_SIZE;
+                rheaParams.POP_SIZE = 10;
 //                rheaParams.print();
                 return new RHEAAgent(agentSeed, rheaParams);
         }
@@ -101,10 +104,10 @@ public class Tournament {
 
         Types.GAME_MODE gameMode = CAPITALS; //SCORE;
         Tournament t = new Tournament(gameMode);
-        int nRepetitions = 4;
+        int nRepetitions = 20;
         if(args.length == 0)
         {
-            t.setPlayers(new PlayerType[]{PlayerType.SIMPLE, PlayerType.MC});
+            t.setPlayers(new PlayerType[]{PlayerType.RHEA, PlayerType.RANDOM});
             t.setTribes(new Types.TRIBE[]{XIN_XI, IMPERIUS});
         }else
         {
@@ -241,6 +244,9 @@ public class Tournament {
 
                     if (playersIn < participants.size())
                         System.out.print(", ");
+                    NN.train();
+                    //Todo check if NN trained enough
+
                 }
                 System.out.println("] (" + (nseed*repetitions + rep + 1) + "/" + (seeds.length*repetitions) + ")");
 
@@ -266,6 +272,7 @@ public class Tournament {
 
             nseed++;
         }
+
 
         _printRunResults();
 
@@ -306,6 +313,9 @@ public class Tournament {
                 Run.runGame(game);
 
                 _addGameResults(game, assignment);
+
+                    //NN.train();
+
 
                 //Shift arrays for position changes.
                 if (shift) {

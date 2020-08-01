@@ -631,7 +631,11 @@ public class InfoView extends JComponent {
                     break;
                 case "Upgrade":
                     if (e.getSource() instanceof JButton) {
-                        a = new Upgrade(unitID);
+                        Unit u = (Unit) gs.getActor(unitID);
+                        Types.ACTION actionType = null;
+                        if(u.getType() == Types.UNIT.BOAT) actionType = Types.ACTION.UPGRADE_BOAT;
+                        if(u.getType() == Types.UNIT.SHIP) actionType = Types.ACTION.UPGRADE_SHIP;
+                        a = new Upgrade(actionType, unitID);
                     }
                     break;
             }

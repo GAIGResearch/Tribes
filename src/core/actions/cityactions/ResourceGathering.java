@@ -17,6 +17,7 @@ public class ResourceGathering extends CityAction
 
     public ResourceGathering(int cityId)
     {
+        super(Types.ACTION.RESOURCE_GATHERING);
         super.cityId = cityId;
     }
 
@@ -43,31 +44,6 @@ public class ResourceGathering extends CityAction
                     return t.getTechTree().isResearched(Types.TECHNOLOGY.WHALING);
                 case FRUIT:
                     return t.getTechTree().isResearched(Types.TECHNOLOGY.ORGANIZATION);
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean execute(GameState gs) {
-        //Check if action feasible before execution
-        if(isFeasible(gs)){
-            City city = (City) gs.getActor(this.cityId);
-            Vector2d position = super.getTargetPos();
-            gs.getBoard().setResourceAt(position.x, position.y, null);
-            Tribe tribe = gs.getTribe(city.getTribeId());
-            tribe.subtractStars(this.resource.getCost());
-            switch (this.resource){
-                case FISH:
-                case ANIMAL:
-                case FRUIT:
-                    city.addPopulation(tribe, this.resource.getBonus());
-                    return true;
-                case WHALES: //Whaling is the only resource which provides extra stars
-                    Board b = gs.getBoard();
-                    Tribe t  = b.getTribe(city.getTribeId());
-                    t.addStars(this.resource.getBonus());
-                    return true;
             }
         }
         return false;

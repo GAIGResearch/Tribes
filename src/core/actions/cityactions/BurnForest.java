@@ -7,13 +7,11 @@ import core.actors.Tribe;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.City;
-import utils.Vector2d;
-
-import java.util.LinkedList;
 
 public class BurnForest extends CityAction
 {
     public BurnForest(int cityId) {
+        super(Types.ACTION.BURN_FOREST);
         super.cityId = cityId;
     }
 
@@ -28,20 +26,6 @@ public class BurnForest extends CityAction
         Tribe t = gs.getTribe(city.getTribeId());
         if(t.getStars() < TribesConfig.BURN_FOREST_COST) return false;
         return t.getTechTree().isResearched(Types.TECHNOLOGY.CHIVALRY);
-    }
-
-    @Override
-    public boolean execute(GameState gs) {
-        City city = (City) gs.getActor(this.cityId);
-        if (isFeasible(gs)){
-            Board b = gs.getBoard();
-            Tribe t = gs.getTribe(city.getTribeId());
-            b.setTerrainAt(targetPos.x, targetPos.y, Types.TERRAIN.PLAIN);
-            b.setResourceAt(targetPos.x, targetPos.y, Types.RESOURCE.CROPS);
-            t.subtractStars(TribesConfig.BURN_FOREST_COST);
-            return true;
-        }
-        return false;
     }
 
     @Override

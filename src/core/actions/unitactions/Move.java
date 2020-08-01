@@ -2,8 +2,6 @@ package core.actions.unitactions;
 
 import core.Types;
 import core.actions.Action;
-import core.actors.Tribe;
-import core.game.Board;
 import core.game.GameState;
 import core.actors.units.Unit;
 import utils.Vector2d;
@@ -18,6 +16,7 @@ public class Move extends UnitAction
 
     public Move(int unitId)
     {
+        super(Types.ACTION.MOVE);
         super.unitId = unitId;
     }
 
@@ -44,33 +43,6 @@ public class Move extends UnitAction
         return false;
     }
 
-    @Override
-    public boolean execute(GameState gs)
-    {
-        if(isFeasible(gs)) {
-            Unit unit = (Unit) gs.getActor(this.unitId);
-            Board board = gs.getBoard();
-            Tribe tribe = gs.getTribe(unit.getTribeId());
-            Types.TERRAIN destinationTerrain = board.getTerrainAt(destination.x, destination.y);
-
-            board.moveUnit(unit, unit.getPosition().x, unit.getPosition().y, destination.x, destination.y, gs.getRandomGenerator());
-
-            if(unit.getType().isWaterUnit()){
-                if(destinationTerrain != Types.TERRAIN.SHALLOW_WATER && destinationTerrain != Types.TERRAIN.DEEP_WATER){ // && destinationTerrain != Types.TERRAIN.CITY){
-                    board.disembark(unit, tribe, destination.x, destination.y);
-                }
-            }else {
-                if(board.getBuildingAt(destination.x, destination.y) == Types.BUILDING.PORT){
-                    board.embark(unit, tribe, destination.x, destination.y);
-                }
-            }
-
-            unit.transitionToStatus(Types.TURN_STATUS.MOVED);
-
-            return true;
-        }
-        return false;
-    }
 
     @Override
     public Action copy() {

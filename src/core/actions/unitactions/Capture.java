@@ -1,19 +1,13 @@
 package core.actions.unitactions;
 
-import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
-import core.actors.Building;
-import core.actors.Tribe;
 import core.game.Board;
 import core.game.GameState;
 import core.actors.City;
 import core.actors.units.Unit;
 import utils.Vector2d;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Random;
 
 public class Capture extends UnitAction
 {
@@ -22,6 +16,7 @@ public class Capture extends UnitAction
 
     public Capture(int unitId)
     {
+        super(Types.ACTION.CAPTURE);
         super.unitId = unitId;
     }
 
@@ -62,40 +57,6 @@ public class Capture extends UnitAction
         {
             Vector2d unitPos = unit.getPosition();
             return b.getTerrainAt(unitPos.x, unitPos.y) == Types.TERRAIN.VILLAGE;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean execute(GameState gs) {
-        if(isFeasible(gs)) {
-            // Change city tribe id to execute action
-            Unit unit = (Unit) gs.getActor(this.unitId);
-            Board b = gs.getBoard();
-            Tribe thisTribe = b.getTribe(unit.getTribeId());
-
-            if(captureType == Types.TERRAIN.CITY)
-            {
-                City targetCity = (City) gs.getActor(this.targetCityId);
-                Tribe targetTribe = b.getTribe(targetCity.getTribeId());
-
-                //Update scores
-                targetTribe.subtractScore(targetCity.getPointsWorth());
-                thisTribe.addScore(targetCity.getPointsWorth());
-
-                //the unit that captures exhausts their turn
-                unit.setStatus(Types.TURN_STATUS.FINISHED);
-
-                return b.capture(gs, thisTribe, targetCity.getPosition().x, targetCity.getPosition().y);
-            }else if(captureType == Types.TERRAIN.VILLAGE)
-            {
-                //the unit that captures exhausts their turn
-                unit.setStatus(Types.TURN_STATUS.FINISHED);
-
-                Vector2d unitPos = unit.getPosition();
-                return b.capture(gs, thisTribe, unitPos.x, unitPos.y);
-            }
-
         }
         return false;
     }

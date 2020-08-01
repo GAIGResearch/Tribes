@@ -13,6 +13,7 @@ public class Convert extends UnitAction
 
     public Convert(int unitId)
     {
+        super(Types.ACTION.CONVERT);
         super.unitId = unitId;
     }
 
@@ -38,30 +39,6 @@ public class Convert extends UnitAction
         return unitInRange(unit, target, gs.getBoard());
     }
 
-    @Override
-    public boolean execute(GameState gs) {
-        //Check if action is feasible before execution
-        if(isFeasible(gs)) {
-            Unit target = (Unit) gs.getActor(this.targetId);
-            Unit unit = (Unit) gs.getActor(this.unitId);
-            Tribe targetTribe = gs.getTribe(target.getTribeId());
-
-            //remove the unit from its original city.
-            int cityId = target.getCityId();
-            City c = (City) gs.getActor(cityId);
-            gs.getBoard().removeUnitFromCity(target, c, targetTribe);
-
-            //add tribe to converted unit
-            target.setTribeId(unit.getTribeId());
-            gs.getActiveTribe().addExtraUnit(target);
-
-            //manage status of the units after the action is executed
-            unit.transitionToStatus(Types.TURN_STATUS.ATTACKED);
-            target.setStatus(Types.TURN_STATUS.FINISHED);
-            return true;
-        }
-        return false;
-    }
 
     @Override
     public Action copy() {

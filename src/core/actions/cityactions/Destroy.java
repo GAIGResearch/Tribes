@@ -12,6 +12,7 @@ public class Destroy extends CityAction
 {
     public Destroy(int cityId)
     {
+        super(Types.ACTION.DESTROY);
         super.cityId = cityId;
     }
 
@@ -24,28 +25,6 @@ public class Destroy extends CityAction
         if(buildingToRemove == null || buildingToRemove.type == null) return false;
         if(gs.getBoard().getCityIdAt(targetPos.x, targetPos.y) != this.cityId) return false;
         return gs.getTribe(city.getTribeId()).getTechTree().isResearched(Types.TECHNOLOGY.CONSTRUCTION);
-    }
-
-    @Override
-    public boolean execute(GameState gs) {
-        if (isFeasible(gs)){
-            City city = (City) gs.getActor(this.cityId);
-            Tribe tribe = gs.getTribe(city.getTribeId());
-            Building buildingToRemove = city.getBuilding(targetPos.x, targetPos.y);
-
-            Board b = gs.getBoard();
-            b.setBuildingAt(targetPos.x, targetPos.y, null);
-
-            if(buildingToRemove.type == Types.BUILDING.PORT)
-            {
-                //If a port is removed, then the tile stops belonging to the trade network
-                b.destroyPort(targetPos.x, targetPos.y);
-            }
-
-            city.removeBuilding(gs, buildingToRemove);
-            return true;
-        }
-        return false;
     }
 
     @Override

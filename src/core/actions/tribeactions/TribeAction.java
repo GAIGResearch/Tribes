@@ -1,8 +1,26 @@
 package core.actions.tribeactions;
+import core.Types;
 import core.actions.Action;
+import core.game.GameState;
 
-public abstract class TribeAction implements Action {
+public class TribeAction extends Action {
+
+    TribeAction(Types.ACTION aType)
+    {
+        this.actionType = aType;
+    }
+
     protected int tribeId;
     public void setTribeId(int tribeId) {this.tribeId = tribeId;}
     public int getTribeId() {return this.tribeId;}
+
+    @Override
+    public boolean isFeasible(GameState gs) {
+        return false;
+    }
+
+    @Override
+    public Action copy() {
+        return null;
+    }
 }

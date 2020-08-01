@@ -12,6 +12,7 @@ public class ResearchTech extends TribeAction {
 
     public ResearchTech(int tribeId)
     {
+        super(Types.ACTION.RESEARCH_TECH);
         this.tribeId = tribeId;
     }
     public void setTech(Types.TECHNOLOGY tech) {this.tech = tech;}
@@ -30,25 +31,6 @@ public class ResearchTech extends TribeAction {
         return false;
     }
 
-    @Override
-    public boolean execute(GameState gs) {
-        Tribe tribe = gs.getTribe(tribeId);
-        if(isFeasible(gs))
-        {
-            //Research tech
-            int techCost = tech.getCost(tribe.getNumCities(), tribe.getTechTree());
-            tribe.subtractStars(techCost);
-            tribe.getTechTree().doResearch(tech);
-
-            //Flag if research tree is completed.
-            if (tribe.getTechTree().isEverythingResearched())
-            {
-                tribe.allResearched();
-            }
-            return true;
-        }
-        return false;
-    }
 
     @Override
     public Action copy() {

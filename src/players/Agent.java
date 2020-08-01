@@ -1,5 +1,6 @@
 package players;
 
+import core.Types;
 import core.actions.Action;
 import core.actions.cityactions.Destroy;
 import core.actions.unitactions.Disband;
@@ -92,14 +93,14 @@ public abstract class Agent {
         ArrayList<Action> cityActions = gs.getAllCityActions();
         ArrayList<Action> cityGoodActions = new ArrayList<>();
         for(Action act : cityActions)
-            if(!(act instanceof Destroy))
+            if(!(act.getActionType() == Types.ACTION.DESTROY))
                 cityGoodActions.add(act);
         if(cityGoodActions.size() > 0) availableTypes.add(ACTION_TYPE.CITY);
 
         ArrayList<Action> unitActions = gs.getAllUnitActions();
         ArrayList<Action> unitGoodActions = new ArrayList<>();
         for(Action act : unitActions)
-            if(!(act instanceof Disband))
+            if(!(act.getActionType() == Types.ACTION.DISBAND))
                 unitGoodActions.add(act);
         if(unitActions.size() > 0) availableTypes.add(ACTION_TYPE.UNIT);
 
@@ -137,12 +138,12 @@ public abstract class Agent {
         ArrayList<Action> allActions = new ArrayList<>();
         ArrayList<Action> cityActions = gs.getAllCityActions();
         for(Action act : cityActions)
-            if(!(act instanceof Destroy))
+            if(!(act.getActionType() == Types.ACTION.DESTROY))
                 allActions.add(act);
 
         ArrayList<Action> unitActions = gs.getAllUnitActions();
         for(Action act : unitActions)
-            if(!(act instanceof Disband))
+            if(!(act.getActionType() == Types.ACTION.DISBAND))
                 allActions.add(act);
 
         ArrayList<Action> tribeActions = gs.getTribeActions();

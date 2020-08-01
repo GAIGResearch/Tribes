@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static core.Constants.*;
-
+import static core.Types.ACTION.*;
 
 public class GUI extends JFrame {
     private JLabel appTurn;
@@ -159,7 +159,7 @@ public class GUI extends JFrame {
                     Action candidate = getActionAt(p.x, p.y, infoView.getHighlightX(), infoView.getHighlightY());
                     if (candidate != null) {
                         int n = 0;
-                        if (candidate instanceof Disband) {  // These actions needs confirmation before executing
+                        if (candidate.getActionType() == DISBAND) {  // These actions needs confirmation before executing
                             n = JOptionPane.showConfirmDialog(mainPanel,
                                     "Confirm action " + candidate.toString(),
                                     "Are you sure?",
@@ -400,13 +400,18 @@ public class GUI extends JFrame {
             otherInfo.setText("");  // Reset info
         }
 
-        // Display result of Examine action
-        if (a instanceof Examine) {
-            lastExamineAction = (Examine) a;
-        }
-        // Draw animations for these actions
-        if (a instanceof Attack || a instanceof Convert || a instanceof HealOthers) {
-            boardView.paintAction((UnitAction)a);
+        if (a != null)
+        {
+            // Display result of Examine action
+            if (a.getActionType() == EXAMINE) {
+                lastExamineAction = (Examine) a;
+            }
+            // Draw animations for these actions
+            if (a.getActionType() == ATTACK ||
+                    a.getActionType() == CONVERT ||
+                    a.getActionType() == HEAL_OTHERS) {
+                boardView.paintAction((UnitAction)a);
+            }
         }
 
 //        if (this.gs != null) {
@@ -458,7 +463,7 @@ public class GUI extends JFrame {
                 for (Action a : e.getValue()) {
                     Vector2d pos = getActionPosition(gs, a);
                     if (pos != null && pos.x == actionY && pos.y == actionX) {
-                        if ((a instanceof Capture || a instanceof Examine) ||  // These actions don't need the unit highlighted
+                        if ((a.getActionType() == CAPTURE || a.getActionType() == EXAMINE) ||  // These actions don't need the unit highlighted
                                 u.getPosition().x == unitY && u.getPosition().y == unitX) {
                             return a;
                         }
@@ -496,18 +501,18 @@ public class GUI extends JFrame {
 
     public static Vector2d getActionPosition(GameState gs, Action a) {
         Vector2d pos = null;
-        if (a instanceof Move) {
+        if (a.getActionType() == MOVE) {
             pos = new Vector2d(((Move) a).getDestination().x, ((Move) a).getDestination().y);
-        } else if (a instanceof Attack) {
+        } else if (a.getActionType() == ATTACK) {
             Unit target = (Unit) gs.getActor(((Attack) a).getTargetId());
             pos = target.getPosition();
-        } else if (a instanceof Recover) {
+        } else if (a.getActionType() == RECOVER) {
             Unit u = (Unit) gs.getActor(((UnitAction) a).getUnitId());
             pos = u.getPosition();
-        } else if (a instanceof Capture || a instanceof Examine) {
+        } else if (a.getActionType() == CAPTURE || a.getActionType() == EXAMINE) {
             Unit u = (Unit) gs.getActor(((UnitAction) a).getUnitId());
             pos = new Vector2d(u.getPosition().x-1, u.getPosition().y);
-        } else if (a instanceof Convert) {
+        } else if (a.getActionType() == CONVERT) {
             Unit target = (Unit) gs.getActor(((Convert) a).getTargetId());
             pos = target.getPosition();
         }

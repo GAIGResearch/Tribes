@@ -274,7 +274,7 @@ public class GameState {
         }
 
         //No city or unit actions - if there's only one (EndTurn) tribe action, there are no actions available.
-        return tribeActions.size() != 1 || !(tribeActions.get(0) instanceof EndTurn);
+        return tribeActions.size() != 1 || !(tribeActions.get(0).getActionType() == Types.ACTION.END_TURN);
     }
 
     /**
@@ -325,7 +325,7 @@ public class GameState {
 
             if(executed) {
                 //it's an end turn
-                if(action instanceof EndTurn)
+                if(action.getActionType() == Types.ACTION.END_TURN)
                 {
                     //manage the end of this turn.
                     this.endTurn(getActiveTribe());

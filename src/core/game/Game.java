@@ -13,6 +13,7 @@ import utils.*;
 import java.util.*;
 
 import static core.Constants.*;
+import static core.Types.ACTION.*;
 
 public class Game {
 
@@ -372,7 +373,7 @@ public class Game {
                 else frame.update(gameStateObservations[gs.getActiveTribeID()], action);        // Partial Obs
 
                 // Turn should be ending, start timer for delay of next action and show all updates
-                if (action instanceof EndTurn) {
+                if (action != null && action.getActionType() == END_TURN) {
                     if (isHumanPlayer) break;
                     endTurnDelay = new ElapsedCpuTimer();
                     endTurnDelay.setMaxTimeMillis(FRAME_DELAY);
@@ -383,11 +384,11 @@ public class Game {
 //                } catch (InterruptedException e) {
 //                    e.printStackTrace();
 //                }
-            } else if (action instanceof EndTurn) { // If no visuals and we should end the turn, just break out of loop here
+            } else if (action != null && action.getActionType() == END_TURN) { // If no visuals and we should end the turn, just break out of loop here
                 break;
             }
 
-            if (action != null && !VISUALS || frame != null && (!(action instanceof Attack) && action != null ||
+            if (action != null && !VISUALS || frame != null && (action != null && !(action.getActionType() == ATTACK) ||
                     (action = frame.getAnimatedAction()) != null)) {
                 // Play the action in the game and update the available actions list and observations
                 // Some actions are animated, the condition above checks if this animation is finished and retrieves

@@ -1,5 +1,6 @@
 package players.osla;
 
+import core.Types;
 import core.actions.Action;
 import core.actions.cityactions.Destroy;
 import core.actions.tribeactions.EndTurn;
@@ -53,7 +54,9 @@ public class OneStepLookAheadAgent extends Agent {
         while(!end)
         {
             Action act = allActions.get(actionIdx);
-            if(!(act instanceof EndTurn) && !(act instanceof Destroy) && !(act instanceof Disband)) {
+            if(!(act.getActionType() == Types.ACTION.END_TURN) &&
+                !(act.getActionType() == Types.ACTION.DESTROY) &&
+                !(act.getActionType() == Types.ACTION.DISBAND)) {
 
                 GameState gsCopy = gs.copy();
                 advance(gsCopy, act, false);

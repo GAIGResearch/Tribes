@@ -104,8 +104,8 @@ public class Play {
 
 
         //1. Play one game with visuals using the Level Generator:
-//        AGENT_SEED = 1591558056165L; GAME_SEED = 1590855640174L;
-        play(new Types.TRIBE[]{XIN_XI, IMPERIUS}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.RHEA}, gameMode);
+//        AGENT_SEED = 1595182910699L; GAME_SEED = 1596317202689L;
+        play(new Types.TRIBE[]{XIN_XI, IMPERIUS}, -1, new PlayerType[]{PlayerType.MCTS, PlayerType.RHEA}, gameMode);
 //        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA, PlayerType.OSLA}, gameMode);
 //        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR, OUMAJI}, -1, new PlayerType[]{PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE}, gameMode);
 

@@ -797,24 +797,7 @@ public class Types {
         }
 
         public static Image getImage(Action a) {
-            if (a instanceof Move) {
-                return ImageIO.GetInstance().getImage(MOVE.imgPath);
-            } else if (a instanceof Attack) {
-                return ImageIO.GetInstance().getImage(ATTACK.imgPath);
-            } else if (a instanceof Capture) {
-                return ImageIO.GetInstance().getImage(CAPTURE.imgPath);
-            } else if (a instanceof Examine) {
-                return ImageIO.GetInstance().getImage(EXAMINE.imgPath);
-            } else if (a instanceof Disband) {
-                return ImageIO.GetInstance().getImage(DISBAND.imgPath);
-            } else if (a instanceof Recover || a instanceof HealOthers) {
-                return ImageIO.GetInstance().getImage(HEAL_OTHERS.imgPath);
-            } else if (a instanceof Upgrade) {
-                return ImageIO.GetInstance().getImage(UPGRADE_BOAT.imgPath);
-            } else if (a instanceof Convert) {
-                return ImageIO.GetInstance().getImage(CONVERT.imgPath);
-            }
-            return null;
+            return ImageIO.GetInstance().getImage(a.getActionType().imgPath);
         }
 
         public ActionCommand getCommand()

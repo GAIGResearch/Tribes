@@ -18,6 +18,7 @@ import players.rhea.RHEAParams;
 import utils.IO;
 import utils.MultiStatSummary;
 
+
 import javax.swing.plaf.metal.MetalBorders;
 import java.util.*;
 
@@ -34,7 +35,7 @@ public class Tournament {
     private static boolean MCTS_ROLLOUTS;
     private static int POP_SIZE;
 
-    private static Agent _getAgent(PlayerType playerType, long agentSeed, ActionController ac)
+    public static Agent _getAgent(PlayerType playerType, long agentSeed, ActionController ac)
     {
         switch (playerType)
         {
@@ -101,18 +102,19 @@ public class Tournament {
         }else {
             try {
 
-                gameMode = ((String) config.get("Game Mode")).equalsIgnoreCase("Capitals") ?
+                gameMode = config.getString("Game Mode").equalsIgnoreCase("Capitals") ?
                         CAPITALS : SCORE;
                 t = new Tournament(gameMode);
-                nRepetitions = (Integer)config.get("Repetitions");
-                MAX_LENGTH = (Integer)config.get("Search Depth");
-                FORCE_TURN_END = (Boolean)config.get("Force End");
-                MCTS_ROLLOUTS = (Boolean)config.get("Rollouts");
-                POP_SIZE = (Integer)config.get("Population Size");
-                shiftTribes = (Boolean)config.get("Shift Tribes");
+                nRepetitions = config.getInt("Repetitions");
+
+                MAX_LENGTH = config.getInt("Search Depth");
+                FORCE_TURN_END = config.getBoolean("Force End");
+                MCTS_ROLLOUTS = config.getBoolean("Rollouts");
+                POP_SIZE = config.getInt("Population Size");
+                shiftTribes = config.getBoolean("Shift Tribes");
 
                 JSONArray playersArray = (JSONArray) config.get("Players");
-                JSONArray tribesArray = (JSONArray)config.get("Tribes");
+                JSONArray tribesArray = (JSONArray) config.get("Tribes");
                 if (playersArray.length() != tribesArray.length())
                     throw new Exception("Number of players must be equal to number of tribes");
 
@@ -121,14 +123,14 @@ public class Tournament {
                 Types.TRIBE[] tribes = new Types.TRIBE[nPlayers];
 
                 for (int i = 0; i < nPlayers; ++i) {
-                    playerTypes[i] = parsePlayerTypeStr(playersArray.getString(i));
-                    tribes[i] = parseTribeStr(tribesArray.getString(i));
+                    playerTypes[i] = Run.parsePlayerTypeStr(playersArray.getString(i));
+                    tribes[i] = Run.parseTribeStr(tribesArray.getString(i));
                 }
 
                 t.setPlayers(playerTypes);
                 t.setTribes(tribes);
 
-                Constants.VERBOSE = (Boolean)config.get("Verbose");
+                Constants.VERBOSE = config.getBoolean("Verbose");
                 JSONArray seeds = (JSONArray) config.get("Level Seeds");
                 t.setSeeds(seeds);
 
@@ -142,35 +144,6 @@ public class Tournament {
         //All ready, running.
         t.run(nRepetitions, shiftTribes);
     }
-
-    private static PlayerType parsePlayerTypeStr(String arg) throws Exception
-    {
-        switch(arg)
-        {
-            case "Do Nothing": return PlayerType.DONOTHING;
-            case "Random": return PlayerType.RANDOM;
-            case "Rule Based": return PlayerType.SIMPLE;
-            case "OSLA": return PlayerType.OSLA;
-            case "MC": return PlayerType.MC;
-            case "MCTS": return PlayerType.MCTS;
-            case "RHEA": return PlayerType.RHEA;
-            case "OEP": return PlayerType.OEP;
-        }
-        throw new Exception("Error: unrecognized Player Type: " + arg);
-    }
-
-    private static Types.TRIBE parseTribeStr(String arg) throws Exception
-    {
-        switch(arg)
-        {
-            case "Xin Xi": return XIN_XI;
-            case "Imperius": return IMPERIUS;
-            case "Bardur": return BARDUR;
-            case "Oumaji": return OUMAJI;
-        }
-        throw new Exception("Error: unrecognized Tribe: " + arg);
-    }
-
 
     private Types.GAME_MODE gameMode;
     private boolean RUN_VERBOSE = true;
@@ -477,7 +450,7 @@ public class Tournament {
 
     /// ----- Players and participants -----
 
-    enum PlayerType
+    public enum PlayerType
     {
         DONOTHING,
         HUMAN,
@@ -489,7 +462,6 @@ public class Tournament {
         RHEA,
         OEP;
     }
-
 
     private static class Participant
     {

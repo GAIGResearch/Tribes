@@ -1,0 +1,20 @@
+{
+  "Run Mode" : "PlayLG",
+  "Run Mode comment" : "PlayLG / PlayFile / Replay",
+
+  "Game Mode" : "Capitals",
+  "Rollouts" : false,
+  "Search Depth" : 5,
+  "Force End" : false,
+  "Population Size" : 20,
+  "Players" : ["MCTS", "RHEA", "OSLA", "Random"],
+  "Tribes" : ["Xin Xi", "Imperius", "Bardur", "Oumaji"],
+  "Verbose" : false,
+
+  "Replay File Name" : "save/1590072023986/0_0/game.json",
+  "Level File" : "levels/SampleLevel.csv",
+
+  "Game Seed" : "-1",
+  "Agents Seed" : "-1",
+  "Level Seed" : "-1"
+}

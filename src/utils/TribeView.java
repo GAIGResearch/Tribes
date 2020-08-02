@@ -55,27 +55,24 @@ public class TribeView extends JComponent {
             Tribe[] tribes = gs.getTribes().clone();
 
             Tribe t_this = tribes[gs.getActiveTribeID()];
-            String s = "<p><b>" + t_this.getName() + "</b>  ...........  " + t_this.getScore() + " points. Stars: "
-                    + t_this.getStars() + " (+" + t_this.getMaxProduction(gs) + ")</p><br/><hr><h2>Rankings</h2>";
+            StringBuilder s = new StringBuilder("<p><b>" + t_this.getName() + "</b>  ...........  " + t_this.getScore() + " points. Stars: "
+                    + t_this.getStars() + " (+" + t_this.getMaxProduction(gs) + ")</p><br/><hr><h2>Rankings</h2>");
             Agent[] agents = game.getPlayers();
 
-            // TODO: make sure this doesn't mess up assumptions of tribe order, it shouldn't since array cloned
             Arrays.sort(tribes, Comparator.comparing(Tribe::getReverseScore));
-            for(int i = 0; i < tribes.length; ++i)
-            {
-                Tribe t = tribes[i];
-                Agent ag = agents[i];
+            for (Tribe t : tribes) {
+                Agent ag = agents[t.getTribeId()];
                 Types.RESULT winState = t.getWinner();
                 String w = "";
                 String[] agentChunks = ag.getClass().toString().split("\\.");
-                String agentName = agentChunks[agentChunks.length-1];
+                String agentName = agentChunks[agentChunks.length - 1];
 
                 if (winState != Types.RESULT.INCOMPLETE) w = " (" + winState.toString() + ")";
-                s += "<p><b>" + t.getName() + "</b> (" + agentName +  ") ...........  " + t.getScore() + " points" + w + "</p>";
+                s.append("<p><b>").append(t.getName()).append("</b> (").append(agentName).append(") ...........  ").append(t.getScore()).append(" points").append(w).append("</p>");
             }
 
-            if (!textArea.getText().equals(s)) {
-                textArea.setText(s);
+            if (!textArea.getText().equals(s.toString())) {
+                textArea.setText(s.toString());
             }
         }
     }

@@ -44,6 +44,7 @@ class Run {
     {
         switch(arg)
         {
+            case "Human": return Tournament.PlayerType.HUMAN;
             case "Do Nothing": return Tournament.PlayerType.DONOTHING;
             case "Random": return Tournament.PlayerType.RANDOM;
             case "Rule Based": return Tournament.PlayerType.SIMPLE;

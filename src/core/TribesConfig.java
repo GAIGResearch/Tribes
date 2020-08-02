@@ -195,6 +195,7 @@ public class TribesConfig
     public static final int CITY_LEVEL_UP_POP_GROWTH = 3;
     public static final int CITY_LEVEL_UP_PARK = 250;
     public static final int CITY_BORDER_POINTS = 20;
+    public static final int CITY_CENTRE_POINTS = 100;
     public static final int PROD_CAPITAL_BONUS = 1;
     public static final int EXPLORER_CLEAR_RANGE = 1;
     public static final int FIRST_CITY_CLEAR_RANGE = 2;
@@ -206,6 +207,7 @@ public class TribesConfig
     public static final int TECH_BASE_COST = 4;
     public static final Types.TECHNOLOGY TECH_DISCOUNT = Types.TECHNOLOGY.PHILOSOPHY;
     public static final double TECH_DISCOUNT_VALUE = 0.2;
+    public static final int TECH_TIER_POINTS = 100;
 
     /* TRIBES */
     public static final int INITIAL_STARS = 5;//1000;

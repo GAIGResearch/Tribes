@@ -445,7 +445,6 @@ public class GameState {
 
         if(tick == 0)
         {
-            tribe.setScore(tribe.getType().getInitialScore());
             tribe.setStars(TribesConfig.INITIAL_STARS);
         }else{
             acumProd = Math.max(0, acumProd); //Never have a negative amount of stars.

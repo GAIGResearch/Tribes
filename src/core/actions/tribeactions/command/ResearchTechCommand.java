@@ -21,6 +21,7 @@ public class ResearchTechCommand implements ActionCommand {
             int techCost = tech.getCost(tribe.getNumCities(), tribe.getTechTree());
             tribe.subtractStars(techCost);
             tribe.getTechTree().doResearch(tech);
+            tribe.addScore(tech.getPoints());
 
             //Flag if research tree is completed.
             if (tribe.getTechTree().isEverythingResearched())

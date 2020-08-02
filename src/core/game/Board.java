@@ -660,6 +660,9 @@ public class Board {
             // Move the unit from one city to village. Rank: capital -> cities -> None
             moveOneToNewCity(newCity, capturingTribe, rnd);
 
+            //Add score for this city centre
+            capturingTribe.addScore(TribesConfig.CITY_CENTRE_POINTS);
+
         }else if(ter == CITY)
         {
             City capturedCity = (City) gameActors.get(tileCityId[x][y]);

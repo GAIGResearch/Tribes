@@ -6,7 +6,6 @@ import core.actions.cityactions.command.*;
 import core.actions.tribeactions.command.BuildRoadCommand;
 import core.actions.tribeactions.command.EndTurnCommand;
 import core.actions.tribeactions.command.ResearchTechCommand;
-import core.actions.unitactions.*;
 import core.actions.unitactions.command.*;
 import core.actors.units.*;
 import org.json.JSONObject;
@@ -82,28 +81,28 @@ public class Types {
             return cost;
         }
 
+        public int getPoints() { return this.tier * TECH_TIER_POINTS;}
+
     }
 
     public enum TRIBE{
-        XIN_XI(0, "Xin-Xi", CLIMBING, WARRIOR, 515,
+        XIN_XI(0, "Xin-Xi", CLIMBING, WARRIOR,
                 new Color(251, 2, 7), new Color(253, 130, 123), new Color(174, 66, 48)),
-        IMPERIUS(1, "Imperius", ORGANIZATION, WARRIOR, 515,
+        IMPERIUS(1, "Imperius", ORGANIZATION, WARRIOR,
                 new Color(0, 0, 255), new Color(102, 125, 255), new Color(50, 73, 177)),
-        BARDUR(2, "Bardur", HUNTING, WARRIOR, 515,
+        BARDUR(2, "Bardur", HUNTING, WARRIOR,
                 new Color(76, 76, 76), new Color(176, 178, 178), new Color(70, 58, 58)),
-        OUMAJI(3, "Oumaji", RIDING, RIDER, 520, //yes, 520.
+        OUMAJI(3, "Oumaji", RIDING, RIDER,
                 new Color(255, 255, 10), new Color(242, 255, 100), new Color(146, 144, 0));
 
         private int key;
         private String name;
         private TECHNOLOGY initialTech;
         private UNIT startingUnit;
-        private int startingScore;
         private Color color, color_light, color_dark;
-        TRIBE(int numVal, String name, TECHNOLOGY initialTech, UNIT startingUnit, int startingScore, Color color, Color color_light, Color color_dark) {
+        TRIBE(int numVal, String name, TECHNOLOGY initialTech, UNIT startingUnit, Color color, Color color_light, Color color_dark) {
             this.key = numVal;  this.name = name; this.initialTech = initialTech; this.startingUnit = startingUnit;
             this.color = color;
-            this.startingScore = startingScore;
             this.color_light = color_light;
             this.color_dark = color_dark;
         }
@@ -122,7 +121,6 @@ public class Types {
             return initialTech;
         }
         public UNIT getStartingUnit() {return startingUnit;}
-        public int getInitialScore() { return startingScore; }
         public Color getColorDark() {return color_dark;}
     }
 

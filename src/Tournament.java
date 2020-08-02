@@ -18,8 +18,6 @@ import players.rhea.RHEAParams;
 import utils.IO;
 import utils.MultiStatSummary;
 
-
-import javax.swing.plaf.metal.MetalBorders;
 import java.util.*;
 
 import static core.Types.GAME_MODE.*;
@@ -35,11 +33,10 @@ public class Tournament {
     private static boolean MCTS_ROLLOUTS;
     private static int POP_SIZE;
 
-    public static Agent _getAgent(PlayerType playerType, long agentSeed, ActionController ac)
+    private static Agent _getAgent(PlayerType playerType, long agentSeed)
     {
         switch (playerType)
         {
-            case HUMAN: return new HumanAgent(ac);
             case DONOTHING: return new DoNothingAgent(agentSeed);
             case RANDOM: return new RandomAgent(agentSeed);
             case SIMPLE: return new SimpleAgent(agentSeed);
@@ -75,7 +72,6 @@ public class Tournament {
                 rheaParams.INDIVIDUAL_LENGTH = MAX_LENGTH;
                 rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
                 rheaParams.POP_SIZE = POP_SIZE;
-//                rheaParams.print();
                 return new RHEAAgent(agentSeed, rheaParams);
         }
         return null;
@@ -147,7 +143,6 @@ public class Tournament {
 
     private Types.GAME_MODE gameMode;
     private boolean RUN_VERBOSE = true;
-    private long AGENT_SEED = -1, GAME_SEED = -1;
     private HashMap<Integer, Participant> participants;
     private MultiStatSummary[] stats;
     private Types.TRIBE[] tribes;
@@ -173,10 +168,6 @@ public class Tournament {
 
     public void setTribes(Types.TRIBE[] tribes) {
         this.tribes = tribes;
-    }
-
-    private void setSeeds(long[] seeds) {
-        this.seeds = seeds;
     }
 
     private void setSeeds(JSONArray seeds) {
@@ -223,7 +214,7 @@ public class Tournament {
                 }
                 System.out.println("] (" + (nseed*repetitions + rep + 1) + "/" + (seeds.length*repetitions) + ")");
 
-                Game game = _prepareGame(tribes, levelSeed, players, gameMode, null);
+                Game game = _prepareGame(tribes, levelSeed, players, gameMode);
 
                 try {
                     Run.runGame(game);
@@ -250,54 +241,6 @@ public class Tournament {
 
     }
 
-
-    public void run(String[] levelFiles, int repetitions, boolean shift)
-    {
-        int starter = 0;
-        for (String s : levelFiles) {
-
-            System.out.println("**** Playing level with file " + s + " ****");
-
-            for (int rep = 0; rep < repetitions; rep++) {
-
-                HashMap<Types.TRIBE, Participant> assignment = new HashMap<>();
-                int next = starter;
-                PlayerType[] players = new PlayerType[participants.size()];
-
-                int playersIn = 0;
-                System.out.print("Playing with [");
-                while(playersIn < participants.size())
-                {
-                    Participant p = participants.get(next);
-                    System.out.print(p.participantId + ":" + p.playerType + "(" + tribes[playersIn] + ")");
-                    players[playersIn] = p.playerType;
-                    assignment.put(tribes[playersIn], p);
-
-                    playersIn++;
-                    next = (next + 1) % participants.size();
-
-                    if (playersIn < participants.size())
-                        System.out.print(", ");
-                }
-                System.out.println("]");
-
-                Game game = _prepareGame(s, players, gameMode, null);
-                Run.runGame(game);
-
-                _addGameResults(game, assignment);
-
-                //Shift arrays for position changes.
-                if (shift) {
-                    starter = (starter + 1) % participants.size();
-                }
-            }
-        }
-
-        _printRunResults();
-
-    }
-
-
     private MultiStatSummary initMultiStat(Participant p)
     {
         MultiStatSummary mss = new MultiStatSummary(p);
@@ -309,25 +252,13 @@ public class Tournament {
         return mss;
     }
 
-    private Game _prepareGame(String levelFile, PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
+    private Game _prepareGame(Types.TRIBE[] tribes, long levelSeed, PlayerType[] playerTypes, Types.GAME_MODE gameMode)
     {
-        long gameSeed = GAME_SEED == -1 ? System.currentTimeMillis() : GAME_SEED;
-        if(RUN_VERBOSE) System.out.println("Game seed: " + gameSeed);
-
-        ArrayList<Agent> players = getPlayers(playerTypes, ac);
-
-        Game game = new Game();
-        game.init(players, levelFile, gameSeed, gameMode);
-        return game;
-    }
-
-    private Game _prepareGame(Types.TRIBE[] tribes, long levelSeed, PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
-    {
-        long gameSeed = GAME_SEED == -1 ? System.currentTimeMillis() : GAME_SEED;
+        long gameSeed = System.currentTimeMillis();
 
         if(RUN_VERBOSE) System.out.println("Game seed: " + gameSeed);
 
-        ArrayList<Agent> players = getPlayers(playerTypes, ac);
+        ArrayList<Agent> players = getPlayers(playerTypes);
 
         Game game = new Game();
 
@@ -342,10 +273,10 @@ public class Tournament {
         return game;
     }
 
-    private ArrayList<Agent> getPlayers(PlayerType[] playerTypes, ActionController ac)
+    private ArrayList<Agent> getPlayers(PlayerType[] playerTypes)
     {
         ArrayList<Agent> players = new ArrayList<>();
-        long agentSeed = AGENT_SEED == -1 ? System.currentTimeMillis() + new Random().nextInt() : AGENT_SEED;
+        long agentSeed = System.currentTimeMillis();
 
         if(RUN_VERBOSE)  System.out.println("Agents random seed: " + agentSeed);
 
@@ -355,7 +286,8 @@ public class Tournament {
 
         for(int i = 0; i < playerTypes.length; ++i)
         {
-            Agent ag = _getAgent(playerTypes[i], agentSeed, ac);
+            Agent ag = _getAgent(playerTypes[i], agentSeed);
+            assert ag != null;
             ag.setPlayerIDs(i, allIds);
             players.add(ag);
         }
@@ -460,7 +392,7 @@ public class Tournament {
         SIMPLE,
         MCTS,
         RHEA,
-        OEP;
+        OEP
     }
 
     private static class Participant

@@ -40,7 +40,7 @@ class Run {
         g.run(null, null);
     }
 
-    public static Tournament.PlayerType parsePlayerTypeStr(String arg) throws Exception
+    static Tournament.PlayerType parsePlayerTypeStr(String arg) throws Exception
     {
         switch(arg)
         {
@@ -56,7 +56,7 @@ class Run {
         throw new Exception("Error: unrecognized Player Type: " + arg);
     }
 
-    public static Types.TRIBE parseTribeStr(String arg) throws Exception
+    static Types.TRIBE parseTribeStr(String arg) throws Exception
     {
         switch(arg)
         {

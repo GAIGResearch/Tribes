@@ -1,5 +1,7 @@
 import core.Types;
 import core.game.Game;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import players.*;
 import players.mc.MCParams;
 import players.mc.MonteCarloAgent;
@@ -11,39 +13,182 @@ import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
 import players.rhea.RHEAAgent;
 import players.rhea.RHEAParams;
+import utils.IO;
 
 import java.util.*;
 
 import static core.Types.GAME_MODE.*;
-import static core.Types.TRIBE.*;
 
 /**
  * Entry point of the framework.
  */
 public class Play {
 
-    public static boolean RUN_VERBOSE = true;
-    public static long AGENT_SEED = -1, GAME_SEED = -1;
+    private static boolean RUN_VERBOSE = true;
+    private static long AGENT_SEED = -1;
+    private static long GAME_SEED = -1;
 
-    enum PlayerType
-    {
-        DONOTHING,
-        HUMAN,
-        RANDOM,
-        OSLA,
-        MC,
-        SIMPLE,
-        MCTS,
-        RHEA,
-        OEP;
+    public static void main(String[] args) {
+
+        try {
+            JSONObject config = new IO().readJSON("play.json");
+
+            if (config != null && !config.isEmpty()) {
+                String runMode = config.getString("Run Mode");
+
+                JSONArray playersArray = (JSONArray) config.get("Players");
+                JSONArray tribesArray = (JSONArray) config.get("Tribes");
+                if (playersArray.length() != tribesArray.length())
+                    throw new Exception("Number of players must be equal to number of tribes");
+
+                int nPlayers = playersArray.length();
+                Tournament.PlayerType[] playerTypes = new Tournament.PlayerType[nPlayers];
+                Types.TRIBE[] tribes = new Types.TRIBE[nPlayers];
+
+                for (int i = 0; i < nPlayers; ++i) {
+                    playerTypes[i] = Run.parsePlayerTypeStr(playersArray.getString(i));
+                    tribes[i] = Run.parseTribeStr(tribesArray.getString(i));
+                }
+                Types.GAME_MODE gameMode = config.getString("Game Mode").equalsIgnoreCase("Capitals") ?
+                        CAPITALS : SCORE;
+
+                AGENT_SEED = config.getLong("Agents Seed");
+                GAME_SEED = config.getLong("Game Seed");
+                long levelSeed = config.getLong("Level Seed");
+
+                //1. Play one game with visuals using the Level Generator:
+                if (runMode.equalsIgnoreCase("PlayLG")) {
+                    play(tribes, levelSeed, playerTypes, gameMode);
+
+                //2. Play one game with visuals from a file:
+                } else if (runMode.equalsIgnoreCase("PlayFile")) {
+                    String levelFile = config.getString("Level File");
+                    play(levelFile, playerTypes, gameMode);
+
+                //3. Play one game with visuals from a savegame
+                } else if (runMode.equalsIgnoreCase("Replay")) {
+                    String saveGameFile = config.getString("Replay File Name");
+                    load(playerTypes, saveGameFile);
+                } else {
+                    System.out.println("ERROR: run mode '" + runMode + "' not recognized.");
+                }
+
+            } else {
+                System.out.println("ERROR: Couldn't find 'play.json'");
+            }
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
-//    Game seed: 1590514560867
-//    Agents random seed: 1590486463964
-//    Level seed: 1591330872230
+    private static void play(Types.TRIBE[] tribes, long levelSeed, Tournament.PlayerType[] playerTypes, Types.GAME_MODE gameMode)
+    {
+        KeyController ki = new KeyController(true);
+        ActionController ac = new ActionController();
+
+        Game game = _prepareGame(tribes, levelSeed, playerTypes, gameMode, ac);
+        Run.runGame(game, ki, ac);
+    }
+
+    private static void play(String levelFile, Tournament.PlayerType[] playerTypes, Types.GAME_MODE gameMode)
+    {
+        KeyController ki = new KeyController(true);
+        ActionController ac = new ActionController();
+
+        Game game = _prepareGame(levelFile, playerTypes, gameMode, ac);
+        Run.runGame(game, ki, ac);
+    }
 
 
-    private static Agent _getAgent(PlayerType playerType, long agentSeed, ActionController ac)
+    private static void load(Tournament.PlayerType[] playerTypes, String saveGameFile)
+    {
+        KeyController ki = new KeyController(true);
+        ActionController ac = new ActionController();
+
+        long agentSeed = AGENT_SEED == -1 ? System.currentTimeMillis() + new Random().nextInt() : AGENT_SEED;
+
+        Game game = _loadGame(playerTypes, saveGameFile, agentSeed);
+        Run.runGame(game, ki, ac);
+    }
+
+
+    private static Game _prepareGame(String levelFile, Tournament.PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
+    {
+        long gameSeed = GAME_SEED == -1 ? System.currentTimeMillis() : GAME_SEED;
+        if(RUN_VERBOSE) System.out.println("Game seed: " + gameSeed);
+
+        ArrayList<Agent> players = getPlayers(playerTypes, ac);
+
+        Game game = new Game();
+        game.init(players, levelFile, gameSeed, gameMode);
+        return game;
+    }
+
+    private static Game _prepareGame(Types.TRIBE[] tribes, long levelSeed, Tournament.PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
+    {
+        long gameSeed = GAME_SEED == -1 ? System.currentTimeMillis() : GAME_SEED;
+
+        if(RUN_VERBOSE) System.out.println("Game seed: " + gameSeed);
+
+        ArrayList<Agent> players = getPlayers(playerTypes, ac);
+
+        Game game = new Game();
+
+        long levelGenSeed = levelSeed;
+        if(levelGenSeed == -1)
+            levelGenSeed = System.currentTimeMillis() + new Random().nextInt();
+
+        if(RUN_VERBOSE) System.out.println("Level seed: " + levelGenSeed);
+
+        game.init(players, levelGenSeed, tribes, gameSeed, gameMode);
+
+        return game;
+    }
+
+    private static ArrayList<Agent> getPlayers(Tournament.PlayerType[] playerTypes, ActionController ac)
+    {
+        ArrayList<Agent> players = new ArrayList<>();
+        long agentSeed = AGENT_SEED == -1 ? System.currentTimeMillis() + new Random().nextInt() : AGENT_SEED;
+
+        if(RUN_VERBOSE)  System.out.println("Agents random seed: " + agentSeed);
+
+        ArrayList<Integer> allIds = new ArrayList<>();
+        for(int i = 0; i < playerTypes.length; ++i)
+            allIds.add(i);
+
+        for(int i = 0; i < playerTypes.length; ++i)
+        {
+            Agent ag = _getAgent(playerTypes[i], agentSeed, ac);
+            assert ag != null;
+            ag.setPlayerIDs(i, allIds);
+            players.add(ag);
+        }
+        return players;
+    }
+
+    private static Game _loadGame(Tournament.PlayerType[] playerTypes, String saveGameFile, long agentSeed)
+    {
+        ArrayList<Agent> players = new ArrayList<>();
+        ArrayList<Integer> allIds = new ArrayList<>();
+        for(int i = 0; i < playerTypes.length; ++i)
+            allIds.add(i);
+
+        for(int i = 0; i < playerTypes.length; ++i)
+        {
+            Agent ag = _getAgent(playerTypes[i], agentSeed, null);
+            assert ag != null;
+            ag.setPlayerIDs(i, allIds);
+            players.add(ag);
+        }
+
+        Game game = new Game();
+        game.init(players, saveGameFile);
+        return game;
+    }
+
+
+    private static Agent _getAgent(Tournament.PlayerType playerType, long agentSeed, ActionController ac)
     {
         switch (playerType)
         {
@@ -88,138 +233,4 @@ public class Play {
         }
         return null;
     }
-
-
-    public static void main(String[] args) {
-
-        Types.GAME_MODE gameMode = CAPITALS; //SCORE;
-
-//        String filename = "levels/SampleLevel2p.csv";
-//        String filename = "levels/SampleLevel.csv";
-//        String filename = "levels/MinimalLevel.csv";
-//        String filename = "levels/MinimalLevel_water.csv";
-//        String filename = "levels/MinimalLevel2.csv";
-
-        String saveGameFile = "save/1589357287411/4_0/game.json";
-
-
-        //1. Play one game with visuals using the Level Generator:
-//        AGENT_SEED = 1595182910699L; GAME_SEED = 1596317202689L;
-        play(new Types.TRIBE[]{XIN_XI, IMPERIUS}, -1, new PlayerType[]{PlayerType.MCTS, PlayerType.RHEA}, gameMode);
-//        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR}, -1, new PlayerType[]{PlayerType.HUMAN, PlayerType.OSLA, PlayerType.OSLA}, gameMode);
-//        play(new Types.TRIBE[]{XIN_XI, IMPERIUS, BARDUR, OUMAJI}, -1, new PlayerType[]{PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE}, gameMode);
-
-        //2. Play one game with visuals from a file:
-//        play(filename[0], new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.RANDOM, PlayerType.HUMAN}, gameMode);
-//        play(filename[0], new PlayerType[]{PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE, PlayerType.SIMPLE}, gameMode);
-//        play(filename[0], new PlayerType[]{PlayerType.HUMAN, PlayerType.SIMPLE}, gameMode);
-
-
-        //3. Play one game with visuals from a savegame
-//        load(new PlayerType[]{PlayerType.SIMPLE, PlayerType.OSLA, PlayerType.RANDOM, PlayerType.OSLA}, saveGameFile);
-    }
-
-    private static void play(Types.TRIBE[] tribes, long levelSeed, PlayerType[] playerTypes, Types.GAME_MODE gameMode)
-    {
-        KeyController ki = new KeyController(true);
-        ActionController ac = new ActionController();
-
-        Game game = _prepareGame(tribes, levelSeed, playerTypes, gameMode, ac);
-        Run.runGame(game, ki, ac);
-    }
-
-    private static void play(String levelFile, PlayerType[] playerTypes, Types.GAME_MODE gameMode)
-    {
-        KeyController ki = new KeyController(true);
-        ActionController ac = new ActionController();
-
-        Game game = _prepareGame(levelFile, playerTypes, gameMode, ac);
-        Run.runGame(game, ki, ac);
-    }
-
-
-    private static void load(PlayerType[] playerTypes, String saveGameFile)
-    {
-        KeyController ki = new KeyController(true);
-        ActionController ac = new ActionController();
-
-        long agentSeed = AGENT_SEED == -1 ? System.currentTimeMillis() + new Random().nextInt() : AGENT_SEED;
-
-        Game game = _loadGame(playerTypes, saveGameFile, agentSeed);
-        Run.runGame(game, ki, ac);
-    }
-
-
-    private static Game _prepareGame(String levelFile, PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
-    {
-        long gameSeed = GAME_SEED == -1 ? System.currentTimeMillis() : GAME_SEED;
-        if(RUN_VERBOSE) System.out.println("Game seed: " + gameSeed);
-
-        ArrayList<Agent> players = getPlayers(playerTypes, ac);
-
-        Game game = new Game();
-        game.init(players, levelFile, gameSeed, gameMode);
-        return game;
-    }
-
-    private static Game _prepareGame(Types.TRIBE[] tribes, long levelSeed, PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
-    {
-        long gameSeed = GAME_SEED == -1 ? System.currentTimeMillis() : GAME_SEED;
-
-        if(RUN_VERBOSE) System.out.println("Game seed: " + gameSeed);
-
-        ArrayList<Agent> players = getPlayers(playerTypes, ac);
-
-        Game game = new Game();
-
-        long levelGenSeed = levelSeed;
-        if(levelGenSeed == -1)
-            levelGenSeed = System.currentTimeMillis() + new Random().nextInt();
-
-        if(RUN_VERBOSE) System.out.println("Level seed: " + levelGenSeed);
-
-        game.init(players, levelGenSeed, tribes, gameSeed, gameMode);
-
-        return game;
-    }
-
-    private static ArrayList<Agent> getPlayers(PlayerType[] playerTypes, ActionController ac)
-    {
-        ArrayList<Agent> players = new ArrayList<>();
-        long agentSeed = AGENT_SEED == -1 ? System.currentTimeMillis() + new Random().nextInt() : AGENT_SEED;
-
-        if(RUN_VERBOSE)  System.out.println("Agents random seed: " + agentSeed);
-
-        ArrayList<Integer> allIds = new ArrayList<>();
-        for(int i = 0; i < playerTypes.length; ++i)
-            allIds.add(i);
-
-        for(int i = 0; i < playerTypes.length; ++i)
-        {
-            Agent ag = _getAgent(playerTypes[i], agentSeed, ac);
-            ag.setPlayerIDs(i, allIds);
-            players.add(ag);
-        }
-        return players;
-    }
-
-    private static Game _loadGame(PlayerType[] playerTypes, String saveGameFile, long agentSeed)
-    {
-        ArrayList<Agent> players = new ArrayList<>();
-        ArrayList<Integer> allIds = new ArrayList<>();
-        for(int i = 0; i < playerTypes.length; ++i)
-            allIds.add(i);
-
-        for(int i = 0; i < playerTypes.length; ++i)
-        {
-            Agent ag = _getAgent(playerTypes[i], agentSeed, null);
-            ag.setPlayerIDs(i, allIds);
-            players.add(ag);
-        }
-
-        Game game = new Game();
-        game.init(players, saveGameFile);
-        return game;
-    }
-
 }

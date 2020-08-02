@@ -1,3 +1,4 @@
+import core.Types;
 import core.game.Game;
 import players.ActionController;
 import players.KeyController;
@@ -5,6 +6,8 @@ import utils.GUI;
 import utils.WindowInput;
 
 import static core.Constants.*;
+import static core.Types.TRIBE.*;
+import static core.Types.TRIBE.OUMAJI;
 
 class Run {
 
@@ -36,4 +39,33 @@ class Run {
     static void runGame(Game g) {
         g.run(null, null);
     }
+
+    static Tournament.PlayerType parsePlayerTypeStr(String arg) throws Exception
+    {
+        switch(arg)
+        {
+            case "Do Nothing": return Tournament.PlayerType.DONOTHING;
+            case "Random": return Tournament.PlayerType.RANDOM;
+            case "Rule Based": return Tournament.PlayerType.SIMPLE;
+            case "OSLA": return Tournament.PlayerType.OSLA;
+            case "MC": return Tournament.PlayerType.MC;
+            case "MCTS": return Tournament.PlayerType.MCTS;
+            case "RHEA": return Tournament.PlayerType.RHEA;
+            case "OEP": return Tournament.PlayerType.OEP;
+        }
+        throw new Exception("Error: unrecognized Player Type: " + arg);
+    }
+
+    static Types.TRIBE parseTribeStr(String arg) throws Exception
+    {
+        switch(arg)
+        {
+            case "Xin Xi": return XIN_XI;
+            case "Imperius": return IMPERIUS;
+            case "Bardur": return BARDUR;
+            case "Oumaji": return OUMAJI;
+        }
+        throw new Exception("Error: unrecognized Tribe: " + arg);
+    }
+
 }

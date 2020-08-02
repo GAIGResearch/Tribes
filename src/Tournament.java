@@ -2,6 +2,8 @@ import core.Constants;
 import core.Types;
 import core.game.Game;
 import core.game.TribeResult;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import players.*;
 import players.mc.MCParams;
 import players.mc.MonteCarloAgent;
@@ -13,6 +15,7 @@ import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
 import players.rhea.RHEAAgent;
 import players.rhea.RHEAParams;
+import utils.IO;
 import utils.MultiStatSummary;
 
 import javax.swing.plaf.metal.MetalBorders;
@@ -79,96 +82,93 @@ public class Tournament {
 
     public static void main(String[] args) {
 
-
-        long seeds[] = new long[]{
-                1590191438878L, 1590791907337L,
-                1591330872230L, 1590557911279L,
-                1589827394219L, 1590597667781L,
-                1588955551452L, 1588591994323L,
-                1590218550448L, 1592282275322L,
-                1592432219672L, 1590938785410L,
-                1589359308213L, 1591528602817L,
-                1592393638354L, 1588485987095L,
-                1588564020405L, 1589717827778L,
-                1592435145738L, 1592040799152L,
-                1588965819946L, 1589014941900L,
-                1590182659177L, 1590912178111L,
-                1588407146837L
-        };
-//        Arrays.fill(seeds, -1);
-
+        //Some defaults:
         Types.GAME_MODE gameMode = CAPITALS; //SCORE;
         Tournament t = new Tournament(gameMode);
         int nRepetitions = 4;
-        if(args.length == 0)
+        boolean shiftTribes = true;
+        Constants.VERBOSE = true;
+
+        JSONObject config = null;
+        if(args.length > 0)
+            //First argument should be the name of the JSON file with the tournament configuration
+            config = new IO().readJSON(args[0]);
+
+        if(config == null || config.isEmpty())
         {
             t.setPlayers(new PlayerType[]{PlayerType.MC, PlayerType.MC});
             t.setTribes(new Types.TRIBE[]{XIN_XI, IMPERIUS});
-        }else
-        {
+        }else {
             try {
-                gameMode = (Integer.parseInt(args[0]) == 0) ? CAPITALS : SCORE;
+
+                gameMode = ((String) config.get("Game Mode")).equalsIgnoreCase("Capitals") ?
+                        CAPITALS : SCORE;
                 t = new Tournament(gameMode);
-                nRepetitions = Integer.parseInt(args[1]);
+                nRepetitions = (Integer)config.get("Repetitions");
+                MAX_LENGTH = (Integer)config.get("Search Depth");
+                FORCE_TURN_END = (Boolean)config.get("Force End");
+                MCTS_ROLLOUTS = (Boolean)config.get("Rollouts");
+                POP_SIZE = (Integer)config.get("Population Size");
+                shiftTribes = (Boolean)config.get("Shift Tribes");
 
-                MAX_LENGTH = Integer.parseInt(args[2]);
-                FORCE_TURN_END = Integer.parseInt(args[3]) == 1;
-                MCTS_ROLLOUTS = Integer.parseInt(args[4]) == 1;
-                POP_SIZE = Integer.parseInt(args[5]);
+                JSONArray playersArray = (JSONArray) config.get("Players");
+                JSONArray tribesArray = (JSONArray)config.get("Tribes");
+                if (playersArray.length() != tribesArray.length())
+                    throw new Exception("Number of players must be equal to number of tribes");
 
-                int nPlayers = (args.length - 6) / 2;
+                int nPlayers = playersArray.length();
                 PlayerType[] playerTypes = new PlayerType[nPlayers];
                 Types.TRIBE[] tribes = new Types.TRIBE[nPlayers];
 
                 for (int i = 0; i < nPlayers; ++i) {
-                    playerTypes[i] = parsePlayerTypeStr(args[6 + i]);
-                    tribes[i] = parseTribeStr(args[6 + nPlayers + i]);
+                    playerTypes[i] = parsePlayerTypeStr(playersArray.getString(i));
+                    tribes[i] = parseTribeStr(tribesArray.getString(i));
                 }
 
                 t.setPlayers(playerTypes);
                 t.setTribes(tribes);
 
-            }catch(Exception e)
-            {
+                Constants.VERBOSE = (Boolean)config.get("Verbose");
+                JSONArray seeds = (JSONArray) config.get("Level Seeds");
+                t.setSeeds(seeds);
+
+            } catch (Exception e) {
+                System.out.println("Malformed JSON config file: " + e);
+                e.printStackTrace();
                 printRunHelp(args);
-                System.exit(-1);
             }
         }
 
-        boolean shiftTribes = true;
-        t.setSeeds(seeds);
-        Constants.VERBOSE = true;
+        //All ready, running.
         t.run(nRepetitions, shiftTribes);
     }
 
     private static PlayerType parsePlayerTypeStr(String arg) throws Exception
     {
-        int data = Integer.parseInt(arg);
-        switch(data)
+        switch(arg)
         {
-            case 0: return PlayerType.DONOTHING;
-            case 1: return PlayerType.RANDOM;
-            case 2: return PlayerType.SIMPLE;
-            case 3: return PlayerType.OSLA;
-            case 4: return PlayerType.MC;
-            case 5: return PlayerType.MCTS;
-            case 6: return PlayerType.RHEA;
-            case 7: return PlayerType.OEP;
+            case "Do Nothing": return PlayerType.DONOTHING;
+            case "Random": return PlayerType.RANDOM;
+            case "Rule Based": return PlayerType.SIMPLE;
+            case "OSLA": return PlayerType.OSLA;
+            case "MC": return PlayerType.MC;
+            case "MCTS": return PlayerType.MCTS;
+            case "RHEA": return PlayerType.RHEA;
+            case "OEP": return PlayerType.OEP;
         }
-        throw new Exception("Error: unrecognized Player Type: " + data);
+        throw new Exception("Error: unrecognized Player Type: " + arg);
     }
 
     private static Types.TRIBE parseTribeStr(String arg) throws Exception
     {
-        int data = Integer.parseInt(arg);
-        switch(data)
+        switch(arg)
         {
-            case 0: return XIN_XI;
-            case 1: return IMPERIUS;
-            case 2: return BARDUR;
-            case 3: return OUMAJI;
+            case "Xin Xi": return XIN_XI;
+            case "Imperius": return IMPERIUS;
+            case "Bardur": return BARDUR;
+            case "Oumaji": return OUMAJI;
         }
-        throw new Exception("Error: unrecognized Tribe: " + data);
+        throw new Exception("Error: unrecognized Tribe: " + arg);
     }
 
 
@@ -204,6 +204,14 @@ public class Tournament {
 
     private void setSeeds(long[] seeds) {
         this.seeds = seeds;
+    }
+
+    private void setSeeds(JSONArray seeds) {
+        this.seeds = new long[seeds.length()];
+        for (int i = 0; i < this.seeds.length; ++i)
+        {
+            this.seeds[i] = Long.parseLong(seeds.getString(i));
+        }
     }
 
 
@@ -455,37 +463,16 @@ public class Tournament {
 
 
 
-    private static void printRunHelp(String args[])
+    private static void printRunHelp(String[] args)
     {
         System.out.print("Invalid Arguments ");
         for(String s : args) {
             System.out.print(s + " ");
         }
         System.out.println(". Usage: ");
-
-        System.out.println("'java Tournament <g> <r> <max> <force> <mcts_rollouts> <pop_size> <p1> <p2> [...] <t1> <t2> [...]', where: ");
-        System.out.println("\t<g> is the game mode; 0: capitals, 1: score");
-        System.out.println("\t<r> is the number of repetitions per level");
-        System.out.println("\t<max> max length of a rollout (MC/MCTS)");
-        System.out.println("\t<force> forces a turn end after this amount of moves in a rollout");
-        System.out.println("\t<mcts_rollouts> mcts rollouts are toggled on (1) or off (0)");
-        System.out.println("\t<pop_size> Population size for EA agents");
-        System.out.println("\t<p_i> is player type i:");
-        System.out.println("\t\t0: DoNothing player");
-        System.out.println("\t\t1: Random player");
-        System.out.println("\t\t2: RuleBased player");
-        System.out.println("\t\t3: OneStepLookAhead player");
-        System.out.println("\t\t4: Monte Carlo player");
-        System.out.println("\t\t5: Monte Carlo Tree Search player");
-        System.out.println("\t\t6: Rolling Horizon Evolutionary Algorithm player");
-        System.out.println("\t\t7: Online Evolutionary Planning player");
-        System.out.println("\t<t_i> is tribe i:");
-        System.out.println("\t\t0: Xin Xi tribe");
-        System.out.println("\t\t1: Imperius tribe");
-        System.out.println("\t\t2: Bardur tribe");
-        System.out.println("\t\t3: Oumaji tribe");
-        System.out.println("\tThe number of tribes and players must be equal.");
-        System.out.println("Example: java -jar Tribes.jar 0 10 2 3 0 1");
+        System.out.println("'java Tournament <jsonConfigFile>', where: ");
+        System.out.println("\t<jsonConfigFile> is the JSON file with the tournament configuration.");
+        System.out.println("Example: java -jar tournament.json");
     }
 
     /// ----- Players and participants -----

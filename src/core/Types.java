@@ -580,6 +580,11 @@ public class Types {
             return this == BOAT || this == SHIP || this == BATTLESHIP || this == ARCHER  || this == CATAPULT ;
         }
 
+        public boolean canFortify()
+        {
+            return this == WARRIOR || this == RIDER || this == ARCHER || this == DEFENDER || this == SWORDMAN || this == KNIGHT;
+        }
+
         public static ArrayList<UNIT> getSpawnableTypes() {
             ArrayList<UNIT> units = new ArrayList<>();
             for (UNIT u: UNIT.values()) {

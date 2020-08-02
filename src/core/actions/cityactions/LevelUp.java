@@ -20,6 +20,7 @@ public class LevelUp extends CityAction {
 
     public LevelUp(int cityId)
     {
+        super(Types.ACTION.LEVEL_UP);
         super.cityId = cityId;
     }
     public CITY_LEVEL_UP getBonus() {
@@ -35,61 +36,6 @@ public class LevelUp extends CityAction {
         return city.canLevelUp() && bonus.validType(city.getLevel());
     }
 
-    @Override
-    public boolean execute(GameState gs) {
-
-        if(!isFeasible(gs))
-            return false;
-
-        City city = (City) gs.getActor(this.cityId);
-        Tribe tribe = gs.getBoard().getTribe(city.getTribeId());
-        Vector2d cityPos = city.getPosition();
-
-        if(bonus.grantsMonument())
-            tribe.cityMaxedUp();
-
-        tribe.addScore(bonus.getLevelUpPoints());
-        city.addPointsWorth(bonus.getLevelUpPoints());
-        city.levelUp();
-
-        switch(bonus)
-        {
-            case WORKSHOP:
-                city.addProduction(TribesConfig.CITY_LEVEL_UP_WORKSHOP_PROD);
-                break;
-            case EXPLORER:
-                gs.getBoard().launchExplorer(cityPos.x, cityPos.y, city.getTribeId(), gs.getRandomGenerator());
-                break;
-            case CITY_WALL:
-                city.setWalls(true);
-                break;
-            case RESOURCES:
-                tribe.addStars(TribesConfig.CITY_LEVEL_UP_RESOURCES);
-                break;
-            case POP_GROWTH:
-                city.addPopulation(tribe, TribesConfig.CITY_LEVEL_UP_POP_GROWTH);
-                break;
-            case BORDER_GROWTH:
-                gs.getBoard().expandBorder(city);
-                break;
-            case PARK:
-                tribe.addScore(TribesConfig.CITY_LEVEL_UP_PARK);
-                city.addPointsWorth(TribesConfig.CITY_LEVEL_UP_PARK);
-                break;
-            case SUPERUNIT:
-                Unit unitInCity = gs.getBoard().getUnitAt(cityPos.x, cityPos.y);
-                if(unitInCity != null)
-                {
-                    gs.pushUnit(unitInCity, cityPos.x, cityPos.y);
-                }
-
-                Unit superUnit = Types.UNIT.createUnit(cityPos, 0, false, city.getActorId(), city.getTribeId(), Types.UNIT.SUPERUNIT);
-                gs.getBoard().addUnit(city, superUnit);
-                break;
-        }
-
-        return true;
-    }
 
     @Override
     public Action copy() {

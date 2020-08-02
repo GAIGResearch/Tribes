@@ -12,6 +12,7 @@ import utils.Vector2d;
 
 import java.util.ArrayList;
 import java.util.Random;
+import static core.Types.ACTION.*;
 
 class SingleTreeNode
 {
@@ -131,7 +132,7 @@ class SingleTreeNode
         while(actionIdx < availableActions.size())
         {
             Action act = availableActions.get(actionIdx);
-            if(act instanceof EndTurn)
+            if(act.getActionType() == END_TURN)
             {
                 //Here's the end turn, return it's index.
                 return actionIdx;

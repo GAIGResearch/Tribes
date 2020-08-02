@@ -1,12 +1,19 @@
 package core.actions.unitactions;
 
+import core.Types;
 import core.actions.Action;
 import core.actors.units.Unit;
 import core.game.Board;
+import core.game.GameState;
 import utils.Vector2d;
 
-public abstract class UnitAction implements Action
+public class UnitAction extends Action
 {
+    UnitAction(Types.ACTION aType)
+    {
+        this.actionType = aType;
+    }
+
     /**
      * Unit that PERFORMS this action
      */
@@ -19,7 +26,7 @@ public abstract class UnitAction implements Action
         return unitId;
     }
 
-    public boolean unitInRange(Unit attacker, Unit defender, Board b)
+    boolean unitInRange(Unit attacker, Unit defender, Board b)
     {
         //Check if target is visible.
         Vector2d targetPos = defender.getPosition();
@@ -32,4 +39,13 @@ public abstract class UnitAction implements Action
         return distance <= attacker.RANGE;
     }
 
+    @Override
+    public boolean isFeasible(GameState gs) {
+        return false;
+    }
+
+    @Override
+    public Action copy() {
+        return null;
+    }
 }

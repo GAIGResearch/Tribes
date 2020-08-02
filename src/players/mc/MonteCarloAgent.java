@@ -1,6 +1,7 @@
 package players.mc;
 
 import core.TechnologyTree;
+import core.Types;
 import core.actions.Action;
 import core.actions.cityactions.Destroy;
 import core.actions.tribeactions.EndTurn;
@@ -76,7 +77,7 @@ public class MonteCarloAgent extends Agent {
             Action act = rootActions.get(rootActionIndex);
 
             //Let's avoid unwanted EndTurn actions
-            while(act instanceof EndTurn)
+            while(act.getActionType() == Types.ACTION.END_TURN)
             {
                 rootActionIndex = m_rnd.nextInt(rootActions.size());
                 act = rootActions.get(rootActionIndex);
@@ -169,7 +170,7 @@ public class MonteCarloAgent extends Agent {
                 if(numActions == 1) {
                     //If there's only 1 action available, it should be an EndTurn
                     act = allActions.get(0);
-                    if(act instanceof EndTurn)
+                    if(act.getActionType() == Types.ACTION.END_TURN)
                         turnEndCountDown = params.FORCE_TURN_END + 1;
                     else
                         System.out.println("Warning: Unexpected non-EndTurn action in MC player");
@@ -181,7 +182,7 @@ public class MonteCarloAgent extends Agent {
                         int actIdx = m_rnd.nextInt(numActions);
                         act = allActions.get(actIdx);
 
-                    }  while(act instanceof EndTurn);
+                    }  while(act.getActionType() == Types.ACTION.END_TURN);
                 }
             }
         }

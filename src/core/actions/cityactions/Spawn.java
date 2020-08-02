@@ -14,6 +14,7 @@ public class Spawn extends CityAction
 
     public Spawn(int cityId)
     {
+        super(Types.ACTION.SPAWN);
         super.cityId = cityId;
     }
     public void setUnitType(Types.UNIT unit_type) {this.unit_type = unit_type;}
@@ -44,21 +45,6 @@ public class Spawn extends CityAction
         Types.TECHNOLOGY tech = unit_type.getTechnologyRequirement();
         return tech == null || t.getTechTree().isResearched(tech);
 
-    }
-
-    @Override
-    public boolean execute(GameState gs) {
-        if (isFeasible(gs)){
-            City city = (City) gs.getActor(this.cityId);
-            Vector2d cityPos = city.getPosition();
-            Unit newUnit = Types.UNIT.createUnit(new Vector2d(cityPos.x, cityPos.y), 0, false, city.getActorId(), city.getTribeId(), unit_type);
-            gs.getBoard().addUnit(city, newUnit);
-            Tribe tribe = gs.getTribe(city.getTribeId());
-            tribe.subtractStars(unit_type.getCost());
-            tribe.addScore(unit_type.getPoints());
-            return true;
-        }
-        return false;
     }
 
     @Override

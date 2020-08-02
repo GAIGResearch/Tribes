@@ -4,6 +4,7 @@ import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
+import core.actions.ActionCommand;
 import core.actions.cityactions.factory.CityActionBuilder;
 import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.factory.TribeActionBuilder;
@@ -273,7 +274,7 @@ public class GameState {
         }
 
         //No city or unit actions - if there's only one (EndTurn) tribe action, there are no actions available.
-        return tribeActions.size() != 1 || !(tribeActions.get(0) instanceof EndTurn);
+        return tribeActions.size() != 1 || !(tribeActions.get(0).getActionType() == Types.ACTION.END_TURN);
     }
 
     /**
@@ -284,11 +285,14 @@ public class GameState {
     {
         if(action != null)
         {
-            boolean executed = action.execute(this);
+            boolean executed = false;
+            ActionCommand ac = action.getActionType().getCommand();
+            if(ac != null)
+                executed = ac.execute(action, this);
 
-            if(!executed) {
+            if(!executed && ac != null) {
                 System.out.println("Tick: " + this.tick + "; action [" + action + "] couldn't execute?");
-                action.execute(this);
+                ac.execute(action, this);
             }
 
             //Post-action execution matters:
@@ -309,18 +313,19 @@ public class GameState {
     {
         if(action != null)
         {
-            boolean executed = action.execute(this);
+            boolean executed = false;
+            ActionCommand ac = action.getActionType().getCommand();
+            if(ac != null)
+                executed = ac.execute(action, this);
 
-            if(!executed) {
+            if(!executed && ac != null) {
                 System.out.println("FM: Action [" + action + "] couldn't execute?");
-                action.execute(this);
+                ac.execute(action, this);
             }
 
             if(executed) {
-
-
                 //it's an end turn
-                if(action instanceof EndTurn)
+                if(action.getActionType() == Types.ACTION.END_TURN)
                 {
                     //manage the end of this turn.
                     this.endTurn(getActiveTribe());
@@ -389,7 +394,9 @@ public class GameState {
                 if(recoverActions.size() > 0)
                 {
                     Recover recoverAction = (Recover)recoverActions.get(0);
-                    recoverAction.execute(this);
+                    ActionCommand ac = recoverAction.getActionType().getCommand();
+                    if(ac != null)
+                        ac.execute(recoverAction, this);
                 }
             }
         }

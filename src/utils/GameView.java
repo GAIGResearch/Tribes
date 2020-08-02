@@ -22,6 +22,7 @@ import core.actions.Action;
 import static core.Constants.*;
 import static core.Types.TERRAIN.*;
 import static core.Types.UNIT.*;
+import static core.Types.ACTION.*;
 import static utils.Vector2d.manhattanDistance;
 
 @SuppressWarnings({"SuspiciousNameCombination", "unchecked"})
@@ -186,7 +187,7 @@ public class GameView extends JComponent {
                 if (a instanceof CityAction) {
                     Vector2d pos = ((CityAction) a).getTargetPos();
                     if (pos != null) {
-                        actionable[pos.x][pos.y] = a instanceof ResourceGathering;
+                        actionable[pos.x][pos.y] = a.getActionType() == Types.ACTION.RESOURCE_GATHERING;
                     }
                 }
             }
@@ -344,14 +345,14 @@ public class GameView extends JComponent {
                 ArrayList<Action> possibleActions = gameState.getUnitActions(u);
                 if (possibleActions != null && possibleActions.size() > 0) {
                     for (Action a : possibleActions) {
-                        if (!(a instanceof Examine || a instanceof Capture)) {
+                        if (!(a.getActionType() == Types.ACTION.EXAMINE || a.getActionType() == Types.ACTION.CAPTURE)) {
                             Image actionImg = Types.ACTION.getImage(a);
 
                             if (actionImg != null) {
                                 Vector2d pos = GUI.getActionPosition(gameState, a);
 
                                 if (pos != null) {
-                                    if (a instanceof Move) {
+                                    if (a.getActionType() == Types.ACTION.MOVE) {
                                         paintImageRotated(g, pos.y * CELL_SIZE, pos.x * CELL_SIZE, actionImg, CELL_SIZE, panTranslate);
                                     } else {
                                         Vector2d rotated = rotatePoint(pos.y, pos.x);
@@ -370,7 +371,7 @@ public class GameView extends JComponent {
         HashMap<Integer, ArrayList<Action>> actions = gameState.getUnitActions();
         for (Map.Entry<Integer, ArrayList<Action>> e: actions.entrySet()) {
             for (Action a : e.getValue()) {
-                if (a instanceof Examine || a instanceof Capture) {
+                if (a.getActionType() == EXAMINE || a.getActionType() == CAPTURE) {
                     Image actionImg = Types.ACTION.getImage(a);
                     if (actionImg != null) {
                         Vector2d pos = GUI.getActionPosition(gameState, a);
@@ -880,7 +881,7 @@ public class GameView extends JComponent {
     }
 
     void paintAction(UnitAction a) {
-        if (a instanceof Attack || a instanceof Convert || a instanceof HealOthers) {  // These are the actions currently animated
+        if (a.getActionType() == ATTACK || a.getActionType() == CONVERT || a.getActionType() == HEAL_OTHERS) {  // These are the actions currently animated
             animationSpeed.clear();
             actionAnimationUnitsTribe.clear();
             sourceTargetAnimationInfo.clear();
@@ -896,7 +897,7 @@ public class GameView extends JComponent {
                 ArrayList<Unit> targets = new ArrayList<>();
                 Image weapon2 = null;
 
-                if (a instanceof Attack) {
+                if (a.getActionType() == ATTACK) {
                     Unit t = (Unit) gameState.getBoard().getActor(((Attack) a).getTargetId());
                     targets.add(t);
                     weapon2 = t.getType().getWeaponImage(t.getTribeId());  // units can retaliate in Attack actions
@@ -907,7 +908,7 @@ public class GameView extends JComponent {
                     } else if (source.getType() == ARCHER || source.getType() == BOAT) {
                         this.effectType = EFFECT.PIERCE;
                     }
-                } else if (a instanceof Convert) {
+                } else if (a.getActionType() == CONVERT) {
                     this.effectType = EFFECT.CONVERT;
                     Unit target = (Unit) gameState.getBoard().getActor(((Convert) a).getTargetId());
                     targets.add(target);
@@ -966,7 +967,7 @@ public class GameView extends JComponent {
                     effectTribeIdx = actionAnimationUnitsTribe.get(i).getFirst();
                     effectDrawingIdx = 0;
 
-                    if (animatedAction instanceof Attack && target.getFirst() != null && ((Attack) animatedAction).isRetaliation(gameState)) {
+                    if (animatedAction.getActionType() == ATTACK && target.getFirst() != null && ((Attack) animatedAction).isRetaliation(gameState)) {
                         // Retaliating! Reset variables to target's attack
                         Vector2d startPosition = target.getSecond().copy();
                         Vector2d targetPosition = board.getActor(animatedAction.getUnitId()).getPosition().copy();

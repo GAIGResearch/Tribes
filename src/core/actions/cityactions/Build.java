@@ -3,8 +3,6 @@ package core.actions.cityactions;
 import core.TechnologyTree;
 import core.Types;
 import core.actions.Action;
-import core.actors.Building;
-import core.actors.Temple;
 import core.actors.Tribe;
 import core.game.Board;
 import core.game.GameState;
@@ -17,6 +15,7 @@ public class Build extends CityAction
 
     public Build(int cityId)
     {
+        super(Types.ACTION.BUILD);
         super.cityId = cityId;
     }
 
@@ -64,35 +63,6 @@ public class Build extends CityAction
                     return tribe.isMonumentBuildable(buildingType);
                 }
                 else return false;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean execute(GameState gs) {
-        City city = (City) gs.getActor(this.cityId);
-        Tribe tribe = gs.getTribe(city.getTribeId());
-        Board board = gs.getBoard();
-
-        if(isFeasible(gs)) {
-
-            tribe.subtractStars(buildingType.getCost());
-            board.setBuildingAt(targetPos.x, targetPos.y, buildingType);
-            board.setResourceAt(targetPos.x, targetPos.y, null);
-
-            if(buildingType.isTemple())
-                city.addBuilding(gs, new Temple(targetPos.x, targetPos.y, buildingType, this.cityId));
-            else
-                city.addBuilding(gs, new Building(targetPos.x, targetPos.y, buildingType, this.cityId));
-
-            if(buildingType == Types.BUILDING.PORT)
-                board.buildPort(targetPos.x, targetPos.y);
-            if(buildingType.isMonument())
-                tribe.monumentIsBuilt(buildingType);
-            if(buildingType == Types.BUILDING.LUMBER_HUT)
-                board.setTerrainAt(targetPos.x, targetPos.y, Types.TERRAIN.PLAIN);
-
-            return true;
         }
         return false;
     }

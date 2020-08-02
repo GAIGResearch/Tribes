@@ -4,12 +4,14 @@ import core.actions.Action;
 import core.actors.Tribe;
 import core.game.GameState;
 import utils.Vector2d;
+import core.Types;
 
 public class BuildRoad extends TribeAction {
 
     private Vector2d position;
     public BuildRoad(int tribeId)
     {
+        super(Types.ACTION.BUILD_ROAD);
         this.tribeId = tribeId;
     }
     public void setPosition(Vector2d position){
@@ -31,18 +33,6 @@ public class BuildRoad extends TribeAction {
 
         //... and also in this position
         return gs.getBoard().canBuildRoadAt(tribeId, position.x, position.y);
-    }
-
-    @Override
-    public boolean execute(GameState gs) {
-        if(isFeasible(gs))
-        {
-            Tribe tribe = gs.getTribe(tribeId);
-            tribe.subtractStars(TribesConfig.ROAD_COST);
-            gs.getBoard().addRoad(position.x, position.y);
-            return true;
-        }
-        return false;
     }
 
     @Override

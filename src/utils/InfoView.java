@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import static core.Constants.*;
 import static core.TribesConfig.VETERAN_KILLS;
 import static utils.GameView.gridSize;
+import static core.Types.ACTION.*;
 
 @SuppressWarnings({"StringConcatenationInsideStringBufferAppend", "SuspiciousNameCombination"})
 public class InfoView extends JComponent {
@@ -306,7 +307,7 @@ public class InfoView extends JComponent {
         if (board.getTribe(board.getActiveTribeID()).getTechTree().isResearched(Types.TECHNOLOGY.ROADS)) {
             ArrayList<Action> acts = gs.getTribeActions();
             for (Action a: acts) {
-                if (a instanceof BuildRoad && ((BuildRoad) a).getPosition().equals(position)) {
+                if (a.getActionType() == BUILD_ROAD && ((BuildRoad) a).getPosition().equals(position)) {
                     actionRoad.setVisible(true);
                     listenerRoad.update(board.getActiveTribeID(), position, ac, gs);
                 }
@@ -329,31 +330,31 @@ public class InfoView extends JComponent {
                     for (Action a : acts) {
                         if (a != null && ((CityAction) a).getTargetPos() != null &&
                                 ((CityAction) a).getTargetPos().equals(position)) {
-                            if (a instanceof ResourceGathering) {
+                            if (a.getActionType() == RESOURCE_GATHERING) {
                                 if (((ResourceGathering) a).getResource().equals(r)) {
                                     listenerRG.update(cityID, position, ac, gs);
                                     listenerRG.setResource(r);
                                     foundRG = true;
                                 }
-                            } else if (a instanceof BurnForest) {
+                            } else if (a.getActionType() == BURN_FOREST) {
                                 listenerBF.update(cityID, position, ac, gs);
                                 foundBF = true;
-                            } else if (a instanceof ClearForest) {
+                            } else if (a.getActionType() == CLEAR_FOREST) {
                                 listenerCF.update(cityID, position, ac, gs);
                                 foundCF = true;
-                            } else if (a instanceof GrowForest) {
+                            } else if (a.getActionType() == GROW_FOREST) {
                                 listenerGF.update(cityID, position, ac, gs);
                                 foundGF = true;
-                            } else if (a instanceof Destroy) {
+                            } else if (a.getActionType() == DESTROY) {
                                 listenerD.update(cityID, position, ac, gs);
                                 foundD = true;
                                 break;
-                            } else if (a instanceof Spawn) {
+                            } else if (a.getActionType() == SPAWN) {
                                 Types.UNIT unitType = ((Spawn) a).getUnitType();
                                 int idx = Types.UNIT.getSpawnableTypes().indexOf(unitType);
                                 listenerS.update(cityID, position, ac, gs);
                                 foundS[idx] = true;
-                            } else if (a instanceof Build) {
+                            } else if (a.getActionType() == BUILD) {
                                 Types.BUILDING buildingType = ((Build) a).getBuildingType();
                                 int idx = buildingType.getKey();
                                 listenerB.update(cityID, position, ac, gs);
@@ -383,13 +384,13 @@ public class InfoView extends JComponent {
                 boolean foundD = false;
                 boolean foundU = false;
                 for (Action a : unitActions) {
-                    if (a instanceof HealOthers) {
+                    if (a.getActionType() == HEAL_OTHERS) {
                         foundHO = true;
                         listenerHealOthers.update(u.getActorId(), ac, gs);
-                    } else if (a instanceof Disband) {
+                    } else if (a.getActionType() == DISBAND) {
                         foundD = true;
                         listenerDisband.update(u.getActorId(), ac, gs);
-                    } else if (a instanceof Upgrade) {
+                    } else if (a.getActionType() == UPGRADE_BOAT || a.getActionType() == UPGRADE_SHIP) {
                         foundU = true;
                         listenerUpgrade.update(u.getActorId(), ac, gs);
                     }
@@ -631,7 +632,11 @@ public class InfoView extends JComponent {
                     break;
                 case "Upgrade":
                     if (e.getSource() instanceof JButton) {
-                        a = new Upgrade(unitID);
+                        Unit u = (Unit) gs.getActor(unitID);
+                        Types.ACTION actionType = null;
+                        if(u.getType() == Types.UNIT.BOAT) actionType = UPGRADE_BOAT;
+                        if(u.getType() == Types.UNIT.SHIP) actionType = UPGRADE_SHIP;
+                        a = new Upgrade(actionType, unitID);
                     }
                     break;
             }

@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static core.Constants.TURN_TIME_MILLIS;
+import static core.Types.ACTION.*;
 
 public class OEPAgent extends Agent {
 
@@ -137,16 +137,16 @@ public class OEPAgent extends Agent {
         while (actionIndex < min_action){
             Action a = pop.get(parent_index[index%2]).getActions().get(actionIndex);
             Action b = pop.get(parent_index[(index+1)%2]).getActions().get(actionIndex);
-            if (a.isFeasible(clone) && !(a instanceof EndTurn)){
+            if (a.isFeasible(clone) && !(a.getActionType() == END_TURN)){
                 clone.advance(a, true);
                 actions.add(a);
                 index ++;
                 actionIndex++;
-            }else if(b.isFeasible(clone) && !(b instanceof EndTurn)){
+            }else if(b.isFeasible(clone) && !(b.getActionType() == END_TURN)){
                 clone.advance(b, true);
                 actions.add(b);
                 actionIndex++;
-            }else if((a instanceof EndTurn) && (b instanceof EndTurn)){
+            }else if((a.getActionType() == END_TURN) && (b.getActionType() == END_TURN)){
                 Action endTurn = new EndTurn(getPlayerID());
                 while (!endTurn.isFeasible(clone)){
                     ArrayList<Action> allAvailableActions = clone.getAllAvailableActions();
@@ -196,7 +196,7 @@ public class OEPAgent extends Agent {
             return;
         }else{
             selectedAction = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-            while (selectedAction instanceof EndTurn){
+            while (selectedAction.getActionType() == END_TURN){
                 selectedAction = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
             }
             actions.set(mutationIndex, selectedAction);
@@ -224,7 +224,7 @@ public class OEPAgent extends Agent {
                     }
                 }else{
                     selectedAction = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-                    while (selectedAction instanceof EndTurn){
+                    while (selectedAction.getActionType() == END_TURN){
                         selectedAction = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
                     }
                     actions.set(i, selectedAction);

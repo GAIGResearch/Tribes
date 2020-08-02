@@ -1,7 +1,13 @@
 package core;
 
 import core.actions.Action;
+import core.actions.ActionCommand;
+import core.actions.cityactions.command.*;
+import core.actions.tribeactions.command.BuildRoadCommand;
+import core.actions.tribeactions.command.EndTurnCommand;
+import core.actions.tribeactions.command.ResearchTechCommand;
 import core.actions.unitactions.*;
+import core.actions.unitactions.command.*;
 import core.actors.units.*;
 import org.json.JSONObject;
 import utils.ImageIO;
@@ -748,21 +754,36 @@ public class Types {
     }
 
     public enum ACTION {
-        MOVE("img/actions/move.png", null),
-        CLIMB_MOUNTAIN(null, CLIMBING),
-        ATTACK("img/actions/attack.png", null),
-        CAPTURE("img/actions/capture.png", null),
-        CONVERT("img/actions/convert.png", null),
-        EXAMINE("img/actions/examine.png", null),
-        DISBAND("img/actions/disband.png", FREE_SPIRIT),
-        HEAL("img/actions/heal2.png", null),
-        UPGRADE_BOAT("img/actions/upgrade.png", SAILING),
-        UPGRADE_SHIP("img/actions/upgrade.png", NAVIGATION),
+        //city
+        BUILD(null, null),
         BURN_FOREST(null, CHIVALRY),
         CLEAR_FOREST(null, FORESTRY),
         DESTROY(null, CONSTRUCTION),
         GROW_FOREST(null, SPIRITUALISM),
-        BUILD_ROAD(null, ROADS);
+        LEVEL_UP(null, null),
+        RESOURCE_GATHERING(null, null),
+        SPAWN(null, null),
+
+        //tribe
+        BUILD_ROAD(null, ROADS),
+        END_TURN(null, null),
+        RESEARCH_TECH(null, null),
+
+        //unit
+        ATTACK("img/actions/attack.png", null),
+        CAPTURE("img/actions/capture.png", null),
+        CONVERT("img/actions/convert.png", null),
+        DISBAND("img/actions/disband.png", FREE_SPIRIT),
+        EXAMINE("img/actions/examine.png", null),
+        HEAL_OTHERS("img/actions/heal2.png", null),
+        MAKE_VETERAN(null, null),
+        MOVE("img/actions/move.png", null),
+        RECOVER(null, null),
+
+        //others
+        CLIMB_MOUNTAIN(null, CLIMBING),
+        UPGRADE_BOAT("img/actions/upgrade.png", SAILING),
+        UPGRADE_SHIP("img/actions/upgrade.png", NAVIGATION);
 
         private String imgPath;
         private TECHNOLOGY tech;  // Requires this technology to perform action
@@ -776,23 +797,43 @@ public class Types {
         }
 
         public static Image getImage(Action a) {
-            if (a instanceof Move) {
-                return ImageIO.GetInstance().getImage(MOVE.imgPath);
-            } else if (a instanceof Attack) {
-                return ImageIO.GetInstance().getImage(ATTACK.imgPath);
-            } else if (a instanceof Capture) {
-                return ImageIO.GetInstance().getImage(CAPTURE.imgPath);
-            } else if (a instanceof Examine) {
-                return ImageIO.GetInstance().getImage(EXAMINE.imgPath);
-            } else if (a instanceof Disband) {
-                return ImageIO.GetInstance().getImage(DISBAND.imgPath);
-            } else if (a instanceof Recover || a instanceof HealOthers) {
-                return ImageIO.GetInstance().getImage(HEAL.imgPath);
-            } else if (a instanceof Upgrade) {
-                return ImageIO.GetInstance().getImage(UPGRADE_BOAT.imgPath);
-            } else if (a instanceof Convert) {
-                return ImageIO.GetInstance().getImage(CONVERT.imgPath);
+            return ImageIO.GetInstance().getImage(a.getActionType().imgPath);
+        }
+
+        public ActionCommand getCommand()
+        {
+            switch (this)
+            {
+                //City actions
+                case BUILD: return new BuildCommand();
+                case BURN_FOREST: return new BurnForestCommand();
+                case CLEAR_FOREST: return new ClearForestCommand();
+                case DESTROY: return new DestroyCommand();
+                case GROW_FOREST: return new GrowForestCommand();
+                case LEVEL_UP: return new LevelUpCommand();
+                case RESOURCE_GATHERING: return new ResourceGatheringCommand();
+                case SPAWN: return new SpawnCommand();
+
+                //Tribe actions
+                case BUILD_ROAD: return new BuildRoadCommand();
+                case END_TURN: return new EndTurnCommand();
+                case RESEARCH_TECH: return new ResearchTechCommand();
+
+                //Unit actions
+                case ATTACK: return new AttackCommand();
+                case CAPTURE: return new CaptureCommand();
+                case CONVERT: return new ConvertCommand();
+                case DISBAND: return new DisbandCommand();
+                case EXAMINE: return new ExamineCommand();
+                case HEAL_OTHERS: return new HealOthersCommand();
+                case MAKE_VETERAN: return new MakeVeteranCommand();
+                case MOVE: return new MoveCommand();
+                case RECOVER: return new RecoverCommand();
+                case UPGRADE_BOAT:
+                case UPGRADE_SHIP: return new UpgradeCommand();
+
             }
+            System.out.println("ERROR: ActionCommand for action type " + this + " not implemented.");
             return null;
         }
     }

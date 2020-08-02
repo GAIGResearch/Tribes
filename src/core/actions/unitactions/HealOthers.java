@@ -14,6 +14,7 @@ public class HealOthers extends UnitAction
 {
     public HealOthers(int unitId)
     {
+        super(Types.ACTION.HEAL_OTHERS);
         super.unitId = unitId;
     }
 
@@ -34,23 +35,6 @@ public class HealOthers extends UnitAction
                 return true;
         }
 
-        return false;
-    }
-
-    @Override
-    public boolean execute(GameState gs) {
-
-        if (isFeasible(gs)) {
-            Unit unit = (Unit) gs.getActor(this.unitId);
-            ArrayList<Unit> targets = getTargets(gs);
-
-            for (Unit target: targets) {
-                target.setCurrentHP(Math.min(target.getCurrentHP() + TribesConfig.MINDBENDER_HEAL, target.getMaxHP()));
-            }
-
-            unit.transitionToStatus(Types.TURN_STATUS.ATTACKED);
-            return true;
-        }
         return false;
     }
 

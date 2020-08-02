@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
+import static core.Types.ACTION.*;
 
 /**
  * This is the Simple agent for the game.
@@ -109,52 +110,51 @@ public class SimpleAgent extends Agent {
         Tribe thisTribe = gs.getActiveTribe();
 
         //UNIT ACTIONS:
-        if (a instanceof Move) {
+        if (a.getActionType() ==  MOVE) {
             score = evalMove(a, gs, thisTribe);
-        }else if (a instanceof Attack) {
+        }else if (a.getActionType() ==  ATTACK) {
             score = evalAttack(a, gs);
-        }else if (a instanceof Upgrade) {
+        }else if (a.getActionType() ==  UPGRADE_SHIP || a.getActionType() == UPGRADE_BOAT) {
             score = evalUpgrade(a, gs, thisTribe);
-        }else if (a instanceof Recover) {
+        }else if (a.getActionType() ==  RECOVER) {
             score = evalRecover(a, gs, thisTribe);
-        }else if (a instanceof Capture || a instanceof Examine) {
+        }else if (a.getActionType() ==  CAPTURE || a.getActionType() ==  EXAMINE) {
             score = 5; //Capturing provides only benefits
-        }else if (a instanceof HealOthers) {
+        }else if (a.getActionType() ==  HEAL_OTHERS) {
             score = evalHeal(a, gs);
-        }else if (a instanceof Convert) {
+        }else if (a.getActionType() ==  CONVERT) {
             score = evalConvert(a, gs);
-        }else if (a instanceof MakeVeteran) {
+        }else if (a.getActionType() ==  MAKE_VETERAN) {
             score = 5; //Making a veteran is placed as highest priority
-        }else if (a instanceof Disband) {
+        }else if (a.getActionType() ==  DISBAND) {
             score = -2;
         }
 
         //CITY ACTIONS
-        if (a instanceof Destroy) {
+        if (a.getActionType() == DESTROY) {
             score = -2;
-        }else if (a instanceof BurnForest) {
+        }else if (a.getActionType() ==  BURN_FOREST) {
             score = evalBurn(a, gs, thisTribe);
-        }else if (a instanceof ClearForest) {
+        }else if (a.getActionType() ==  CLEAR_FOREST) {
             score = evalClear(thisTribe);
-        }else if (a instanceof GrowForest) {
+        }else if (a.getActionType() ==  GROW_FOREST) {
             score = evalGrow(a, gs);
-        }else if (a instanceof Build) {
+        }else if (a.getActionType() ==  BUILD) {
             score = evalBuild(a, gs, thisTribe);
-        }else if (a instanceof Spawn) {
+        }else if (a.getActionType() ==  SPAWN) {
             score = evalSpawn(a, gs, thisTribe);
-        }else if (a instanceof ResourceGathering) {
+        }else if (a.getActionType() ==  RESOURCE_GATHERING) {
             score = evalResourceGathering(a, gs);
-        }else if (a instanceof LevelUp) {
+        }else if (a.getActionType() ==  LEVEL_UP) {
             score = evalLevelUp(a);
         }
 
-
         //TRIBE ACTIONS
-        if (a instanceof BuildRoad) {
+        if (a.getActionType() ==  BUILD_ROAD) {
             score = evalRoad(a,gs,thisTribe);
-        }else if (a instanceof ResearchTech) {
+        }else if (a.getActionType() ==  RESEARCH_TECH) {
             score = evalResearch(a, gs, thisTribe);
-        }else if (a instanceof EndTurn)
+        }else if (a.getActionType() ==  END_TURN)
         {
             score = -1;
         }

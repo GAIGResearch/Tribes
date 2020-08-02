@@ -16,6 +16,7 @@ public class GrowForest extends CityAction
 
     public GrowForest(int cityId)
     {
+        super(Types.ACTION.GROW_FOREST);
         super.cityId = cityId;
     }
 
@@ -30,19 +31,6 @@ public class GrowForest extends CityAction
         Tribe t = gs.getTribe(city.getTribeId());
         if(t.getStars() < TribesConfig.GROW_FOREST_COST) return false;
         return t.getTechTree().isResearched(Types.TECHNOLOGY.SPIRITUALISM);
-    }
-
-    @Override
-    public boolean execute(GameState gs) {
-        if (isFeasible(gs)){
-            Board b = gs.getBoard();
-            City city = (City) gs.getActor(this.cityId);
-            b.setTerrainAt(targetPos.x, targetPos.y, Types.TERRAIN.FOREST);
-            b.setResourceAt(targetPos.x, targetPos.y, null);
-            gs.getTribe(city.getTribeId()).subtractStars(TribesConfig.GROW_FOREST_COST);
-            return true;
-        }
-        return false;
     }
 
     @Override

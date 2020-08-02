@@ -8,6 +8,7 @@ import core.Types;
 import core.actions.cityactions.CityAction;
 import core.actions.cityactions.ResourceGathering;
 import core.actions.unitactions.*;
+import core.actions.unitactions.command.AttackCommand;
 import core.actors.Actor;
 import core.actors.City;
 import core.actors.Tribe;
@@ -967,17 +968,24 @@ public class GameView extends JComponent {
                     effectTribeIdx = actionAnimationUnitsTribe.get(i).getFirst();
                     effectDrawingIdx = 0;
 
-                    if (animatedAction.getActionType() == ATTACK && target.getFirst() != null && ((Attack) animatedAction).isRetaliation(gameState)) {
-                        // Retaliating! Reset variables to target's attack
-                        Vector2d startPosition = target.getSecond().copy();
-                        Vector2d targetPosition = board.getActor(animatedAction.getUnitId()).getPosition().copy();
-                        Vector2d endPosition = new Vector2d(targetPosition.y * CELL_SIZE, targetPosition.x * CELL_SIZE);
-                        source = new Pair<>(target.getFirst(), startPosition);
-                        target = new Pair<>(null, endPosition);
-                        actionAnimationUnitsTribe.get(i).swap();
-                        sourceTargetAnimationInfo.set(i, new Pair<>(source, target));
-                    } else {
-                        // No more of this animation
+                    boolean finishAnimation = true;
+                    if (animatedAction.getActionType() == ATTACK && target.getFirst() != null) {
+                        boolean retaliates = new AttackCommand().isRetaliation((Attack) animatedAction, gameState);
+                        if(retaliates) {
+                            // Retaliating! Reset variables to target's attack
+                            Vector2d startPosition = target.getSecond().copy();
+                            Vector2d targetPosition = board.getActor(animatedAction.getUnitId()).getPosition().copy();
+                            Vector2d endPosition = new Vector2d(targetPosition.y * CELL_SIZE, targetPosition.x * CELL_SIZE);
+                            source = new Pair<>(target.getFirst(), startPosition);
+                            target = new Pair<>(null, endPosition);
+                            actionAnimationUnitsTribe.get(i).swap();
+                            sourceTargetAnimationInfo.set(i, new Pair<>(source, target));
+                            finishAnimation = false;
+                        }
+                    }
+
+                    if(finishAnimation)
+                    {
                         finished.add(i);
                     }
                 }

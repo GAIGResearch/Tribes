@@ -115,7 +115,7 @@ public class TribesConfig
 
     //General Unit constants
     public static final double ATTACK_MODIFIER = 4.5;
-    public static final double DEFENCE = 1.5;
+    public static final double DEFENCE_BONUS = 1.5;
     public static final double DEFENCE_IN_WALLS = 4.0;
     public static final int VETERAN_KILLS = 3;
     public static final int VETERAN_PLUS_HP = 5;

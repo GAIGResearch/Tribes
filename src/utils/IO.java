@@ -1,5 +1,7 @@
 package utils;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -40,5 +42,29 @@ public class IO
             return null;
         }
         return lines.toArray(new String[lines.size()]);
+    }
+
+    /**
+     * Reads 'filename' and returns it as a JSON Object.
+     * @param filename path to the file.
+     * @return a JSON Object.
+     */
+    public JSONObject readJSON(String filename) {
+        String result = "";
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(filename));
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+            while (line != null) {
+                sb.append(line);
+                line = br.readLine();
+            }
+            result = sb.toString();
+            return new JSONObject(result);
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return new JSONObject();
     }
 }

@@ -6,6 +6,7 @@ import static core.Types.TRIBE.*;
 //import static core.Types.RESOURCE.*;
 import core.Types;
 import org.json.JSONObject;
+import utils.IO;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -51,7 +52,7 @@ public class LevelGenerator {
 
         //Read the JSON that contains all the probability values for all the tribes.
         try {
-            this.data = new JSONObject(_readFile("terrainProbs.json"));
+            this.data =  new IO().readJSON("terrainProbs.json");
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -429,28 +430,6 @@ public class LevelGenerator {
      */
     public boolean proc(ArrayList<Integer> villageMap, int cell, double probability) {
         return (villageMap.get(cell) == 2 && rnd.nextDouble() < probability) || (villageMap.get(cell) == 1 && rnd.nextDouble() < probability * BORDER_EXPANSION);
-    }
-
-    /**
-     * Reads 'filename' and returns it as a String.
-     * @param filename path to the file.
-     * @return the file as a String.
-     */
-    private String _readFile(String filename) {
-        String result = "";
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(filename));
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
-            while (line != null) {
-                sb.append(line);
-                line = br.readLine();
-            }
-            result = sb.toString();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-        return result;
     }
 
     /**

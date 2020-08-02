@@ -1,5 +1,6 @@
 package core.game;
 
+import core.TribesConfig;
 import core.Types;
 import core.actors.City;
 import core.actors.Tribe;
@@ -73,10 +74,14 @@ class LevelLoader
                         c.setCapital(true);
                         board.addCityToTribe(c,rnd);
 
+                        //Add score for this city centre
+                        tribes[tribeID].addScore(TribesConfig.CITY_CENTRE_POINTS);
+
                         //Also, each tribe starts with a unit in the same location where the city is
                         Types.UNIT unitType = tribes[tribeID].getType().getStartingUnit();
                         Unit unit = Types.UNIT.createUnit(new Vector2d(i,j), 0, false, c.getActorId(), tribeID, unitType);
                         board.addUnit(c, unit);
+                        tribes[tribeID].addScore(unitType.getPoints());
 
                         //City tiles
                         board.assignCityTiles(c, c.getBound());

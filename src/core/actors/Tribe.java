@@ -4,6 +4,7 @@ import core.Constants;
 import core.TechnologyTree;
 import core.TribesConfig;
 import core.Types;
+import core.actions.tribeactions.ResearchTech;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.Game;
@@ -120,10 +121,11 @@ public class Tribe extends Actor {
 
     private void init() {
         techTree = new TechnologyTree();
-        techTree.doResearch(tribe.getInitialTech());
+        Types.TECHNOLOGY initTech = tribe.getInitialTech();
+        techTree.doResearch(initTech);
         citiesID = new ArrayList<>();
         stars = TribesConfig.INITIAL_STARS;
-        score = tribe.getInitialScore();
+        score = initTech.getPoints();
         tribesMet = new ArrayList<>();
         extraUnits = new ArrayList<>();
         connectedCities = new ArrayList<>();

@@ -666,11 +666,11 @@ public class GameState {
                     //add test data
                     try {
                        // Unit attacker = (Unit) this.getActor(((Attack) action).getUnitId());
-                        Unit defender = (Unit) this.getActor(((Attack) action).getTargetId());
-                        if(defender.getType() == Types.UNIT.WARRIOR) {
-                            NN.expectedValues.add((float) ((Attack) action).getAttackResults(this).getFirst());
-                            NN.testDataCounter ++;
-                        }
+                      //  Unit defender = (Unit) this.getActor(((Attack) action).getTargetId());
+                        //if(defender.getType() == Types.UNIT.WARRIOR) {
+                        NN.expectedValues.add((float) ((Attack) action).getAttackResults(this).getFirst());
+                        NN.testDataCounter ++;
+                      //  }
 
                         //  System.out.println(NN.expectedValues);
 
@@ -762,10 +762,16 @@ public class GameState {
                                 //boolean check = checkIfAllEqual(NN.testDataCounter);
                                 //boolean check2 = checkIfAllEqual(NN.trainDataCounter);
 
-                                if(NN.trainDataCounter == NN.testDataCounter){
+                                if(NN.trainDataCounter == NN.testDataCounter){ //if we have enough values
                                     Unit attacker = (Unit) this.getActor(((Attack) action).getUnitId());
+                                    Unit defender = (Unit) this.getActor(((Attack) action).getTargetId());
+
                                     try {
-                                        NN.test((float) ((Attack) action).getAttackResults(this).getFirst());
+                                        if(((Attack) action).isInBorder)
+                                            NN.test((float) ((Attack) action).getAttackResults(this).getFirst(), (float) defender.getType().getKey(), (float) attacker.getType().getKey(),1);
+                                        else
+                                            NN.test((float) ((Attack) action).getAttackResults(this).getFirst(), (float) defender.getType().getKey(), (float) attacker.getType().getKey(),0);
+
 
                                     }catch (Exception e){
 
@@ -813,14 +819,24 @@ public class GameState {
 
                                   }
                                 }
-                                if(NN.trainDataCounter >= NN.testDataCounter) {
-                                 //   Unit attacker = (Unit) this.getActor(((Attack) action).getUnitId());
+                                //other wise just gather training data
+                                if(NN.trainDataCounter <= NN.testDataCounter) {
+                                    Unit attacker = (Unit) this.getActor(((Attack) action).getUnitId());
                                     Unit defender = (Unit) this.getActor(((Attack) action).getTargetId());
                                     //add data for all unit types
-                                    if(defender.getType() == Types.UNIT.WARRIOR) {
+                                  //  if(defender.getType() == Types.UNIT.WARRIOR) {
                                         NN.trainingData.add((float) ((Attack) action).getAttackResults(this).getFirst());
-                                        NN.trainDataCounter ++;
-                                    }
+                                        NN.trainingData2.add((float)defender.getType().getKey());
+                                        NN.trainingData3.add((float)attacker.getType().getKey());
+                                        if(((Attack) action).isInBorder){
+                                            NN.trainingData4.add(0f);
+
+                                        }else
+                                            NN.trainingData4.add(1f);
+
+
+                                    NN.trainDataCounter ++; //increment training data counter
+                                 //   }
 
 
                                 }
@@ -1004,8 +1020,8 @@ public class GameState {
         copy.turnMustEnd = turnMustEnd;
         copy.gameIsOver = gameIsOver;
         copy.tc = tc.copy();
-        //long seed = 1860142121111L; //possibly different seeds
-        long seed = 1631159151187L;
+        long seed = 1860142121111L; //possibly different seeds
+        //long seed = 1631159151187L;
         copy.changeTribesConfig(distance,seed);
         copy.isCopy = true;
 

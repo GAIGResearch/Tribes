@@ -25,7 +25,7 @@ public class Attack extends UnitAction
     public int getTargetId() {
         return targetId;
     }
-
+    public boolean isInBorder = false;
     @Override
     public boolean isFeasible(final GameState gs)
     {
@@ -148,6 +148,7 @@ public class Attack extends UnitAction
             if (citesID.contains(cityID)){
                 City c = gs.getBoard().getCityInBorders(target.getPosition().x, target.getPosition().y);
                 defenceForce *= c.hasWalls() ? tc.DEFENCE_IN_WALLS : tc.DEFENCE;
+                isInBorder = true;
             }
         }
         double totalDamage =attackForce+defenceForce;

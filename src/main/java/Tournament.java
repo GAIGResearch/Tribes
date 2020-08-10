@@ -16,8 +16,10 @@ import players.rhea.RHEAAgent;
 import players.rhea.RHEAParams;
 import utils.MultiStatSummary;
 import core.FMLearner.NN;
-
+import java.io.File;  // Import the File class
 import javax.swing.plaf.metal.MetalBorders;
+import java.io.FileWriter;
+import java.io.PrintStream;
 import java.util.*;
 
 import static core.Types.GAME_MODE.*;
@@ -32,6 +34,7 @@ public class Tournament {
     private static boolean FORCE_TURN_END;
     private static boolean MCTS_ROLLOUTS;
     private static int POP_SIZE;
+    private static File accFile;
     //public static NN nn = new NN();
 
     private static Agent _getAgent(PlayerType playerType, long agentSeed, ActionController ac)
@@ -84,7 +87,6 @@ public class Tournament {
 
     public static void main(String[] args) {
 
-
         long seeds[] = new long[]{
                 1590191438878L, 1590791907337L,
                 1591330872230L, 1590557911279L,
@@ -105,6 +107,7 @@ public class Tournament {
         Types.GAME_MODE gameMode = CAPITALS; //SCORE;
         Tournament t = new Tournament(gameMode);
         int nRepetitions = 20;
+
         if(args.length == 0)
         {
             t.setPlayers(new PlayerType[]{PlayerType.RHEA, PlayerType.RANDOM});
@@ -124,6 +127,8 @@ public class Tournament {
                 int nPlayers = (args.length - 6) / 2;
                 PlayerType[] playerTypes = new PlayerType[nPlayers];
                 Types.TRIBE[] tribes = new Types.TRIBE[nPlayers];
+                accFile = new File(parsePlayerTypeStr(args[6 + 0]) + "vs" + parsePlayerTypeStr(args[6 + 1])+ ".txt");
+                accFile.createNewFile();
 
                 for (int i = 0; i < nPlayers; ++i) {
                     playerTypes[i] = parsePlayerTypeStr(args[6 + i]);
@@ -143,7 +148,7 @@ public class Tournament {
         boolean shiftTribes = true;
         t.setSeeds(seeds);
         Constants.VERBOSE = true;
-        t.run(nRepetitions, shiftTribes);
+        t.run(nRepetitions, shiftTribes, args);
     }
 
     private static PlayerType parsePlayerTypeStr(String arg) throws Exception
@@ -212,10 +217,12 @@ public class Tournament {
     }
 
 
-    private void run(int repetitions, boolean shift)
+    private void run(int repetitions, boolean shift, String[] args)
     {
+
         int starter = 0;
         int nseed = 0;
+        double[] finalAccs = new double[repetitions];
         for (long levelSeed : seeds) {
 
             if(levelSeed == -1)
@@ -244,8 +251,8 @@ public class Tournament {
 
                     if (playersIn < participants.size())
                         System.out.print(", ");
-                        NN.train();
-
+                    NN.train();
+                    finalAccs[rep] = NN.finalAccuracy;
 
                     //Todo check if NN trained enough
 
@@ -274,6 +281,19 @@ public class Tournament {
 
             nseed++;
         }
+
+        try {
+            PrintStream fw = new PrintStream(parsePlayerTypeStr(args[6 + 0]) + "vs" + parsePlayerTypeStr(args[6 + 1])+ ".txt");
+            for (int i =0; i<finalAccs.length; i++){
+                fw.println(Double.toString(finalAccs[i]) + "," + Integer.toString(i));
+
+            }
+            fw.close();
+        }catch (Exception e){
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+
 
 
         _printRunResults();
@@ -325,6 +345,8 @@ public class Tournament {
                 }
             }
         }
+
+
 
         _printRunResults();
 

@@ -222,7 +222,8 @@ public class Tournament {
 
         int starter = 0;
         int nseed = 0;
-        double[] finalAccs = new double[repetitions];
+        double[] finalAccs = new double[25];
+        int counter = 0;
         for (long levelSeed : seeds) {
 
             if(levelSeed == -1)
@@ -251,12 +252,14 @@ public class Tournament {
 
                     if (playersIn < participants.size())
                         System.out.print(", ");
-                    NN.train();
-                    finalAccs[rep] = NN.finalAccuracy;
 
                     //Todo check if NN trained enough
 
                 }
+                NN.train();
+
+                finalAccs[counter] = NN.finalAccuracy;
+                counter++;
                 System.out.println("] (" + (nseed*repetitions + rep + 1) + "/" + (seeds.length*repetitions) + ")");
 
                 Game game = _prepareGame(tribes, levelSeed, players, gameMode, null);

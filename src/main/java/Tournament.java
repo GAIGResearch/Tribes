@@ -253,8 +253,6 @@ public class Tournament {
                     if (playersIn < participants.size())
                         System.out.print(", ");
 
-                    //Todo check if NN trained enough
-
                 }
                 NN.train();
 

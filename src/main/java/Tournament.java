@@ -222,7 +222,7 @@ public class Tournament {
 
         int starter = 0;
         int nseed = 0;
-        double[] finalAccs = new double[25];
+        double[] finalAccs = new double[500];
         int counter = 0;
         for (long levelSeed : seeds) {
 

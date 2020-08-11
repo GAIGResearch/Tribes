@@ -42,7 +42,7 @@ public  class NN {
         });
 
         // set learning rate and max error
-        learningRule.setLearningRate(0.1);
+        learningRule.setLearningRate(0.01);
         learningRule.setMaxIterations(100);
         //learningRule.setMaxError(0.3);
 
@@ -97,7 +97,7 @@ public  class NN {
         output = nn.getOutput();
         double out = denormalise(output[0]);
 
-            System.out.println(out);
+         //   System.out.println(out);
 
 
         //return output;

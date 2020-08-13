@@ -476,6 +476,7 @@ public class Tournament {
                 int n = stat.getVariable("v").n();
                 double perc_w = 100.0 * (double)w/n;
 
+
                 System.out.printf("[N:%d];", n);
                 System.out.printf("[%%:%.2f];", perc_w);
                 System.out.printf("[W:%d];", w);

@@ -22,7 +22,7 @@ Alternatively, open the code directly in your IDE of choice and add libraries in
 
 # Running the framework
 
-The main class for running the framework is `Play.java` found in the sources root directory. The `main` method in this class contains 3 ways of running the code:
+The main class for running the framework is `Play.java` found in the sources root directory. The `main` method in this class contains 3 ways of running the code. The parameters for all these execution modes can be found in the configuration file `play.json`.
 
 1. **Play one game with visuals, using the level generator.** Call the `play` method with the following possible settings:
     * **tribes**: array of type `Types.TRIBE` containing the tribes that will be assigned to the players.
@@ -73,7 +73,8 @@ Other intersting variables in the `core.Constants.java` class for running games 
 
 ## Tournaments
 
-To run round-robin tournaments between multiple AI players, run class `Tournament.java`. This class takes several program arguments when running, as follows:
+To run round-robin tournaments between multiple AI players, run class `Tournament.java`. Running a tourament requires some parameters, which are indicated in the file `tournament.json`. Among these parameters, you may determine:
+
 * **game mode**: Int, 0 for Capitals, 1 for Score
 * **# repetitions**: Int, number of repetitions per match-up
 * **max length**: Int, maximum number of turns per game
@@ -82,8 +83,9 @@ To run round-robin tournaments between multiple AI players, run class `Tournamen
 * **population size**: Int, for population-based algorithms, e.g. RHEA
 * **players**: String x N, N player types taking part in the game
 * **tribes**: String x N, N tribes for the game, same number as players
+* **Level Seeds**: A series of random seeds for the game levels.
 
-A series of random seeds for the games can be set for the tournament (see method `main` in `Tournamnet.java`). Tournament results indicate number of games played (N), number of wins (W) and win rate, score (S), number of technologies researched (T), number of cities (C) and star production (P) for each player. 
+Tournament results indicate number of games played (N), number of wins (W) and win rate, score (S), number of technologies researched (T), number of cities (C) and star production (P) for each player. 
 
 ## Game configuration
 

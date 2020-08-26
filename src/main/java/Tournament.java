@@ -15,7 +15,7 @@ import players.osla.OneStepLookAheadAgent;
 import players.rhea.RHEAAgent;
 import players.rhea.RHEAParams;
 import utils.MultiStatSummary;
-import core.FMLearner.NN;
+//import core.FMLearner.NN;
 import java.io.File;  // Import the File class
 import javax.swing.plaf.metal.MetalBorders;
 import java.io.FileWriter;
@@ -254,9 +254,9 @@ public class Tournament {
                         System.out.print(", ");
 
                 }
-                NN.train();
+ //               NN.train();
 
-                finalAccs[counter] = NN.finalAccuracy;
+//                finalAccs[counter] = NN.finalAccuracy;
                 counter++;
                 System.out.println("] (" + (nseed*repetitions + rep + 1) + "/" + (seeds.length*repetitions) + ")");
 

@@ -1,7 +1,7 @@
 package core.game;
 
 import core.Constants;
-import core.FMLearner.NN;
+//import core.FMLearner.NN;
 import core.Types;
 import core.actions.Action;
 import core.actions.tribeactions.EndTurn;

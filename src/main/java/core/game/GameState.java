@@ -16,7 +16,7 @@ import core.actors.units.Unit;
 import core.levelgen.LevelGenerator;
 import utils.IO;
 import utils.Vector2d;
-import core.FMLearner.NN;
+//import core.FMLearner.NN;
 import core.Types;
 import java.util.stream.*;
 
@@ -668,8 +668,8 @@ public class GameState {
                        // Unit attacker = (Unit) this.getActor(((Attack) action).getUnitId());
                       //  Unit defender = (Unit) this.getActor(((Attack) action).getTargetId());
                         //if(defender.getType() == Types.UNIT.WARRIOR) {
-                        NN.expectedValues.add((float) ((Attack) action).getAttackResults(this).getFirst());
-                        NN.testDataCounter ++;
+//                        NN.expectedValues.add((float) ((Attack) action).getAttackResults(this).getFirst());
+//                        NN.testDataCounter ++;
                       //  }
 
                         //  System.out.println(NN.expectedValues);
@@ -758,91 +758,91 @@ public class GameState {
                         // NN training and testing
                         if (this.isCopy) {
                             //add training data
-                            try {
-                                //boolean check = checkIfAllEqual(NN.testDataCounter);
-                                //boolean check2 = checkIfAllEqual(NN.trainDataCounter);
-
-                                if(NN.trainDataCounter == NN.testDataCounter){ //if we have enough values
-                                    Unit attacker = (Unit) this.getActor(((Attack) action).getUnitId());
-                                    Unit defender = (Unit) this.getActor(((Attack) action).getTargetId());
-
-                                    try {
-                                        if(((Attack) action).isInBorder)
-                                            NN.test((float) ((Attack) action).getAttackResults(this).getFirst(), (float) defender.getType().getKey(), (float) attacker.getType().getKey(),1);
-                                        else
-                                            NN.test((float) ((Attack) action).getAttackResults(this).getFirst(), (float) defender.getType().getKey(), (float) attacker.getType().getKey(),0);
-
-
-                                    }catch (Exception e){
-
-                                    }
-                                  try {
-                                //      System.out.println(NN.denormalise(NN.output[0]));
-                                      if(isCopy) {
-                                          if (attacker.getType() == Types.UNIT.WARRIOR)
-                                              tc.WARRIOR_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
-
-                                          if (attacker.getType() == Types.UNIT.RIDER)
-                                              tc.RIDER_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
-
-                                          if (attacker.getType() == Types.UNIT.DEFENDER)
-                                              tc.DEFENDER_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
-
-                                          if (attacker.getType() == Types.UNIT.SWORDMAN)
-                                              tc.SWORDMAN_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
-
-                                          if (attacker.getType() == Types.UNIT.ARCHER)
-                                              tc.ARCHER_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
-
-                                          if (attacker.getType() == Types.UNIT.CATAPULT)
-                                              tc.CATAPULT_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
-
-                                          if (attacker.getType() == Types.UNIT.KNIGHT)
-                                              tc.KNIGHT_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
-
-                                          if (attacker.getType() == Types.UNIT.MIND_BENDER)
-                                              tc.MINDBENDER_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
-
-                                          if (attacker.getType() == Types.UNIT.BOAT)
-                                              tc.BOAT_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
-
-                                          if (attacker.getType() == Types.UNIT.SHIP)
-                                              tc.SHIP_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
-
-                                          if (attacker.getType() == Types.UNIT.BATTLESHIP)
-                                              tc.BATTLESHIP_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
-
-                                          if (attacker.getType() == Types.UNIT.SUPERUNIT)
-                                              tc.SUPERUNIT_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
-                                      }
-                                  }catch (Exception e){
-
-                                  }
-                                }
-                                //other wise just gather training data
-                                if(NN.trainDataCounter <= NN.testDataCounter) {
-                                    Unit attacker = (Unit) this.getActor(((Attack) action).getUnitId());
-                                    Unit defender = (Unit) this.getActor(((Attack) action).getTargetId());
-                                    //add data for all unit types
-                                  //  if(defender.getType() == Types.UNIT.WARRIOR) {
-                                        NN.trainingData.add((float) ((Attack) action).getAttackResults(this).getFirst());
-                                        NN.trainingData2.add((float)defender.getType().getKey());
-                                        NN.trainingData3.add((float)attacker.getType().getKey());
-                                        if(((Attack) action).isInBorder){
-                                            NN.trainingData4.add(0f);
-
-                                        }else
-                                            NN.trainingData4.add(1f);
-
-
-                                    NN.trainDataCounter ++; //increment training data counter
-                                 //   }
-
-
-                                }
-                            }catch (NullPointerException e){
-
-                            }
+//                            try {
+//                                //boolean check = checkIfAllEqual(NN.testDataCounter);
+//                                //boolean check2 = checkIfAllEqual(NN.trainDataCounter);
+//
+//                                if(NN.trainDataCounter == NN.testDataCounter){ //if we have enough values
+//                                    Unit attacker = (Unit) this.getActor(((Attack) action).getUnitId());
+//                                    Unit defender = (Unit) this.getActor(((Attack) action).getTargetId());
+//
+//                                    try {
+//                                        if(((Attack) action).isInBorder)
+//                                            NN.test((float) ((Attack) action).getAttackResults(this).getFirst(), (float) defender.getType().getKey(), (float) attacker.getType().getKey(),1);
+//                                        else
+//                                            NN.test((float) ((Attack) action).getAttackResults(this).getFirst(), (float) defender.getType().getKey(), (float) attacker.getType().getKey(),0);
+//
+//
+//                                    }catch (Exception e){
+//
+//                                    }
+//                                  try {
+//                                //      System.out.println(NN.denormalise(NN.output[0]));
+//                                      if(isCopy) {
+//                                          if (attacker.getType() == Types.UNIT.WARRIOR)
+//                                              tc.WARRIOR_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
+//
+//                                          if (attacker.getType() == Types.UNIT.RIDER)
+//                                              tc.RIDER_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
+//
+//                                          if (attacker.getType() == Types.UNIT.DEFENDER)
+//                                              tc.DEFENDER_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
+//
+//                                          if (attacker.getType() == Types.UNIT.SWORDMAN)
+//                                              tc.SWORDMAN_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
+//
+//                                          if (attacker.getType() == Types.UNIT.ARCHER)
+//                                              tc.ARCHER_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
+//
+//                                          if (attacker.getType() == Types.UNIT.CATAPULT)
+//                                              tc.CATAPULT_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
+//
+//                                          if (attacker.getType() == Types.UNIT.KNIGHT)
+//                                              tc.KNIGHT_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
+//
+//                                          if (attacker.getType() == Types.UNIT.MIND_BENDER)
+//                                              tc.MINDBENDER_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
+//
+//                                          if (attacker.getType() == Types.UNIT.BOAT)
+//                                              tc.BOAT_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
+//
+//                                          if (attacker.getType() == Types.UNIT.SHIP)
+//                                              tc.SHIP_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
+//
+//                                          if (attacker.getType() == Types.UNIT.BATTLESHIP)
+//                                              tc.BATTLESHIP_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
+//
+//                                          if (attacker.getType() == Types.UNIT.SUPERUNIT)
+//                                              tc.SUPERUNIT_ATTACK = (int) NN.denormalise(NN.output[0]) / (attacker.getCurrentHP() / attacker.getMaxHP());
+//                                      }
+//                                  }catch (Exception e){
+//
+//                                  }
+//                                }
+//                                //other wise just gather training data
+//                                if(NN.trainDataCounter <= NN.testDataCounter) {
+//                                    Unit attacker = (Unit) this.getActor(((Attack) action).getUnitId());
+//                                    Unit defender = (Unit) this.getActor(((Attack) action).getTargetId());
+//                                    //add data for all unit types
+//                                  //  if(defender.getType() == Types.UNIT.WARRIOR) {
+//                                        NN.trainingData.add((float) ((Attack) action).getAttackResults(this).getFirst());
+//                                        NN.trainingData2.add((float)defender.getType().getKey());
+//                                        NN.trainingData3.add((float)attacker.getType().getKey());
+//                                        if(((Attack) action).isInBorder){
+//                                            NN.trainingData4.add(0f);
+//
+//                                        }else
+//                                            NN.trainingData4.add(1f);
+//
+//
+//                                    NN.trainDataCounter ++; //increment training data counter
+//                                 //   }
+//
+//
+//                                }
+//                            }catch (NullPointerException e){
+//
+//                            }
                         }
 
                 }
@@ -1020,8 +1020,8 @@ public class GameState {
         copy.turnMustEnd = turnMustEnd;
         copy.gameIsOver = gameIsOver;
         copy.tc = tc.copy();
-        long seed = 1860142121111L; //possibly different seeds
-        //long seed = 1631159151187L;
+        //Winlong seed = 1860142121111L; //possibly different seeds
+        long seed = 1631159151187L;
         copy.changeTribesConfig(distance,seed);
         copy.isCopy = true;
 

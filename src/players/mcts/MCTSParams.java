@@ -1,7 +1,5 @@
 package players.mcts;
 
-
-import javafx.util.Pair;
 import players.heuristics.AlgParams;
 
 import java.util.ArrayList;

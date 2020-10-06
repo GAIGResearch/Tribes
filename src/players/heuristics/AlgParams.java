@@ -1,7 +1,5 @@
 package players.heuristics;
 
-import javafx.util.Pair;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,8 +30,6 @@ public class AlgParams
     public Object getParameterValue(String param) { return null; }
     public ArrayList<String> getParameters() { return null; }
     public Map<String, Object[]> getParameterValues() { return null; }
-    public Pair<String, ArrayList<Object>> getParameterParent(String parameter) { return null; }
-    public Map<Object, ArrayList<String>> getParameterChildren(String root) { return null; }
 
     public Map<String, String[]> constantNames() {
         HashMap<String, String[]> names = new HashMap<>();

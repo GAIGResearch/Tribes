@@ -1,4 +1,4 @@
-package utils;
+package utils.file;
 
 import org.json.JSONObject;
 
@@ -11,7 +11,6 @@ import java.util.ArrayList;
  * User: Diego
  * Date: 04/10/13
  * Time: 16:56
- * This is a Java port from Tom Schaul's VGDL - https://github.com/schaul/py-vgdl
  */
 public class IO
 {

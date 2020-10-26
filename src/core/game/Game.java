@@ -4,11 +4,13 @@ import core.Constants;
 import core.Types;
 import core.actions.Action;
 import core.actions.tribeactions.EndTurn;
-import core.actions.unitactions.Attack;
 import core.actors.Tribe;
 import players.Agent;
 import players.HumanAgent;
 import utils.*;
+import gui.GUI;
+import gui.WindowInput;
+import utils.stats.AIStats;
 
 import java.util.*;
 

@@ -1,4 +1,4 @@
-package utils;
+package utils.stats;
 
 import java.math.BigInteger;
 import java.text.DecimalFormat;

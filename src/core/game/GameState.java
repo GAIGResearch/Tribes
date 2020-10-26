@@ -6,7 +6,6 @@ import core.Types;
 import core.actions.Action;
 import core.actions.ActionCommand;
 import core.actions.cityactions.factory.CityActionBuilder;
-import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.factory.TribeActionBuilder;
 import core.actions.unitactions.Recover;
 import core.actions.unitactions.factory.RecoverFactory;
@@ -14,7 +13,7 @@ import core.actions.unitactions.factory.UnitActionBuilder;
 import core.actors.*;
 import core.actors.units.Unit;
 import core.levelgen.LevelGenerator;
-import utils.IO;
+import utils.file.IO;
 import utils.Vector2d;
 
 import java.util.*;
@@ -514,7 +513,7 @@ public class GameState {
      * @param playerIdx player index that indicates who is this copy for.
      * @return a copy of this game state.
      */
-    public GameState copy(int playerIdx)
+    GameState copy(int playerIdx)
     {
 //        GameState copy = new GameState(this.rnd, this.gameMode); //use this for a 100% repetition of the game based on random seed and game seed.
         GameState copy = new GameState(new Random(), this.gameMode); //copies of the game state can't have the same random generator.

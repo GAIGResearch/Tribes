@@ -1,4 +1,4 @@
-package utils;
+package gui;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,7 +6,6 @@ import java.util.*;
 
 import core.Types;
 import core.actions.cityactions.CityAction;
-import core.actions.cityactions.ResourceGathering;
 import core.actions.unitactions.*;
 import core.actions.unitactions.command.AttackCommand;
 import core.actors.Actor;
@@ -19,6 +18,9 @@ import core.game.Board;
 import core.game.Game;
 import core.game.GameState;
 import core.actions.Action;
+import utils.file.ImageIO;
+import utils.Pair;
+import utils.Vector2d;
 
 import static core.Constants.*;
 import static core.Types.TERRAIN.*;

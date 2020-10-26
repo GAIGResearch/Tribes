@@ -1,4 +1,4 @@
-package utils;
+package gui;
 
 import core.Types;
 import core.actors.Tribe;

@@ -5,7 +5,7 @@ import core.actors.City;
 import core.actors.units.Unit;
 import core.game.GameState;
 import core.*;
-import utils.StatSummary;
+import utils.stats.StatSummary;
 
 import java.util.ArrayList;
 

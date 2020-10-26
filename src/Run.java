@@ -2,8 +2,8 @@ import core.Types;
 import core.game.Game;
 import players.ActionController;
 import players.KeyController;
-import utils.GUI;
-import utils.WindowInput;
+import gui.GUI;
+import gui.WindowInput;
 
 import static core.Constants.*;
 import static core.Types.TRIBE.*;

@@ -1,4 +1,4 @@
-package utils;
+package gui;
 
 import core.TechnologyTree;
 import core.Types;
@@ -18,6 +18,7 @@ import core.game.Board;
 import core.game.GameState;
 import core.actions.Action;
 import players.ActionController;
+import utils.Vector2d;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 
 import static core.Constants.*;
 import static core.TribesConfig.VETERAN_KILLS;
-import static utils.GameView.gridSize;
+import static gui.GameView.gridSize;
 import static core.Types.ACTION.*;
 
 @SuppressWarnings({"StringConcatenationInsideStringBufferAppend", "SuspiciousNameCombination"})

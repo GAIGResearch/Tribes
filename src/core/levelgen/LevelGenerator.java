@@ -6,10 +6,8 @@ import static core.Types.TRIBE.*;
 //import static core.Types.RESOURCE.*;
 import core.Types;
 import org.json.JSONObject;
-import utils.IO;
+import utils.file.IO;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.*;
 

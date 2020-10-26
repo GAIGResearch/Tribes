@@ -1,7 +1,7 @@
 package players.heuristics;
 
 import core.game.GameState;
-import utils.StatSummary;
+import utils.stats.StatSummary;
 
 import java.util.ArrayList;
 

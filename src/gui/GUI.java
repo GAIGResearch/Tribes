@@ -1,4 +1,4 @@
-package utils;
+package gui;
 
 import core.Constants;
 import core.Types;
@@ -12,6 +12,7 @@ import core.actions.Action;
 import players.ActionController;
 import players.HumanAgent;
 import players.KeyController;
+import utils.Vector2d;
 
 import javax.swing.*;
 import java.awt.*;

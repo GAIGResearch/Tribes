@@ -2,7 +2,7 @@ package players.heuristics;
 
 import core.actors.City;
 import core.game.GameState;
-import utils.StatSummary;
+import utils.stats.StatSummary;
 
 import java.util.ArrayList;
 

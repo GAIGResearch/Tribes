@@ -1,4 +1,4 @@
-package utils;
+package utils.stats;
 
 /**
  This class is used to model the statistics

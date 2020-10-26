@@ -13,7 +13,7 @@ import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
 import players.rhea.RHEAAgent;
 import players.rhea.RHEAParams;
-import utils.IO;
+import utils.file.IO;
 
 import java.util.*;
 

@@ -1,17 +1,14 @@
 package players.mc;
 
-import core.TechnologyTree;
 import core.Types;
 import core.actions.Action;
-import core.actions.cityactions.Destroy;
 import core.actions.tribeactions.EndTurn;
-import core.actions.unitactions.Disband;
 import core.actors.Tribe;
 import core.game.GameState;
 import players.Agent;
 import players.heuristics.StateHeuristic;
 import utils.ElapsedCpuTimer;
-import utils.StatSummary;
+import utils.stats.StatSummary;
 
 import java.util.ArrayList;
 import java.util.Random;

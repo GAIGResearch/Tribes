@@ -1,4 +1,4 @@
-package utils;
+package gui;
 
 import core.TechnologyTree;
 import core.Types;

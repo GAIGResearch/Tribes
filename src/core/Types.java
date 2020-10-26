@@ -9,7 +9,7 @@ import core.actions.tribeactions.command.ResearchTechCommand;
 import core.actions.unitactions.command.*;
 import core.actors.units.*;
 import org.json.JSONObject;
-import utils.ImageIO;
+import utils.file.ImageIO;
 import utils.Vector2d;
 
 import java.awt.*;

@@ -197,14 +197,14 @@ public class Play {
             case RANDOM: return new RandomAgent(agentSeed);
             case OSLA:
                 OSLAParams oslaParams = new OSLAParams();
-                oslaParams.stop_type = oslaParams.STOP_FMCALLS; //Upper bound
-                oslaParams.heuristic_method = oslaParams.DIFF_HEURISTIC;
+                oslaParams.stop_type = oslaParams.STOP_ITERATIONS; //Upper bound
+                oslaParams.heuristic_method = oslaParams.SIMPLE_HEURISTIC;
                 return new OneStepLookAheadAgent(agentSeed, oslaParams);
             case MC:
                 MCParams mcparams = new MCParams();
-                mcparams.stop_type = mcparams.STOP_FMCALLS;
+                mcparams.stop_type = mcparams.STOP_ITERATIONS;
 //                mcparams.stop_type = mcparams.STOP_ITERATIONS;
-                mcparams.heuristic_method = mcparams.DIFF_HEURISTIC;
+                mcparams.heuristic_method = mcparams.SIMPLE_HEURISTIC;
                 mcparams.PRIORITIZE_ROOT = true;
                 mcparams.ROLLOUT_LENGTH = 10;
                 mcparams.FORCE_TURN_END = 5;//mcparams.ROLLOUT_LENGTH+2;
@@ -212,23 +212,25 @@ public class Play {
             case SIMPLE: return new SimpleAgent(agentSeed);
             case MCTS:
                 MCTSParams mctsParams = new MCTSParams();
-                mctsParams.stop_type = mctsParams.STOP_FMCALLS;
+                mctsParams.stop_type = mctsParams.STOP_ITERATIONS;
                 mctsParams.PRIORITIZE_ROOT = true;
-                mctsParams.heuristic_method = mctsParams.DIFF_HEURISTIC;
+                mctsParams.heuristic_method = mctsParams.SIMPLE_HEURISTIC;
                 mctsParams.ROLLOUT_LENGTH = 20;
 //                mctsParams.ROLOUTS_ENABLED = false;
                 mctsParams.FORCE_TURN_END = 25;
                 return new MCTSPlayer(agentSeed, mctsParams);
             case RHEA:
                 RHEAParams rheaParams = new RHEAParams();
-                rheaParams.stop_type = rheaParams.STOP_FMCALLS;
-                rheaParams.heuristic_method = rheaParams.DIFF_HEURISTIC;
+                rheaParams.stop_type = rheaParams.STOP_ITERATIONS;
+                rheaParams.heuristic_method = rheaParams.SIMPLE_HEURISTIC;
                 rheaParams.INDIVIDUAL_LENGTH = 20;
                 rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
                 rheaParams.POP_SIZE = 1;
                 return new RHEAAgent(agentSeed, rheaParams);
             case OEP:
                 OEPParams oepParams = new OEPParams();
+                oepParams.stop_type = oepParams.STOP_ITERATIONS;
+                oepParams.heuristic_method = oepParams.SIMPLE_HEURISTIC;
                 return new OEPAgent(agentSeed, oepParams);
         }
         return null;

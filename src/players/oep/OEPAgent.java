@@ -1,7 +1,13 @@
 package players.oep;
 
+import core.Types;
 import core.actions.Action;
+import core.actions.cityactions.CityAction;
 import core.actions.tribeactions.EndTurn;
+import core.actions.unitactions.UnitAction;
+import core.actors.Actor;
+import core.actors.City;
+import core.actors.units.Unit;
 import core.game.GameState;
 import players.Agent;
 import players.heuristics.StateHeuristic;
@@ -17,16 +23,36 @@ import static core.Types.ACTION.*;
 
 public class OEPAgent extends Agent {
 
+    /*
+        -> create a population of *Random* individuals, using params with the amount
+            -> create a method that returns a list of actions that is an individual
+            -> use params to set the act method to run properly
+
+        -> asses each individual and re-order them from best to worst
+
+        -> kill off the amount based on the kill rate from param
+
+        -> perform crossover to re-populate
+
+        -> perform mutations at random from param
+
+        -> add more random individuals too fill up population
+
+        -> check time allowance
+        ---------------------Done To This Point--------------------------------
+    */
+
+    private int ok = 0;
+    private int repairing = 0;
+    private int critRepair = 0;
+
     private Random m_rnd;
     private StateHeuristic heuristic;
     private OEPParams params;
 
-    ArrayList<Genome> pop = new ArrayList<>();
-    int currentTurn = -1;
-    long timeBudget = 0;
-    boolean newTurn = true;
-    int actionIndex = 0;
 
+    private Individual bestIndividual;
+    private boolean returnAction = false;
 
     public OEPAgent(long seed, OEPParams params) {
         super(seed);
@@ -36,45 +62,114 @@ public class OEPAgent extends Agent {
 
     @Override
     public Action act(GameState gs, ElapsedCpuTimer ect) {
+        ok = 0;
+        repairing = 0;
+        critRepair = 0;
+        double avgTimeTaken;
+        double acumTimeTaken = 0;
+        long remaining;
+        int numIters = 0;
+
+        int remainingLimit = 5;
+        boolean stop = false;
+
+        if(this.returnAction){
+            //System.out.println(bestIndividual.size());
+            Action action;
+            if(bestIndividual.getActions().size() == 1){
+                returnAction = false;
+            }
+            action = bestIndividual.returnNext();
+            //System.out.println("Action Given");
+            return action;
+        }
+
+
+        //create a population of individuals defined in param
+        ArrayList<Individual> population = new ArrayList<>();
+        for(int i = 0; i < params.POP_SIZE; i++){
+            population.add(new Individual(randomActions(gs.copy())));
+        }
 
         this.heuristic = params.getHeuristic(playerID, allPlayerIDs);
 
-        if (currentTurn != gs.getTick()){
-            currentTurn = gs.getTick();
-            actionIndex = 0;
-            timeBudget = ect.remainingTimeMillis() / (gs.getAllAvailableActions().size() *3);
-            newTurn = true;
-        }
+        //keep going until time limit gone
+        while(!stop){
+            numIters ++;
+            ElapsedCpuTimer elapsedTimerIteration = new ElapsedCpuTimer();
 
-        if (newTurn){
-            ect.setMaxTimeMillis(timeBudget);
-            init(gs.copy());
-            while (ect.remainingTimeMillis() > 0){
-                for (Genome g : pop) {
-                    GameState clone = gs.copy();
-                    for (Action a : g.getActions()){
-                        clone.advance(a, true);
-                    }
-                    if (g.getVisit() == 0){
-                        g.setValue(eval(clone));
-                        g.visited();
-                    }
-                }
-                Collections.sort(pop);
-                for (int i = params.POP_SIZE-1; i >= (params.POP_SIZE/2); i--){
-                    pop.remove(i);
-                }
-                procreate(gs.copy());
+            //perform uniform crossover
+            boolean even = false;
+            if(population.size() % 2 == 0){
+                even = true;
+            }
+            Individual person1 = null;
+            if(!even){
+                person1 = population.get(m_rnd.nextInt(population.size()));
+                population.remove(person1);
             }
 
-            System.out.println(gs.getTick());
-            System.out.println(pop.get(0).getActions());
-            System.out.println(pop.get(0).getActions().get(actionIndex));
-            newTurn = false;
-        }else{
-            System.out.println(pop.get(0).getActions().get(actionIndex));
+            population = procreate(gs.copy(), population);
+
+            if(!even){
+                population.add(crossover(gs.copy(), person1, population.get(m_rnd.nextInt(population.size()))));
+            }
+
+
+            // fill the population with random individuals
+            for(int i = population.size() - 1; i < params.POP_SIZE; i++){
+                population.add(new Individual(randomActions(gs.copy())));
+            }
+
+            // rate each individual and sort them
+            for(Individual individual : population){
+                individual.setValue(eval(gs.copy(), individual));
+            }
+            population = reorderIndividuals(population);
+            this.bestIndividual = population.get(population.size() - 1);
+
+
+            //Kill the amount of the population that needs to die
+            int amount =  (int)(population.size() * params.KILL_RATE);
+            for(int i = 0; i < amount; i++){
+                population.remove(population.size() - 1);
+            }
+            //System.out.println("Rate and Kill done");
+
+
+            if(params.stop_type == params.STOP_TIME) {
+                acumTimeTaken += (elapsedTimerIteration.elapsedMillis()) ;
+                avgTimeTaken  = acumTimeTaken/numIters;
+                remaining = ect.remainingTimeMillis();
+                stop = remaining <= 2 * avgTimeTaken || remaining <= remainingLimit;
+                if(stop){ returnAction = true; }
+            }else if(params.stop_type == params.STOP_ITERATIONS) {
+                stop = numIters >= params.num_iterations;
+                if(stop){ returnAction = true; }
+            }
+
         }
-        return pop.get(0).getActions().get(actionIndex++);
+
+        //System.out.println(bestIndividual.getActions().size());
+
+        //System.out.println(bestIndividual.size());
+        System.out.println("OK: " + ok);
+        System.out.println("Repairing: " + repairing);
+        System.out.println("Crit Repair: " + critRepair);
+        System.out.println(" ");
+
+        Action action = null;
+        if(this.returnAction){
+
+            if(bestIndividual.getActions().size() == 1){
+                returnAction = false;
+            }
+            action = bestIndividual.returnNext();
+
+        }
+
+        return action;
+
 
     }
 
@@ -83,164 +178,219 @@ public class OEPAgent extends Agent {
         return null;
     }
 
-    private void init(GameState gs){
-        pop = new ArrayList<>();
-        for(int i = 0; i < params.POP_SIZE; i++){
-            GameState clone = gs.copy();
-            Genome g = new Genome(randomActions(clone));
-            pop.add(g);
+
+    // sorting algorithm using quick sort
+    private ArrayList<Individual> reorderIndividuals(ArrayList<Individual> population){
+        if(population.size() == 1 || population.size() == 0){
+            return population;
+        }else{
+            int pos = (int)(population.size() / 2);
+            ArrayList<Individual> popLower = new ArrayList<>();
+            ArrayList<Individual> popHigher = new ArrayList<>();
+
+            for(int i = 0; i < population.size(); i++){
+                if(!(i == pos)){
+                    if(population.get(i).getValue() < population.get(pos).getValue()){
+                        popLower.add(population.get(i));
+                    }else{
+                        popHigher.add(population.get(i));
+                    }
+                }
+            }
+
+            popLower = reorderIndividuals(popLower);
+            popLower.add(population.get(pos));
+            popLower.addAll(reorderIndividuals(popHigher));
+
+            return popLower;
         }
     }
+
+
 
     private ArrayList<Action> randomActions(GameState gs){
-        ArrayList<Action> actions = new ArrayList<>();
+        ArrayList<Action> individual = new ArrayList<>();
         while (!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())){
-            ArrayList<Action> allAvailableActions = gs.getAllAvailableActions();
+            ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
             Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
             gs.advance(a, true);
-            actions.add(a);
+            individual.add(a);
+
         }
-        return actions;
+        return individual;
     }
 
-    private void procreate(GameState gs){
-        int originalSize = pop.size();
-        while (pop.size() < params.POP_SIZE){
-            GameState clone = gs.copy();
-            ArrayList<Action> actions = crossover(clone, originalSize);
-            if (m_rnd.nextDouble() < params.MUTATION_RATE){
-                mutation(gs.copy(), actions);
-            }
-            pop.add(new Genome(actions));
-        }
-
-    }
-
-    private ArrayList<Action> crossover(GameState clone, int originalSize){
-        ArrayList<Action> actions = new ArrayList<>();
-
-        // Choose Parent
-        int firstNum = m_rnd.nextInt(originalSize);
-        int secondNum = m_rnd.nextInt(originalSize);
-        while (firstNum == secondNum){
-            secondNum = m_rnd.nextInt(pop.size());
-        }
-        int[] parent_index = {firstNum, secondNum};
-        int min_action = Math.min(pop.get(parent_index[0]).getActions().size(), pop.get(parent_index[1]).getActions().size());
-        int max_action = Math.max(pop.get(parent_index[0]).getActions().size(), pop.get(parent_index[1]).getActions().size());
-        int max_action_parent = (pop.get(parent_index[0]).getActions().size() > pop.get(parent_index[1]).getActions().size()) ? parent_index[0]:parent_index[1];
-
-        int index = 0;
-        int actionIndex = 0;
-
-        // While two parents has actions
-        while (actionIndex < min_action){
-            Action a = pop.get(parent_index[index%2]).getActions().get(actionIndex);
-            Action b = pop.get(parent_index[(index+1)%2]).getActions().get(actionIndex);
-            if (a.isFeasible(clone) && !(a.getActionType() == END_TURN)){
-                clone.advance(a, true);
-                actions.add(a);
-                index ++;
-                actionIndex++;
-            }else if(b.isFeasible(clone) && !(b.getActionType() == END_TURN)){
-                clone.advance(b, true);
-                actions.add(b);
-                actionIndex++;
-            }else if((a.getActionType() == END_TURN) && (b.getActionType() == END_TURN)){
-                Action endTurn = new EndTurn(getPlayerID());
-                while (!endTurn.isFeasible(clone)){
-                    ArrayList<Action> allAvailableActions = clone.getAllAvailableActions();
-                    Action selectedAction = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-                    actions.add(selectedAction);
-                    clone.advance(selectedAction, true);
-                    endTurn = new EndTurn(getPlayerID());
-                }
-                actions.add(endTurn);
-                return actions;
+    // must be given a even no. of population
+    private ArrayList<Individual> procreate (GameState gs, ArrayList<Individual> population){
+        ArrayList<Individual> group1 = new ArrayList<>();
+        ArrayList<Individual> group2 = new ArrayList<>();
+        boolean g1 = true;
+        while(population.size() > 0){
+            Individual temp = population.get(m_rnd.nextInt(population.size()));
+            if(g1){
+                group1.add(temp);
+                g1 = false;
             }else{
-                actionIndex++;
+                group2.add(temp);
+                g1 = true;
             }
+            population.remove(temp);
         }
 
-        // While only one parent has action
-        while (actionIndex < max_action){
-            Action a = pop.get(max_action_parent).getActions().get(actionIndex);
-            if (a.isFeasible(clone)){
-                clone.advance(a, false);
-                actions.add(a);
-                actionIndex++;
-            }else {
-                actionIndex++;
-            }
+        for(int i = 0; i < group1.size(); i++){
+            population.add(crossover(gs.copy(), group1.get(i), group2.get(i)));
         }
-
-        return actions;
+        return population;
     }
 
-    private void mutation(GameState gs, ArrayList<Action> actions){
+    //method to perform uniform crossover on two individuals
+    private Individual crossover(GameState clone, Individual individual1, Individual individual2){
+        ArrayList<Action> in1 = individual1.getActions();
+        ArrayList<Action> in2 = individual2.getActions();
 
-        int mutationIndex = m_rnd.nextInt(actions.size());
-        for (int i=0; i<mutationIndex-1; i++){
-            gs.advance(actions.get(i), false);
-        }
-        if (mutationIndex != 0){
-            gs.advance(actions.get(mutationIndex-1), true);
-        }
-        Action selectedAction;
-        ArrayList<Action> allAvailableActions = gs.getAllAvailableActions();
-        if (allAvailableActions.size() == 1){
-            actions.set(mutationIndex, allAvailableActions.get(0));
-            for (int j=actions.size()-1; j>mutationIndex; j--) {
-                actions.remove(j);
-            }
-            return;
-        }else{
-            selectedAction = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-            while (selectedAction.getActionType() == END_TURN){
-                selectedAction = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-            }
-            actions.set(mutationIndex, selectedAction);
-        }
+        ArrayList<Action> child = new ArrayList<>();
+        //if both individuals are of the same size
 
-        for (int i=mutationIndex; i<actions.size(); i++){
-            if (actions.get(i).isFeasible(gs)){
-                gs.advance(actions.get(i), true);
-            }else if (i == actions.size() - 1){
-                Action a = new EndTurn(getPlayerID());
-                while (!a.isFeasible(gs)){
-                    allAvailableActions = gs.getAllAvailableActions();
-                    selectedAction = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-                    actions.add(selectedAction);
-                    gs.advance(selectedAction, true);
-                    a = new EndTurn(getPlayerID());
-                }
-                actions.add(a);
-            }else{
-                allAvailableActions = gs.getAllAvailableActions();
-                if (allAvailableActions.size() == 1) {
-                    actions.set(i, selectedAction);
-                    for (int j=actions.size()-1; j>i; j--) {
-                        actions.remove(j);
-                    }
+        boolean ind1 = true;
+        int smallSize = in1.size();
+        if(smallSize > in2.size()){ind1 = false; smallSize = in2.size();}
+        //if in1 is smaller
+        if(ind1){
+
+            int in1amount =(int)(in1.size() / 2);
+            int in2amount = in1.size() - in1amount;
+            for(int i = 0; i < in2.size(); i++){
+                if(i >= smallSize){
+                    child.add(in2.get(i));
                 }else{
-                    selectedAction = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-                    while (selectedAction.getActionType() == END_TURN){
-                        selectedAction = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+                    if(in1amount == 0){
+                        child.add(in2.get(i));
+                    }else if(in2amount == 0){
+                        child.add(in1.get(i));
+                    }else{
+                        int temp = m_rnd.nextInt(100);
+                        if(temp < 50){
+                            child.add(in1.get(i));
+                            in1amount--;
+                        }else{
+                            child.add(in2.get(i));
+                            in2amount--;
+                        }
                     }
-                    actions.set(i, selectedAction);
-                    gs.advance(selectedAction, true);
+                }
+            }
+        }else{
+            // if in2 is smaller
+            int in2amount =(int)(in2.size() / 2);
+            int in1amount = in2.size() - in2amount;
+            for(int i = 0; i < in1.size(); i++){
+                if(i >= smallSize){
+                    child.add(in1.get(i));
+                }else{
+                    if(in1amount == 0){
+                        child.add(in2.get(i));
+                    }else if(in2amount == 0){
+                        child.add(in1.get(i));
+                    }else{
+                        int temp = m_rnd.nextInt(100);
+                        if(temp < 50){
+                            child.add(in1.get(i));
+                            in1amount--;
+                        }else{
+                            child.add(in2.get(i));
+                            in2amount--;
+                        }
+                    }
                 }
             }
         }
+        child = repair(clone, child);
+        return (new Individual(child));
     }
+    //repair an individual if actions can't be performed with a random action
+    private ArrayList<Action> repair(GameState gs, ArrayList<Action> child){
+        ArrayList<Action> repairedChild = new ArrayList<>();
 
-    public double eval(GameState gs){
+        for(int a = 0 ;a < child.size(); a ++) {
 
-        for (int i=0; i<params.DEPTH; i++){
-            ArrayList<Action> allAvailableActions = gs.getAllAvailableActions();
-            gs.advance(allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size())), true);
+            int chance = m_rnd.nextInt((int)(params.MUTATION_RATE * 100));
+            if(m_rnd.nextInt(100) < chance){
+                Action ac = mutation(gs);
+                gs.advance(ac,true);
+                repairedChild.add(ac);
+            }else{
+                try {
+                    boolean done = checkActionFeasibility(child.get(a), gs.copy());
+
+                    if (!done) {
+                        repairing ++;
+                        ArrayList<Action> allAvailableActions = this.allGoodActions(gs.copy(), m_rnd);
+                        Action ac = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+                        gs.advance(ac, true);
+                        repairedChild.add(ac);
+                    } else {
+                        ok++;
+                        repairedChild.add(child.get(a));
+                        gs.advance(child.get(a), true);
+                    }
+                } catch (Exception e) {
+                    critRepair++;
+                    ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
+                    Action ac = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+                    gs.advance(ac, true);
+                    repairedChild.add(ac);
+                }
+            }
+
+
         }
 
+        return repairedChild;
+    }
+
+    //give a random possible move as a mutation
+    private Action mutation(GameState gs){
+
+        ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
+        return  allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+
+    }
+
+    public double eval(GameState gs, Individual actionSet){
+        for(Action move : actionSet.getActions()){
+            //System.out.println("Evaluating");
+            gs.advance(move, true);
+        }
+        actionSet.setGs(gs);
         return heuristic.evaluateState(gs);
+    }
+
+    private boolean checkActionFeasibility(Action a, GameState gs)
+    {
+        if(gs.isGameOver())
+            return false;
+
+        if(a instanceof UnitAction)
+        {
+            UnitAction ua = (UnitAction)a;
+            int unitId = ua.getUnitId();
+            Actor act = gs.getActor(unitId);
+            if(!(act instanceof Unit) || act.getTribeId() != gs.getActiveTribeID())
+                return false;
+        }else if (a instanceof CityAction)
+        {
+            CityAction ca = (CityAction)a;
+            int cityId = ca.getCityId();
+            Actor act = gs.getActor(cityId);
+            if(!(act instanceof City) || act.getTribeId() != gs.getActiveTribeID())
+                return false;
+        }
+
+        boolean feasible = false;
+        try{
+            feasible = a.isFeasible(gs);
+        }catch (Exception e) { }
+
+        return feasible;
     }
 }

@@ -2,12 +2,12 @@
   "Run Mode" : "PlayLG",
   "Run Mode comment" : "PlayLG / PlayFile / Replay",
 
-  "Game Mode" : "Capitals",
+  "Game Mode" : "Score",
   "Rollouts" : false,
   "Search Depth" : 5,
   "Force End" : false,
   "Population Size" : 20,
-  "Players" : ["Human", "MCTS", "MCTS", "MCTS"],
+  "Players" : ["OEP", "MCTS", "MCTS", "MCTS"],
   "Tribes" : ["Xin Xi", "Imperius", "Bardur", "Oumaji"],
   "Verbose" : false,
 

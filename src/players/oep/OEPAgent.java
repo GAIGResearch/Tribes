@@ -42,9 +42,6 @@ public class OEPAgent extends Agent {
         ---------------------Done To This Point--------------------------------
     */
 
-    private int ok = 0;
-    private int repairing = 0;
-    private int critRepair = 0;
 
     private Random m_rnd;
     private StateHeuristic heuristic;
@@ -62,9 +59,6 @@ public class OEPAgent extends Agent {
 
     @Override
     public Action act(GameState gs, ElapsedCpuTimer ect) {
-        ok = 0;
-        repairing = 0;
-        critRepair = 0;
         double avgTimeTaken;
         double acumTimeTaken = 0;
         long remaining;
@@ -149,14 +143,6 @@ public class OEPAgent extends Agent {
             }
 
         }
-
-        //System.out.println(bestIndividual.getActions().size());
-
-        //System.out.println(bestIndividual.size());
-        System.out.println("OK: " + ok);
-        System.out.println("Repairing: " + repairing);
-        System.out.println("Crit Repair: " + critRepair);
-        System.out.println(" ");
 
         Action action = null;
         if(this.returnAction){
@@ -252,11 +238,16 @@ public class OEPAgent extends Agent {
         //if both individuals are of the same size
 
         boolean ind1 = true;
+        boolean sameSize = false;
         int smallSize = in1.size();
         if(smallSize > in2.size()){ind1 = false; smallSize = in2.size();}
+        else if(smallSize == in2.size()){
+            sameSize = true;
+        }
+        smallSize --;
         //if in1 is smaller
         if(ind1){
-
+            if(!sameSize && in1.size() > 0){in1.remove(in1.size() - 1);}
             int in1amount =(int)(in1.size() / 2);
             int in2amount = in1.size() - in1amount;
             for(int i = 0; i < in2.size(); i++){
@@ -281,6 +272,7 @@ public class OEPAgent extends Agent {
             }
         }else{
             // if in2 is smaller
+            if(in2.size() > 0){in2.remove(in2.size() - 1);}
             int in2amount =(int)(in2.size() / 2);
             int in1amount = in2.size() - in2amount;
             for(int i = 0; i < in1.size(); i++){
@@ -312,7 +304,7 @@ public class OEPAgent extends Agent {
         ArrayList<Action> repairedChild = new ArrayList<>();
 
         for(int a = 0 ;a < child.size(); a ++) {
-
+            if(!(gs.getActiveTribeID() == getPlayerID())){return repairedChild;}
             int chance = m_rnd.nextInt((int)(params.MUTATION_RATE * 100));
             if(m_rnd.nextInt(100) < chance){
                 Action ac = mutation(gs);
@@ -323,18 +315,15 @@ public class OEPAgent extends Agent {
                     boolean done = checkActionFeasibility(child.get(a), gs.copy());
 
                     if (!done) {
-                        repairing ++;
                         ArrayList<Action> allAvailableActions = this.allGoodActions(gs.copy(), m_rnd);
                         Action ac = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
                         gs.advance(ac, true);
                         repairedChild.add(ac);
                     } else {
-                        ok++;
                         repairedChild.add(child.get(a));
                         gs.advance(child.get(a), true);
                     }
                 } catch (Exception e) {
-                    critRepair++;
                     ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
                     Action ac = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
                     gs.advance(ac, true);

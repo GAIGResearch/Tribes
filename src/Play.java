@@ -3,6 +3,8 @@ import core.game.Game;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import players.*;
+import players.emcts.EMCTSAgent;
+import players.emcts.EMCTSParams;
 import players.mc.MCParams;
 import players.mc.MonteCarloAgent;
 import players.mcts.MCTSParams;
@@ -232,6 +234,11 @@ public class Play {
                 oepParams.stop_type = oepParams.STOP_ITERATIONS;
                 oepParams.heuristic_method = oepParams.SIMPLE_HEURISTIC;
                 return new OEPAgent(agentSeed, oepParams);
+            case EMCTS:
+                EMCTSParams emctsParams = new EMCTSParams();
+                emctsParams.stop_type = emctsParams.STOP_ITERATIONS;
+                emctsParams.heuristic_method = emctsParams.SIMPLE_HEURISTIC;
+                return new EMCTSAgent(agentSeed,emctsParams);
         }
         return null;
     }

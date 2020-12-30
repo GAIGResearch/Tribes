@@ -392,7 +392,8 @@ public class Tournament {
         SIMPLE,
         MCTS,
         RHEA,
-        OEP
+        OEP,
+        EMCTS
     }
 
     private static class Participant

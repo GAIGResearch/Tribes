@@ -1,9 +1,8 @@
 package players.oep;
 
-import core.Types;
+
 import core.actions.Action;
 import core.actions.cityactions.CityAction;
-import core.actions.tribeactions.EndTurn;
 import core.actions.unitactions.UnitAction;
 import core.actors.Actor;
 import core.actors.City;
@@ -11,13 +10,9 @@ import core.actors.units.Unit;
 import core.game.GameState;
 import players.Agent;
 import players.heuristics.StateHeuristic;
-import players.heuristics.TribesSimpleHeuristic;
 import utils.ElapsedCpuTimer;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import static core.Types.ACTION.*;
 

@@ -45,6 +45,7 @@ public class OEPAgent extends Agent {
 
     private Individual bestIndividual;
     private boolean returnAction = false;
+    private int fmCallsCount;
 
     public OEPAgent(long seed, OEPParams params) {
         super(seed);
@@ -135,6 +136,9 @@ public class OEPAgent extends Agent {
             }else if(params.stop_type == params.STOP_ITERATIONS) {
                 stop = numIters >= params.num_iterations;
                 if(stop){ returnAction = true; }
+            }else if(params.stop_type == params.STOP_FMCALLS){
+                stop = fmCallsCount > params.num_fmcalls;
+                if(stop){ returnAction = true; }
             }
 
         }
@@ -194,7 +198,7 @@ public class OEPAgent extends Agent {
         while (!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())){
             ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
             Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-            gs.advance(a, true);
+            advance(gs, a);
             individual.add(a);
 
         }
@@ -303,7 +307,7 @@ public class OEPAgent extends Agent {
             int chance = m_rnd.nextInt((int)(params.MUTATION_RATE * 100));
             if(m_rnd.nextInt(100) < chance){
                 Action ac = mutation(gs);
-                gs.advance(ac,true);
+                advance(gs, ac);
                 repairedChild.add(ac);
             }else{
                 try {
@@ -312,16 +316,16 @@ public class OEPAgent extends Agent {
                     if (!done) {
                         ArrayList<Action> allAvailableActions = this.allGoodActions(gs.copy(), m_rnd);
                         Action ac = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-                        gs.advance(ac, true);
+                        advance(gs,ac);
                         repairedChild.add(ac);
                     } else {
                         repairedChild.add(child.get(a));
-                        gs.advance(child.get(a), true);
+                        advance(gs, child.get(a));
                     }
                 } catch (Exception e) {
                     ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
                     Action ac = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-                    gs.advance(ac, true);
+                    advance(gs,ac);
                     repairedChild.add(ac);
                 }
             }
@@ -343,7 +347,7 @@ public class OEPAgent extends Agent {
     public double eval(GameState gs, Individual actionSet){
         for(Action move : actionSet.getActions()){
             //System.out.println("Evaluating");
-            gs.advance(move, true);
+            advance(gs, move);
         }
         actionSet.setGs(gs);
         return heuristic.evaluateState(gs);
@@ -376,5 +380,10 @@ public class OEPAgent extends Agent {
         }catch (Exception e) { }
 
         return feasible;
+    }
+
+    private void advance(GameState gs, Action move){
+        this.fmCallsCount++;
+        gs.advance(move,true);
     }
 }

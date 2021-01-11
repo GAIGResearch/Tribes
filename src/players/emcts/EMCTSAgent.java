@@ -11,6 +11,18 @@ import java.util.Random;
 
 public class EMCTSAgent extends Agent {
 
+    /*
+    * ->create a root node that is a sequence of moves
+    *
+    * ->create a exploration alg that looks for a node to expand
+    *
+    * -> expand that node with a mutation
+    *
+    * -> have an eval method to eval each node to return the most promising move
+    *   ->ucb ->value + bias * root(Ln(Num parent visited)/num times visited)
+    *
+    * */
+
     private Random m_rnd;
     private StateHeuristic heuristic;
     private EMCTSParams params;

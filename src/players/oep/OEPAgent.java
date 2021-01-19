@@ -12,9 +12,8 @@ import players.Agent;
 import players.heuristics.StateHeuristic;
 import utils.ElapsedCpuTimer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
-
-import static core.Types.ACTION.*;
 
 public class OEPAgent extends Agent {
 
@@ -115,9 +114,8 @@ public class OEPAgent extends Agent {
             for(Individual individual : population){
                 individual.setValue(eval(gs.copy(), individual));
             }
-            population = reorderIndividuals(population);
+            Collections.sort(population, Collections.reverseOrder());
             this.bestIndividual = population.get(population.size() - 1);
-
 
             //Kill the amount of the population that needs to die
             int amount =  (int)(population.size() * params.KILL_RATE);
@@ -162,36 +160,6 @@ public class OEPAgent extends Agent {
     public Agent copy() {
         return null;
     }
-
-
-    // sorting algorithm using quick sort
-    private ArrayList<Individual> reorderIndividuals(ArrayList<Individual> population){
-        if(population.size() == 1 || population.size() == 0){
-            return population;
-        }else{
-            int pos = (int)(population.size() / 2);
-            ArrayList<Individual> popLower = new ArrayList<>();
-            ArrayList<Individual> popHigher = new ArrayList<>();
-
-            for(int i = 0; i < population.size(); i++){
-                if(!(i == pos)){
-                    if(population.get(i).getValue() < population.get(pos).getValue()){
-                        popLower.add(population.get(i));
-                    }else{
-                        popHigher.add(population.get(i));
-                    }
-                }
-            }
-
-            popLower = reorderIndividuals(popLower);
-            popLower.add(population.get(pos));
-            popLower.addAll(reorderIndividuals(popHigher));
-
-            return popLower;
-        }
-    }
-
-
 
     private ArrayList<Action> randomActions(GameState gs){
         ArrayList<Action> individual = new ArrayList<>();

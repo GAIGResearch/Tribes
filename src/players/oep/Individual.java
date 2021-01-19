@@ -2,10 +2,11 @@ package players.oep;
 
 import core.actions.Action;
 import core.game.GameState;
+import players.rhea.Genome;
 
 import java.util.ArrayList;
 
-public class Individual{
+public class Individual implements Comparable<Individual>{
 
     private ArrayList<Action> actions;
     private GameState gs;
@@ -43,5 +44,10 @@ public class Individual{
         Action action = actions.get(0);
         actions.remove(0);
         return action;
+    }
+
+    @Override
+    public int compareTo(Individual i) {
+        return (int)(i.getValue() - this.getValue());
     }
 }

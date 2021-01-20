@@ -69,7 +69,7 @@ public class EMCTSTreeNode {
 
     public void visited(){ times_visited++; } // if needs be
 
-    public void refreshScore(int bias){
+    public void refreshScore(float bias){
         this.score = value + bias * Math.sqrt((Math.log((getParentVisited())/times_visited)));
     }
 
@@ -79,5 +79,11 @@ public class EMCTSTreeNode {
 
     public GameState getGs() {
         return gs;
+    }
+
+    public Action returnNext(){
+        Action action = sequence.get(0);
+        sequence.remove(0);
+        return action;
     }
 }

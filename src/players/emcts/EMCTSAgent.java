@@ -9,7 +9,6 @@ import core.actors.units.Unit;
 import core.game.GameState;
 import players.Agent;
 import players.heuristics.StateHeuristic;
-import players.oep.Individual;
 import utils.ElapsedCpuTimer;
 
 import java.util.ArrayList;
@@ -19,20 +18,6 @@ import java.util.Random;
 
 public class EMCTSAgent extends Agent {
 
-    /*
-    * ->create a root node that is a sequence of moves
-    *---------------------Done To This Point--------------------------------
-    * ->create a exploration alg that looks for a node to expand
-    *
-    * -> expand that node with a mutation to a given depth
-    *
-    * -> have an eval method to eval each node to return the most promising move
-    *   ->ucb ->value + bias * root(Ln(Num parent visited)/num times visited)
-    *
-    * keep expanding untill every position hasnt been expanded.
-    *
-    * */
-
     private Random m_rnd;
     private StateHeuristic heuristic;
     private EMCTSParams params;
@@ -40,6 +25,7 @@ public class EMCTSAgent extends Agent {
     private EMCTSTreeNode root;
     private EMCTSTreeNode bestNode;
 
+    boolean returnAction = false;
     private int fmCallsCount;
 
     public EMCTSAgent(long seed, EMCTSParams params) {
@@ -59,10 +45,21 @@ public class EMCTSAgent extends Agent {
         int remainingLimit = 5;
         boolean stop = false;
 
+        if(this.returnAction){
+            Action action;
+            if(bestNode.getSequence().size() == 1){
+                returnAction = false;
+            }
+            action = bestNode.returnNext();
+            return action;
+        }
+
         this.heuristic = params.getHeuristic(playerID, allPlayerIDs);
 
         root = new EMCTSTreeNode(randomActions(gs.copy()), null);
         eval(gs.copy(), root);
+
+        bestNode = root;
 
         while(!stop) {
             numIters++;
@@ -73,22 +70,47 @@ public class EMCTSAgent extends Agent {
             int depth = 0;
             while(depth < params.depth){
                 EMCTSTreeNode child = mutate(toMutate, gs.copy());
+                eval(gs.copy(), child);
 
+                if(child.getValue() > bestNode.getValue()){
+                    bestNode = child;
+                }
+
+                child.visited();
+                toMutate = child;
+                depth++;
             }
 
+            for(int i = 0; i < params.depth; i++){
+                toMutate.refreshScore(params.bias);
+                toMutate = toMutate.getParent();
+            }
+
+            //System.out.println(numIters);
             if (params.stop_type == params.STOP_TIME) {
                 acumTimeTaken += (elapsedTimerIteration.elapsedMillis());
                 avgTimeTaken = acumTimeTaken / numIters;
                 remaining = ect.remainingTimeMillis();
                 stop = remaining <= 2 * avgTimeTaken || remaining <= remainingLimit;
+                if(stop){this.returnAction = true;}
             } else if (params.stop_type == params.STOP_ITERATIONS) {
                 stop = numIters >= params.num_iterations;
+                if(stop){this.returnAction = true;}
             } else if (params.stop_type == params.STOP_FMCALLS) {
                 stop = fmCallsCount > params.num_fmcalls;
+                if(stop){this.returnAction = true;}
             }
         }
 
-        return null;
+        Action action = null;
+        if(this.returnAction){
+            if(bestNode.getSequence().size() == 1){
+                returnAction = false;
+            }
+            action = bestNode.returnNext();
+        }
+        return action;
+
     }
 
     @Override
@@ -119,6 +141,7 @@ public class EMCTSAgent extends Agent {
             while(!found){
                 if(nodeOn.getChildren().size() == 0){
                     found = true;
+                    toMutate = nodeOn;
                 }else{
                     boolean bigger = false;
                     for(EMCTSTreeNode node : nodeOn.getChildren()){
@@ -129,12 +152,84 @@ public class EMCTSAgent extends Agent {
                         }
                         if(!bigger){
                             found = true;
+                            toMutate = nodeOn;
                         }
                     }
                 }
             }
         }
         return toMutate;
+    }
+
+    private ArrayList<Action> randomActions(GameState gs){
+        ArrayList<Action> individual = new ArrayList<>();
+        while (!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())){
+            ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
+            Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+            advance(gs, a);
+            individual.add(a);
+
+        }
+        return individual;
+    }
+
+    private void advance(GameState gs, Action move){
+        this.fmCallsCount++;
+        gs.advance(move,true);
+    }
+
+    private EMCTSTreeNode mutate(EMCTSTreeNode node, GameState gs){
+        GameState clone = gs.copy();
+        ArrayList<Action> seq = node.getSequence();
+        int moveToMutate = m_rnd.nextInt(seq.size());
+        ArrayList<Action> newSeq = new ArrayList<>();
+        for(int i = 0; i < moveToMutate; i++){
+            advance(gs,seq.get(i));
+            newSeq.add(seq.get(i));
+        }
+        ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
+        Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+        newSeq.add(a);
+
+        for(int i = moveToMutate +1; i < seq.size(); i++){
+            newSeq.add(seq.get(i));
+        }
+
+        newSeq = repair(newSeq, clone);
+        EMCTSTreeNode newNode = new EMCTSTreeNode(newSeq,node);
+        node.addChild(newNode);
+
+        return newNode;
+    }
+
+    private ArrayList<Action> repair(ArrayList<Action> child, GameState gs){
+        ArrayList<Action> repairedChild = new ArrayList<>();
+
+        for(int a = 0 ;a < child.size(); a ++) {
+            if (!(gs.getActiveTribeID() == getPlayerID())) {
+                return repairedChild;
+            }
+
+            try {
+                boolean done = checkActionFeasibility(child.get(a), gs.copy());
+
+                if (!done) {
+                    ArrayList<Action> allAvailableActions = this.allGoodActions(gs.copy(), m_rnd);
+                    Action ac = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+                    advance(gs, ac);
+                    repairedChild.add(ac);
+                } else {
+                    repairedChild.add(child.get(a));
+                    advance(gs, child.get(a));
+                }
+            } catch (Exception e) {
+                ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
+                Action ac = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+                advance(gs, ac);
+                repairedChild.add(ac);
+            }
+        }
+        return repairedChild;
     }
 
     private boolean checkActionFeasibility(Action a, GameState gs)
@@ -166,25 +261,4 @@ public class EMCTSAgent extends Agent {
         return feasible;
     }
 
-    private ArrayList<Action> randomActions(GameState gs){
-        ArrayList<Action> individual = new ArrayList<>();
-        while (!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())){
-            ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
-            Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-            advance(gs, a);
-            individual.add(a);
-
-        }
-        return individual;
-    }
-
-    private void advance(GameState gs, Action move){
-        this.fmCallsCount++;
-        gs.advance(move,true);
-    }
-
-    private EMCTSTreeNode mutate(EMCTSTreeNode node, GameState gs){
-        // mutate method
-        return null;
-    }
 }

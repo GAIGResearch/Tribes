@@ -1,5 +1,6 @@
 package players.emcts;
 
+import core.Types;
 import core.actions.Action;
 import core.actions.cityactions.CityAction;
 import core.actions.unitactions.UnitAction;
@@ -77,6 +78,7 @@ public class EMCTSAgent extends Agent {
                 }
 
                 child.visited();
+                extend(child, gs.copy());
                 toMutate = child;
                 depth++;
             }
@@ -161,14 +163,16 @@ public class EMCTSAgent extends Agent {
         return toMutate;
     }
 
+    //this version of random Actions will return a list of random actions and tries to make the length as long as possible
     private ArrayList<Action> randomActions(GameState gs){
         ArrayList<Action> individual = new ArrayList<>();
         while (!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())){
             ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
             Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-            advance(gs, a);
-            individual.add(a);
-
+            if(!(a.getActionType() == Types.ACTION.END_TURN) || allAvailableActions.size() == 1){
+                advance(gs, a);
+                individual.add(a);
+            }
         }
         return individual;
     }
@@ -259,6 +263,27 @@ public class EMCTSAgent extends Agent {
         }catch (Exception e) { }
 
         return feasible;
+    }
+
+    // try to see of the tree can be extended
+    private void extend(EMCTSTreeNode node, GameState gs){
+        ArrayList<Action> currentActions = node.getSequence();
+        for(int i = 0; i < currentActions.size() - 1; i++){
+            advance(gs,currentActions.get(i));
+        }
+
+        ArrayList<Action> possibleActions = this.allGoodActions(gs, m_rnd);
+        if(possibleActions.size() > 1){
+            while (!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())){
+                ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
+                Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+                if(!(a.getActionType() == Types.ACTION.END_TURN) || allAvailableActions.size() == 1){
+                    advance(gs, a);
+                    currentActions.add(a);
+                }
+            }
+        }
+        node.setSequence(currentActions);
     }
 
 }

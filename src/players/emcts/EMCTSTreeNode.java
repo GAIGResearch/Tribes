@@ -67,6 +67,10 @@ public class EMCTSTreeNode {
         }
     }
 
+    public void setSequence(ArrayList<Action> sequence) {
+        this.sequence = sequence;
+    }
+
     public void visited(){ times_visited++; } // if needs be
 
     public void refreshScore(float bias){

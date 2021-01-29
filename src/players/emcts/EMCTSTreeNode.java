@@ -90,4 +90,11 @@ public class EMCTSTreeNode {
         sequence.remove(0);
         return action;
     }
+    //used to erase links to all other objects this JVM should clear it
+    public void unlink(){
+        this.parent = null;
+        this.children = null;
+        this.gs = null;
+        this.sequence=null;
+    }
 }

@@ -105,11 +105,6 @@ public class OEPAgent extends Agent {
             }
 
 
-            // fill the population with random individuals
-            for(int i = population.size() - 1; i < params.POP_SIZE; i++){
-                population.add(new Individual(randomActions(gs.copy())));
-            }
-
             // rate each individual and sort them
             for(Individual individual : population){
                 individual.setValue(eval(gs.copy(), individual));
@@ -122,7 +117,11 @@ public class OEPAgent extends Agent {
             for(int i = 0; i < amount; i++){
                 population.remove(population.size() - 1);
             }
-            //System.out.println("Rate and Kill done");
+
+            // fill the population with random individuals
+            for(int i = population.size() - 1; i < params.POP_SIZE; i++){
+                population.add(new Individual(randomActions(gs.copy())));
+            }
 
 
             if(params.stop_type == params.STOP_TIME) {
@@ -207,76 +206,55 @@ public class OEPAgent extends Agent {
         boolean ind1 = true;
         boolean sameSize = false;
         int smallSize = in1.size();
-        if(smallSize > in2.size()){ind1 = false; smallSize = in2.size();}
+        if(smallSize > in2.size()){
+            ArrayList<Action> temp = in1;
+            in1 = in2;
+            in2 = temp;
+            smallSize = in1.size();
+        }
         else if(smallSize == in2.size()){
             sameSize = true;
         }
         smallSize --;
-        //if in1 is smaller
-        if(ind1){
-            if(!sameSize && in1.size() > 0){in1.remove(in1.size() - 1);}
-            int in1amount =(int)(in1.size() / 2);
-            int in2amount = in1.size() - in1amount;
-            for(int i = 0; i < in2.size(); i++){
-                if(i >= smallSize){
+        if(!sameSize && in1.size() > 0){in1.remove(in1.size() - 1);}
+        int in1amount =(int)(in1.size() / 2);
+        int in2amount = in1.size() - in1amount;
+        for(int i = 0; i < in2.size(); i++){
+            if(i >= smallSize){
+                child.add(in2.get(i));
+            }else{
+                if(in1amount == 0){
                     child.add(in2.get(i));
-                }else{
-                    if(in1amount == 0){
-                        child.add(in2.get(i));
-                    }else if(in2amount == 0){
-                        child.add(in1.get(i));
-                    }else{
-                        int temp = m_rnd.nextInt(100);
-                        if(temp < 50){
-                            child.add(in1.get(i));
-                            in1amount--;
-                        }else{
-                            child.add(in2.get(i));
-                            in2amount--;
-                        }
-                    }
-                }
-            }
-        }else{
-            // if in2 is smaller
-            if(in2.size() > 0){in2.remove(in2.size() - 1);}
-            int in2amount =(int)(in2.size() / 2);
-            int in1amount = in2.size() - in2amount;
-            for(int i = 0; i < in1.size(); i++){
-                if(i >= smallSize){
+                }else if(in2amount == 0){
                     child.add(in1.get(i));
                 }else{
-                    if(in1amount == 0){
-                        child.add(in2.get(i));
-                    }else if(in2amount == 0){
+                    int temp = m_rnd.nextInt(100);
+                    if(temp < 50){
                         child.add(in1.get(i));
+                        in1amount--;
                     }else{
-                        int temp = m_rnd.nextInt(100);
-                        if(temp < 50){
-                            child.add(in1.get(i));
-                            in1amount--;
-                        }else{
-                            child.add(in2.get(i));
-                            in2amount--;
-                        }
+                        child.add(in2.get(i));
+                        in2amount--;
                     }
                 }
             }
         }
+
         child = repair(clone, child);
         return (new Individual(child));
     }
     //repair an individual if actions can't be performed with a random action
     private ArrayList<Action> repair(GameState gs, ArrayList<Action> child){
         ArrayList<Action> repairedChild = new ArrayList<>();
-
+        boolean mutated = false;
         for(int a = 0 ;a < child.size(); a ++) {
             if(!(gs.getActiveTribeID() == getPlayerID())){return repairedChild;}
             int chance = m_rnd.nextInt((int)(params.MUTATION_RATE * 100));
-            if(m_rnd.nextInt(100) < chance){
+            if((m_rnd.nextInt(100) < chance) && !mutated){
                 Action ac = mutation(gs);
                 advance(gs, ac);
                 repairedChild.add(ac);
+                mutated = true;
             }else{
                 try {
                     boolean done = checkActionFeasibility(child.get(a), gs.copy());
@@ -297,10 +275,16 @@ public class OEPAgent extends Agent {
                     repairedChild.add(ac);
                 }
             }
-
-
         }
 
+        if(!(gs.getActiveTribeID() == getPlayerID())){return repairedChild;}
+
+        while (!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())){
+            ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
+            Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+            advance(gs, a);
+            repairedChild.add(a);
+        }
         return repairedChild;
     }
 

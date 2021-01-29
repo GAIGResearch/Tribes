@@ -7,7 +7,7 @@
   "Search Depth" : 5,
   "Force End" : false,
   "Population Size" : 20,
-  "Players" : ["EMCTS", "MCTS", "MCTS", "MCTS"],
+  "Players" : ["OEP", "MCTS", "MCTS", "OEP"],
   "Tribes" : ["Xin Xi", "Imperius", "Bardur", "Oumaji"],
   "Verbose" : false,
 

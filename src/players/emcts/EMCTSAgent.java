@@ -26,8 +26,9 @@ public class EMCTSAgent extends Agent {
     private EMCTSTreeNode root;
     private EMCTSTreeNode bestNode;
 
-    boolean returnAction = false;
+    private boolean returnAction = false;
     private int fmCallsCount;
+
 
     public EMCTSAgent(long seed, EMCTSParams params) {
         super(seed);
@@ -233,6 +234,15 @@ public class EMCTSAgent extends Agent {
                 repairedChild.add(ac);
             }
         }
+        if(!(repairedChild.get(repairedChild.size()-1).getActionType() == Types.ACTION.END_TURN)){
+            while ((!gs.isGameOver()) && (gs.getActiveTribeID() == getPlayerID())){
+                ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
+                Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+                advance(gs, a);
+                repairedChild.add(a);
+            }
+        }
+
         return repairedChild;
     }
 
@@ -265,25 +275,41 @@ public class EMCTSAgent extends Agent {
         return feasible;
     }
 
-    // try to see of the tree can be extended
+    // try to see of the node can be extended
     private void extend(EMCTSTreeNode node, GameState gs){
+        GameState clone = gs.copy();
         ArrayList<Action> currentActions = node.getSequence();
-        for(int i = 0; i < currentActions.size() - 1; i++){
+        ArrayList<Action> newActions = new ArrayList<>();
+        for(int i = 0; i < currentActions.size()-1; i++){
+            newActions.add(currentActions.get(i));
             advance(gs,currentActions.get(i));
         }
 
-        ArrayList<Action> possibleActions = this.allGoodActions(gs, m_rnd);
-        if(possibleActions.size() > 1){
+        if(this.allGoodActions(gs, m_rnd).size() > 1){
             while (!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())){
                 ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
                 Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-                if(!(a.getActionType() == Types.ACTION.END_TURN) || allAvailableActions.size() == 1){
+                if(!(a.getActionType() == Types.ACTION.END_TURN)){
                     advance(gs, a);
-                    currentActions.add(a);
+                    newActions.add(a);
+                }else if(allAvailableActions.size() == 1){
+                    advance(gs, a);
+                    newActions.add(a);
+                    break;
                 }
             }
+        }else{
+            return;
         }
-        node.setSequence(currentActions);
+        newActions = repair(newActions,clone.copy());
+        EMCTSTreeNode newNode = new EMCTSTreeNode(newActions, node.getParent());
+        eval(clone, newNode);
+        if(newNode.getValue() > node.getValue()){
+            node.setSequence(newActions);
+            node.setValue(newNode.getValue());
+        }
+        //clear links so that JVM can clear it
+        newNode.unlink();
     }
 
 }

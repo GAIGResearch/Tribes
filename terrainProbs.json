@@ -4,62 +4,134 @@
     "XIN_XI" : 0,
     "IMPERIUS" : 0,
     "BARDUR" : 0,
-    "OUMAJI" : 0
+    "OUMAJI" : 0,
+    "KICKOO" : 0.4,
+    "HOODRICK" : 0,
+    "LUXIDOOR" : 0,
+    "VENGIR" : 0,
+    "ZEBASI" : 0,
+    "AI_MO" : 0,
+    "QUETZALI" : 0,
+    "YADAKK" : 0
   },
   "FOREST" : {
     "BASE" : 0.4,
     "XIN_XI" : 1,
     "IMPERIUS" : 1,
     "BARDUR" : 1,
-    "OUMAJI" : 0.1
+    "OUMAJI" : 0.1,
+    "KICKOO" : 1,
+    "HOODRICK" : 1.5,
+    "LUXIDOOR" : 1,
+    "VENGIR" : 1,
+    "ZEBASI" : 0.5,
+    "AI_MO" : 1,
+    "QUETZALI" : 1,
+    "YADAKK" : 0.5
   },
   "MOUNTAIN" : {
     "BASE" : 0.15,
     "XIN_XI" : 1.5,
     "IMPERIUS" : 1,
     "BARDUR" : 1,
-    "OUMAJI" : 1
+    "OUMAJI" : 1,
+    "KICKOO" : 0.5,
+    "HOODRICK" : 0.5,
+    "LUXIDOOR" : 1,
+    "VENGIR" : 1,
+    "ZEBASI" : 0.5,
+    "AI_MO" : 1.5,
+    "QUETZALI" : 1,
+    "YADAKK" : 0.5
   },
   "ORE" : {
     "BASE" : 0.5,
     "XIN_XI" : 1,
     "IMPERIUS" : 1,
     "BARDUR" : 1,
-    "OUMAJI" : 1
+    "OUMAJI" : 1,
+    "KICKOO" : 1,
+    "HOODRICK" : 1,
+    "LUXIDOOR" : 1,
+    "VENGIR" : 2,
+    "ZEBASI" : 1,
+    "AI_MO" : 1,
+    "QUETZALI" : 0.1,
+    "YADAKK" : 1
   },
   "FRUIT" : {
     "BASE" : 0.5,
     "XIN_XI" : 1,
     "IMPERIUS" : 1,
     "BARDUR" : 1.5,
-    "OUMAJI" : 1
+    "OUMAJI" : 1,
+    "KICKOO" : 1,
+    "HOODRICK" : 1,
+    "LUXIDOOR" : 2,
+    "VENGIR" : 0.1,
+    "ZEBASI" : 0.5,
+    "AI_MO" : 1,
+    "QUETZALI" : 2,
+    "YADAKK" : 1.5
   },
   "CROPS" : {
     "BASE" : 0.5,
     "XIN_XI" : 1,
     "IMPERIUS" : 1,
     "BARDUR" : 0.1,
-    "OUMAJI" : 1
+    "OUMAJI" : 1,
+    "KICKOO" : 1,
+    "HOODRICK" : 1,
+    "LUXIDOOR" : 1,
+    "VENGIR" : 1,
+    "ZEBASI" : 1,
+    "AI_MO" : 0.1,
+    "QUETZALI" : 0.1,
+    "YADAKK" : 1
   },
   "ANIMAL" : {
     "BASE" : 0.5,
     "XIN_XI" : 1,
     "IMPERIUS" : 1,
     "BARDUR" : 2,
-    "OUMAJI" : 1
+    "OUMAJI" : 1,
+    "KICKOO" : 1,
+    "HOODRICK" : 1,
+    "LUXIDOOR" : 0.5,
+    "VENGIR" : 0.1,
+    "ZEBASI" : 1,
+    "AI_MO" : 1,
+    "QUETZALI" : 1,
+    "YADAKK" : 1
   },
   "FISH" : {
     "BASE" : 0.5,
     "XIN_XI" : 1,
     "IMPERIUS" : 1,
     "BARDUR" : 1,
-    "OUMAJI" : 1
+    "OUMAJI" : 1,
+    "KICKOO" : 1.5,
+    "HOODRICK" : 1,
+    "LUXIDOOR" : 1,
+    "VENGIR" : 0.1,
+    "ZEBASI" : 1,
+    "AI_MO" : 1,
+    "QUETZALI" : 1,
+    "YADAKK" : 1
   },
   "WHALES" : {
     "BASE" : 0.4,
     "XIN_XI" : 1,
     "IMPERIUS" : 1,
     "BARDUR" : 1,
-    "OUMAJI" : 1
+    "OUMAJI" : 1,
+    "KICKOO" : 1,
+    "HOODRICK" : 1,
+    "LUXIDOOR" : 1,
+    "VENGIR" : 1,
+    "ZEBASI" : 1,
+    "AI_MO" : 1,
+    "QUETZALI" : 1,
+    "YADAKK" : 1
   }
 }

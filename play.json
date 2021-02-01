@@ -8,7 +8,7 @@
   "Force End" : false,
   "Population Size" : 20,
   "Players" : ["Human", "MCTS", "MCTS", "MCTS"],
-  "Tribes" : ["Xin Xi", "Imperius", "Bardur", "Oumaji"],
+  "Tribes" : ["Xin Xi", "Kickoo", "Bardur", "Oumaji"],
   "Verbose" : false,
 
   "Replay File Name" : "save/1590072023986/0_0/game.json",

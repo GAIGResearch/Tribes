@@ -17,26 +17,6 @@ import java.util.Random;
 
 public class OEPAgent extends Agent {
 
-    /*
-        -> create a population of *Random* individuals, using params with the amount
-            -> create a method that returns a list of actions that is an individual
-            -> use params to set the act method to run properly
-
-        -> asses each individual and re-order them from best to worst
-
-        -> kill off the amount based on the kill rate from param
-
-        -> perform crossover to re-populate
-
-        -> perform mutations at random from param
-
-        -> add more random individuals too fill up population
-
-        -> check time allowance
-        ---------------------Done To This Point--------------------------------
-    */
-
-
     private Random m_rnd;
     private StateHeuristic heuristic;
     private OEPParams params;
@@ -63,13 +43,11 @@ public class OEPAgent extends Agent {
         boolean stop = false;
 
         if(this.returnAction){
-            //System.out.println(bestIndividual.size());
             Action action;
             if(bestIndividual.getActions().size() == 1){
                 returnAction = false;
             }
             action = bestIndividual.returnNext();
-            //System.out.println("Action Given");
             return action;
         }
 
@@ -239,7 +217,6 @@ public class OEPAgent extends Agent {
                 }
             }
         }
-
         child = repair(clone, child);
         return (new Individual(child));
     }
@@ -256,23 +233,29 @@ public class OEPAgent extends Agent {
                 repairedChild.add(ac);
                 mutated = true;
             }else{
+                GameState copy = gs.copy();
+                boolean added = false;
                 try {
                     boolean done = checkActionFeasibility(child.get(a), gs.copy());
-
                     if (!done) {
                         ArrayList<Action> allAvailableActions = this.allGoodActions(gs.copy(), m_rnd);
                         Action ac = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
                         advance(gs,ac);
                         repairedChild.add(ac);
+                        added = true;
                     } else {
                         repairedChild.add(child.get(a));
+                        added = true;
                         advance(gs, child.get(a));
                     }
                 } catch (Exception e) {
-                    ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
-                    Action ac = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-                    advance(gs,ac);
-                    repairedChild.add(ac);
+                    if(added){repairedChild.remove(repairedChild.size()-1);}
+                    gs = copy;
+
+//                    ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
+//                    Action ac = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+//                    advance(gs,ac);
+//                    repairedChild.add(ac);
                 }
             }
         }
@@ -298,7 +281,6 @@ public class OEPAgent extends Agent {
 
     public double eval(GameState gs, Individual actionSet){
         for(Action move : actionSet.getActions()){
-            //System.out.println("Evaluating");
             advance(gs, move);
         }
         actionSet.setGs(gs);

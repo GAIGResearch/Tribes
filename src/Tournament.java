@@ -105,6 +105,7 @@ public class Tournament {
         {
             t.setPlayers(new PlayerType[]{PlayerType.MC, PlayerType.MC});
             t.setTribes(new Types.TRIBE[]{XIN_XI, IMPERIUS});
+
         }else {
             try {
 

@@ -4,7 +4,7 @@ import players.heuristics.AlgParams;
 
 public class RHEAParams extends AlgParams {
 
-    public int POP_SIZE = 10;
+    public int POP_SIZE = 100;
     public double MUTATION_RATE = 0.1;
     public int INDIVIDUAL_LENGTH = 20;
     public int TOURNAMENT_SIZE = 3;

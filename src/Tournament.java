@@ -88,7 +88,6 @@ public class Tournament {
     }
 
     public static void main(String[] args) {
-
         //Some defaults:
         Types.GAME_MODE gameMode = CAPITALS; //SCORE;
         Tournament t = new Tournament(gameMode);

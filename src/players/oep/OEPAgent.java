@@ -38,6 +38,7 @@ public class OEPAgent extends Agent {
         double acumTimeTaken = 0;
         long remaining;
         int numIters = 0;
+        fmCallsCount = 0;
 
         int remainingLimit = 5;
         boolean stop = false;
@@ -55,13 +56,23 @@ public class OEPAgent extends Agent {
         //create a population of individuals defined in param
         ArrayList<Individual> population = new ArrayList<>();
         for(int i = 0; i < params.POP_SIZE; i++){
-            population.add(new Individual(randomActions(gs.copy())));
+            population.add(randomActions(gs.copy()));
+        }
+        //System.out.println(this.fmCallsCount);
+        double avg = 0.0;
+        double biggest = 0;
+        for(Individual i : population){
+            if(i.getActions().size() > biggest){
+                biggest = i.getActions().size();
+            }
+            avg += i.getActions().size();
         }
 
         this.heuristic = params.getHeuristic(playerID, allPlayerIDs);
 
         //keep going until time limit gone
         while(!stop){
+            System.out.println("Start Fm Count: " + this.fmCallsCount);
             numIters ++;
             ElapsedCpuTimer elapsedTimerIteration = new ElapsedCpuTimer();
 
@@ -85,7 +96,7 @@ public class OEPAgent extends Agent {
 
             // rate each individual and sort them
             for(Individual individual : population){
-                individual.setValue(eval(gs.copy(), individual));
+                individual.setValue(eval( individual));
             }
             Collections.sort(population, Collections.reverseOrder());
             this.bestIndividual = population.get(population.size() - 1);
@@ -98,7 +109,7 @@ public class OEPAgent extends Agent {
 
             // fill the population with random individuals
             for(int i = population.size() - 1; i < params.POP_SIZE; i++){
-                population.add(new Individual(randomActions(gs.copy())));
+                population.add(randomActions(gs.copy()));
             }
 
 
@@ -113,10 +124,12 @@ public class OEPAgent extends Agent {
                 if(stop){ returnAction = true; }
             }else if(params.stop_type == params.STOP_FMCALLS){
                 stop = fmCallsCount > params.num_fmcalls;
+                System.out.println("FM count END: "+this.fmCallsCount);
                 if(stop){ returnAction = true; }
             }
 
         }
+        //System.out.println(this.fmCallsCount);
 
         Action action = null;
         if(this.returnAction){
@@ -138,16 +151,17 @@ public class OEPAgent extends Agent {
         return null;
     }
 
-    private ArrayList<Action> randomActions(GameState gs){
+    private Individual randomActions(GameState gs){
         ArrayList<Action> individual = new ArrayList<>();
         while (!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())){
             ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
             Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
             advance(gs, a);
             individual.add(a);
-
         }
-        return individual;
+        Individual in = new Individual(individual);
+        in.setGs(gs);
+        return in;
     }
 
     // must be given a even no. of population
@@ -218,7 +232,9 @@ public class OEPAgent extends Agent {
             }
         }
         child = repair(clone, child);
-        return (new Individual(child));
+        Individual in = new Individual(child);
+        in.setGs(clone);
+        return in;
     }
     //repair an individual if actions can't be performed with a random action
     private ArrayList<Action> repair(GameState gs, ArrayList<Action> child){
@@ -252,10 +268,6 @@ public class OEPAgent extends Agent {
                     if(added){repairedChild.remove(repairedChild.size()-1);}
                     gs = copy;
 
-//                    ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
-//                    Action ac = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-//                    advance(gs,ac);
-//                    repairedChild.add(ac);
                 }
             }
         }
@@ -279,11 +291,12 @@ public class OEPAgent extends Agent {
 
     }
 
-    public double eval(GameState gs, Individual actionSet){
-        for(Action move : actionSet.getActions()){
-            advance(gs, move);
-        }
-        actionSet.setGs(gs);
+    public double eval( Individual actionSet){
+//        for(Action move : actionSet.getActions()){
+//            advance(gs, move);
+//        }
+//        actionSet.setGs(gs);
+        GameState gs = actionSet.getGs();
         return heuristic.evaluateState(gs);
     }
 

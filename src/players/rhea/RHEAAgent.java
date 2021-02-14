@@ -76,6 +76,7 @@ public class RHEAAgent extends Agent {
                 end = this.fmcalls >= params.num_fmcalls;
 
         }
+        //System.out.println(fmcalls);
         Collections.sort(pop);
     }
 

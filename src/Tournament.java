@@ -71,7 +71,7 @@ public class Tournament {
                 rheaParams.heuristic_method = rheaParams.SIMPLE_HEURISTIC;
                 rheaParams.INDIVIDUAL_LENGTH = 20;
                 rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
-                rheaParams.POP_SIZE = 1;
+                rheaParams.POP_SIZE = 100;
                 return new RHEAAgent(agentSeed, rheaParams);
             case OEP:
                 OEPParams oepParams = new OEPParams();

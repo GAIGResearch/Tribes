@@ -44,6 +44,8 @@ public class EMCTSAgent extends Agent {
         long remaining;
         int numIters = 0;
 
+        this.fmCallsCount = 0;
+
         int remainingLimit = 5;
         boolean stop = false;
 
@@ -104,6 +106,7 @@ public class EMCTSAgent extends Agent {
                 if(stop){this.returnAction = true;}
             }
         }
+        System.out.println(this.fmCallsCount);
 
         Action action = null;
         if(this.returnAction){

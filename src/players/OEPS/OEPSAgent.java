@@ -1,6 +1,6 @@
-package players.oep;
+package players.OEPS;
 
-
+import core.Types;
 import core.actions.Action;
 import core.actions.cityactions.CityAction;
 import core.actions.unitactions.UnitAction;
@@ -15,19 +15,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-public class OEPAgent extends Agent {
+public class OEPSAgent extends Agent {
 
     private Random m_rnd;
     private StateHeuristic heuristic;
-    private OEPParams params;
+    private OEPSParams params;
 
 
-    private Individual bestIndividual;
+    private IndividualS bestIndividual;
     private boolean returnAction = false;
     private int fmCallsCount;
     private int fmCallsRun;
 
-    public OEPAgent(long seed, OEPParams params) {
+    public OEPSAgent(long seed, OEPSParams params) {
         super(seed);
         m_rnd = new Random(seed);
         this.params = params;
@@ -55,14 +55,14 @@ public class OEPAgent extends Agent {
 
 
         //create a population of individuals defined in param
-        ArrayList<Individual> population = new ArrayList<>();
+        ArrayList<IndividualS> population = new ArrayList<>();
         for(int i = 0; i < params.POP_SIZE; i++){
             population.add(randomActions(gs.copy()));
         }
         //System.out.println(this.fmCallsCount);
         double avg = 0.0;
         double biggest = 0;
-        for(Individual i : population){
+        for(IndividualS i : population){
             if(i.getActions().size() > biggest){
                 biggest = i.getActions().size();
             }
@@ -81,7 +81,7 @@ public class OEPAgent extends Agent {
             if(population.size() % 2 == 0){
                 even = true;
             }
-            Individual person1 = null;
+            IndividualS person1 = null;
             if(!even){
                 person1 = population.get(m_rnd.nextInt(population.size()));
                 population.remove(person1);
@@ -95,7 +95,7 @@ public class OEPAgent extends Agent {
 
 
             // rate each individual and sort them
-            for(Individual individual : population){
+            for(IndividualS individual : population){
                 individual.setValue(eval( individual));
             }
             Collections.sort(population, Collections.reverseOrder());
@@ -111,7 +111,18 @@ public class OEPAgent extends Agent {
             for(int i = population.size() - 1; i < params.POP_SIZE; i++){
                 population.add(randomActions(gs.copy()));
             }
-
+//            biggest = 0;
+//            avg = 0;
+//            for(IndividualS i : population){
+//                if(i.getActions().size() > biggest){
+//                    biggest = i.getActions().size();
+//                }
+//                avg += i.getActions().size();
+//            }
+//            avg = avg/population.size();
+//
+//            System.out.println("biggest in: " + biggest);
+//            System.out.println("avg in: " + avg);
 
             if(params.stop_type == params.STOP_TIME) {
                 acumTimeTaken += (elapsedTimerIteration.elapsedMillis()) ;
@@ -151,26 +162,37 @@ public class OEPAgent extends Agent {
         return null;
     }
 
-    private Individual randomActions(GameState gs){
+    private IndividualS randomActions(GameState gs){
         ArrayList<Action> individual = new ArrayList<>();
-        while (!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())){
+        while ((!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())) && (individual.size() < 19)){
             ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
             Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
             advance(gs, a);
             individual.add(a);
         }
-        Individual in = new Individual(individual);
+        if(individual.size() == 19 && (individual.get(18).getActionType() != Types.ACTION.END_TURN)){
+            ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
+            Action end = null; ;
+            for(Action a : allAvailableActions){
+                if(a.getActionType() == Types.ACTION.END_TURN){
+                    end = a;
+                    break;
+                }
+            }
+            individual.add(end);
+        }
+        IndividualS in = new IndividualS(individual);
         in.setGs(gs);
         return in;
     }
 
     // must be given a even no. of population
-    private ArrayList<Individual> procreate (GameState gs, ArrayList<Individual> population){
-        ArrayList<Individual> group1 = new ArrayList<>();
-        ArrayList<Individual> group2 = new ArrayList<>();
+    private ArrayList<IndividualS> procreate (GameState gs, ArrayList<IndividualS> population){
+        ArrayList<IndividualS> group1 = new ArrayList<>();
+        ArrayList<IndividualS> group2 = new ArrayList<>();
         boolean g1 = true;
         while(population.size() > 0){
-            Individual temp = population.get(m_rnd.nextInt(population.size()));
+            IndividualS temp = population.get(m_rnd.nextInt(population.size()));
             if(g1){
                 group1.add(temp);
                 g1 = false;
@@ -188,7 +210,7 @@ public class OEPAgent extends Agent {
     }
 
     //method to perform uniform crossover on two individuals
-    private Individual crossover(GameState clone, Individual individual1, Individual individual2){
+    private IndividualS crossover(GameState clone, IndividualS individual1, IndividualS individual2){
         ArrayList<Action> in1 = individual1.getActions();
         ArrayList<Action> in2 = individual2.getActions();
 
@@ -232,7 +254,7 @@ public class OEPAgent extends Agent {
             }
         }
         child = repair(clone, child);
-        Individual in = new Individual(child);
+        IndividualS in = new IndividualS(child);
         in.setGs(clone);
         return in;
     }
@@ -274,12 +296,16 @@ public class OEPAgent extends Agent {
 
         if(!(gs.getActiveTribeID() == getPlayerID())){return repairedChild;}
 
-        while (!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())){
-            ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
-            Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-            advance(gs, a);
-            repairedChild.add(a);
+        ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
+        Action end = null; ;
+        for(Action a : allAvailableActions){
+            if(a.getActionType() == Types.ACTION.END_TURN){
+                end = a;
+                break;
+            }
         }
+        repairedChild.add(end);
+
         return repairedChild;
     }
 
@@ -291,7 +317,7 @@ public class OEPAgent extends Agent {
 
     }
 
-    public double eval( Individual actionSet){
+    public double eval( IndividualS actionSet){
 //        for(Action move : actionSet.getActions()){
 //            advance(gs, move);
 //        }

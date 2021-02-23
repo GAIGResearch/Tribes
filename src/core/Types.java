@@ -98,7 +98,7 @@ public class Types {
                 new Color(0, 255, 0), new Color(82, 245, 82, 255), new Color(0, 145, 0, 255)),
         HOODRICK(5, "Hoodrick", ARCHERY, ARCHER,
                 new Color(153, 102, 0), new Color(199, 137, 13), new Color(102, 69, 0, 255)),
-        LUXIDOOR(6, "Luxidoor", HUNTING, WARRIOR,
+        LUXIDOOR(6, "Luxidoor", null, WARRIOR,
                 new Color(171, 59, 214), new Color(191, 81, 234), new Color(116, 41, 145, 255)),
         VENGIR(7, "Vengir", SMITHERY, SWORDMAN,
                 new Color(255, 255, 255), new Color(220, 220, 220), new Color(145, 145, 145)),

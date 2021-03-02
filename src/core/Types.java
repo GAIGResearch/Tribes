@@ -93,7 +93,23 @@ public class Types {
         BARDUR(2, "Bardur", HUNTING, WARRIOR,
                 new Color(76, 76, 76), new Color(176, 178, 178), new Color(70, 58, 58)),
         OUMAJI(3, "Oumaji", RIDING, RIDER,
-                new Color(255, 255, 10), new Color(242, 255, 100), new Color(146, 144, 0));
+                new Color(255, 255, 10), new Color(242, 255, 100), new Color(146, 144, 0)),
+        KICKOO(4, "Kickoo", FISHING, WARRIOR,
+                new Color(0, 255, 0), new Color(82, 245, 82, 255), new Color(0, 145, 0, 255)),
+        HOODRICK(5, "Hoodrick", ARCHERY, ARCHER,
+                new Color(153, 102, 0), new Color(199, 137, 13), new Color(102, 69, 0, 255)),
+        LUXIDOOR(6, "Luxidoor", null, WARRIOR,
+                new Color(171, 59, 214), new Color(191, 81, 234), new Color(116, 41, 145, 255)),
+        VENGIR(7, "Vengir", SMITHERY, SWORDMAN,
+                new Color(255, 255, 255), new Color(220, 220, 220), new Color(145, 145, 145)),
+        ZEBASI(8, "Zebasi", FARMING, WARRIOR,
+                new Color(255, 153, 0), new Color(255, 171, 47), new Color(145, 87, 0)),
+        AI_MO(9, "Ai-Mo", MEDITATION, WARRIOR,
+                new Color(54, 226, 170), new Color(168, 255, 229), new Color(35, 145, 109)),
+        QUETZALI(10, "Quetzali", SHIELDS, DEFENDER,
+                new Color(39, 92, 74), new Color(79, 165, 136), new Color(20, 51, 41)),
+        YADAKK(11, "Yadakk", ROADS, WARRIOR,
+                new Color(125, 38, 28), new Color(177, 70, 57), new Color(92, 33, 13));
 
         private int key;
         private String name;

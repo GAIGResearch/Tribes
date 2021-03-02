@@ -13,8 +13,11 @@ import players.oep.OEPAgent;
 import players.oep.OEPParams;
 import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
+import players.portfolioMCTS.PortfolioMCTSParams;
+import players.portfolioMCTS.PortfolioMCTSPlayer;
 import players.rhea.RHEAAgent;
 import players.rhea.RHEAParams;
+import players.portfolio.RandomPortfolio;
 import utils.file.IO;
 import utils.stats.MultiStatSummary;
 
@@ -73,6 +76,14 @@ public class Tournament {
                 rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
                 rheaParams.POP_SIZE = POP_SIZE;
                 return new RHEAAgent(agentSeed, rheaParams);
+            case PORTFOLIO_MCTS:
+                PortfolioMCTSParams portfolioMCTSParams = new PortfolioMCTSParams();
+                portfolioMCTSParams.stop_type = portfolioMCTSParams.STOP_FMCALLS;
+                portfolioMCTSParams.PRIORITIZE_ROOT = false;
+                portfolioMCTSParams.heuristic_method = portfolioMCTSParams.DIFF_HEURISTIC;
+                portfolioMCTSParams.ROLLOUT_LENGTH = 20;
+                portfolioMCTSParams.setPortfolio(new RandomPortfolio());
+                return new PortfolioMCTSPlayer(agentSeed, portfolioMCTSParams);
         }
         return null;
     }
@@ -392,7 +403,8 @@ public class Tournament {
         SIMPLE,
         MCTS,
         RHEA,
-        OEP
+        OEP,
+        PORTFOLIO_MCTS
     }
 
     private static class Participant

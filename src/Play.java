@@ -11,8 +11,11 @@ import players.oep.OEPAgent;
 import players.oep.OEPParams;
 import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
+import players.portfolioMCTS.PortfolioMCTSParams;
+import players.portfolioMCTS.PortfolioMCTSPlayer;
 import players.rhea.RHEAAgent;
 import players.rhea.RHEAParams;
+import players.portfolio.RandomPortfolio;
 import utils.file.IO;
 
 import java.util.*;
@@ -230,6 +233,14 @@ public class Play {
             case OEP:
                 OEPParams oepParams = new OEPParams();
                 return new OEPAgent(agentSeed, oepParams);
+            case PORTFOLIO_MCTS:
+                PortfolioMCTSParams portfolioMCTSParams = new PortfolioMCTSParams();
+                portfolioMCTSParams.stop_type = portfolioMCTSParams.STOP_FMCALLS;
+                portfolioMCTSParams.PRIORITIZE_ROOT = false;
+                portfolioMCTSParams.heuristic_method = portfolioMCTSParams.DIFF_HEURISTIC;
+                portfolioMCTSParams.ROLLOUT_LENGTH = 20;
+                portfolioMCTSParams.setPortfolio(new RandomPortfolio());
+                return new PortfolioMCTSPlayer(agentSeed, portfolioMCTSParams);
         }
         return null;
     }

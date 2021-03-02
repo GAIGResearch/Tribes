@@ -38,7 +38,6 @@ public class AttackCommand implements ActionCommand {
             int defenceResult = results.getSecond();
 
             if (target.getCurrentHP() <= attackResult) {
-
                 attacker.addKill();
                 attackerTribe.addKill();
 

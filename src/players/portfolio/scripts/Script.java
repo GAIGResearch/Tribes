@@ -8,11 +8,9 @@ import java.util.ArrayList;
 
 public class Script
 {
-    //Used in classes where there are more than one scripts that can be used for action.
+    //List of actions this script could pick from. Subclasses should override the process
+    // method to choose one of them. Otherwise, default behaviour is to take the first one.
     protected ArrayList<Action> actions;
-
-    //For wrapper scripts
-    private Action action;
 
     /**
      * Main processing function. Given a game state and an actor, returns the action it should execute.
@@ -21,12 +19,7 @@ public class Script
      * @return action to execute.
      */
     public Action process(GameState gs, Actor ac) {
-        return action;
-    }
-
-    public void setAction(Action action)
-    {
-        this.action = action;
+        return actions.get(0);
     }
 
     public void setActions(ArrayList<Action> actions) {

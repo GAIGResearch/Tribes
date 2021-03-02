@@ -16,6 +16,12 @@ public class RandomPortfolio extends Portfolio
 
     public RandomPortfolio()
     {
+        initPortfolio();
+    }
+
+
+    @Override
+    public void initPortfolio() {
         portfolio = new Script[]{new RandomScr(new Random())};
     }
 

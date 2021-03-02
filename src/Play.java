@@ -11,6 +11,7 @@ import players.oep.OEPAgent;
 import players.oep.OEPParams;
 import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
+import players.portfolio.SimplePortfolio;
 import players.portfolioMCTS.PortfolioMCTSParams;
 import players.portfolioMCTS.PortfolioMCTSPlayer;
 import players.rhea.RHEAAgent;
@@ -239,7 +240,7 @@ public class Play {
                 portfolioMCTSParams.PRIORITIZE_ROOT = false;
                 portfolioMCTSParams.heuristic_method = portfolioMCTSParams.DIFF_HEURISTIC;
                 portfolioMCTSParams.ROLLOUT_LENGTH = 20;
-                portfolioMCTSParams.setPortfolio(new RandomPortfolio());
+                portfolioMCTSParams.setPortfolio(new SimplePortfolio(agentSeed));
                 return new PortfolioMCTSPlayer(agentSeed, portfolioMCTSParams);
         }
         return null;

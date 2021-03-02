@@ -21,23 +21,8 @@ public class RandomScr extends Script {
 
     @Override
     public Action process(GameState gs, Actor ac) {
-        ArrayList<Action> allActions;
-
-        if(ac instanceof Unit)
-        {
-            allActions = gs.getUnitActions(ac.getActorId());
-        }else if(ac instanceof City)
-        {
-            allActions = gs.getCityActions(ac.getActorId());
-        }else
-        {
-            allActions = gs.getTribeActions();
-        }
-
-        if(allActions == null || allActions.size() == 0) return null;
-
-        int nActions = allActions.size();
-        return allActions.get(rnd.nextInt(nActions));
+        int nActions = actions.size();
+        return actions.get(rnd.nextInt(nActions));
     }
 
 }

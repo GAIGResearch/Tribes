@@ -6,8 +6,9 @@ import core.game.GameState;
 import players.portfolio.scripts.Script;
 
 public class ActionAssignment {
-    Actor actor;
-    Script script;
+    private Script script;
+    private Actor actor;
+
 
     public ActionAssignment(Actor a, Script s)
     {
@@ -20,5 +21,12 @@ public class ActionAssignment {
         return script.process(gs, actor);
     }
 
+    public Script getScript() {
+        return script;
+    }
+
+    public Actor getActor() {
+        return actor;
+    }
 
 }

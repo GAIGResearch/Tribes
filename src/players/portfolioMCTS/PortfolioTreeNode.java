@@ -24,6 +24,7 @@ public class PortfolioTreeNode
     private int fmCallsCount;
     private int playerID;
 
+
     private ArrayList<ActionAssignment> actions;
     private GameState state;
 
@@ -330,6 +331,10 @@ public class PortfolioTreeNode
         }
 
         return selected;
+    }
+
+    public ArrayList<ActionAssignment> getActions() {
+        return actions;
     }
 
 

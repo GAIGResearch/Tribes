@@ -1,5 +1,6 @@
 package core.actions.unitactions.command;
 
+import core.Diplomacy;
 import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
@@ -38,6 +39,11 @@ public class AttackCommand implements ActionCommand {
             int defenceResult = results.getSecond();
 
             if (target.getCurrentHP() <= attackResult) {
+                System.out.println(attackResult);
+                //System.out.println("Kill" + " " + target.getCurrentHP());
+
+                // Diplomacy d = gs.getBoard().getDiplomacy();
+                // d.UpdateAllegiance(gs.getBoard(),-10, attacker.getTribeId(), target.getTribeId());
 
                 attacker.addKill();
                 attackerTribe.addKill();
@@ -56,6 +62,7 @@ public class AttackCommand implements ActionCommand {
                         gs.getBoard().tryPush(attackerTribe, attacker, attacker.getPosition().x, attacker.getPosition().y, target.getPosition().x, target.getPosition().y, gs.getRandomGenerator());
                 }
             } else {
+
                 target.setCurrentHP(target.getCurrentHP() - attackResult);
 
                 //Retaliation attack

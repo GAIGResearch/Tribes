@@ -6,8 +6,20 @@ import core.game.GameState;
 
 import java.util.ArrayList;
 
-public class Script
+public class BaseScript
 {
+    public enum Feature
+    {
+        DISTANCE,
+        ATTACK,
+        DEFENCE,
+        MOVEMENT,
+        RANGE,
+        DAMAGE,
+        HP,
+        COST
+    }
+
     //List of actions this script could pick from. Subclasses should override the process
     // method to choose one of them. Otherwise, default behaviour is to take the first one.
     protected ArrayList<Action> actions;

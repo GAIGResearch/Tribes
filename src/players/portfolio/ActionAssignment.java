@@ -3,14 +3,14 @@ package players.portfolio;
 import core.actions.Action;
 import core.actors.Actor;
 import core.game.GameState;
-import players.portfolio.scripts.Script;
+import players.portfolio.scripts.BaseScript;
 
 public class ActionAssignment {
-    private Script script;
+    private BaseScript script;
     private Actor actor;
 
 
-    public ActionAssignment(Actor a, Script s)
+    public ActionAssignment(Actor a, BaseScript s)
     {
         actor = a;
         script = s;
@@ -21,7 +21,7 @@ public class ActionAssignment {
         return script.process(gs, actor);
     }
 
-    public Script getScript() {
+    public BaseScript getScript() {
         return script;
     }
 

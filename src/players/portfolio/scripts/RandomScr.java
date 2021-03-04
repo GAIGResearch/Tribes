@@ -2,15 +2,11 @@ package players.portfolio.scripts;
 
 import core.actions.Action;
 import core.actors.Actor;
-import core.actors.City;
-import core.actors.units.Unit;
 import core.game.GameState;
-import players.portfolio.scripts.Script;
 
-import java.util.ArrayList;
 import java.util.Random;
 
-public class RandomScr extends Script {
+public class RandomScr extends BaseScript {
 
     private Random rnd;
 

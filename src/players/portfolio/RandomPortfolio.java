@@ -4,7 +4,7 @@ import core.actors.City;
 import core.actors.units.Unit;
 import core.game.GameState;
 import players.portfolio.scripts.RandomScr;
-import players.portfolio.scripts.Script;
+import players.portfolio.scripts.BaseScript;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -12,7 +12,7 @@ import java.util.Random;
 public class RandomPortfolio extends Portfolio
 {
 
-    Script[] portfolio;
+    BaseScript[] portfolio;
 
     public RandomPortfolio()
     {
@@ -22,14 +22,14 @@ public class RandomPortfolio extends Portfolio
 
     @Override
     public void initPortfolio() {
-        portfolio = new Script[]{new RandomScr(new Random())};
+        portfolio = new BaseScript[]{new RandomScr(new Random())};
     }
 
     public ArrayList<ActionAssignment> produceActionAssignments(GameState state)
     {
         ArrayList<ActionAssignment> list = new ArrayList<>();
 
-        for(Script s : portfolio)
+        for(BaseScript s : portfolio)
         {
             ArrayList<Unit> units = state.getUnits(state.getActiveTribeID());
             for(Unit u : units)

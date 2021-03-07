@@ -152,6 +152,7 @@ public class Board {
         }
 
         this.assignTribes(tribes);
+        // diplomacy.setTribeIDs(tribes);
         // diplomacy.setTribes(tribes);
         // System.out.print(diplomacy.Tribes[0].getName());
     }

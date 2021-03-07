@@ -39,11 +39,10 @@ public class AttackCommand implements ActionCommand {
             int defenceResult = results.getSecond();
 
             if (target.getCurrentHP() <= attackResult) {
-                System.out.println(attackResult);
                 //System.out.println("Kill" + " " + target.getCurrentHP());
 
-                // Diplomacy d = gs.getBoard().getDiplomacy();
-                // d.UpdateAllegiance(gs.getBoard(),-10, attacker.getTribeId(), target.getTribeId());
+                Diplomacy d = gs.getBoard().getDiplomacy();
+                d.UpdateAllegiance(gs.getBoard(),-10, attacker.getTribeId(), target.getTribeId());
 
                 attacker.addKill();
                 attackerTribe.addKill();

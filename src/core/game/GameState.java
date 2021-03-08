@@ -294,6 +294,8 @@ public class GameState {
                 ac.execute(action, this);
             }
 
+            this.board.getDiplomacy().LogAllegiance();
+
             //Post-action execution matters:
 
             //new actions may have become available, update the 'dirty' flag

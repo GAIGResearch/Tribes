@@ -1,5 +1,6 @@
 package core.actions.unitactions.command;
 
+import core.Diplomacy;
 import core.Types;
 import core.actions.Action;
 import core.actions.ActionCommand;
@@ -16,9 +17,13 @@ public class ConvertCommand implements ActionCommand {
 
     @Override
     public boolean execute(Action a, GameState gs) {
-        Convert action = (Convert)a;
+        Convert action = (Convert) a;
+
+        //Getting current diplomacy
+        Diplomacy d = gs.getBoard().getDiplomacy();
+
         //Check if action is feasible before execution
-        if(action.isFeasible(gs)) {
+        if (action.isFeasible(gs)) {
             int unitId = action.getUnitId();
             int targetId = action.getTargetId();
             Unit target = (Unit) gs.getActor(targetId);
@@ -33,6 +38,9 @@ public class ConvertCommand implements ActionCommand {
             //add tribe to converted unit
             target.setTribeId(unit.getTribeId());
             gs.getActiveTribe().addExtraUnit(target);
+
+            // Updating relationship between tribes, deducting 5
+            d.UpdateAllegiance(gs.getBoard(), -5, unit.getTribeId(), target.getTribeId());
 
             //manage status of the units after the action is executed
             unit.transitionToStatus(Types.TURN_STATUS.ATTACKED);

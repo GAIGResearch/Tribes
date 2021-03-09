@@ -44,7 +44,7 @@ public class PortfolioMCTSPlayer extends Agent {
         m_root.mctsSearch(ect);
 
         ActionAssignment act = m_root.getActions().get(m_root.mostVisitedAction());
-        return act.process(gs);
+        return act.getAction();
     }
 
     @Override

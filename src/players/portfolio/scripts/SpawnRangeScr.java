@@ -3,6 +3,7 @@ package players.portfolio.scripts;
 import core.actions.Action;
 import core.actors.Actor;
 import core.game.GameState;
+import players.portfolio.scripts.utils.MilitaryFunc;
 
 public class SpawnRangeScr extends BaseScript {
 
@@ -10,7 +11,7 @@ public class SpawnRangeScr extends BaseScript {
 
     @Override
     public Action process(GameState gs, Actor ac) {
-        return new Func().getActionByActorAttr(gs, actions, ac, Feature.RANGE, true);
+        return new MilitaryFunc().getActionByActorAttr(gs, actions, ac, Feature.RANGE, true);
     }
 
 }

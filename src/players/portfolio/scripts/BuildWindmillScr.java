@@ -7,15 +7,15 @@ import players.portfolio.scripts.utils.BuildingFunc;
 
 import java.util.Random;
 
-import static core.Types.BUILDING.*;
+import static core.Types.BUILDING.WINDMILL;
 
-public class ClearForestForCustomScr extends BaseScript {
+public class BuildWindmillScr extends BaseScript {
 
-    //This script returns the Clear Forest action that makes room for a custom house.
+    //Selects the action that builds the Forge in the best possible place.
 
     private Random rnd;
 
-    public ClearForestForCustomScr(Random rnd)
+    public BuildWindmillScr(Random rnd)
     {
         this.rnd = rnd;
     }
@@ -23,6 +23,7 @@ public class ClearForestForCustomScr extends BaseScript {
     @Override
     public Action process(GameState gs, Actor ac)
     {
-        return new BuildingFunc().buildSupportBuilding(CUSTOMS_HOUSE, gs, actions, rnd);
+        return new BuildingFunc().buildSupportBuilding(WINDMILL, gs, actions, rnd);
     }
+
 }

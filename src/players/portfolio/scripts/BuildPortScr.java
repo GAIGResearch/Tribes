@@ -9,13 +9,13 @@ import java.util.Random;
 
 import static core.Types.BUILDING.*;
 
-public class ClearForestForCustomScr extends BaseScript {
+public class BuildPortScr extends BaseScript {
 
-    //This script returns the Clear Forest action that makes room for a custom house.
+    //Selects the action that builds a Forge in the best possible place.
 
     private Random rnd;
 
-    public ClearForestForCustomScr(Random rnd)
+    public BuildPortScr(Random rnd)
     {
         this.rnd = rnd;
     }
@@ -23,6 +23,7 @@ public class ClearForestForCustomScr extends BaseScript {
     @Override
     public Action process(GameState gs, Actor ac)
     {
-        return new BuildingFunc().buildSupportBuilding(CUSTOMS_HOUSE, gs, actions, rnd);
+        return new BuildingFunc().buildBaseBuilding(PORT, CUSTOMS_HOUSE, gs, actions, rnd);
     }
+
 }

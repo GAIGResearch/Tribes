@@ -6,9 +6,9 @@ import core.game.GameState;
 import players.portfolio.scripts.BaseScript;
 
 public class ActionAssignment {
-    private BaseScript script;
-    private Actor actor;
-
+    private final BaseScript script;
+    private final Actor actor;
+    private Action action;
 
     public ActionAssignment(Actor a, BaseScript s)
     {
@@ -16,17 +16,18 @@ public class ActionAssignment {
         script = s;
     }
 
-    public Action process(GameState gs)
+    boolean process(GameState gs)
     {
-        return script.process(gs, actor);
+        action = script.process(gs, actor);
+        return action != null;
     }
 
     public BaseScript getScript() {
         return script;
     }
-
     public Actor getActor() {
         return actor;
     }
+    public Action getAction() {return action;}
 
 }

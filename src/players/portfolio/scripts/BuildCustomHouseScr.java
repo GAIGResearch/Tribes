@@ -9,13 +9,13 @@ import java.util.Random;
 
 import static core.Types.BUILDING.*;
 
-public class ClearForestForCustomScr extends BaseScript {
+public class BuildCustomHouseScr extends BaseScript {
 
-    //This script returns the Clear Forest action that makes room for a custom house.
+    //Selects the action that builds the Custom House in the best possible place.
 
     private Random rnd;
 
-    public ClearForestForCustomScr(Random rnd)
+    public BuildCustomHouseScr(Random rnd)
     {
         this.rnd = rnd;
     }
@@ -25,4 +25,5 @@ public class ClearForestForCustomScr extends BaseScript {
     {
         return new BuildingFunc().buildSupportBuilding(CUSTOMS_HOUSE, gs, actions, rnd);
     }
+
 }

@@ -2,6 +2,7 @@ package players.portfolio;
 
 import core.Types;
 import core.actions.Action;
+import core.actions.cityactions.Build;
 import core.actors.Actor;
 import core.actors.City;
 import core.actors.units.Unit;
@@ -11,6 +12,9 @@ import players.portfolio.scripts.*;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.logging.Level;
+
+import static core.Types.BUILDING.PORT;
 
 public class SimplePortfolio extends Portfolio
 {
@@ -32,8 +36,8 @@ public class SimplePortfolio extends Portfolio
         //TRIBE: ResearchTech, BuildRoad, EndTurn
 
         portfolio = new TreeMap<>();
-        //portfolio.put(Types.ACTION.DESTROY, new Script[]{new RandomScr(rnd)});
-        //portfolio.put(Types.ACTION.DISBAND, new Script[]{new Script()});
+        //portfolio.put(Types.ACTION.DESTROY, new Script[]{new BaseScript(rnd)});
+        //portfolio.put(Types.ACTION.DISBAND, new Script[]{new BaseScript()});
 
         //Wrapper scripts:
         portfolio.put(Types.ACTION.CAPTURE, new BaseScript[]{new BaseScript()});
@@ -53,7 +57,6 @@ public class SimplePortfolio extends Portfolio
                 new AttackStrongestScr()
         });
         portfolio.put(Types.ACTION.CLEAR_FOREST, new BaseScript[]{
-                new ClearForestByProdScr(rnd),
                 new ClearForestForCustomScr(rnd),
                 new ClearForestForForgeScr(rnd),
                 new ClearForestForSawmillScr(rnd),
@@ -75,19 +78,48 @@ public class SimplePortfolio extends Portfolio
                 new SpawnRangeScr()
         });
 
+        portfolio.put(Types.ACTION.BUILD, new BaseScript[]{
+                new BuildCustomHouseScr(rnd),
+                new BuildSawmillScr(rnd),
+                new BuildWindmillScr(rnd),
+                new BuildForgeScr(rnd),
+                new BuildFarmScr(rnd),
+                new BuildMineScr(rnd),
+                new BuildLumberHutScr(rnd),
+                new BuildPortScr(rnd),
+                new BuildMonumentScr(rnd),
+                new BuildTempleScr(rnd),
+        });
+
+        portfolio.put(Types.ACTION.BURN_FOREST, new BaseScript[]{
+                new BurnForestScr(rnd)
+        });
+
+        portfolio.put(Types.ACTION.GROW_FOREST, new BaseScript[]{
+                new GrowForestScr(rnd)
+        });
+
+        portfolio.put(Types.ACTION.LEVEL_UP, new BaseScript[]{
+                new LevelUpGrowthScr(rnd),
+                new LevelUpMilitaryScr(rnd)
+        });
+
+        portfolio.put(Types.ACTION.RESOURCE_GATHERING, new BaseScript[]{
+                new ResourceGatheringScr(rnd)
+        });
+
+
+        portfolio.put(Types.ACTION.RESEARCH_TECH, new BaseScript[]{
+                new ResearchFarmsScr(rnd),
+                new ResearchNavalScr(rnd),
+                new ResearchMountainsScr(rnd),
+                new ResearchRangeScr(rnd),
+                new ResearchRoadsScr(rnd),
+        });
 
 
         portfolio.put(Types.ACTION.MOVE, new BaseScript[]{new RandomScr(rnd)});
-
-
-
         portfolio.put(Types.ACTION.BUILD_ROAD, new BaseScript[]{new RandomScr(rnd)});
-        portfolio.put(Types.ACTION.RESEARCH_TECH, new BaseScript[]{new RandomScr(rnd)});
-        portfolio.put(Types.ACTION.BUILD, new BaseScript[]{new RandomScr(rnd)});
-        portfolio.put(Types.ACTION.BURN_FOREST, new BaseScript[]{new RandomScr(rnd)});
-        portfolio.put(Types.ACTION.GROW_FOREST, new BaseScript[]{new RandomScr(rnd)});
-        portfolio.put(Types.ACTION.LEVEL_UP, new BaseScript[]{new RandomScr(rnd)});
-        portfolio.put(Types.ACTION.RESOURCE_GATHERING, new BaseScript[]{new RandomScr(rnd)});
 
     }
 
@@ -101,24 +133,24 @@ public class SimplePortfolio extends Portfolio
         {
             ArrayList<Action> unitActions = state.getUnitActions(u);
             if(unitActions != null && unitActions.size() > 0)
-                extract(list, unitActions, u);
+                extract(state, list, unitActions, u);
         }
 
         for(City c : state.getCities(state.getActiveTribeID()))
         {
             ArrayList<Action> cityActions = state.getCityActions(c);
-            if(cityActions != null &&cityActions.size() > 0)
-                extract(list, cityActions, c);
+            if(cityActions != null && cityActions.size() > 0)
+                extract(state, list, cityActions, c);
         }
 
         ArrayList<Action> tribeActions = state.getTribeActions();
-            extract(list, tribeActions, state.getActiveTribe());
+            extract(state, list, tribeActions, state.getActiveTribe());
 
         return list;
     }
 
 
-    private void extract(ArrayList<ActionAssignment> actionList, ArrayList<Action> actions, Actor a)
+    private void extract(GameState state, ArrayList<ActionAssignment> actionList, ArrayList<Action> actions, Actor a)
     {
         //Extract assignments for all action types.
         for (Types.ACTION actType : portfolio.keySet()) {
@@ -138,7 +170,17 @@ public class SimplePortfolio extends Portfolio
 
                     //Assign actor to script and return the assignment.
                     ActionAssignment aas = new ActionAssignment(a, s);
-                    actionList.add(aas);
+                    if(aas.process(state)) {
+                        if(aas.getAction() instanceof Build) {
+//                            System.out.println("Build: " + ((Build) aas.getAction()).getBuildingType());
+                            if (((Build) aas.getAction()).getBuildingType() == PORT) {
+//                                System.out.println("A");
+                                aas.process(state);
+                            }
+                        }
+
+                        actionList.add(aas);
+                    }
                 }
             }
         }

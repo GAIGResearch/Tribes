@@ -1,83 +1,22 @@
-package players.portfolio.scripts;
+package players.portfolio.scripts.utils;
 
 import core.Types;
 import core.actions.Action;
-import core.actions.cityactions.ClearForest;
 import core.actions.cityactions.Spawn;
+import core.actions.tribeactions.ResearchTech;
 import core.actions.unitactions.Attack;
 import core.actions.unitactions.Convert;
 import core.actions.unitactions.command.AttackCommand;
 import core.actors.Actor;
-import core.actors.Building;
-import core.actors.City;
 import core.actors.units.Unit;
 import core.game.GameState;
+import players.portfolio.scripts.BaseScript;
 import utils.Vector2d;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Random;
 
-import static core.Types.BUILDING.*;
-import static core.Types.RESOURCE.*;
-import static core.Types.TERRAIN.*;
-
-public class Func {
-
-    public int candidatesForBuilding(GameState gs, Actor ac, Types.BUILDING unique_building, ArrayList<Action> actions, ArrayList<Action> candidates)
-    {
-        City c = (City) gs.getActor(ac.getActorId());
-        for(Building b : c.getBuildings())
-        {
-            //No more than one building of type 'unique_building' can be built.
-            if(b.type == unique_building)
-                return 0;
-        }
-
-        int highestNeigh = 0;
-        for(Action act : actions)
-        {
-            ClearForest action = (ClearForest)act;
-            Vector2d forestPos = action.getTargetPos();
-            int goodNeigh = 0;
-            LinkedList<Vector2d> neighs = forestPos.neighborhood(1, 0, gs.getBoard().getSize());
-            for(Vector2d neighPos : neighs)
-            {
-                goodNeigh += goodFor(gs, neighPos, unique_building) ? 1 : 0;
-            }
-
-            if(goodNeigh > highestNeigh)
-            {
-                candidates = new ArrayList<>();
-                highestNeigh = goodNeigh;
-                candidates.add(act);
-            }else if (goodNeigh == highestNeigh)
-            {
-                candidates.add(act);
-            }
-        }
-
-        return highestNeigh;
-    }
-
-    private boolean goodFor(GameState gs, Vector2d v, Types.BUILDING unique_building)
-    {
-        Types.TERRAIN t = gs.getBoard().getTerrainAt(v.x, v.y);
-        Types.BUILDING b = gs.getBoard().getBuildingAt(v.x, v.y);
-        Types.RESOURCE r = gs.getBoard().getResourceAt(v.x, v.y);
-        switch (unique_building)
-        {
-            case CUSTOMS_HOUSE:
-                return (t.isWater() && (b == null || b == PORT));
-            case WINDMILL:
-                return (r == CROPS || b == FARM);
-            case FORGE:
-                return ((t == MOUNTAIN && r == ORE) || b == MINE);
-            case SAWMILL:
-                return t == FOREST || b == LUMBER_HUT;
-        }
-        return false;
-    }
-
+public class MilitaryFunc {
 
     public Action getActionByActorAttr(GameState gs, ArrayList<Action> actions, Actor source,
                                        BaseScript.Feature feat, boolean maximize)
@@ -148,9 +87,55 @@ public class Func {
                 }
             }
         }
-
         return finalAction;
-
     }
 
+    public Action getPreferredResearchTech(GameState gs, ArrayList<Action> actions, ArrayList<Types.TECHNOLOGY> preferredTechs, Random rnd)
+    {
+        ArrayList<Action> candidate_actions = new ArrayList<>();
+        int lowestTier = Integer.MAX_VALUE;
+        boolean preferredBranch = false;
+
+        for(Action act : actions)
+        {
+            ResearchTech rt = (ResearchTech)act;
+            int tier = rt.getTech().getTier();
+
+            if( preferredTechs.contains(rt.getTech()))
+            {
+                if(!preferredBranch || tier < lowestTier)
+                {
+                    //Either we have our first from the preferred branch, or we have a lower tier in the preferred branch.
+                    candidate_actions.clear();
+                    lowestTier = tier;
+                }
+
+                //Only consider if in the lowest tier found
+                if(tier == lowestTier)
+                    candidate_actions.add(rt);
+
+                preferredBranch = true;
+            }
+            else if(!preferredBranch)
+            {
+                //Only insert here if we didn't find any from the preferred branch.
+                if(tier < lowestTier)
+                {
+                    //We have a new lowest tier in the not preferred branch.
+                    candidate_actions.clear();
+                    lowestTier = tier;
+                }
+
+                //Only consider if in the lowest tier found
+                if(tier == lowestTier)
+                    candidate_actions.add(rt);
+            }
+        }
+
+        int nActions = candidate_actions.size();
+        if( nActions > 0)
+            return candidate_actions.get(rnd.nextInt(nActions));
+
+        return null;
+    }
 }

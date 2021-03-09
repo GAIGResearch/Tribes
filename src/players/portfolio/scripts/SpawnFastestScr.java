@@ -3,6 +3,7 @@ package players.portfolio.scripts;
 import core.actions.Action;
 import core.actors.Actor;
 import core.game.GameState;
+import players.portfolio.scripts.utils.MilitaryFunc;
 
 public class SpawnFastestScr extends BaseScript {
 
@@ -11,7 +12,7 @@ public class SpawnFastestScr extends BaseScript {
 
     @Override
     public Action process(GameState gs, Actor ac) {
-        return new Func().getActionByActorAttr(gs, actions, ac, Feature.MOVEMENT, true);
+        return new MilitaryFunc().getActionByActorAttr(gs, actions, ac, Feature.MOVEMENT, true);
     }
 
 }

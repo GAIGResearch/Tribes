@@ -1,11 +1,9 @@
 package players.portfolio.scripts;
 
 import core.actions.Action;
-import core.actions.unitactions.Attack;
 import core.actors.Actor;
-import core.actors.units.Unit;
 import core.game.GameState;
-import utils.Vector2d;
+import players.portfolio.scripts.utils.MilitaryFunc;
 
 public class AttackClosestScr extends BaseScript {
 
@@ -14,7 +12,7 @@ public class AttackClosestScr extends BaseScript {
     @Override
     public Action process(GameState gs, Actor ac)
     {
-        return new Func().getActionByActorAttr(gs, actions, ac, Feature.DISTANCE, false);
+        return new MilitaryFunc().getActionByActorAttr(gs, actions, ac, Feature.DISTANCE, false);
     }
 
 }

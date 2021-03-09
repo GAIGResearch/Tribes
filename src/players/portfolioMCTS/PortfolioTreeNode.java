@@ -149,12 +149,9 @@ public class PortfolioTreeNode
         return tn;
     }
 
-
-
-
     private ArrayList<ActionAssignment> advance(GameState gs, ActionAssignment actionAssignment, boolean computeActions)
     {
-        Action act = actionAssignment.process(gs);
+        Action act = actionAssignment.getAction();
         gs.advance(act, computeActions);
         root.fmCallsCount++;
         return params.getPortfolio().produceActionAssignments(gs);

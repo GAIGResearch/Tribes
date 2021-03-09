@@ -122,11 +122,14 @@ public class Tribe extends Actor {
 
     private void init() {
         techTree = new TechnologyTree();
-        if (!getName().equals("Luxidoor")){
+        // checking if tribe starts with initial tech
+        if (!(tribe.getInitialTech() == null)){
+            // if so assign initTech and update score
             Types.TECHNOLOGY initTech = tribe.getInitialTech();
-            techTree.doResearch(initTech);
+            techTree.doResearchInit(initTech);
             score = initTech.getPoints();
         }
+
         citiesID = new ArrayList<>();
         stars = TribesConfig.INITIAL_STARS;
         tribesMet = new ArrayList<>();

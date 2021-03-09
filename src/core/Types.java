@@ -787,6 +787,7 @@ public class Types {
         BUILD_ROAD(null, ROADS),
         END_TURN(null, null),
         RESEARCH_TECH(null, null),
+        DECLARE_WAR(null,null),
 
         //unit
         ATTACK("img/actions/attack.png", null),

@@ -152,9 +152,6 @@ public class Board {
         }
 
         this.assignTribes(tribes);
-        // diplomacy.setTribeIDs(tribes);
-        // diplomacy.setTribes(tribes);
-        // System.out.print(diplomacy.Tribes[0].getName());
     }
 
     /**
@@ -831,6 +828,20 @@ public class Board {
 
         //By default, cities are considered to be roads for trade network purposes.
         tradeNetwork.setTradeNetwork(this, c.getPosition().x, c.getPosition().y, true);
+    }
+
+    /**
+     * Upgrades a city on start if they don't have a starting technology
+     * @param c city to add
+     */
+
+    void upgradeCityOnStart(City c, int tribeID){
+        if (tribes[tribeID].getName().equals("Luxidoor")){
+            c.levelUp();
+            c.levelUp();
+            c.setWalls(true);
+            c.setPopulation(0);
+        }
     }
 
     /**

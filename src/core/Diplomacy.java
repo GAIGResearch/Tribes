@@ -15,26 +15,6 @@ public class Diplomacy {
     // the absolute of the maximum positive and negative values
     private int absoluteMax = 60;
 
-    /*private HashMap<Integer,Integer> tribeIDs = new HashMap<>();
-
-    public HashMap<Integer, Integer> getTribeIDs() {
-        return tribeIDs;
-    }
-
-    public void setTribeIDs(Tribe[] tribes) {
-        for (Tribe t: tribes){
-            System.out.println(t.getName() + " " + t.getTribeId());
-        }
-        HashMap<Integer, Integer> tribeIDs = new HashMap<>();
-        for (int i=0; i<tribes.length;i++){
-            tribeIDs.put(tribes[i].getTribeId(),i);
-        }
-        this.tribeIDs = tribeIDs;
-        for (Integer i: tribeIDs.keySet()) {
-            System.out.println("key: " + i + " value: " + tribeIDs.get(i));
-        }
-    }*/
-
     /**
      * Creates allegiances for each of the existing tribes
      *
@@ -47,19 +27,17 @@ public class Diplomacy {
     /**
      * Creates allegiances for each of the existing tribes
      *
-     * @param b               number of tribes in-game
-     * @param value           number of tribes in-game
-     * @param attackerTribeID number of tribes in-game
-     * @param targetTribeID   number of tribes in-game
+     * @param b             board for the game
+     * @param value         value the allegiance will change by
+     * @param initTribeID   ID for the tribe initiating the action
+     * @param targetTribeID ID for the target tribe of the action
      */
-    public void UpdateAllegiance(Board b, int value, int attackerTribeID, int targetTribeID) {
-        //int attackerTribePos = this.tribeIDs.get(attackerTribeID);
-        //int targetTribePos = this.tribeIDs.get(targetTribeID);
+    public void UpdateAllegiance(Board b, int value, int initTribeID, int targetTribeID) {
 
-        this.AllegianceStatus[attackerTribeID][targetTribeID] = this.AllegianceStatus[attackerTribeID][targetTribeID] + value;
-        this.AllegianceStatus[targetTribeID][attackerTribeID] = this.AllegianceStatus[targetTribeID][attackerTribeID] + value;
-        System.out.println(b.getTribes()[attackerTribeID].getName() + " " + b.getTribes()[targetTribeID].getName() +
-                " " + this.AllegianceStatus[attackerTribeID][targetTribeID]);
+        //TODO check new value against absolute max, if new value is above, set to +-absolute max
+
+        this.AllegianceStatus[initTribeID][targetTribeID] = this.AllegianceStatus[initTribeID][targetTribeID] + value;
+        this.AllegianceStatus[targetTribeID][initTribeID] = this.AllegianceStatus[targetTribeID][initTribeID] + value;
     }
 
     //Method to test the diplomacy is working

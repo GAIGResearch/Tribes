@@ -72,6 +72,7 @@ class LevelLoader
                         //A city to create. Add it and assign it to the next tribe.
                         City c = new City(i, j, tribeID);
                         c.setCapital(true);
+                        board.upgradeCityOnStart(c, tribeID);
                         board.addCityToTribe(c,rnd);
 
                         //Add score for this city centre

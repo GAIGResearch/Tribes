@@ -43,11 +43,11 @@ public class AttackCommand implements ActionCommand {
             int defenceResult = results.getSecond();
 
             // Updating relationship between tribes, deducting 5
-            d.UpdateAllegiance(gs.getBoard(), -5, attacker.getTribeId(), target.getTribeId());
+            d.updateAllegiance(gs.getBoard(), -5, attacker.getTribeId(), target.getTribeId());
 
             if (target.getCurrentHP() <= attackResult) {
                 // Updating relationship between tribes, deducting an additional 5 if the unit is killed
-                d.UpdateAllegiance(gs.getBoard(), -5, attacker.getTribeId(), target.getTribeId());
+                d.updateAllegiance(gs.getBoard(), -5, attacker.getTribeId(), target.getTribeId());
 
                 attacker.addKill();
                 attackerTribe.addKill();

@@ -1,11 +1,8 @@
 package core;
 
-import core.actors.Tribe;
 import core.game.Board;
-import core.game.GameState;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
 public class Diplomacy {
 
@@ -32,7 +29,7 @@ public class Diplomacy {
      * @param initTribeID   ID for the tribe initiating the action
      * @param targetTribeID ID for the target tribe of the action
      */
-    public void UpdateAllegiance(Board b, int value, int initTribeID, int targetTribeID) {
+    public void updateAllegiance(Board b, int value, int initTribeID, int targetTribeID) {
 
         //TODO check new value against absolute max, if new value is above, set to +-absolute max
 
@@ -41,7 +38,7 @@ public class Diplomacy {
     }
 
     //Method to test the diplomacy is working
-    public void LogAllegiance() {
+    public void logAllegiance() {
         System.out.println(Arrays.deepToString(this.AllegianceStatus));
     }
 

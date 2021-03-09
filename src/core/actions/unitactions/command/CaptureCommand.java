@@ -40,7 +40,7 @@ public class CaptureCommand implements ActionCommand {
                 //Updating diplomacy
                 Diplomacy d = gs.getBoard().getDiplomacy();
                 // Updating the relationship of the tribes, deducting 30 for a capture
-                d.UpdateAllegiance(gs.getBoard(), -30, thisTribe.getTribeId(), targetTribe.getTribeId());
+                d.updateAllegiance(gs.getBoard(), -30, thisTribe.getTribeId(), targetTribe.getTribeId());
 
                 //the unit that captures exhausts their turn
                 unit.setStatus(Types.TURN_STATUS.FINISHED);

@@ -117,9 +117,12 @@ public class SimplePortfolio extends Portfolio
                 new ResearchRoadsScr(rnd),
         });
 
+        portfolio.put(Types.ACTION.BUILD_ROAD, new BaseScript[]{
+                new BuildRoadScr(rnd)
+        });
+
 
         portfolio.put(Types.ACTION.MOVE, new BaseScript[]{new RandomScr(rnd)});
-        portfolio.put(Types.ACTION.BUILD_ROAD, new BaseScript[]{new RandomScr(rnd)});
 
     }
 

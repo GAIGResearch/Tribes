@@ -4,14 +4,12 @@ import core.Diplomacy;
 import core.Types;
 import core.actions.Action;
 import core.actions.ActionCommand;
-import core.actions.unitactions.Attack;
 import core.actions.unitactions.Capture;
 import core.actors.City;
 import core.actors.Tribe;
 import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
-import utils.Pair;
 import utils.Vector2d;
 
 public class CaptureCommand implements ActionCommand {

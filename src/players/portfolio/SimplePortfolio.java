@@ -122,7 +122,17 @@ public class SimplePortfolio extends Portfolio
         });
 
 
-        portfolio.put(Types.ACTION.MOVE, new BaseScript[]{new RandomScr(rnd)});
+        portfolio.put(Types.ACTION.MOVE, new BaseScript[]{
+                new MoveToCaptureScr(rnd),
+                new MoveToOwnCityCentreScr(rnd),
+                new MoveDefensivelyScr(rnd),
+                new MoveOffensivelyScr(rnd),
+                new MoveToDisembarkScr(rnd),
+                new MoveToEmbarkScr(rnd),
+                new MoveToAttackRangeScr(rnd),
+                new MoveToConvergeScr(rnd),
+                new MoveToDivergeScr(rnd)
+        });
 
     }
 

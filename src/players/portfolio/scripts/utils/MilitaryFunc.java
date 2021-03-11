@@ -6,9 +6,11 @@ import core.actions.cityactions.Spawn;
 import core.actions.tribeactions.ResearchTech;
 import core.actions.unitactions.Attack;
 import core.actions.unitactions.Convert;
+import core.actions.unitactions.Move;
 import core.actions.unitactions.command.AttackCommand;
 import core.actors.Actor;
 import core.actors.units.Unit;
+import core.game.Board;
 import core.game.GameState;
 import players.portfolio.scripts.BaseScript;
 import utils.Vector2d;
@@ -138,4 +140,84 @@ public class MilitaryFunc {
 
         return null;
     }
+
+    public Action moveTowards(GameState gs, Actor ac, ArrayList<Action> actions, Random rnd, InterestPoint p)
+    {
+        ArrayList<Action> candidate_actions = new ArrayList<>();
+        ArrayList<Vector2d> movePositions = new ArrayList<>();
+        Board b = gs.getBoard();
+
+        //Positions in the board that are of interest.
+        int size = b.getSize();
+        for(int i = 0; i < size; ++i) {
+            for(int j = 0; j < size; ++j) {
+                if(p.ofInterest(gs, ac, i, j))
+                    movePositions.add(new Vector2d(i,j));
+            }
+        }
+
+        double minDistance = Double.MAX_VALUE;
+        for(Action act : actions)
+        {
+            Move action = (Move) act;
+            Vector2d destPos = action.getDestination();
+
+            for(Vector2d potentialPosition : movePositions)
+            {
+                double dist = destPos.custom_dist(potentialPosition);
+                if(dist < minDistance)
+                {
+                    minDistance = dist;
+                    candidate_actions.clear();
+                    candidate_actions.add(act);
+                }else if(dist == minDistance)
+                {
+                    candidate_actions.add(act);
+                }
+            }
+        }
+
+        int nActions = candidate_actions.size();
+        if( nActions > 0) {
+            Action act =  candidate_actions.get(rnd.nextInt(nActions));
+            //System.out.println("TRIBE ID: " + ac.getTribeId() + " Moving from " +  ac.getPosition() +  " to " + ((Move)act).getDestination() + " distance: " + minDistance);
+            return act;
+        }
+        return null;
+    }
+
+
+    public Action position(GameState gs, Actor ac, ArrayList<Action> actions,
+                           Random rnd, int minValue, ValuePoint p)
+    {
+        ArrayList<Action> candidate_actions = new ArrayList<>();
+
+        //Positions in the board that are of interest.
+        double bestValue = Double.NEGATIVE_INFINITY;
+        for(Action act : actions)
+        {
+            Move action = (Move) act;
+            Vector2d destPos = action.getDestination();
+            int valuePos = p.ofInterest(gs, ac, destPos.x, destPos.y);
+            if(valuePos > bestValue)
+            {
+                bestValue = valuePos;
+                candidate_actions.clear();
+                candidate_actions.add(act);
+            }else if(valuePos == bestValue)
+            {
+                candidate_actions.add(act);
+            }
+        }
+
+        int nActions = candidate_actions.size();
+        if( nActions > 0 && bestValue >= minValue) {
+            Action act =  candidate_actions.get(rnd.nextInt(nActions));
+           //System.out.println("TRIBE ID: " + ac.getTribeId() + " Moving to RANGE " +  ac.getPosition() +  " to " + ((Move)act).getDestination() + " reaching: " + bestValue);
+            return act;
+        }
+        return null;
+    }
+
+
 }

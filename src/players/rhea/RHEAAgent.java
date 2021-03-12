@@ -2,8 +2,6 @@ package players.rhea;
 
 import core.actions.Action;
 import core.actions.cityactions.CityAction;
-import core.actions.tribeactions.EndTurn;
-import core.actions.unitactions.Attack;
 import core.actions.unitactions.UnitAction;
 import core.actors.Actor;
 import core.actors.City;
@@ -40,7 +38,7 @@ public class RHEAAgent extends Agent {
     @Override
     public Action act(GameState gs, ElapsedCpuTimer ect) {
 
-        this.heuristic = params.getHeuristic(playerID, allPlayerIDs);
+        this.heuristic = params.getStateHeuristic(playerID, allPlayerIDs);
         this.fmcalls = 0;
 
         if (currentTurn != gs.getTick()){

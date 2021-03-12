@@ -48,4 +48,13 @@ public class UnitAction extends Action
     public Action copy() {
         return null;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(!(o instanceof UnitAction))
+            return false;
+        UnitAction other = (UnitAction)o;
+
+        return unitId == other.unitId && actionType == other.actionType;
+    }
 }

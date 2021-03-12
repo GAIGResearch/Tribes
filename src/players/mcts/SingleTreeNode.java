@@ -2,13 +2,9 @@ package players.mcts;
 
 import core.actions.Action;
 import core.actions.tribeactions.EndTurn;
-import core.actors.Tribe;
 import core.game.GameState;
 import players.heuristics.StateHeuristic;
-import players.heuristics.TribesEntropyHeuristic;
-import players.heuristics.TribesSimpleHeuristic;
 import utils.ElapsedCpuTimer;
-import utils.Vector2d;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -67,7 +63,7 @@ class SingleTreeNode
         this.state = gs;
         this.root = root;
         this.rootState = gs;
-        this.rootStateHeuristic = params.getHeuristic(playerID, allIDs);
+        this.rootStateHeuristic = params.getStateHeuristic(playerID, allIDs);
     }
 
 

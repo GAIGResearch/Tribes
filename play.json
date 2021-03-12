@@ -4,7 +4,7 @@
 
   "Game Mode" : "Capitals",
   "Rollouts" : false,
-  "Search Depth" : 5,
+  "Search Depth" : 20,
   "Force End" : false,
   "Population Size" : 20,
   "Players" : ["MCTS", "pMCTS"],

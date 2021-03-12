@@ -66,6 +66,14 @@ public class Tournament {
                 mctsParams.FORCE_TURN_END = FORCE_TURN_END ? 5 : mctsParams.ROLLOUT_LENGTH + 1;
                 mctsParams.ROLOUTS_ENABLED = MCTS_ROLLOUTS;
                 return new MCTSPlayer(agentSeed, mctsParams);
+            case PORTFOLIO_MCTS:
+                PortfolioMCTSParams portfolioMCTSParams = new PortfolioMCTSParams();
+                portfolioMCTSParams.stop_type = portfolioMCTSParams.STOP_FMCALLS;
+                portfolioMCTSParams.heuristic_method = portfolioMCTSParams.DIFF_HEURISTIC;
+                portfolioMCTSParams.PRIORITIZE_ROOT = false;
+                portfolioMCTSParams.ROLLOUT_LENGTH = MAX_LENGTH;
+                portfolioMCTSParams.setPortfolio(new SimplePortfolio(agentSeed));
+                return new PortfolioMCTSPlayer(agentSeed, portfolioMCTSParams);
             case OEP:
                 OEPParams oepParams = new OEPParams();
                 return new OEPAgent(agentSeed, oepParams);
@@ -77,14 +85,6 @@ public class Tournament {
                 rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
                 rheaParams.POP_SIZE = POP_SIZE;
                 return new RHEAAgent(agentSeed, rheaParams);
-            case PORTFOLIO_MCTS:
-                PortfolioMCTSParams portfolioMCTSParams = new PortfolioMCTSParams();
-                portfolioMCTSParams.stop_type = portfolioMCTSParams.STOP_FMCALLS;
-                portfolioMCTSParams.PRIORITIZE_ROOT = false;
-                portfolioMCTSParams.heuristic_method = portfolioMCTSParams.DIFF_HEURISTIC;
-                portfolioMCTSParams.ROLLOUT_LENGTH = 20;
-                portfolioMCTSParams.setPortfolio(new SimplePortfolio(agentSeed));
-                return new PortfolioMCTSPlayer(agentSeed, portfolioMCTSParams);
         }
         return null;
     }

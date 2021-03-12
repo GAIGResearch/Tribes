@@ -4,11 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pylab
 
-colors = ["#E66908", "#FFCE6B", "#5F7EC6", "#FF8A6B", "#B3F064", "#8D5DC7", "#FFF36B", "#0000FF"]
+colors = ["#E66908", "#FFCE6B", "#5F7EC6", "#FF8A6B", "#B3F064", "#8D5DC7", "#FFF36B", "#0000FF", "#0000FF"]
 
-agent_names = ["DoNothing", "Random", "RuleBased", "OSLA", "MC", "MCTS", "RHEA", "OEP"]
+agent_names = ["DoNothing", "Random", "RuleBased", "OSLA", "MC", "MCTS", "RHEA", "OEP", "PORTFOLIO_MCTS"]
 agents_dict = {"DoNothing" : "DoNothing", "RandomAgent" : "Random", "SimpleAgent" : "RuleBased", "OneStepLookAheadAgent" : "OSLA",
-               "MonteCarloAgent" : "MC", "MCTSPlayer":"MCTS", "RHEAAgent":"RHEA", "OEP":"OEP"}
+               "MonteCarloAgent" : "MC", "MCTSPlayer":"MCTS", "RHEAAgent":"RHEA", "OEP":"OEP", "PortfolioMCTSPlayer" : "PORTFOLIO_MCTS"}
 
 game_modes = ["CAPITALS", "SCORE"]
 
@@ -35,12 +35,13 @@ def process_file(f_name):
         cities_l[ag] = []
         prods[ag] = []
 
-    agents.append(agent_names[int(f_name.split(".")[-2].split("_")[7])])
-    agents.append(agent_names[int(f_name.split(".")[-2].split("_")[8])])
-    if nparams >= 13:
-        agents.append(agent_names[int(f_name.split(".")[-2].split("_")[9])])
-    if nparams == 15:
-        agents.append(agent_names[int(f_name.split(".")[-2].split("_")[10])])
+    with open(f_name) as f:
+
+        lines = f.readlines()
+        line2 = lines[1]
+
+        agents.append(line2.split(":")[1].split("(")[0])
+        agents.append(line2.split(":")[2].split("(")[0])
 
     data_per_game = {}
     all_data = {}
@@ -168,7 +169,7 @@ def print_agent_pw(ag, data, column_order):
 
     all_txt = all_txt + "\\\\"
     all_txt = all_txt + "\\hline"
-    print all_txt
+    print (all_txt)
 
 
     #
@@ -182,7 +183,7 @@ def print_agent_pw(ag, data, column_order):
 
 def main():
 
-    file_path = "../../res/scores/"
+    file_path = "C:\\Work\\git\\Tribes\\test\\agg\\"
     files = [join(file_path, f) for f in listdir(file_path) if isfile(join(file_path, f)) and f.endswith(".txt")]
 
     victories = {}
@@ -213,11 +214,11 @@ def main():
 
         if "tribes_" in f:
 
-            print " --- " + f + " --- "
+            print (" --- " + f + " --- ")
 
-            game_mode = game_modes[int(f.split(".")[-2].split("_")[1])]
-            length = int(f.split(".")[-2].split("_")[3])
-            pop_size = int(f.split(".")[-2].split("_")[6])
+            # game_mode = game_modes[int(f.split(".")[-2].split("_")[1])]
+            # length = int(f.split(".")[-2].split("_")[3])
+            # pop_size = int(f.split(".")[-2].split("_")[6])
 
             agents, all_data, sum_data, data_per_game = process_file(f)
 
@@ -261,15 +262,17 @@ def main():
                 # plot(all_scores_n, False, 'upper right')
 
     # column_order = ["RHEA", "RuleBased", "MCTS", "MC", "OSLA", "Random"]
-    column_order = ["RHEA", "RuleBased", "MCTS", "MC", "OSLA"]
-    print_agent_pw("RHEA", victories, column_order)
-    print_agent_pw("RuleBased", victories, column_order)
+#    column_order = ["RHEA", "RuleBased", "MCTS", "MC", "OSLA"]
+    column_order = ["MCTS", "PORTFOLIO_MCTS"]
+    # print_agent_pw("RHEA", victories, column_order)
+    # print_agent_pw("RuleBased", victories, column_order)
     print_agent_pw("MCTS", victories, column_order)
-    print_agent_pw("MC", victories, column_order)
-    print_agent_pw("OSLA", victories, column_order)
+    print_agent_pw("PORTFOLIO_MCTS", victories, column_order)
+    # print_agent_pw("MC", victories, column_order)
+    # print_agent_pw("OSLA", victories, column_order)
     # print_agent_pw("Random", victories, column_order)
 
-    print "_____________"
+    print ("_____________")
 
     if True:
         for ag in agent_names:
@@ -298,7 +301,7 @@ def main():
                   g=technologies[ag]['tot'][0], h=technologies[ag]['tot'][1],
                   i=cities[ag]['tot'][0], j=cities[ag]['tot'][1],
                   k=productions[ag]['tot'][0], l=productions[ag]['tot'][1]))
-            print "\\hline"
+            print ("\\hline")
 
     # print victories
 

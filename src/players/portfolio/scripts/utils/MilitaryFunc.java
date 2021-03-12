@@ -96,7 +96,6 @@ public class MilitaryFunc {
     {
         ArrayList<Action> candidate_actions = new ArrayList<>();
         int lowestTier = Integer.MAX_VALUE;
-        boolean preferredBranch = false;
 
         for(Action act : actions)
         {
@@ -105,7 +104,7 @@ public class MilitaryFunc {
 
             if( preferredTechs.contains(rt.getTech()))
             {
-                if(!preferredBranch || tier < lowestTier)
+                if(tier < lowestTier)
                 {
                     //Either we have our first from the preferred branch, or we have a lower tier in the preferred branch.
                     candidate_actions.clear();
@@ -116,21 +115,6 @@ public class MilitaryFunc {
                 if(tier == lowestTier)
                     candidate_actions.add(rt);
 
-                preferredBranch = true;
-            }
-            else if(!preferredBranch)
-            {
-                //Only insert here if we didn't find any from the preferred branch.
-                if(tier < lowestTier)
-                {
-                    //We have a new lowest tier in the not preferred branch.
-                    candidate_actions.clear();
-                    lowestTier = tier;
-                }
-
-                //Only consider if in the lowest tier found
-                if(tier == lowestTier)
-                    candidate_actions.add(rt);
             }
         }
 

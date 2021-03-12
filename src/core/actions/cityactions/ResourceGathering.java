@@ -61,4 +61,13 @@ public class ResourceGathering extends CityAction
     {
         return "RESOURCE_GATHERED by city " + this.cityId+ " : " + resource.toString();
     }
+
+    public boolean equals(Object o) {
+        if(!(o instanceof ResourceGathering))
+            return false;
+
+        ResourceGathering other = (ResourceGathering) o;
+
+        return super.equals(other) && resource == other.resource;
+    }
 }

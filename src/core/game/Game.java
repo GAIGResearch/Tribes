@@ -342,7 +342,7 @@ public class Game {
                         remainingECT = ect.remainingTimeMillis(); // Note down the remaining time to use it for the next iteration
 
                         if(!isHumanPlayer)
-                            updateBranchingFactor(aiStats[playerID], gs.getTick(), gameStateObservations[playerID]);
+                            updateBranchingFactor(aiStats[playerID], gs.getTick(), gameStateObservations[playerID], ag);
 
 
                         curActionCounter++;
@@ -450,24 +450,11 @@ public class Game {
         }
     }
 
-    private void updateBranchingFactor(AIStats aiStats, int turn, GameState currentGameState)
+    private void updateBranchingFactor(AIStats aiStats, int turn, GameState currentGameState, Agent ag)
     {
-        ArrayList<Integer> actionCounts = new ArrayList<>();
-
-        HashMap<Integer, ArrayList<Action>> cityActions = currentGameState.getCityActions();
-        for (Integer id : cityActions.keySet()) {
-            actionCounts.add(cityActions.get(id).size());
-        }
-
-        HashMap<Integer, ArrayList<Action>> unitAcions = currentGameState.getUnitActions();
-        for (Integer id : unitAcions.keySet()) {
-            actionCounts.add(unitAcions.get(id).size());
-        }
-
-        actionCounts.add(currentGameState.getTribeActions().size());
-
+        ArrayList<Integer> actionCounts = ag.actionsPerUnit(currentGameState);
         aiStats.addBranchingFactor(turn, actionCounts);
-        aiStats.addActionsPerStep(turn, gs.getAllAvailableActions().size());
+        aiStats.addActionsPerStep(turn, ag.actionsPerGameState(gs));
     }
 
     /**

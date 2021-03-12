@@ -2,19 +2,13 @@ package players.osla;
 
 import core.Types;
 import core.actions.Action;
-import core.actions.cityactions.Destroy;
 import core.actions.tribeactions.EndTurn;
-import core.actions.unitactions.Capture;
-import core.actions.unitactions.Disband;
-import core.actions.unitactions.Move;
 import core.game.GameState;
 import players.Agent;
 import players.heuristics.StateHeuristic;
-import players.heuristics.TribesSimpleHeuristic;
 import utils.ElapsedCpuTimer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
 public class OneStepLookAheadAgent extends Agent {
@@ -48,7 +42,7 @@ public class OneStepLookAheadAgent extends Agent {
 
         Action bestAction = new EndTurn();
         double maxQ = Double.NEGATIVE_INFINITY;
-        StateHeuristic heuristic = params.getHeuristic(this.getPlayerID(), allPlayerIDs);
+        StateHeuristic heuristic = params.getStateHeuristic(this.getPlayerID(), allPlayerIDs);
         boolean end = false;
         int actionIdx = 0;
         while(!end)

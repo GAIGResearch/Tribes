@@ -1,7 +1,6 @@
 package core.actions.cityactions;
 
 import core.actions.Action;
-import core.actors.City;
 import core.game.GameState;
 import utils.Vector2d;
 import core.Types;
@@ -32,5 +31,14 @@ public class CityAction extends Action {
     @Override
     public Action copy() {
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(!(o instanceof CityAction))
+            return false;
+        CityAction other = (CityAction) o;
+
+        return cityId == other.cityId && actionType == other.actionType && targetPos == other.getTargetPos();
     }
 }

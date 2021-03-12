@@ -37,7 +37,7 @@ public class AlgParams
         return names;
     }
 
-    public StateHeuristic getHeuristic(int playerID, ArrayList<Integer> allIDs)
+    public StateHeuristic getStateHeuristic(int playerID, ArrayList<Integer> allIDs)
     {
         if (heuristic_method == ENTROPY_HEURISTIC)
             return new TribesEntropyHeuristic(playerID, allIDs);
@@ -46,5 +46,10 @@ public class AlgParams
         else if (heuristic_method == DIFF_HEURISTIC)
             return new TribesDiffHeuristic(playerID, allIDs);
         return null;
+    }
+
+    public PruneHeuristic getPruneHeuristic(int playerID, ArrayList<Integer> allIDs)
+    {
+        return new PrunePortfolioHeuristic();
     }
 }

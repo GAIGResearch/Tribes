@@ -1,14 +1,14 @@
 {
   "Game Mode" : "Capitals",
-  "Repetitions" : 20,
+  "Repetitions" : 1,
   "Rollouts" : false,
-  "Search Depth" : 5,
+  "Search Depth" : 20,
   "Force End" : false,
   "Population Size" : 20,
-  "Players" : ["MCTS", "RHEA"],
+  "Players" : ["MCTS", "pMCTS"],
   "Tribes" : ["Xin Xi", "Imperius"],
   "Shift Tribes" : true,
-  "Verbose" : false,
+  "Verbose" : true,
   "Level Seeds" : [
     "1590191438878", "1590791907337",
     "1591330872230", "1590557911279",

@@ -133,4 +133,13 @@ public class Build extends CityAction
     {
         return "BUILD by city " + this.cityId+ " at " + targetPos + " : " + buildingType.toString();
     }
+
+    public boolean equals(Object o) {
+        if(!(o instanceof Build))
+            return false;
+
+        Build other = (Build) o;
+
+        return super.equals(other) && buildingType == other.buildingType;
+    }
 }

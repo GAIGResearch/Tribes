@@ -9,3 +9,5 @@ save/*
 res/
 out/
 .idea/
+*.pyc
+py/venv/

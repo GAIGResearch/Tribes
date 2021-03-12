@@ -184,15 +184,13 @@ public class SimplePortfolio extends Portfolio
                     //Assign actor to script and return the assignment.
                     ActionAssignment aas = new ActionAssignment(a, s);
                     if(aas.process(state)) {
-                        if(aas.getAction() instanceof Build) {
-//                            System.out.println("Build: " + ((Build) aas.getAction()).getBuildingType());
-                            if (((Build) aas.getAction()).getBuildingType() == PORT) {
-//                                System.out.println("A");
-                                aas.process(state);
-                            }
+                        //TODO: Check for duplicate actions.
+                        if(!actionList.contains(aas))
+                            actionList.add(aas);
+                        else
+                        {
+                            int a3 = 0;
                         }
-
-                        actionList.add(aas);
                     }
                 }
             }

@@ -30,4 +30,20 @@ public class ActionAssignment {
     }
     public Action getAction() {return action;}
 
+    @Override
+    public boolean equals(Object o)
+    {
+        if(!(o instanceof ActionAssignment))
+        {
+            return false;
+        }
+        ActionAssignment aas = (ActionAssignment)o;
+
+        return actor.getActorId() == aas.getActor().getActorId() && action == aas.getAction();
+    }
+
+    public String toString()
+    {
+        return "Actor " + actor.getActorId() + ", Action " + action.toString() + "; " + script;
+    }
 }

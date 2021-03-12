@@ -9,12 +9,14 @@ import players.portfolio.ActionAssignment;
 import utils.ElapsedCpuTimer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public class PortfolioMCTSPlayer extends Agent {
 
     private final Random m_rnd;
     private PortfolioMCTSParams params;
+    private PortfolioTreeNode m_root;
 
     public PortfolioMCTSPlayer(long seed)
     {
@@ -39,7 +41,7 @@ public class PortfolioMCTSPlayer extends Agent {
 //        if(rootActions == null)
 //            return new EndTurn();
 
-        PortfolioTreeNode m_root = new PortfolioTreeNode(params, m_rnd, this.playerID);
+        m_root = new PortfolioTreeNode(params, m_rnd, this.playerID);
         m_root.setRootGameState(m_root, gs, allPlayerIDs);
         m_root.mctsSearch(ect);
 
@@ -51,5 +53,40 @@ public class PortfolioMCTSPlayer extends Agent {
     public Agent copy() {
         return null;
     }
+
+    /**
+     * Returns the number of actions available for each of the actors, from the perspective of this agent.
+     * By default, it's the same as the game state says - but overriding this function allows for pruning analysis.
+     */
+    public ArrayList<Integer> actionsPerUnit(GameState gs)
+    {
+        HashMap<Integer, Integer> actionsPerUnit = new HashMap<>();
+        for(ActionAssignment aas : m_root.getActions())
+        {
+            int actorID = aas.getActor().getActorId();
+
+            int n = actionsPerUnit.containsKey(actorID) ? actionsPerUnit.get(actorID) + 1 : 1;
+            actionsPerUnit.put(actorID, n);
+        }
+
+        ArrayList<Integer> actionCounts = new ArrayList<>();
+        for(int id : actionsPerUnit.keySet())
+        {
+            actionCounts.add(actionsPerUnit.get(id));
+        }
+
+        return actionCounts;
+    }
+
+    /**
+     * Returns the total number of actions available in a game state, from the perspective of this agent.
+     * By default, it's the same as the game state says - but overriding this function allows for pruning analysis.
+     */
+    public int actionsPerGameState(GameState gs)
+    {
+        return m_root.getActions().size();
+    }
+
+
 
 }

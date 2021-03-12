@@ -4,12 +4,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pylab
 import matplotlib
+from cycler import cycler
 
 linestiles = ['-', '--', '-.', ':']
+colours = ['blue', 'green', 'red', 'yellow']
 
-agent_names = ["DoNothing", "Random", "RuleBased", "OSLA", "MC", "MCTS", "RHEA", "OEP"]
+agent_names = ["DoNothing", "Random", "RuleBased", "OSLA", "MC", "MCTS", "RHEA", "OEP", "PORTFOLIO_MCTS"]
 agents_dict = {"DoNothing" : "DoNothing", "Random" : "Random", "SimpleAgent" : "RuleBased", "OneStepLookAheadAgent" : "OSLA",
-               "MonteCarloAgent" : "MC", "MCTSPlayer":"MCTS", "RHEAAgent":"RHEA", "OEP":"OEP"}
+               "MonteCarloAgent" : "MC", "MCTSPlayer":"MCTS", "RHEAAgent":"RHEA", "OEP":"OEP", "PortfolioMCTSPlayer" : "PORTFOLIO_MCTS"}
 
 game_modes = ["CAPITALS", "SCORE"]
 
@@ -19,8 +21,6 @@ TURNS = 51
 
 def errorfill(x, y, yerr, lnst='-', color=None, alpha_fill=0.3, ax=None):
     ax = ax if ax is not None else plt.gca()
-    if color is None:
-        color = ax._get_lines.color_cycle.next()
     if np.isscalar(yerr) or len(yerr) == len(y):
         ymin = [a - b for a,b in zip(y, yerr)]
         ymax = [sum(pair) for pair in zip(y, yerr)]
@@ -130,7 +130,7 @@ def drawPlot(series, xlab, ylab, legend, title, outputFile, series_err=None, sho
     rects = [x for x in range(len(series[0]))]
 
     for i in range(len(series)):
-        errorfill(range(0, len(rects)), series[i], series_err[i], linestiles[i])
+        errorfill(range(0, len(rects)), series[i], series_err[i], linestiles[i], colours[i])
 
     plt.xticks(np.arange(0, 51, step=5))
     ax.set_xticklabels(np.arange(0, 51, step=5))
@@ -200,13 +200,13 @@ def getTrends(f, max_data, indices = [0,2,1,3], apply_log10 = True, bounds = [0,
     bfs = [bf_win_avg, bf_win_std, bf_lose_avg, bf_lose_std]
     moves = [moves_win_avg, moves_win_std, moves_lose_avg, moves_lose_std]
 
-    print "Num samples: " + str(samples)
-    print "Avg trend1[0]: " + str(np.average(bf_win_avg))
-    print "Avg trend1[1]: " + str(np.average(bf_lose_avg))
-    print "Avg trend1[0+1]: " + str((np.average(bf_win_avg) + np.average(bf_lose_avg)) / 2.0)
-    print "Avg trend2[0]: " + str(np.average(moves_win_avg))
-    print "Avg trend2[1]: " + str(np.average(moves_lose_avg))
-    print "Avg trend2[0+1]: " + str((np.average(moves_win_avg) + np.average(moves_lose_avg)) / 2.0)
+    print("Num samples: " + str(samples))
+    print("Avg trend1[0]: " + str(np.average(bf_win_avg)))
+    print("Avg trend1[1]: " + str(np.average(bf_lose_avg)))
+    print("Avg trend1[0+1]: " + str((np.average(bf_win_avg) + np.average(bf_lose_avg)) / 2.0))
+    print("Avg trend2[0]: " + str(np.average(moves_win_avg)))
+    print("Avg trend2[1]: " + str(np.average(moves_lose_avg)))
+    print("Avg trend2[0+1]: " + str((np.average(moves_win_avg) + np.average(moves_lose_avg)) / 2.0))
     # print bf_win_avg
     # print all_game_data
 
@@ -219,7 +219,7 @@ def main():
     # bfs, moves = getTrends(f, 200)
     # f = "/Users/dperez/sandbox/2/action_spaces_mean.txt"
     # bfs_mean, moves2 = getTrends(f,200)
-    f = "/Users/dperez/Work/git/Tribes/res/all.txt"
+    f = "C:\\Work\\git\\Tribes\\test\\agg\\tribes_test.txt"
 
     # drawPlot([bfs[0], bfs[2]], 'Turns', 'Action Space Size (log-10 scale)',
     #          ['ABF Winner', 'ABF Loser'], 'Action Space', 'output.png',
@@ -247,9 +247,9 @@ def main():
     #          [trend1[1], trend1[3], trend2[1], trend2[3]], True, True)
 
 
-    # bounds = [0, 51]
+    bounds = [0, 51]
     # bounds = [0,25]
-    bounds = [46,51]
+    # bounds = [46,51]
     trend1, trend2 = getTrends(f, 400, [1, 4, 0, 3], True, bounds)
 
 

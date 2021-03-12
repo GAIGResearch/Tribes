@@ -43,4 +43,12 @@ public class Examine extends UnitAction
     public String toString() {
         return "EXAMINE by unit " + this.unitId + " of ruins.";
     }
+
+    public boolean equals(Object o) {
+        if(!(o instanceof Examine))
+            return false;
+        Examine other = (Examine) o;
+
+        return super.equals(other) && bonus == other.getBonus();
+    }
 }

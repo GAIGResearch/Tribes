@@ -5,13 +5,11 @@ import core.actions.tribeactions.EndTurn;
 import core.game.GameState;
 import players.Agent;
 import players.heuristics.StateHeuristic;
-import players.heuristics.TribesSimpleHeuristic;
 import utils.ElapsedCpuTimer;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import static core.Types.ACTION.*;
 
@@ -37,7 +35,7 @@ public class OEPAgent extends Agent {
     @Override
     public Action act(GameState gs, ElapsedCpuTimer ect) {
 
-        this.heuristic = params.getHeuristic(playerID, allPlayerIDs);
+        this.heuristic = params.getStateHeuristic(playerID, allPlayerIDs);
 
         if (currentTurn != gs.getTick()){
             currentTurn = gs.getTick();

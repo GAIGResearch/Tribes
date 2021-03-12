@@ -74,4 +74,13 @@ public class Capture extends UnitAction
         return "CAPTURE by unit " + unitId + " of target " + captureType.toString() + ": " + targetCityId;
     }
 
+
+    public boolean equals(Object o) {
+        if(!(o instanceof Capture))
+            return false;
+        Capture other = (Capture) o;
+
+        return super.equals(other) && targetCityId == other.targetCityId && captureType == other.captureType;
+    }
+
 }

@@ -56,4 +56,12 @@ public class Move extends UnitAction
         return "MOVE by unit " + this.unitId + " to " + destination;
     }
 
+    public boolean equals(Object o) {
+        if(!(o instanceof Move))
+            return false;
+        Move other = (Move) o;
+
+        return super.equals(other) && destination == other.destination;
+    }
+
 }

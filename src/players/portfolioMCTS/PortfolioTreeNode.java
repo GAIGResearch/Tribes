@@ -2,6 +2,7 @@ package players.portfolioMCTS;
 
 import core.actions.Action;
 import core.game.GameState;
+import players.heuristics.PruneHeuristic;
 import players.heuristics.StateHeuristic;
 import players.portfolio.ActionAssignment;
 import utils.ElapsedCpuTimer;
@@ -30,16 +31,17 @@ public class PortfolioTreeNode
 
     private GameState rootState;
     private StateHeuristic rootStateHeuristic;
+    private PruneHeuristic rootPruneHeuristic;
 
     //TODO: Branching via pairs <unit, script>
 
     //From MCTSPlayer
     PortfolioTreeNode(PortfolioMCTSParams p, Random rnd, int playerID) {
-        this(p, null, rnd, 0, null, null, playerID, null, null);
+        this(p, null, rnd, 0, null, null, null, playerID, null, null);
     }
 
     private PortfolioTreeNode(PortfolioMCTSParams p, PortfolioTreeNode parent, Random rnd, int num_actions,
-                           ArrayList<ActionAssignment> actions, StateHeuristic sh, int playerID, PortfolioTreeNode root, GameState state) {
+                           ArrayList<ActionAssignment> actions, StateHeuristic sh, PruneHeuristic ph, int playerID, PortfolioTreeNode root, GameState state) {
         this.params = p;
         this.fmCallsCount = 0;
         this.parent = parent;
@@ -53,6 +55,7 @@ public class PortfolioTreeNode
         if(parent != null) {
             m_depth = parent.m_depth + 1;
             this.rootStateHeuristic = sh;
+            this.rootPruneHeuristic = ph;
         }
         else {
             m_depth = 0;
@@ -65,11 +68,17 @@ public class PortfolioTreeNode
         this.state = gs;
         this.root = root;
         this.rootState = gs;
-        this.rootStateHeuristic = params.getHeuristic(playerID, allIDs);
+        this.rootStateHeuristic = params.getStateHeuristic(playerID, allIDs);
+        this.rootPruneHeuristic = params.getPruneHeuristic(playerID, allIDs);
 
         //Init portfolio and action assignments at the root
         this.actions = this.params.getPortfolio().produceActionAssignments(gs);
         this.children = new PortfolioTreeNode[this.actions.size()];
+
+//        System.out.println("N Actions at root: " + this.actions.size());
+//        for(ActionAssignment aas : this.actions)
+//            System.out.println(aas);
+
     }
 
 
@@ -141,10 +150,9 @@ public class PortfolioTreeNode
 
         //Roll the state, create a new node and assign it.
         GameState nextState = state.copy();
-        ArrayList<ActionAssignment> availableActions = (m_depth == 0 && params.PRIORITIZE_ROOT) ? actions : params.getPortfolio().produceActionAssignments(nextState);
-        ArrayList<ActionAssignment> nextActions = advance(nextState, availableActions.get(bestAction), true);
+        ArrayList<ActionAssignment> nextActions = advance(nextState, actions.get(bestAction), true);
         PortfolioTreeNode tn = new PortfolioTreeNode(params, this, this.m_rnd, nextActions.size(),
-                null, rootStateHeuristic, this.playerID, this.m_depth == 0 ? this : this.root, nextState);
+                nextActions, rootStateHeuristic, rootPruneHeuristic, this.playerID, this.m_depth == 0 ? this : this.root, nextState);
         children[bestAction] = tn;
         return tn;
     }
@@ -173,9 +181,11 @@ public class PortfolioTreeNode
             double hvVal = child.totValue;
             double childValue =  hvVal / (child.nVisits + params.epsilon);
             childValue = normalise(childValue, bounds[0], bounds[1]);
+            double unpruningValue = rootPruneHeuristic.evaluateState(state, actions.get(i)) / (child.nVisits + params.epsilon);
 
             double uctValue = childValue +
-                    params.K * Math.sqrt(Math.log(this.nVisits + 1) / (child.nVisits + params.epsilon));
+                    params.K * Math.sqrt(Math.log(this.nVisits + 1) / (child.nVisits + params.epsilon)) +
+                    unpruningValue;
 
             uctValue = noise(uctValue, params.epsilon, this.m_rnd.nextDouble());     //break ties randomly
             vals[i] = uctValue;

@@ -59,18 +59,11 @@ public class OEPSAgent extends Agent {
         for(int i = 0; i < params.POP_SIZE; i++){
             population.add(randomActions(gs.copy()));
         }
-        //System.out.println(this.fmCallsCount);
-        double avg = 0.0;
-        double biggest = 0;
-        for(IndividualS i : population){
-            if(i.getActions().size() > biggest){
-                biggest = i.getActions().size();
-            }
-            avg += i.getActions().size();
-        }
 
         this.heuristic = params.getHeuristic(playerID, allPlayerIDs);
         fmCallsRun = 0;
+
+        this.bestIndividual = null;
         //keep going until time limit gone
         while(!stop){
             numIters ++;
@@ -93,6 +86,15 @@ public class OEPSAgent extends Agent {
                 population.add(crossover(gs.copy(), person1, population.get(m_rnd.nextInt(population.size()))));
             }
 
+            if((fmCallsCount > params.num_fmcalls)  || ((numIters == 1) && (fmCallsCount >= (0.9 * params.num_fmcalls)))){
+                //over limit and needs to chose individual and return
+                if(this.bestIndividual == null){
+                    this.bestIndividual = population.get(m_rnd.nextInt(population.size()));
+                }
+                returnAction = true;
+                break;
+            }
+
 
             // rate each individual and sort them
             for(IndividualS individual : population){
@@ -107,10 +109,22 @@ public class OEPSAgent extends Agent {
                 population.remove(population.size() - 1);
             }
 
+            if((fmCallsCount > params.num_fmcalls) || ((numIters == 1) && (fmCallsCount >= (0.9 * params.num_fmcalls)))){
+                //over limit and needs to chose individual and return
+                returnAction = true;
+                break;
+            }
+
             // fill the population with random individuals
             for(int i = population.size() - 1; i < params.POP_SIZE; i++){
                 population.add(randomActions(gs.copy()));
+                if((fmCallsCount > params.num_fmcalls) || ((numIters == 1) && (fmCallsCount >= (0.9 * params.num_fmcalls)))){
+                    //over limit and needs to chose individual and return
+                    returnAction = true;
+                    break;
+                }
             }
+
 //            biggest = 0;
 //            avg = 0;
 //            for(IndividualS i : population){
@@ -140,7 +154,7 @@ public class OEPSAgent extends Agent {
 
         }
 
-        //System.out.println(this.fmCallsCount);
+        //System.out.println(this.fmCallsCount + " : " + numIters);
 
         Action action = null;
         if(this.returnAction){

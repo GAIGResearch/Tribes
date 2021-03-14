@@ -9,7 +9,6 @@ import core.actors.City;
 import core.actors.units.Unit;
 import core.game.GameState;
 import players.Agent;
-import players.OEPS.IndividualS;
 import players.heuristics.StateHeuristic;
 import utils.ElapsedCpuTimer;
 
@@ -115,7 +114,7 @@ public class EMCTSSAgent extends Agent {
                 }
             }
         }
-        //System.out.println(fmCallsCount);
+        System.out.println(fmCallsCount);
 
         Action action = null;
         if (this.returnAction) {

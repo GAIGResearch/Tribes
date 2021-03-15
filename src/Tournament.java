@@ -5,8 +5,6 @@ import core.game.TribeResult;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import players.*;
-import players.EMCTSS.EMCTSSAgent;
-import players.EMCTSS.EMCTSSParams;
 import players.emcts.EMCTSAgent;
 import players.emcts.EMCTSParams;
 import players.mc.MCParams;
@@ -19,8 +17,6 @@ import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
 import players.rhea.RHEAAgent;
 import players.rhea.RHEAParams;
-import players.OEPS.OEPSAgent;
-import players.OEPS.OEPSParams;
 import utils.file.IO;
 import utils.stats.MultiStatSummary;
 
@@ -87,16 +83,6 @@ public class Tournament {
                 emctsParams.stop_type = emctsParams.STOP_FMCALLS;
                 emctsParams.heuristic_method = emctsParams.SIMPLE_HEURISTIC;
                 return new EMCTSAgent(agentSeed,emctsParams);
-            case OEPS:
-                OEPSParams oepsParams = new OEPSParams();
-                oepsParams.stop_type = oepsParams.STOP_FMCALLS;
-                oepsParams.heuristic_method = oepsParams.SIMPLE_HEURISTIC;
-                return new OEPSAgent(agentSeed, oepsParams);
-            case EMCTSS:
-                EMCTSSParams emctssParams = new EMCTSSParams();
-                emctssParams.stop_type = emctssParams.STOP_FMCALLS;
-                emctssParams.heuristic_method = emctssParams.SIMPLE_HEURISTIC;
-                return new EMCTSSAgent(agentSeed,emctssParams);
         }
         return null;
     }
@@ -418,8 +404,6 @@ public class Tournament {
         RHEA,
         OEP,
         EMCTS,
-        OEPS,
-        EMCTSS
     }
 
     private static class Participant

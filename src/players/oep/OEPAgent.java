@@ -1,6 +1,6 @@
 package players.oep;
 
-
+import core.Types;
 import core.actions.Action;
 import core.actions.cityactions.CityAction;
 import core.actions.unitactions.UnitAction;
@@ -21,11 +21,11 @@ public class OEPAgent extends Agent {
     private StateHeuristic heuristic;
     private OEPParams params;
 
-
     private Individual bestIndividual;
     private boolean returnAction = false;
     private int fmCallsCount;
     private int fmCallsRun;
+
 
     public OEPAgent(long seed, OEPParams params) {
         super(seed);
@@ -62,6 +62,8 @@ public class OEPAgent extends Agent {
 
         this.heuristic = params.getHeuristic(playerID, allPlayerIDs);
         fmCallsRun = 0;
+
+        this.bestIndividual = null;
         //keep going until time limit gone
         while(!stop){
             numIters ++;
@@ -123,6 +125,18 @@ public class OEPAgent extends Agent {
                 }
             }
 
+//            biggest = 0;
+//            avg = 0;
+//            for(IndividualS i : population){
+//                if(i.getActions().size() > biggest){
+//                    biggest = i.getActions().size();
+//                }
+//                avg += i.getActions().size();
+//            }
+//            avg = avg/population.size();
+//
+//            System.out.println("biggest in: " + biggest);
+//            System.out.println("avg in: " + avg);
 
             if(params.stop_type == params.STOP_TIME) {
                 acumTimeTaken += (elapsedTimerIteration.elapsedMillis()) ;
@@ -140,7 +154,7 @@ public class OEPAgent extends Agent {
 
         }
 
-        //System.out.println(this.fmCallsCount);
+        //System.out.println(this.fmCallsCount + " : " + numIters);
 
         Action action = null;
         if(this.returnAction){
@@ -164,11 +178,22 @@ public class OEPAgent extends Agent {
 
     private Individual randomActions(GameState gs){
         ArrayList<Action> individual = new ArrayList<>();
-        while (!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())){
+        while ((!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())) && (individual.size() < (params.NODE_SIZE-1))){
             ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
             Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
             advance(gs, a);
             individual.add(a);
+        }
+        if(individual.size() == (params.NODE_SIZE-1) && (individual.get((params.NODE_SIZE - 2)).getActionType() != Types.ACTION.END_TURN)){
+            ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
+            Action end = null; ;
+            for(Action a : allAvailableActions){
+                if(a.getActionType() == Types.ACTION.END_TURN){
+                    end = a;
+                    break;
+                }
+            }
+            individual.add(end);
         }
         Individual in = new Individual(individual);
         in.setGs(gs);
@@ -285,12 +310,16 @@ public class OEPAgent extends Agent {
 
         if(!(gs.getActiveTribeID() == getPlayerID())){return repairedChild;}
 
-        while (!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())){
-            ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
-            Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-            advance(gs, a);
-            repairedChild.add(a);
+        ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
+        Action end = null; ;
+        for(Action a : allAvailableActions){
+            if(a.getActionType() == Types.ACTION.END_TURN){
+                end = a;
+                break;
+            }
         }
+        repairedChild.add(end);
+
         return repairedChild;
     }
 

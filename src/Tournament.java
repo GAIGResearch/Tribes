@@ -72,6 +72,7 @@ public class Tournament {
                 portfolioMCTSParams.heuristic_method = portfolioMCTSParams.DIFF_HEURISTIC;
                 portfolioMCTSParams.PRIORITIZE_ROOT = false;
                 portfolioMCTSParams.ROLLOUT_LENGTH = MAX_LENGTH;
+                portfolioMCTSParams.PRUNING = true;
                 portfolioMCTSParams.setPortfolio(new SimplePortfolio(agentSeed));
                 return new PortfolioMCTSPlayer(agentSeed, portfolioMCTSParams);
             case OEP:

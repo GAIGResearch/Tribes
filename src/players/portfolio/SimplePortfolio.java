@@ -49,27 +49,34 @@ public class SimplePortfolio extends Portfolio
         portfolio.put(Types.ACTION.UPGRADE_SHIP, new BaseScript[]{new BaseScript()});
         portfolio.put(Types.ACTION.END_TURN, new BaseScript[]{new BaseScript()});
 
+        //Single-action scripts
+        portfolio.put(Types.ACTION.BURN_FOREST, new BaseScript[]{new BurnForestScr(rnd)});
+        portfolio.put(Types.ACTION.GROW_FOREST, new BaseScript[]{new GrowForestScr(rnd)});
+        portfolio.put(Types.ACTION.RESOURCE_GATHERING, new BaseScript[]{new ResourceGatheringScr(rnd)});
+        portfolio.put(Types.ACTION.BUILD_ROAD, new BaseScript[]{new BuildRoadScr(rnd)});
+
         //Multi-action scripts:
-        portfolio.put(Types.ACTION.ATTACK, new BaseScript[]{
+        portfolio.put(Types.ACTION.ATTACK, new BaseScript[]{ //4
                 new AttackClosestScr(),
                 new AttackWeakestScr(),
                 new AttackMaxDamageScr(),
                 new AttackStrongestScr()
         });
-        portfolio.put(Types.ACTION.CLEAR_FOREST, new BaseScript[]{
+
+        portfolio.put(Types.ACTION.CLEAR_FOREST, new BaseScript[]{ //4
                 new ClearForestForCustomScr(rnd),
                 new ClearForestForForgeScr(rnd),
                 new ClearForestForSawmillScr(rnd),
                 new ClearForestForWindmillScr(rnd)
                 });
 
-        portfolio.put(Types.ACTION.CONVERT, new BaseScript[]{
+        portfolio.put(Types.ACTION.CONVERT, new BaseScript[]{ //3
                 new ConvertStrongestScr(),
                 new ConvertHighestHPScr(),
                 new ConvertHighestDefenceScr(),
         });
 
-        portfolio.put(Types.ACTION.SPAWN, new BaseScript[]{
+        portfolio.put(Types.ACTION.SPAWN, new BaseScript[]{ //6
                 new SpawnStrongestScr(),
                 new SpawnDefensiveScr(),
                 new SpawnCheapestScr(),
@@ -78,7 +85,7 @@ public class SimplePortfolio extends Portfolio
                 new SpawnRangeScr()
         });
 
-        portfolio.put(Types.ACTION.BUILD, new BaseScript[]{
+        portfolio.put(Types.ACTION.BUILD, new BaseScript[]{ //10
                 new BuildCustomHouseScr(rnd),
                 new BuildSawmillScr(rnd),
                 new BuildWindmillScr(rnd),
@@ -91,25 +98,15 @@ public class SimplePortfolio extends Portfolio
                 new BuildTempleScr(rnd),
         });
 
-        portfolio.put(Types.ACTION.BURN_FOREST, new BaseScript[]{
-                new BurnForestScr(rnd)
-        });
 
-        portfolio.put(Types.ACTION.GROW_FOREST, new BaseScript[]{
-                new GrowForestScr(rnd)
-        });
-
-        portfolio.put(Types.ACTION.LEVEL_UP, new BaseScript[]{
+        portfolio.put(Types.ACTION.LEVEL_UP, new BaseScript[]{ //2
                 new LevelUpGrowthScr(rnd),
                 new LevelUpMilitaryScr(rnd)
         });
 
-        portfolio.put(Types.ACTION.RESOURCE_GATHERING, new BaseScript[]{
-                new ResourceGatheringScr(rnd)
-        });
 
 
-        portfolio.put(Types.ACTION.RESEARCH_TECH, new BaseScript[]{
+        portfolio.put(Types.ACTION.RESEARCH_TECH, new BaseScript[]{ //5
                 new ResearchFarmsScr(rnd),
                 new ResearchNavalScr(rnd),
                 new ResearchMountainsScr(rnd),
@@ -117,12 +114,9 @@ public class SimplePortfolio extends Portfolio
                 new ResearchRoadsScr(rnd),
         });
 
-        portfolio.put(Types.ACTION.BUILD_ROAD, new BaseScript[]{
-                new BuildRoadScr(rnd)
-        });
 
 
-        portfolio.put(Types.ACTION.MOVE, new BaseScript[]{
+        portfolio.put(Types.ACTION.MOVE, new BaseScript[]{ //9
                 new MoveToCaptureScr(rnd),
                 new MoveToOwnCityCentreScr(rnd),
                 new MoveDefensivelyScr(rnd),
@@ -134,6 +128,7 @@ public class SimplePortfolio extends Portfolio
                 new MoveToDivergeScr(rnd)
         });
 
+        int a = 0;
     }
 
     @Override
@@ -184,17 +179,15 @@ public class SimplePortfolio extends Portfolio
                     //Assign actor to script and return the assignment.
                     ActionAssignment aas = new ActionAssignment(a, s);
                     if(aas.process(state)) {
-                        //TODO: Check for duplicate actions.
                         if(!actionList.contains(aas))
                             actionList.add(aas);
-                        else
-                        {
-                            int a3 = 0;
-                        }
                     }
                 }
             }
         }
     }
 
+    public TreeMap<Types.ACTION, BaseScript[]> getPortfolio() {
+        return portfolio;
+    }
 }

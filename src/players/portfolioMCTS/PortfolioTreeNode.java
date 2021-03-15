@@ -17,6 +17,7 @@ public class PortfolioTreeNode
     private PortfolioTreeNode root;
     private PortfolioTreeNode parent;
     private PortfolioTreeNode[] children;
+    private boolean[] pruned;
     private double totValue;
     private int nVisits;
     private Random m_rnd;
@@ -24,7 +25,7 @@ public class PortfolioTreeNode
     private double[] bounds = new double[]{Double.MAX_VALUE, -Double.MAX_VALUE};
     private int fmCallsCount;
     private int playerID;
-
+    private int k_plus;
 
     private ArrayList<ActionAssignment> actions;
     private GameState state;
@@ -49,7 +50,9 @@ public class PortfolioTreeNode
         this.actions = actions;
         this.root = root;
         children = new PortfolioTreeNode[num_actions];
+        pruned = null;
         totValue = 0.0;
+        k_plus = 0;
         this.playerID = playerID;
         this.state = state;
         if(parent != null) {
@@ -69,11 +72,12 @@ public class PortfolioTreeNode
         this.root = root;
         this.rootState = gs;
         this.rootStateHeuristic = params.getStateHeuristic(playerID, allIDs);
-        this.rootPruneHeuristic = params.getPruneHeuristic(playerID, allIDs);
 
         //Init portfolio and action assignments at the root
         this.actions = this.params.getPortfolio().produceActionAssignments(gs);
         this.children = new PortfolioTreeNode[this.actions.size()];
+        this.pruned = null;
+        this.rootPruneHeuristic = params.getPruneHeuristic();
 
 //        System.out.println("N Actions at root: " + this.actions.size());
 //        for(ActionAssignment aas : this.actions)
@@ -170,25 +174,57 @@ public class PortfolioTreeNode
 
         PortfolioTreeNode selected;
         boolean IamMoving = (state.getActiveTribeID() == this.playerID);
-        int bestAction = -1;
+
+        if(params.PRUNING && this.nVisits > params.T) {
+            if (k_plus == 0) {
+                //Time to prune
+                pruned = rootPruneHeuristic.prune(this, actions, state, params.K_init);
+                k_plus++;
+            }
+            else
+            {
+                //Progressive unpruning:
+                int limit = (int) Math.pow(params.A * params.B, k_plus);
+                if(this.nVisits > limit)
+                {
+                    //Time to unprune
+                    boolean[] prunedNext = rootPruneHeuristic.unprune(this, actions, state, pruned);
+                    if(prunedNext != null) {
+                        pruned = prunedNext;
+                        k_plus++;
+                    }
+                }
+            }
+        }
 
         //No end turn, use uct.
         double[] vals = new double[this.children.length];
         for(int i = 0; i < this.children.length; ++i)
         {
-            PortfolioTreeNode child = children[i];
+            if(pruned != null && !pruned[i]) {
 
-            double hvVal = child.totValue;
-            double childValue =  hvVal / (child.nVisits + params.epsilon);
-            childValue = normalise(childValue, bounds[0], bounds[1]);
-            double unpruningValue = rootPruneHeuristic.evaluateState(state, actions.get(i)) / (child.nVisits + params.epsilon);
+                PortfolioTreeNode child = children[i];
 
-            double uctValue = childValue +
-                    params.K * Math.sqrt(Math.log(this.nVisits + 1) / (child.nVisits + params.epsilon)) +
-                    unpruningValue;
+                double hvVal = child.totValue;
+                double childValue = hvVal / (child.nVisits + params.epsilon);
+                childValue = normalise(childValue, bounds[0], bounds[1]);
+                double exploreValue = Math.sqrt(Math.log(this.nVisits + 1) / (child.nVisits + params.epsilon));
+                double progBias = rootPruneHeuristic.evaluatePrune(state, actions.get(i)) / (child.nVisits + params.epsilon);
 
-            uctValue = noise(uctValue, params.epsilon, this.m_rnd.nextDouble());     //break ties randomly
-            vals[i] = uctValue;
+                double uctValue = childValue +
+                        params.C * exploreValue;
+
+                if(params.PRUNING)
+                        uctValue += progBias;
+
+                uctValue = noise(uctValue, params.epsilon, this.m_rnd.nextDouble());     //break ties randomly
+
+//            double defValue = (childValue + params.K * exploreValue);
+//            System.out.println("Default UCT: " + defValue +  ", UCT: " + uctValue +
+//                    ", Q: " + childValue + ", explore: " + exploreValue + ", prog. Bias: " + progBias);
+
+                vals[i] = uctValue;
+            }
         }
 
         int which = -1;
@@ -366,5 +402,14 @@ public class PortfolioTreeNode
     private double noise(double input, double epsilon, double random)
     {
         return (input + epsilon) * (1.0 + epsilon * (random - 0.5));
+    }
+
+    public PortfolioTreeNode[] getChildren() {
+        return children;
+    }
+
+    public PortfolioMCTSParams getParams()
+    {
+        return params;
     }
 }

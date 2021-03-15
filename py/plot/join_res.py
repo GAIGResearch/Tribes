@@ -3,8 +3,8 @@ from os.path import isfile, join
 
 def main():
 
-    file_path = "C:\\Work\\git\\Tribes\\test\\"
-    output_file_path = file_path + "agg\\tribes_test.txt"
+    file_path = "C:\\Work\\git\\Tribes\\test\\vsRB\\"
+    output_file_path = file_path + "tribes_test.txt"
     files = [join(file_path, f) for f in listdir(file_path) if isfile(join(file_path, f)) and f.endswith(".txt")]
     lines = []
 

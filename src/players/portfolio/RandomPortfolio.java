@@ -1,5 +1,6 @@
 package players.portfolio;
 
+import core.Types;
 import core.actors.City;
 import core.actors.units.Unit;
 import core.game.GameState;
@@ -8,6 +9,7 @@ import players.portfolio.scripts.BaseScript;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.TreeMap;
 
 public class RandomPortfolio extends Portfolio
 {
@@ -55,5 +57,10 @@ public class RandomPortfolio extends Portfolio
         }
 
         return list;
+    }
+
+    @Override
+    public TreeMap<Types.ACTION, BaseScript[]> getPortfolio() {
+        return null;
     }
 }

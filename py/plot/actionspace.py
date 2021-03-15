@@ -219,7 +219,8 @@ def main():
     # bfs, moves = getTrends(f, 200)
     # f = "/Users/dperez/sandbox/2/action_spaces_mean.txt"
     # bfs_mean, moves2 = getTrends(f,200)
-    f = "C:\\Work\\git\\Tribes\\test\\agg\\tribes_test.txt"
+    f = "C:\\Work\\git\\Tribes\\test\\vsRHEA\\"
+    inputFile = "tribes_test.txt"
 
     # drawPlot([bfs[0], bfs[2]], 'Turns', 'Action Space Size (log-10 scale)',
     #          ['ABF Winner', 'ABF Loser'], 'Action Space', 'output.png',
@@ -250,20 +251,20 @@ def main():
     bounds = [0, 51]
     # bounds = [0,25]
     # bounds = [46,51]
-    trend1, trend2 = getTrends(f, 400, [1, 4, 0, 3], True, bounds)
+    trend1, trend2 = getTrends(f + inputFile, 400, [1, 4, 0, 3], True, bounds)
 
 
     drawPlot([trend1[0], trend1[2]], 'Turns', 'Branching Factor per Turn (log-10 scale)',
-             ['Winning', 'Losing'], 'Average Branching Factor per Turn', 'branchingFactorTurn.png',
+             ['Winning', 'Losing'], 'Average Branching Factor per Turn', f + 'branchingFactorTurn.png',
              [trend1[1], trend1[3]], True, True)
 
 
     drawPlot([trend2[0], trend2[2]], 'Turns', 'Available Actions per Move',
-             ['Winning', 'Losing'], 'Average Available Actions per Move', 'branchingFactorStep.png',
+             ['Winning', 'Losing'], 'Average Available Actions per Move', f + 'branchingFactorStep.png',
              [trend2[1], trend2[3]], True, True)
 
 
-    moves, a = getTrends(f, 200, [2, 5, 0, 0], False, bounds)
-    drawPlot([moves[0], moves[2]], 'Turns', 'Number of Moves', ['Avg Moves Win Player', 'Avg Moves Lose Player'], 'Average Moves Played per Turn', 'movesPlayed.png', [moves[1], moves[3]], True, True)
+    moves, a = getTrends(f+inputFile, 200, [2, 5, 0, 0], False, bounds)
+    drawPlot([moves[0], moves[2]], 'Turns', 'Number of Moves', ['Avg Moves Win Player', 'Avg Moves Lose Player'], 'Average Moves Played per Turn', f + 'movesPlayed.png', [moves[1], moves[3]], True, True)
 
 main()

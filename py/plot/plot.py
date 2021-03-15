@@ -6,8 +6,8 @@ import pylab
 
 colors = ["#E66908", "#FFCE6B", "#5F7EC6", "#FF8A6B", "#B3F064", "#8D5DC7", "#FFF36B", "#0000FF", "#0000FF"]
 
-agent_names = ["DoNothing", "Random", "RuleBased", "OSLA", "MC", "MCTS", "RHEA", "OEP", "PORTFOLIO_MCTS"]
-agents_dict = {"DoNothing" : "DoNothing", "RandomAgent" : "Random", "SimpleAgent" : "RuleBased", "OneStepLookAheadAgent" : "OSLA",
+agent_names = ["DoNothing", "Random", "SIMPLE", "OSLA", "MC", "MCTS", "RHEA", "OEP", "PORTFOLIO_MCTS"]
+agents_dict = {"DoNothing" : "DoNothing", "RandomAgent" : "Random", "SimpleAgent" : "SIMPLE", "OneStepLookAheadAgent" : "OSLA",
                "MonteCarloAgent" : "MC", "MCTSPlayer":"MCTS", "RHEAAgent":"RHEA", "OEP":"OEP", "PortfolioMCTSPlayer" : "PORTFOLIO_MCTS"}
 
 game_modes = ["CAPITALS", "SCORE"]
@@ -183,8 +183,8 @@ def print_agent_pw(ag, data, column_order):
 
 def main():
 
-    file_path = "C:\\Work\\git\\Tribes\\test\\agg\\"
-    files = [join(file_path, f) for f in listdir(file_path) if isfile(join(file_path, f)) and f.endswith(".txt")]
+    file_path = "C:\\Work\\git\\Tribes\\test\\vsRB\\"
+    files = [join(file_path, f) for f in listdir(file_path) if isfile(join(file_path, f)) and f.endswith("test.txt")]
 
     victories = {}
     positions = {}
@@ -263,10 +263,11 @@ def main():
 
     # column_order = ["RHEA", "RuleBased", "MCTS", "MC", "OSLA", "Random"]
 #    column_order = ["RHEA", "RuleBased", "MCTS", "MC", "OSLA"]
-    column_order = ["MCTS", "PORTFOLIO_MCTS"]
+#     column_order = ["MCTS", "PORTFOLIO_MCTS"]
+    column_order = ["SIMPLE", "PORTFOLIO_MCTS"]
     # print_agent_pw("RHEA", victories, column_order)
-    # print_agent_pw("RuleBased", victories, column_order)
-    print_agent_pw("MCTS", victories, column_order)
+    print_agent_pw("SIMPLE", victories, column_order)
+    # print_agent_pw("MCTS", victories, column_order)
     print_agent_pw("PORTFOLIO_MCTS", victories, column_order)
     # print_agent_pw("MC", victories, column_order)
     # print_agent_pw("OSLA", victories, column_order)

@@ -240,6 +240,7 @@ public class Play {
                 portfolioMCTSParams.PRIORITIZE_ROOT = false;
                 portfolioMCTSParams.heuristic_method = portfolioMCTSParams.DIFF_HEURISTIC;
                 portfolioMCTSParams.ROLLOUT_LENGTH = 20;
+                portfolioMCTSParams.PRUNING = true;
                 portfolioMCTSParams.setPortfolio(new SimplePortfolio(agentSeed));
                 return new PortfolioMCTSPlayer(agentSeed, portfolioMCTSParams);
         }

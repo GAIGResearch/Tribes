@@ -1,5 +1,7 @@
 package players.heuristics;
 
+import players.portfolio.Portfolio;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,8 +50,8 @@ public class AlgParams
         return null;
     }
 
-    public PruneHeuristic getPruneHeuristic(int playerID, ArrayList<Integer> allIDs)
+    public PruneHeuristic getPruneHeuristic()
     {
-        return new PrunePortfolioHeuristic();
+        return null;
     }
 }

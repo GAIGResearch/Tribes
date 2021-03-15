@@ -11,3 +11,4 @@ out/
 .idea/
 *.pyc
 py/venv/
+test/

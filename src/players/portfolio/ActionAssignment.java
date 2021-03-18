@@ -4,11 +4,13 @@ import core.actions.Action;
 import core.actors.Actor;
 import core.game.GameState;
 import players.portfolio.scripts.BaseScript;
+import utils.Pair;
 
 public class ActionAssignment {
     private final BaseScript script;
     private final Actor actor;
     private Action action;
+    private double value;
 
     public ActionAssignment(Actor a, BaseScript s)
     {
@@ -18,17 +20,18 @@ public class ActionAssignment {
 
     boolean process(GameState gs)
     {
-        action = script.process(gs, actor);
+        Pair<Action, Double> p = script.process(gs, actor);
+        if(p != null) {
+            action = p.getFirst();
+            value = p.getSecond();
+        }
         return action != null;
     }
 
-    public BaseScript getScript() {
-        return script;
-    }
-    public Actor getActor() {
-        return actor;
-    }
+    public BaseScript getScript() {return script;}
+    public Actor getActor() {return actor; }
     public Action getAction() {return action;}
+    public double getValue() {return value;}
 
     @Override
     public boolean equals(Object o)
@@ -44,6 +47,7 @@ public class ActionAssignment {
 
     public String toString()
     {
-        return "Actor " + actor.getActorId() + ", Action " + action.toString() + "; " + script;
+        return "Actor " + actor.getActorId() + ", Action " + action.toString()
+                + "; " + script.getClass().toString() + "; Value: " + value;
     }
 }

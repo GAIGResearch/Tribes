@@ -127,8 +127,6 @@ public class SimplePortfolio extends Portfolio
                 new MoveToConvergeScr(rnd),
                 new MoveToDivergeScr(rnd)
         });
-
-        int a = 0;
     }
 
     @Override

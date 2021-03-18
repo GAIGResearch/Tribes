@@ -8,6 +8,7 @@ import core.game.Board;
 import core.game.GameState;
 import players.portfolio.scripts.utils.InterestPoint;
 import players.portfolio.scripts.utils.MilitaryFunc;
+import utils.Pair;
 
 import java.util.Random;
 
@@ -22,7 +23,7 @@ public class MoveToOwnCityCentreScr extends BaseScript {
     }
 
     @Override
-    public Action process(GameState gs, Actor ac)
+    public Pair<Action, Double> process(GameState gs, Actor ac)
     {
         return new MilitaryFunc().moveTowards(gs, ac, actions, rnd, new InterestPoint() {
             @Override

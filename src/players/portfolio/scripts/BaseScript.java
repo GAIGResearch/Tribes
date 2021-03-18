@@ -3,11 +3,13 @@ package players.portfolio.scripts;
 import core.actions.Action;
 import core.actors.Actor;
 import core.game.GameState;
+import utils.Pair;
 
 import java.util.ArrayList;
 
 public class BaseScript
 {
+    public double DEFAULT_VALUE = 0.5;
     public enum Feature
     {
         DISTANCE,
@@ -30,12 +32,11 @@ public class BaseScript
      * @param ac Actor who will execute the action returned
      * @return action to execute.
      */
-    public Action process(GameState gs, Actor ac) {
-        return actions.get(0);
+    public Pair<Action, Double> process(GameState gs, Actor ac) {
+        return new Pair<>(actions.get(0), DEFAULT_VALUE);
     }
 
     public void setActions(ArrayList<Action> actions) {
         this.actions = actions;
     }
-
 }

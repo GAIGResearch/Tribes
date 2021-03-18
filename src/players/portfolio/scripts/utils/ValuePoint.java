@@ -5,5 +5,5 @@ import core.game.GameState;
 
 public interface ValuePoint
 {
-    int ofInterest(GameState gs, Actor ac, int posX, int posY);
+    double ofInterest(GameState gs, Actor ac, int posX, int posY);
 }

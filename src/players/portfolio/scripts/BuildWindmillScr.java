@@ -4,6 +4,7 @@ import core.actions.Action;
 import core.actors.Actor;
 import core.game.GameState;
 import players.portfolio.scripts.utils.BuildingFunc;
+import utils.Pair;
 
 import java.util.Random;
 
@@ -21,7 +22,7 @@ public class BuildWindmillScr extends BaseScript {
     }
 
     @Override
-    public Action process(GameState gs, Actor ac)
+    public Pair<Action, Double> process(GameState gs, Actor ac)
     {
         return new BuildingFunc().buildSupportBuilding(WINDMILL, gs, actions, rnd);
     }

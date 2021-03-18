@@ -7,6 +7,7 @@ import core.game.Board;
 import core.game.GameState;
 import players.portfolio.scripts.utils.MilitaryFunc;
 import players.portfolio.scripts.utils.ValuePoint;
+import utils.Pair;
 import utils.Vector2d;
 
 import java.util.LinkedList;
@@ -23,15 +24,16 @@ public class MoveToConvergeScr extends BaseScript {
     }
 
     @Override
-    public Action process(GameState gs, Actor ac)
+    public Pair<Action, Double> process(GameState gs, Actor ac)
     {
         return new MilitaryFunc().position(gs, ac, actions, rnd, 1, new ValuePoint() {
             @Override
-            public int ofInterest(GameState gs, Actor ac, int posX, int posY) {
+            public double ofInterest(GameState gs, Actor ac, int posX, int posY) {
                 Board b = gs.getBoard();
                 Vector2d targetPos = new Vector2d(posX, posY);
                 LinkedList<Vector2d> neighs = targetPos.neighborhood(1, 0, b.getSize());
 
+                int maxAllies = neighs.size();
                 int numAllies = 0;
                 for(Vector2d n : neighs)
                 {
@@ -40,7 +42,7 @@ public class MoveToConvergeScr extends BaseScript {
                         numAllies++;
                 }
 
-                return numAllies;
+                return (double)numAllies/maxAllies;
             }
         });
 

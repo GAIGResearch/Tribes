@@ -4,6 +4,8 @@ import core.actions.Action;
 import core.actions.cityactions.LevelUp;
 import core.actors.Actor;
 import core.game.GameState;
+import utils.Pair;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -22,7 +24,7 @@ public class LevelUpGrowthScr extends BaseScript {
     }
 
     @Override
-    public Action process(GameState gs, Actor ac)
+    public Pair<Action, Double> process(GameState gs, Actor ac)
     {
         ArrayList<Action> candidate_actions = new ArrayList<>();
 
@@ -30,7 +32,7 @@ public class LevelUpGrowthScr extends BaseScript {
         {
             LevelUp action = (LevelUp) act;
             if(action.getBonus() == WORKSHOP || action.getBonus() == RESOURCES || action.getBonus() == POP_GROWTH)
-                return act;
+                return new Pair<>(act, DEFAULT_VALUE);
 
             if(action.getBonus() == PARK || action.getBonus() == SUPERUNIT)
                 candidate_actions.add(action);
@@ -38,7 +40,7 @@ public class LevelUpGrowthScr extends BaseScript {
 
         int nActions = candidate_actions.size();
         if( nActions > 0)
-            return candidate_actions.get(rnd.nextInt(nActions));
+            return new Pair<>(candidate_actions.get(rnd.nextInt(nActions)), DEFAULT_VALUE);
         return null;
     }
 

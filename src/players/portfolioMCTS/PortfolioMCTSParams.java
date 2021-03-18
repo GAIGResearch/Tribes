@@ -14,9 +14,9 @@ public class PortfolioMCTSParams extends AlgParams {
 
     // Parameters
     public double C = Math.sqrt(2);
-    public int K_init = 4;
-    public int T = 20;
-    public double A = 50.0;
+    public double K_init_mult = 0.5;
+    public double T_mult = 2.5;
+    public double A_mult = 1.5;
     public double B = 1.3;
     public int ROLLOUT_LENGTH = 10;//10;
     public boolean ROLOUTS_ENABLED = true;
@@ -76,4 +76,57 @@ public class PortfolioMCTSParams extends AlgParams {
         return parameterValues;
     }
 
+    public int getPruneT(int nChildren)
+    {
+        return (int) (nChildren * this.T_mult);
+    }
+
+    public int getPruneKinit(int nChildren)
+    {
+        int kInit = (int) (nChildren * this.K_init_mult);
+        return Math.max(kInit, 1);
+    }
+
+    public int getPruneA(int nChildren)
+    {
+        return (int) (this.getPruneT(nChildren) * this.A_mult);
+    }
+
+    public int getUnpruneLimit(int nChildren, int nextK)
+    {
+        return (int) (getPruneA(nChildren) * Math.pow(B, nextK));
+    }
+
+    public void printPruneLine(int nChildren)
+    {
+        int MAX_LIM = 100;
+        int T = this.getPruneT(nChildren);
+        int kInit = this.getPruneKinit(nChildren);
+        int A = this.getPruneA(nChildren);
+        double B = this.B;
+        int k = 0;
+        System.out.print("Children: " + nChildren + ", limits: [T: " + T + ", k: " + kInit +"], ");
+//            System.out.print("Children: " + nChildren + ", T: " + T + ", kInit: " + kInit + ", A: " + A + ", B " + B + ", limits: ");
+
+        boolean stop = false;
+        while (!stop) {
+            int limit = this.getUnpruneLimit(nChildren, k);
+            //System.out.print("[k: " + k + ", lim: " + limit + "]");
+            stop = limit >= MAX_LIM;
+            k++;
+            if(!stop)
+                System.out.print(limit + " ");
+        }
+        System.out.println();
+    }
+
+    public static void main(String args[])
+    {
+        PortfolioMCTSParams params = new PortfolioMCTSParams();
+        for(int nChildren = 1; nChildren <= 50; nChildren++) {
+            params.printPruneLine(nChildren);
+        }
+
+
+    }
 }

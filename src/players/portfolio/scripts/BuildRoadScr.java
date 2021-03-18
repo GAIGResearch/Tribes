@@ -7,6 +7,7 @@ import core.actors.City;
 import core.actors.Tribe;
 import core.game.Board;
 import core.game.GameState;
+import utils.Pair;
 import utils.Vector2d;
 import java.util.*;
 
@@ -29,7 +30,7 @@ public class BuildRoadScr extends BaseScript {
     }
 
     @Override
-    public Action process(GameState gs, Actor ac)
+    public Pair<Action, Double> process(GameState gs, Actor ac)
     {
         ArrayList<Action> candidate_actions = new ArrayList<>();
         Tribe thisTribe = (Tribe)ac;
@@ -53,8 +54,6 @@ public class BuildRoadScr extends BaseScript {
                 if(hotspots[roadPos.x][roadPos.y] == RoadSpot.HOT)
                 {
                     candidate_actions.add(act);
-
-
                     //The code below checks for increments in the connected cities. Too slow.
 //                    Action bestAction = null;
 //                    int highestInc = 0;
@@ -85,7 +84,7 @@ public class BuildRoadScr extends BaseScript {
         //Return an action at random that builds a road increasing our capital reach.
         int nActions = candidate_actions.size();
         if( nActions > 0)
-            return candidate_actions.get(rnd.nextInt(nActions));
+            return new Pair<>(candidate_actions.get(rnd.nextInt(nActions)), DEFAULT_VALUE);
 
         //Can't add any road that expands our network. No road building.
         return null;

@@ -8,6 +8,7 @@ import core.game.Board;
 import core.game.GameState;
 import players.portfolio.scripts.utils.InterestPoint;
 import players.portfolio.scripts.utils.MilitaryFunc;
+import utils.Pair;
 import utils.Vector2d;
 
 import java.util.Random;
@@ -23,7 +24,7 @@ public class MoveToDisembarkScr extends BaseScript {
     }
 
     @Override
-    public Action process(GameState gs, Actor ac)
+    public Pair<Action, Double> process(GameState gs, Actor ac)
     {
         Vector2d pos = ac.getPosition();
         Types.TERRAIN t = gs.getBoard().getTerrainAt(pos.x, pos.y);

@@ -5,7 +5,9 @@ import core.actions.Action;
 import core.actors.Actor;
 import core.game.GameState;
 import players.portfolio.scripts.utils.MilitaryFunc;
+import utils.Pair;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -23,10 +25,10 @@ public class ResearchFarmsScr extends BaseScript {
     }
 
     @Override
-    public Action process(GameState gs, Actor ac)
+    public Pair<Action, Double> process(GameState gs, Actor ac)
     {
         if(actions.size() == 1)
-            return actions.get(0);
+            return new Pair<>(actions.get(0), DEFAULT_VALUE);
 
         ArrayList<Types.TECHNOLOGY> techs = new ArrayList<>();
         techs.add(ORGANIZATION);

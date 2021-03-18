@@ -10,6 +10,7 @@ import core.game.GameState;
 import players.portfolio.scripts.utils.InterestPoint;
 import players.portfolio.scripts.utils.MilitaryFunc;
 import players.portfolio.scripts.utils.ValuePoint;
+import utils.Pair;
 import utils.Vector2d;
 
 import java.util.LinkedList;
@@ -26,16 +27,17 @@ public class MoveToAttackRangeScr extends BaseScript {
     }
 
     @Override
-    public Action process(GameState gs, Actor ac)
+    public Pair<Action, Double> process(GameState gs, Actor ac)
     {
         return new MilitaryFunc().position(gs, ac, actions, rnd, 1, new ValuePoint() {
             @Override
-            public int ofInterest(GameState gs, Actor ac, int posX, int posY) {
+            public double ofInterest(GameState gs, Actor ac, int posX, int posY) {
                 Board b = gs.getBoard();
                 int attackRange = ((Unit)ac).RANGE;
                 Vector2d targetPos = new Vector2d(posX, posY);
                 LinkedList<Vector2d> neighs = targetPos.neighborhood(attackRange, 0, b.getSize());
 
+                int maxTargets = neighs.size();
                 int numTargets = 0;
                 for(Vector2d n : neighs)
                 {
@@ -44,7 +46,7 @@ public class MoveToAttackRangeScr extends BaseScript {
                         numTargets++;
                 }
 
-                return numTargets;
+                return (double)numTargets/maxTargets;
             }
         });
 

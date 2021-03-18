@@ -6,6 +6,8 @@ import core.actions.cityactions.GrowForest;
 import core.actors.Actor;
 import core.game.GameState;
 import players.portfolio.scripts.utils.BuildingFunc;
+import utils.Pair;
+import utils.Utils;
 import utils.Vector2d;
 
 import java.util.ArrayList;
@@ -24,9 +26,10 @@ public class GrowForestScr extends BaseScript {
     }
 
     @Override
-    public Action process(GameState gs, Actor ac)
+    public Pair<Action, Double> process(GameState gs, Actor ac)
     {
         ArrayList<Action> candidate_actions = new ArrayList<>();
+        double bestScore = 0;
 
         for(Action act : actions)
         {
@@ -34,15 +37,21 @@ public class GrowForestScr extends BaseScript {
             BuildingFunc f = new BuildingFunc();
             Vector2d targetPos = action.getTargetPos();
 
+            double score = f.valueForBaseBuilding(gs, targetPos, new Types.BUILDING[]{LUMBER_HUT}, action.getCityId());
             //Grow if good place for a lumber hut
-            if( f.goodForBaseBuilding(gs, targetPos, new Types.BUILDING[]{LUMBER_HUT}, action.getCityId()) ){
-                candidate_actions.add(act);
+
+            if (score > bestScore) {
+                candidate_actions.clear();
+                bestScore = score;
             }
+            if (score == bestScore)
+                candidate_actions.add(act);
+
         }
 
         int nActions = candidate_actions.size();
         if( nActions > 0)
-            return candidate_actions.get(rnd.nextInt(nActions));
+            return new Pair<> (candidate_actions.get(rnd.nextInt(nActions)), bestScore);
         return null;
     }
 

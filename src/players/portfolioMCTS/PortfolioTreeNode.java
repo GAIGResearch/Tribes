@@ -6,6 +6,7 @@ import players.heuristics.PruneHeuristic;
 import players.heuristics.StateHeuristic;
 import players.portfolio.ActionAssignment;
 import utils.ElapsedCpuTimer;
+import utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -175,20 +176,22 @@ public class PortfolioTreeNode
         PortfolioTreeNode selected;
         boolean IamMoving = (state.getActiveTribeID() == this.playerID);
 
-        if(params.PRUNING && this.nVisits > params.T) {
+        if(params.PRUNING && this.nVisits >= params.getPruneT(children.length)) {
             if (k_plus == 0) {
                 //Time to prune
-                pruned = rootPruneHeuristic.prune(this, actions, state, params.K_init);
+                pruned = rootPruneHeuristic.prune(this, actions, state, params.getPruneKinit(children.length));
                 k_plus++;
+//                System.out.print("Depth:" + this.m_depth + ": ");
+//                params.printPruneLine(children.length);
             }
             else
             {
                 //Progressive unpruning:
-                int limit = (int) Math.pow(params.A * params.B, k_plus);
+                int limit = params.getUnpruneLimit(children.length, k_plus);
                 if(this.nVisits > limit)
                 {
                     //Time to unprune
-                    boolean[] prunedNext = rootPruneHeuristic.unprune(this, actions, state, pruned);
+                    boolean[] prunedNext = rootPruneHeuristic.unprune(this, actions, state, pruned, m_rnd);
                     if(prunedNext != null) {
                         pruned = prunedNext;
                         k_plus++;
@@ -207,7 +210,7 @@ public class PortfolioTreeNode
 
                 double hvVal = child.totValue;
                 double childValue = hvVal / (child.nVisits + params.epsilon);
-                childValue = normalise(childValue, bounds[0], bounds[1]);
+                childValue = Utils.normalise(childValue, bounds[0], bounds[1]);
                 double exploreValue = Math.sqrt(Math.log(this.nVisits + 1) / (child.nVisits + params.epsilon));
                 double progBias = rootPruneHeuristic.evaluatePrune(state, actions.get(i)) / (child.nVisits + params.epsilon);
 
@@ -216,6 +219,11 @@ public class PortfolioTreeNode
 
                 if(params.PRUNING)
                         uctValue += progBias;
+
+                if(parent == null)
+                {
+                    int a = 0;
+                }
 
                 uctValue = noise(uctValue, params.epsilon, this.m_rnd.nextDouble());     //break ties randomly
 
@@ -278,10 +286,10 @@ public class PortfolioTreeNode
                 advance(rolloutState, next, true);
                 thisDepth++;
             }
-            return normalise(this.rootStateHeuristic.evaluateState(root.rootState, rolloutState), 0, 1);
+            return Utils.normalise(this.rootStateHeuristic.evaluateState(root.rootState, rolloutState), 0, 1);
         }
 
-        return normalise(this.rootStateHeuristic.evaluateState(root.rootState, this.state), 0, 1);
+        return Utils.normalise(this.rootStateHeuristic.evaluateState(root.rootState, this.state), 0, 1);
     }
 
     private boolean finishRollout(GameState rollerState, int depth)
@@ -391,13 +399,7 @@ public class PortfolioTreeNode
         return false;
     }
 
-    private double normalise(double a_value, double a_min, double a_max)
-    {
-        if(a_min < a_max)
-            return (a_value - a_min)/(a_max - a_min);
-        else    // if bounds are invalid, then return same value
-            return a_value;
-    }
+
 
     private double noise(double input, double epsilon, double random)
     {
@@ -406,6 +408,10 @@ public class PortfolioTreeNode
 
     public PortfolioTreeNode[] getChildren() {
         return children;
+    }
+
+    public int getPruneK() {
+        return k_plus;
     }
 
     public PortfolioMCTSParams getParams()

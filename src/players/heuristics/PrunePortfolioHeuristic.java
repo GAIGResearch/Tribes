@@ -27,10 +27,16 @@ public class PrunePortfolioHeuristic implements PruneHeuristic
         }
     }
 
+    public double getWeight(ActionAssignment aas)
+    {
+        return weights.get(aas.getAction().getActionType());
+    }
+
     public double evaluatePrune(GameState state, ActionAssignment aas)
     {
         Types.ACTION actionType = aas.getAction().getActionType();
-        return weights.get(actionType);
+        double value = aas.getValue();
+        return weights.get(actionType) * value;
     }
 
     public boolean[] prune (PortfolioTreeNode parent, ArrayList<ActionAssignment> actions, GameState gameState, int k) {
@@ -45,22 +51,29 @@ public class PrunePortfolioHeuristic implements PruneHeuristic
             {
                 ActionAssignment aas = actions.get(i);
                 double h = evaluatePrune(gameState, aas);
+                //h = noise(h, 0.1, new Random().nextDouble());
                 rank.put(i, h);
             }
         }
 
         SortedSet<Map.Entry<Integer, Double>> ts = entriesSortedByValues(rank);
         int n = 0;
-        Map.Entry<Integer, Double> entry = ts.first();
-
-        while (n < k && n < ts.size())
+        for(Map.Entry<Integer, Double> entry : ts)
         {
-            int idx = entry.getKey();
-            pruned[idx] = false;
-            n++;
+            if(n < k)
+            {
+                int idx = entry.getKey();
+                pruned[idx] = false;
+                n++;
+            }else break;
         }
 
         return pruned;
+    }
+
+    private double noise(double input, double epsilon, double random)
+    {
+        return (input + epsilon) * (1.0 + epsilon * (random - 0.5));
     }
 
     public boolean[] unprune (PortfolioTreeNode parent, ArrayList<ActionAssignment> actions, GameState gameState, boolean[] pruned, Random rnd)
@@ -104,12 +117,13 @@ public class PrunePortfolioHeuristic implements PruneHeuristic
                 new Comparator<Map.Entry<K,V>>() {
                     @Override public int compare(Map.Entry<K,V> e1, Map.Entry<K,V> e2) {
                         int res = e1.getValue().compareTo(e2.getValue());
-                        return res;
-//                        return res != 0 ? res : 1;
+//                        return res;
+                        return res != 0 ? -res : -1;
                     }
                 }
         );
         sortedEntries.addAll(map.entrySet());
         return sortedEntries;
     }
+
 }

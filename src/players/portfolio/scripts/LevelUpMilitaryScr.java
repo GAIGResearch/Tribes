@@ -4,6 +4,7 @@ import core.actions.Action;
 import core.actions.cityactions.LevelUp;
 import core.actors.Actor;
 import core.game.GameState;
+import utils.Pair;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -23,12 +24,12 @@ public class LevelUpMilitaryScr extends BaseScript {
     }
 
     @Override
-    public Action process(GameState gs, Actor ac)
+    public Pair<Action, Double> process(GameState gs, Actor ac)
     {
         for(Action act : actions) {
             LevelUp action = (LevelUp) act;
             if (action.getBonus() == CITY_WALL || action.getBonus() == BORDER_GROWTH || action.getBonus() == SUPERUNIT || action.getBonus() == WORKSHOP)
-                return act;
+                return new Pair<>(act,DEFAULT_VALUE);
         }
         return null;
     }

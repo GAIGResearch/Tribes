@@ -13,6 +13,8 @@ import core.actors.units.Unit;
 import core.game.Board;
 import core.game.GameState;
 import players.portfolio.scripts.BaseScript;
+import utils.Pair;
+import utils.Utils;
 import utils.Vector2d;
 
 import java.util.ArrayList;
@@ -20,11 +22,12 @@ import java.util.Random;
 
 public class MilitaryFunc {
 
-    public Action getActionByActorAttr(GameState gs, ArrayList<Action> actions, Actor source,
-                                       BaseScript.Feature feat, boolean maximize)
+    public Pair<Action, Double> getActionByActorAttr(GameState gs, ArrayList<Action> actions, Actor source,
+                                                     BaseScript.Feature feat, boolean maximize)
     {
         double targetValue = maximize ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
         Action finalAction = null;
+        double min=Double.POSITIVE_INFINITY, max=Double.NEGATIVE_INFINITY;
         for(Action act : actions)
         {
             Unit target = null;
@@ -46,27 +49,34 @@ public class MilitaryFunc {
                 {
                     case HP:
                         better = maximize ? target.getCurrentHP() > targetValue : target.getCurrentHP() < targetValue;
+                        if(better) targetValue = target.getCurrentHP();
                         break;
                     case COST:
                         better = maximize ? target.COST > targetValue : target.COST < targetValue;
+                        if(better) targetValue = target.COST;
                         break;
                     case MOVEMENT:
                         better = maximize ? target.MOV > targetValue : target.MOV < targetValue;
+                        if(better) targetValue = target.MOV;
                         break;
                     case RANGE:
                         better = maximize ? target.RANGE > targetValue : target.RANGE < targetValue;
+                        if(better) targetValue = target.RANGE;
                         break;
                     case DEFENCE:
                         better = maximize ? target.DEF > targetValue : target.DEF < targetValue;
+                        if(better) targetValue = target.DEF;
                         break;
                     case ATTACK:
                         better = maximize ? target.ATK > targetValue : target.ATK < targetValue;
+                        if(better) targetValue = target.ATK;
                         break;
                     case DISTANCE:
                         Vector2d sourcePos = source.getPosition();
                         Vector2d targetPos = target.getPosition();
                         double dist = sourcePos.dist(targetPos);
                         better = maximize ? dist > targetValue : dist < targetValue;
+                        if(better) targetValue = dist;
                         break;
                     case DAMAGE:
                         GameState gsCopy = gs.copy();
@@ -77,22 +87,30 @@ public class MilitaryFunc {
                         if(nextHP <= 0)
                             diff -= 100;
                         better = maximize ? Math.abs(diff) > targetValue : Math.abs(diff) < targetValue;
+                        if(better) targetValue = Math.abs(diff);
                         break;
                     default:
                         System.out.println("Error: getMinAttr not defined for feature " + feat);
                 }
 
+                if(targetValue < min) min = targetValue;
+                if(targetValue > max) max = targetValue;
+
                 if(better)
                 {
-                    targetValue = target.DEF;
                     finalAction = act;
                 }
             }
         }
-        return finalAction;
+
+        double actionValue = Utils.normalise(targetValue, 0, max);
+        if(!maximize)
+            actionValue = 1 - actionValue;
+
+        return new Pair<>(finalAction,actionValue);
     }
 
-    public Action getPreferredResearchTech(GameState gs, ArrayList<Action> actions, ArrayList<Types.TECHNOLOGY> preferredTechs, Random rnd)
+    public Pair<Action, Double> getPreferredResearchTech(GameState gs, ArrayList<Action> actions, ArrayList<Types.TECHNOLOGY> preferredTechs, Random rnd)
     {
         ArrayList<Action> candidate_actions = new ArrayList<>();
         int lowestTier = Integer.MAX_VALUE;
@@ -120,12 +138,14 @@ public class MilitaryFunc {
 
         int nActions = candidate_actions.size();
         if( nActions > 0)
-            return candidate_actions.get(rnd.nextInt(nActions));
-
+        {
+            double value = (4-lowestTier) / 4.0;
+            return new Pair<>(candidate_actions.get(rnd.nextInt(nActions)), value);
+        }
         return null;
     }
 
-    public Action moveTowards(GameState gs, Actor ac, ArrayList<Action> actions, Random rnd, InterestPoint p)
+    public Pair<Action, Double> moveTowards(GameState gs, Actor ac, ArrayList<Action> actions, Random rnd, InterestPoint p)
     {
         ArrayList<Action> candidate_actions = new ArrayList<>();
         ArrayList<Vector2d> movePositions = new ArrayList<>();
@@ -140,6 +160,7 @@ public class MilitaryFunc {
             }
         }
 
+        double max = Double.NEGATIVE_INFINITY;
         double minDistance = Double.MAX_VALUE;
         for(Action act : actions)
         {
@@ -158,20 +179,23 @@ public class MilitaryFunc {
                 {
                     candidate_actions.add(act);
                 }
+                if(dist>max)
+                    max = dist;
             }
         }
 
         int nActions = candidate_actions.size();
         if( nActions > 0) {
             Action act =  candidate_actions.get(rnd.nextInt(nActions));
+            double value = 1 - Utils.normalise(minDistance, 0, max);
             //System.out.println("TRIBE ID: " + ac.getTribeId() + " Moving from " +  ac.getPosition() +  " to " + ((Move)act).getDestination() + " distance: " + minDistance);
-            return act;
+            return new Pair<>(act, value);
         }
         return null;
     }
 
 
-    public Action position(GameState gs, Actor ac, ArrayList<Action> actions,
+    public Pair<Action, Double> position(GameState gs, Actor ac, ArrayList<Action> actions,
                            Random rnd, int minValue, ValuePoint p)
     {
         ArrayList<Action> candidate_actions = new ArrayList<>();
@@ -182,7 +206,7 @@ public class MilitaryFunc {
         {
             Move action = (Move) act;
             Vector2d destPos = action.getDestination();
-            int valuePos = p.ofInterest(gs, ac, destPos.x, destPos.y);
+            double valuePos = p.ofInterest(gs, ac, destPos.x, destPos.y);
             if(valuePos > bestValue)
             {
                 bestValue = valuePos;
@@ -198,7 +222,7 @@ public class MilitaryFunc {
         if( nActions > 0 && bestValue >= minValue) {
             Action act =  candidate_actions.get(rnd.nextInt(nActions));
            //System.out.println("TRIBE ID: " + ac.getTribeId() + " Moving to RANGE " +  ac.getPosition() +  " to " + ((Move)act).getDestination() + " reaching: " + bestValue);
-            return act;
+            return new Pair<>(act, bestValue);
         }
         return null;
     }

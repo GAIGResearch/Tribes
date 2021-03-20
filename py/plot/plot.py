@@ -183,7 +183,8 @@ def print_agent_pw(ag, data, column_order):
 
 def main():
 
-    file_path = "C:\\Work\\git\\Tribes\\test\\vsRB\\"
+    file_path = "C:\\Work\\Tribes-results\\Portfolio no pruning\\vsRB\\"
+    column_order = ["SIMPLE", "PORTFOLIO_MCTS"]
     files = [join(file_path, f) for f in listdir(file_path) if isfile(join(file_path, f)) and f.endswith("test.txt")]
 
     victories = {}
@@ -264,14 +265,18 @@ def main():
     # column_order = ["RHEA", "RuleBased", "MCTS", "MC", "OSLA", "Random"]
 #    column_order = ["RHEA", "RuleBased", "MCTS", "MC", "OSLA"]
 #     column_order = ["MCTS", "PORTFOLIO_MCTS"]
-    column_order = ["SIMPLE", "PORTFOLIO_MCTS"]
+#     column_order = ["SIMPLE", "PORTFOLIO_MCTS"]
+    # column_order = ["RHEA", "PORTFOLIO_MCTS"]
     # print_agent_pw("RHEA", victories, column_order)
-    print_agent_pw("SIMPLE", victories, column_order)
+    # print_agent_pw("SIMPLE", victories, column_order)
     # print_agent_pw("MCTS", victories, column_order)
-    print_agent_pw("PORTFOLIO_MCTS", victories, column_order)
+    # print_agent_pw("PORTFOLIO_MCTS", victories, column_order)
     # print_agent_pw("MC", victories, column_order)
     # print_agent_pw("OSLA", victories, column_order)
     # print_agent_pw("Random", victories, column_order)
+
+    for c in column_order:
+        print_agent_pw(c, victories, column_order)
 
     print ("_____________")
 

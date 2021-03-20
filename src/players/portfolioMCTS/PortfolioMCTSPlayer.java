@@ -45,7 +45,8 @@ public class PortfolioMCTSPlayer extends Agent {
         m_root.setRootGameState(m_root, gs, allPlayerIDs);
         m_root.mctsSearch(ect);
 
-        ActionAssignment act = m_root.getActions().get(m_root.mostVisitedAction());
+        ActionAssignment act = m_root.getActions().get(m_root.bestAction());
+//        ActionAssignment act = m_root.getActions().get(m_root.mostVisitedAction());
         return act.getAction();
     }
 

@@ -1,7 +1,8 @@
 package core;
 
 public class Constants {
-    public static boolean VERBOSE = false;
+    public static boolean LOG_STATS = true;
+    public static boolean VERBOSE = true;
     public static boolean VISUALS = true;
     public static boolean WRITE_SAVEGAMES = false;
     public static boolean DISABLE_NON_HUMAN_GRID_HIGHLIGHT = true;  // If true, human observing/playing doesn't have access to actions of non-human players

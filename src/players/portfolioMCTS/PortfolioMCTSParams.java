@@ -14,14 +14,15 @@ public class PortfolioMCTSParams extends AlgParams {
 
     // Parameters
     public double C = Math.sqrt(2);
-    public double K_init_mult = 0.5;
-    public double T_mult = 2.5;
+    public double K_init_mult = 0.6;
+    public double T_mult = 1.5;
     public double A_mult = 1.5;
-    public double B = 1.3;
-    public int ROLLOUT_LENGTH = 10;//10;
+    public double B = 1.2;
+    public int ROLLOUT_LENGTH = 20;//10;
     public boolean ROLOUTS_ENABLED = true;
     private Portfolio portfolio;
-    public boolean PRUNING = true;
+    public boolean PRUNING = false;
+    public boolean PROGBIAS = false;
 
     /**
      * Function that returns array of scripts to use
@@ -126,7 +127,5 @@ public class PortfolioMCTSParams extends AlgParams {
         for(int nChildren = 1; nChildren <= 50; nChildren++) {
             params.printPruneLine(nChildren);
         }
-
-
     }
 }

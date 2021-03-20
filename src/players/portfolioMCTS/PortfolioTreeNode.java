@@ -217,13 +217,8 @@ public class PortfolioTreeNode
                 double uctValue = childValue +
                         params.C * exploreValue;
 
-                if(params.PRUNING)
+                if(params.PROGBIAS)
                         uctValue += progBias;
-
-                if(parent == null)
-                {
-                    int a = 0;
-                }
 
                 uctValue = noise(uctValue, params.epsilon, this.m_rnd.nextDouble());     //break ties randomly
 
@@ -358,7 +353,7 @@ public class PortfolioTreeNode
         return selected;
     }
 
-    private int bestAction()
+    public int bestAction()
     {
         int selected = -1;
         double bestValue = -Double.MAX_VALUE;

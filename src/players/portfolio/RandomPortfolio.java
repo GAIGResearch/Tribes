@@ -63,4 +63,9 @@ public class RandomPortfolio extends Portfolio
     public TreeMap<Types.ACTION, BaseScript[]> getPortfolio() {
         return null;
     }
+
+    @Override
+    public BaseScript[] scripts(Types.ACTION actionType) {
+        return portfolio;
+    }
 }

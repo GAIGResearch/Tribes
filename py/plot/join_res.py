@@ -3,7 +3,7 @@ from os.path import isfile, join
 
 def main():
 
-    file_path = "C:\\Work\\Tribes-results\\Portfolio no pruning\\vsRB\\"
+    file_path = "C:\\Work\\Tribes-results\\PortfolioValues\\vsMCTS\\"
     output_file_path = file_path + "tribes_test.txt"
     files = [join(file_path, f) for f in listdir(file_path) if isfile(join(file_path, f)) and f.endswith(".txt")]
     lines = []

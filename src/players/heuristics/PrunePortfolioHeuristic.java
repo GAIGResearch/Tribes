@@ -2,6 +2,7 @@ package players.heuristics;
 
 import core.Types;
 import core.game.GameState;
+import jdk.nashorn.api.tree.Tree;
 import players.portfolio.ActionAssignment;
 import players.portfolio.Portfolio;
 import players.portfolio.scripts.BaseScript;
@@ -9,21 +10,25 @@ import players.portfolioMCTS.PortfolioTreeNode;
 
 import java.awt.image.AreaAveragingScaleFilter;
 import java.util.*;
+import static core.Types.ACTION.*;
 
 public class PrunePortfolioHeuristic implements PruneHeuristic
 {
     TreeMap<Types.ACTION, Double> weights;
+    TreeMap<String, Double> weightScripts;
+    Portfolio portfolio;
 
     public PrunePortfolioHeuristic(Portfolio p)
     {
+        this.portfolio = p;
         TreeMap<Types.ACTION, BaseScript[]> portfolio = p.getPortfolio();
         weights = new TreeMap<>();
-        int nEntries = portfolio.size();
-        double rndWeight = 1.0/nEntries;
+        weightScripts = new TreeMap<>();
+        double DEFAULT_W = 0.5;
 
         for(Types.ACTION action : portfolio.keySet())
         {
-            weights.put(action, rndWeight);
+            weights.put(action, DEFAULT_W);
         }
     }
 
@@ -36,7 +41,12 @@ public class PrunePortfolioHeuristic implements PruneHeuristic
     {
         Types.ACTION actionType = aas.getAction().getActionType();
         double value = aas.getValue();
-        return weights.get(actionType) * value;
+        double w = weights.get(actionType);
+        if(w == -1)
+        {
+            w = weightScripts.get(aas.getScript().getClass().toString());
+        }
+        return w * value;
     }
 
     public boolean[] prune (PortfolioTreeNode parent, ArrayList<ActionAssignment> actions, GameState gameState, int k) {
@@ -126,4 +136,46 @@ public class PrunePortfolioHeuristic implements PruneHeuristic
         return sortedEntries;
     }
 
+    private int setWeightsAction(double[] weightValues, int curIdx, Types.ACTION actionType)
+    {
+        weights.put(actionType, -1.0);
+        for(BaseScript bs : portfolio.scripts(actionType))
+        {
+            String str = bs.getClass().toString();
+            weightScripts.put(str, weightValues[curIdx++]);
+        }
+        return curIdx;
+    }
+
+    public void setWeights(double[] weightValues) {
+
+        int widx = 0;
+//        widx = setWeightsAction(weightValues, widx, ATTACK);        //4
+//        widx = setWeightsAction(weightValues, widx, CONVERT);       //3
+        widx = setWeightsAction(weightValues, widx, SPAWN);         //6
+//        widx = setWeightsAction(weightValues, widx, LEVEL_UP);      //2
+        widx = setWeightsAction(weightValues, widx, RESEARCH_TECH); //5
+//        widx = setWeightsAction(weightValues, widx, MOVE);          //9
+//        widx = setWeightsAction(weightValues, widx, CLEAR_FOREST);  //4
+//        widx = setWeightsAction(weightValues, widx, BUILD);         //10
+
+
+//        weights.put(ATTACK, -1.0);
+//        for(BaseScript bs : portfolio.scripts(ATTACK))
+//        {
+//            String str = bs.getClass().toString();
+//            weightScripts.put(str, weightValues[widx++]);
+//        }
+
+//
+//        if(weightValues.length != this.weights.size())
+//            System.out.println("ERROR: mismatch number of weights and portfolio action types");
+//
+//        int i = 0;
+//        for(Types.ACTION action : this.weights.keySet())
+//        {
+//            weights.put(action, weightValues[i]);
+//            i++;
+//        }
+    }
 }

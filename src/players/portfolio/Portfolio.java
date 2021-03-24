@@ -12,4 +12,5 @@ public abstract class Portfolio {
     public abstract void initPortfolio();
     public abstract ArrayList<ActionAssignment> produceActionAssignments(GameState state);
     public abstract TreeMap<Types.ACTION, BaseScript[]> getPortfolio();
+    public abstract BaseScript[] scripts(Types.ACTION actionType);
 }

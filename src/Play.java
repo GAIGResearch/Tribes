@@ -46,7 +46,7 @@ public class Play {
                     throw new Exception("Number of players must be equal to number of tribes");
 
                 int nPlayers = playersArray.length();
-                Tournament.PlayerType[] playerTypes = new Tournament.PlayerType[nPlayers];
+                Run.PlayerType[] playerTypes = new Run.PlayerType[nPlayers];
                 Types.TRIBE[] tribes = new Types.TRIBE[nPlayers];
 
                 for (int i = 0; i < nPlayers; ++i) {
@@ -86,7 +86,7 @@ public class Play {
         }
     }
 
-    private static void play(Types.TRIBE[] tribes, long levelSeed, Tournament.PlayerType[] playerTypes, Types.GAME_MODE gameMode)
+    private static void play(Types.TRIBE[] tribes, long levelSeed, Run.PlayerType[] playerTypes, Types.GAME_MODE gameMode)
     {
         KeyController ki = new KeyController(true);
         ActionController ac = new ActionController();
@@ -95,7 +95,7 @@ public class Play {
         Run.runGame(game, ki, ac);
     }
 
-    private static void play(String levelFile, Tournament.PlayerType[] playerTypes, Types.GAME_MODE gameMode)
+    private static void play(String levelFile, Run.PlayerType[] playerTypes, Types.GAME_MODE gameMode)
     {
         KeyController ki = new KeyController(true);
         ActionController ac = new ActionController();
@@ -105,7 +105,7 @@ public class Play {
     }
 
 
-    private static void load(Tournament.PlayerType[] playerTypes, String saveGameFile)
+    private static void load(Run.PlayerType[] playerTypes, String saveGameFile)
     {
         KeyController ki = new KeyController(true);
         ActionController ac = new ActionController();
@@ -117,7 +117,7 @@ public class Play {
     }
 
 
-    private static Game _prepareGame(String levelFile, Tournament.PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
+    private static Game _prepareGame(String levelFile, Run.PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
     {
         long gameSeed = GAME_SEED == -1 ? System.currentTimeMillis() : GAME_SEED;
         if(RUN_VERBOSE) System.out.println("Game seed: " + gameSeed);
@@ -129,7 +129,7 @@ public class Play {
         return game;
     }
 
-    private static Game _prepareGame(Types.TRIBE[] tribes, long levelSeed, Tournament.PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
+    private static Game _prepareGame(Types.TRIBE[] tribes, long levelSeed, Run.PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
     {
         long gameSeed = GAME_SEED == -1 ? System.currentTimeMillis() : GAME_SEED;
 
@@ -150,7 +150,7 @@ public class Play {
         return game;
     }
 
-    private static ArrayList<Agent> getPlayers(Tournament.PlayerType[] playerTypes, ActionController ac)
+    private static ArrayList<Agent> getPlayers(Run.PlayerType[] playerTypes, ActionController ac)
     {
         ArrayList<Agent> players = new ArrayList<>();
         long agentSeed = AGENT_SEED == -1 ? System.currentTimeMillis() + new Random().nextInt() : AGENT_SEED;
@@ -171,7 +171,7 @@ public class Play {
         return players;
     }
 
-    private static Game _loadGame(Tournament.PlayerType[] playerTypes, String saveGameFile, long agentSeed)
+    private static Game _loadGame(Run.PlayerType[] playerTypes, String saveGameFile, long agentSeed)
     {
         ArrayList<Agent> players = new ArrayList<>();
         ArrayList<Integer> allIds = new ArrayList<>();
@@ -192,7 +192,7 @@ public class Play {
     }
 
 
-    private static Agent _getAgent(Tournament.PlayerType playerType, long agentSeed, ActionController ac)
+    private static Agent _getAgent(Run.PlayerType playerType, long agentSeed, ActionController ac)
     {
         switch (playerType)
         {

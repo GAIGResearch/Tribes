@@ -40,7 +40,8 @@ public class MoveToEmbarkScr extends BaseScript {
                 {
                     //if it's in a city that belongs to this tribe.
                     City c = b.getCityInBorders(posX, posY);
-                    return c.getTribeId() == ac.getTribeId();
+                    if(c != null)
+                        return c.getTribeId() == ac.getTribeId();
                 }
                 return false;
             }

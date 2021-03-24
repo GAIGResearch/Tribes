@@ -14,15 +14,16 @@ public class PortfolioMCTSParams extends AlgParams {
 
     // Parameters
     public double C = Math.sqrt(2);
-    public double K_init_mult = 0.6;
-    public double T_mult = 1.5;
+    public double K_init_mult = 0.5;
+    public double T_mult = 2.0;
     public double A_mult = 1.5;
-    public double B = 1.2;
+    public double B = 1.3;
     public int ROLLOUT_LENGTH = 20;//10;
     public boolean ROLOUTS_ENABLED = true;
     private Portfolio portfolio;
-    public boolean PRUNING = false;
-    public boolean PROGBIAS = false;
+    public boolean PRUNING = true;
+    public boolean PROGBIAS = true;
+    public PrunePortfolioHeuristic pruneHeuristic;
 
     /**
      * Function that returns array of scripts to use
@@ -35,7 +36,7 @@ public class PortfolioMCTSParams extends AlgParams {
     @Override
     public PruneHeuristic getPruneHeuristic()
     {
-        return new PrunePortfolioHeuristic(portfolio);
+        return pruneHeuristic;
     }
 
     public void setPortfolio(Portfolio portfolio)

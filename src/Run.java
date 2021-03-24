@@ -1,9 +1,23 @@
 import core.Types;
 import core.game.Game;
-import players.ActionController;
-import players.KeyController;
+import players.*;
 import gui.GUI;
 import gui.WindowInput;
+import players.heuristics.PrunePortfolioHeuristic;
+import players.mc.MCParams;
+import players.mc.MonteCarloAgent;
+import players.mcts.MCTSParams;
+import players.mcts.MCTSPlayer;
+import players.oep.OEPAgent;
+import players.oep.OEPParams;
+import players.osla.OSLAParams;
+import players.osla.OneStepLookAheadAgent;
+import players.portfolio.Portfolio;
+import players.portfolio.SimplePortfolio;
+import players.portfolioMCTS.PortfolioMCTSParams;
+import players.portfolioMCTS.PortfolioMCTSPlayer;
+import players.rhea.RHEAAgent;
+import players.rhea.RHEAParams;
 
 import static core.Constants.*;
 import static core.Types.TRIBE.*;
@@ -40,20 +54,48 @@ class Run {
         g.run(null, null);
     }
 
-    static Tournament.PlayerType parsePlayerTypeStr(String arg) throws Exception
+
+    public enum PlayerType
+    {
+        DONOTHING,
+        HUMAN,
+        RANDOM,
+        OSLA,
+        MC,
+        SIMPLE,
+        MCTS,
+        RHEA,
+        OEP,
+        PORTFOLIO_MCTS
+    }
+
+    public static double K_INIT_MULT = 0.5;
+    public static double T_MULT = 2.0;
+    public static double A_MULT = 1.5;
+    public static double B = 1.3;
+
+    public static int MAX_LENGTH;
+    public static boolean PRUNING;
+    public static boolean PROGBIAS;
+    public static boolean FORCE_TURN_END;
+    public static boolean MCTS_ROLLOUTS;
+    public static int POP_SIZE;
+
+
+    static Run.PlayerType parsePlayerTypeStr(String arg) throws Exception
     {
         switch(arg)
         {
-            case "Human": return Tournament.PlayerType.HUMAN;
-            case "Do Nothing": return Tournament.PlayerType.DONOTHING;
-            case "Random": return Tournament.PlayerType.RANDOM;
-            case "Rule Based": return Tournament.PlayerType.SIMPLE;
-            case "OSLA": return Tournament.PlayerType.OSLA;
-            case "MC": return Tournament.PlayerType.MC;
-            case "MCTS": return Tournament.PlayerType.MCTS;
-            case "RHEA": return Tournament.PlayerType.RHEA;
-            case "OEP": return Tournament.PlayerType.OEP;
-            case "pMCTS": return Tournament.PlayerType.PORTFOLIO_MCTS;
+            case "Human": return Run.PlayerType.HUMAN;
+            case "Do Nothing": return Run.PlayerType.DONOTHING;
+            case "Random": return Run.PlayerType.RANDOM;
+            case "Rule Based": return Run.PlayerType.SIMPLE;
+            case "OSLA": return Run.PlayerType.OSLA;
+            case "MC": return Run.PlayerType.MC;
+            case "MCTS": return Run.PlayerType.MCTS;
+            case "RHEA": return Run.PlayerType.RHEA;
+            case "OEP": return Run.PlayerType.OEP;
+            case "pMCTS": return Run.PlayerType.PORTFOLIO_MCTS;
         }
         throw new Exception("Error: unrecognized Player Type: " + arg);
     }
@@ -70,4 +112,63 @@ class Run {
         throw new Exception("Error: unrecognized Tribe: " + arg);
     }
 
+    public static Agent getAgent(Run.PlayerType playerType, long agentSeed)
+    {
+        switch (playerType)
+        {
+            case DONOTHING: return new DoNothingAgent(agentSeed);
+            case RANDOM: return new RandomAgent(agentSeed);
+            case SIMPLE: return new SimpleAgent(agentSeed);
+            case OSLA:
+                OSLAParams oslaParams = new OSLAParams();
+                oslaParams.stop_type = oslaParams.STOP_FMCALLS; //Upper bound
+                oslaParams.heuristic_method = oslaParams.DIFF_HEURISTIC;
+                return new OneStepLookAheadAgent(agentSeed, oslaParams);
+            case MC:
+                MCParams mcparams = new MCParams();
+                mcparams.stop_type = mcparams.STOP_FMCALLS;
+                mcparams.heuristic_method = mcparams.DIFF_HEURISTIC;
+                mcparams.PRIORITIZE_ROOT = true;
+                mcparams.ROLLOUT_LENGTH = MAX_LENGTH;
+                mcparams.FORCE_TURN_END = FORCE_TURN_END ? 5 : mcparams.ROLLOUT_LENGTH + 1;
+                return new MonteCarloAgent(agentSeed, mcparams);
+            case MCTS:
+                MCTSParams mctsParams = new MCTSParams();
+                mctsParams.stop_type = mctsParams.STOP_FMCALLS;
+                mctsParams.heuristic_method = mctsParams.DIFF_HEURISTIC;
+                mctsParams.PRIORITIZE_ROOT = true;
+                mctsParams.ROLLOUT_LENGTH = MAX_LENGTH;
+                mctsParams.FORCE_TURN_END = FORCE_TURN_END ? 5 : mctsParams.ROLLOUT_LENGTH + 1;
+                mctsParams.ROLOUTS_ENABLED = MCTS_ROLLOUTS;
+                return new MCTSPlayer(agentSeed, mctsParams);
+            case PORTFOLIO_MCTS:
+                PortfolioMCTSParams portfolioMCTSParams = new PortfolioMCTSParams();
+                portfolioMCTSParams.stop_type = portfolioMCTSParams.STOP_FMCALLS;
+                portfolioMCTSParams.heuristic_method = portfolioMCTSParams.DIFF_HEURISTIC;
+                portfolioMCTSParams.PRIORITIZE_ROOT = false;
+                portfolioMCTSParams.ROLLOUT_LENGTH = MAX_LENGTH;
+                portfolioMCTSParams.PRUNING = PRUNING;
+                portfolioMCTSParams.PROGBIAS = PROGBIAS;
+                portfolioMCTSParams.K_init_mult = K_INIT_MULT;
+                portfolioMCTSParams.A_mult = A_MULT;
+                portfolioMCTSParams.B = B;
+                portfolioMCTSParams.T_mult = T_MULT;
+                Portfolio p = new SimplePortfolio(agentSeed);
+                portfolioMCTSParams.setPortfolio(p);
+                portfolioMCTSParams.pruneHeuristic = new PrunePortfolioHeuristic(p);
+                return new PortfolioMCTSPlayer(agentSeed, portfolioMCTSParams);
+            case OEP:
+                OEPParams oepParams = new OEPParams();
+                return new OEPAgent(agentSeed, oepParams);
+            case RHEA:
+                RHEAParams rheaParams = new RHEAParams();
+                rheaParams.stop_type = rheaParams.STOP_FMCALLS;
+                rheaParams.heuristic_method = rheaParams.DIFF_HEURISTIC;
+                rheaParams.INDIVIDUAL_LENGTH = MAX_LENGTH;
+                rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
+                rheaParams.POP_SIZE = POP_SIZE;
+                return new RHEAAgent(agentSeed, rheaParams);
+        }
+        return null;
+    }
 }

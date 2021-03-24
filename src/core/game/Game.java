@@ -225,14 +225,15 @@ public class Game {
                 firstEnd = false;
 
                 printGameResults();
-                if (VERBOSE) {
+                if (LOG_STATS) {
                     TreeSet<TribeResult> ranking = getCurrentRanking();
                     for (TribeResult tr : ranking) {
                         int idx = tr.getId();
                         AIStats ais = aiStats[idx];
-                        ais.print();
+                        if(VERBOSE) ais.print();
                         GameplayStats gps = gpStats[idx];
-                        gps.print();
+                        gps.logGameEnd(tr);
+                        if(VERBOSE) gps.print();
                     }
                 }
 
@@ -571,5 +572,9 @@ public class Game {
 
     public TreeSet<TribeResult> getCurrentRanking() {
         return gs.getCurrentRanking();
+    }
+
+    public GameplayStats getGamePlayStats(int id) {
+        return gpStats[id];
     }
 }

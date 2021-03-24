@@ -35,8 +35,6 @@ public class PortfolioTreeNode
     private StateHeuristic rootStateHeuristic;
     private PruneHeuristic rootPruneHeuristic;
 
-    //TODO: Branching via pairs <unit, script>
-
     //From MCTSPlayer
     PortfolioTreeNode(PortfolioMCTSParams p, Random rnd, int playerID) {
         this(p, null, rnd, 0, null, null, null, playerID, null, null);

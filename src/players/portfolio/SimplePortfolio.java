@@ -188,4 +188,9 @@ public class SimplePortfolio extends Portfolio
     public TreeMap<Types.ACTION, BaseScript[]> getPortfolio() {
         return portfolio;
     }
+
+    @Override
+    public BaseScript[] scripts(Types.ACTION actionType) {
+        return portfolio.get(actionType);
+    }
 }

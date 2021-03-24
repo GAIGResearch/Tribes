@@ -88,6 +88,7 @@ public class PortfolioMCTSPlayer extends Agent {
         return m_root.getActions().size();
     }
 
-
-
+    public PortfolioMCTSParams getParams() {
+        return params;
+    }
 }

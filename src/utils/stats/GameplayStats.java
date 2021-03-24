@@ -10,6 +10,7 @@ import core.actors.Building;
 import core.actors.City;
 import core.actors.units.Unit;
 import core.game.GameState;
+import core.game.TribeResult;
 
 import java.util.*;
 
@@ -19,7 +20,8 @@ public class GameplayStats {
 
     //Info about player and turns
     private int maxTurn;
-    private int playerID;
+    private final int playerID;
+    private TribeResult tribeResult;
 
     //Data
     private TreeMap<Types.ACTION, HashMap<Integer, Integer>> actionsBreakdown;  //ACTION -> {[turn, count], [turn, count]...}
@@ -28,6 +30,15 @@ public class GameplayStats {
     private TreeMap<String, Integer> actionSubtypeCount;      //String (actionsubtype) -> count
     private TreeMap<String, HashMap<Integer, Integer>> actionSubtypeCountTurn;      //String (actionsubtype) -> {[turn, count], [turn, count]...}
 
+    public int getFinalActionCount(Types.ACTION action)
+    {
+        return actionsCount.get(action);
+    }
+
+    public int getFinalActionCount(String action)
+    {
+        return actionSubtypeCount.get(action);
+    }
 
     //Array helpers for data collection
     private final String[] stats = new String[]{"Production", "Num cities",
@@ -289,4 +300,11 @@ public class GameplayStats {
     }
 
 
+    public void logGameEnd(TribeResult tr) {
+        this.tribeResult = tr;
+    }
+
+    public TribeResult getTribeResult() {
+        return tribeResult;
+    }
 }

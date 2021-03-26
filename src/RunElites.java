@@ -58,6 +58,7 @@ public class RunElites {
         Constants.VERBOSE = true;
         int nWeights = 11;
         boolean master = true;
+        boolean fileBased = false;
         Path mapPath = null;
 
         JSONObject config = null;
@@ -91,6 +92,7 @@ public class RunElites {
                 Run.B = config.getDouble("B");
                 nWeights = config.getInt("nWeights");
                 master = config.getBoolean("Master");
+                fileBased = config.getBoolean("File based");
 
                 Run.POP_SIZE = config.getInt("Population Size");
                 shiftTribes = config.getBoolean("Shift Tribes");
@@ -220,7 +222,7 @@ public class RunElites {
         };
 
         String runStr = args[0].substring(0, args[0].lastIndexOf('.'));
-        MapElites me = new MapElites(features, nWeights, master, mapPath);
+        MapElites me = new MapElites(features, nWeights, master, mapPath, fileBased);
         me.runAlgorithm(numIterations, numRandomInits, runner, runStr);
     }
 

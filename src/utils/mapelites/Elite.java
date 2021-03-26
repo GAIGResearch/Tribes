@@ -25,8 +25,8 @@ import java.util.TreeMap;
  * Returns the feature id and performance of the elite using its stats
  */
 public class Elite {
-    private double[] genome;
-    private ArrayList<GameplayStats> allStats;
+    public double[] genome;
+    public ArrayList<GameplayStats> allStats;
     private TreeMap<Feature, Double> featureValues;
 
 
@@ -38,9 +38,14 @@ public class Elite {
         featureValues = new TreeMap<>();
     }
 
-    public int getFeatureIdx(Feature feature) {
+    public void setFeatureValue(Feature feature) {
         Pair<Integer, Double> p = feature.getBucketIdx(allStats);
         featureValues.put(feature, p.getSecond());
+    }
+
+    public int getFeatureIdx(Feature feature) {
+        Pair<Integer, Double> p = feature.getBucketIdx(allStats);
+        //featureValues.put(feature, p.getSecond());
         return p.getFirst();
     }
 
@@ -76,44 +81,29 @@ public class Elite {
     }
 
     public void printInfo(String statsResultsFileName) {
-        System.out.println("Weights: " + printWeights());
-        String[] allFeatures = featuresString(", ");
-        System.out.println("Feature values (map): "+ allFeatures[0]);
-        System.out.println("Feature values (not in map): "+ allFeatures[1]);
-
-        if (statsResultsFileName != null) {
-//            String resultsHeuristicFile = statsResultsFileName + "_" + weightsString("_") + ".txt";
-            
-            BufferedWriter writer;
-            try {
-                    writer = new BufferedWriter(new FileWriter(new File(statsResultsFileName), true));
-
-                    writer.write("-----------------------\n");
-                    writer.write("(");
-                    for(Feature f : featureValues.keySet())
-                    {
-                        int bucket = f.getBucketIdx(allStats).getFirst();
-                        writer.write(bucket + ",");
-                    }
-                    writer.write(")\n");
-                    writer.write("Weights: " + printWeights() + "\n");
-                    writer.write("Feature values (map): "+ allFeatures[0] + "\n");
-                    writer.write("Feature values (not in map): "+ allFeatures[1] + "\n");
-                    writer.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            //printStats(resultsHeuristicFile);
+        ArrayList<String> lines = new ArrayList<>();
+        lines.add("-----------------------");
+        StringBuilder sb = new StringBuilder("(");
+        for(Feature f : featureValues.keySet())
+        {
+            int bucket = f.getBucketIdx(allStats).getFirst();
+            sb.append(bucket).append(",");
         }
+        sb.append(")");
+        lines.add(sb.toString());
+
+        ArrayList<String> linesInfo = getBasicEliteInfo();
+        lines.addAll(linesInfo);
+
+        new IO().writeFile(statsResultsFileName, lines, true);
     }
 
 
     public void printInfoConsole() {
-        System.out.println("Weights: " + printWeights());
-        String[] allFeatures = featuresString(", ");
-        System.out.println("Feature values (map): "+ allFeatures[0]);
-        System.out.println("Feature values (not in map): "+ allFeatures[1]);
+        ArrayList<String> lines = getBasicEliteInfo();
+        for(String str : lines) {
+            System.out.println(str);
+        }
     }
 
     private String weightsString(String separator) {
@@ -145,44 +135,6 @@ public class Elite {
         return new String[]{mapFeaturesStr.toString(), otherFeatures.toString()};
     }
 
-    /*
-    Weights: [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    Feature values (map): ATTACKS:10.3, PERC_RANGE:6.5,
-    Feature values (not in map): WIN:90.0, SCORE:7952.0, PRODUCTION:23.8, NUM_SPAWN_ARCHERS:0.8, NUM_SPAWN_CATAPULTS:1.5, NUM_SPAWN_KNIGHTS:0.8, NUM_SPAWN_SWORDMAN:0.0,
-
-     */
-    public EliteRecord readFromFile(String filename)
-    {
-        String[] lines = new IO().readFile(filename);
-
-        //weights
-        String weightsLine = lines[0].split(":")[1].trim();
-        String[] weights = weightsLine.substring(1, weightsLine.length()-1).split(",");
-        double[] doubleWeights = new double[weights.length];
-        for(int i = 0; i < weights.length; i++)
-        {
-            doubleWeights[i] = Double.parseDouble(weights[i]);
-        }
-
-        //map and no-map features
-        TreeMap<String, Double> features = new TreeMap<>();
-        for(int i = 1; i <= 2; i++)
-        {
-            int start = lines[i].indexOf(":");
-            String f = lines[i].substring(start+1, lines[i].length()-1).trim();
-            String[] mapFeatures = f.split(",");
-            for (String mapFeature : mapFeatures) {
-                String chunk = mapFeature.trim();
-                String featName = chunk.split(":")[0];
-                double featVal = Double.parseDouble(chunk.split(":")[1]);
-                features.put(featName, featVal);
-            }
-        }
-
-        return new EliteRecord(doubleWeights, features);
-    }
-
-
     public void saveToFile(Path path)
     {
         String saveFilename = "";
@@ -213,7 +165,8 @@ public class Elite {
         if(num > 0)
         {
             String filename = path.toString() + "/" + header + num  + ".txt";
-            EliteRecord eliteInFile = readFromFile(filename);
+            EliteRecord eliteInFile = new EliteRecord();
+            eliteInFile.readFromFile(filename);
             if(eliteInFile.compareTo(this) > 0)
             {
                 saveFilename = path.toString()  + "/" + header + (num+1)  + ".txt";
@@ -226,49 +179,19 @@ public class Elite {
         }
 
         if(save) {
-            ArrayList<String> lines = new ArrayList<>();
-            lines.add("Weights: " + printWeights());
-
-            String[] allFeatures = featuresString(", ");
-            lines.add("Feature values (map): "+ allFeatures[0]);
-            lines.add("Feature values (not in map): "+ allFeatures[1]);
-
-            new IO().writeFile(saveFilename, lines);
+            new IO().writeFile(saveFilename, getBasicEliteInfo(), false);
         }
     }
 
-    private class EliteRecord
+    public ArrayList<String> getBasicEliteInfo()
     {
-        double[] weights;
-        TreeMap<String, Double> features;
+        ArrayList<String> lines = new ArrayList<>();
+        lines.add("Weights: " + printWeights());
 
-        public EliteRecord(double[] wList, TreeMap<String, Double> features)
-        {
-            this.weights = wList;
-            this.features = features;
-        }
-
-        public int compareTo(Elite e)
-        {
-            double eWins = Feature.WINS.getFeatureValue(e.allStats);
-            double eScore = Feature.SCORE.getFeatureValue(e.allStats);
-
-            double thisWins = features.get("WIN");
-            double thisScores = features.get("SCORE");
-
-            if( thisWins > eWins )
-                return -1;
-            else if( thisWins < eWins)
-                return 1;
-            else
-            {
-                if( thisScores > eScore )
-                    return -1;
-                else if( thisScores < eScore)
-                    return 1;
-            }
-            return 0;
-        }
+        String[] allFeatures = featuresString(", ");
+        lines.add("Feature values (map): "+ allFeatures[0]);
+        lines.add("Feature values (not in map): "+ allFeatures[1]);
+        return lines;
     }
 
 }

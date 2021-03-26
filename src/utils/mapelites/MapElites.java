@@ -8,9 +8,11 @@ package utils.mapelites;
 import core.Constants;
 import utils.stats.GameplayStats;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * Contains the definition of the MAP-Elites as well as the methods required to
@@ -27,9 +29,11 @@ public class MapElites {
     private Feature[] features;
     private ArrayList<EliteIdx> occupiedCellsIdx;
     private Map mapElites;
+    private MapRecord mapElitesRecord;
     private int nWeights;
     boolean ELITE_VERBOSE = true;
     boolean master = false;
+    boolean fileBased = false;
     Path path;
 
     private class EliteIdx {
@@ -41,13 +45,15 @@ public class MapElites {
         }
     }
 
-    public MapElites(Feature[] features, int nWeights, boolean master, Path path) {
+    public MapElites(Feature[] features, int nWeights, boolean master, Path path, boolean fileBased) {
         mapElites = new Map(features);
+        mapElitesRecord = new MapRecord(features);
         occupiedCellsIdx = new ArrayList<>();
         this.features = features;
         this.nWeights = nWeights;
         this.master = master;
         this.path = path;
+        this.fileBased = true;
     }
 
     /**
@@ -68,9 +74,8 @@ public class MapElites {
                 genome[i] = 1.0;
 
                 // Create elite for the current behaviour
-                Elite elite = createGameplayElite(genome, runner);
-                addEliteToMap(elite);
-                //elite.saveToFile(path);
+                createGameplayElite(genome, runner);
+
             }
 
         //Non master runs initalize at random
@@ -81,12 +86,11 @@ public class MapElites {
                 Generator.setRandomWeights(genome, 0.0, 0.25, 1.0);
 
                 // Create elite from random values and add to map
-                Elite elite = createGameplayElite(genome, runner);
-                addEliteToMap(elite);
-                //elite.saveToFile(path);
+                createGameplayElite(genome, runner);
             }
         }
 
+        this.refreshMapFromPath();
         if(ELITE_VERBOSE) System.out.println("MAPElites initialised: " + getNCellsOccupied() + " cells occupied\n");
     }
 
@@ -109,23 +113,32 @@ public class MapElites {
             if(ELITE_VERBOSE) System.out.println("MAPELites algorithm iteration " + (nIteration + 1) + "/" + nTotalIterations);
             
             // get random cell elite and a copy of its weights
-            Elite randomElite = getRandomEliteFromMap();
-            randomElite.copyWeightsListValues(genome);
+            EliteIdx eliteIdx = (EliteIdx) Generator.getRandomElementFromArray(occupiedCellsIdx);
+            if(fileBased)
+            {
+                EliteRecord eliteR = mapElitesRecord.getCell(eliteIdx.coordinates);
+                System.arraycopy(eliteR.weights, 0, genome, 0, eliteR.weights.length);
+
+            }else
+            {
+                Elite elite = mapElites.getCell(eliteIdx.coordinates);
+                System.arraycopy(elite.genome, 0, genome, 0, elite.genome.length);
+            }
 
             // evol weights
-            evolveHeuristicsWeights(genome);
+            Generator.stochasticHillClimberMutation(genome, 0.0, 0.25, 1.0);
 
             // Create new possible elite and add to map
-            Elite newElite = createGameplayElite(genome, runner);
-            addEliteToMap(newElite);
+            createGameplayElite(genome, runner);
 
             nIteration++;
 
+            this.refreshMapFromPath();
             printMapElitesInfo("map_" + runStr + "_" + nIteration + ".txt");
         }
 
         // When the algorithm is over, we need to make sure the final elites have all the data available
-        processMapElitesData();
+        //processMapElitesData();
     }
 
     /**
@@ -145,25 +158,66 @@ public class MapElites {
         return occupiedCellsIdx.size();
     }
 
-    private Elite getRandomEliteFromMap() {
-        EliteIdx eliteIdx = (EliteIdx) Generator.getRandomElementFromArray(occupiedCellsIdx);
-        return mapElites.getCell(eliteIdx.coordinates);
-    }
-
-    private void evolveHeuristicsWeights(double[] heuristicsWeightList) {
-        Generator.evolveWeightList(heuristicsWeightList);
-    }
-    
-    private Elite createGameplayElite(double[] genome, Runner runner) {
+    private void createGameplayElite(double[] genome, Runner runner) {
         // Get the game stats needed for the calculations for the map for current controller and weights. 
         // During the iteration of the algorithm, only the stats involved in performance and features are needed
         //GameStats gameStats = gameplayFramework.createMapEliteStatsFromGameplay(controller, performanceCriteria, new Features[]{featureInfoX, featureInfoY});
 
-        //Constants.MAX_TURNS_CAPITALS = 10;
+//        Constants.MAX_TURNS_CAPITALS = 10;
         ArrayList<GameplayStats> allStats = runner.run(genome);
 
         // Create elite with information and results
-        return new Elite(genome, allStats);
+        Elite elite = new Elite(genome, allStats);
+
+        for (Feature feature : features) {
+            elite.setFeatureValue(feature);
+        }
+
+        if(fileBased)  elite.saveToFile(path);
+        else           addEliteToMap(elite);
+    }
+
+    private void refreshMapFromPath()
+    {
+        File f = new File(path.toString());
+        HashMap<String, Integer> filenamesInMap = new HashMap<>();
+        mapElitesRecord = new MapRecord(features);
+        occupiedCellsIdx = new ArrayList<>();
+
+        int num = 0;
+        for(File file : f.listFiles())
+        {
+            String fileName = file.getName();
+            String name = fileName.substring(0, fileName.length()-4); //extension out.
+            int lastHyp = name.lastIndexOf("-");
+            int idx = Integer.parseInt(name.substring(lastHyp+1));
+            String mapCell = name.substring(0, lastHyp);
+
+            if(filenamesInMap.containsKey(mapCell))
+            {
+                int inMapIdx = filenamesInMap.get(mapCell);
+                if(idx > inMapIdx)
+                    filenamesInMap.put(mapCell, idx);
+            }else{
+                filenamesInMap.put(mapCell, idx);
+            }
+        }
+
+        //We have the elites, let's process them:
+        for(String key : filenamesInMap.keySet())
+        {
+            String filename = path.toString() + "/" + key + "-" + filenamesInMap.get(key) + ".txt";
+            EliteRecord eliteInFile = new EliteRecord();
+            eliteInFile.readFromFile(filename);
+
+            String[] coordStr = key.split("-");
+            int[] coord = new int[coordStr.length];
+            for(int i = 0; i < coord.length; i++) coord[i] = Integer.parseInt(coordStr[i]);
+
+            mapElitesRecord.setCell(coord, eliteInFile);
+            occupiedCellsIdx.add(new EliteIdx(coord));
+        }
+
     }
 
     private void addEliteToMap(Elite elite) {
@@ -205,6 +259,9 @@ public class MapElites {
         for(Feature f : features) System.out.print(f.name() + " ");
         System.out.println();
 
-        mapElites.printData(statsResultsFileName);
+        if(fileBased)
+            mapElitesRecord.printData(statsResultsFileName);
+        else
+            mapElites.printData(statsResultsFileName);
     }
 }

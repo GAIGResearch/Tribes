@@ -1,8 +1,8 @@
 {
   "Elites features" : ["ATTACKS", "PERC_RANGE", "PRODUCTION"],
   "nWeights" : 11,
-  "Elites iterations" : 1,
-  "Random inits" : 11,
+  "Elites iterations" : 20,
+  "Random inits" : 10,
   "Repetitions" : 1,
   "Progressive Bias" : true,
   "Pruning" : true,
@@ -23,6 +23,6 @@
     "1590557911279"
   ],
   "Master" : false,
-  "Map folder" : "map/"
-
+  "Map folder" : "map/",
+  "File based" : true
 }

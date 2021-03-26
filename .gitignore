@@ -12,3 +12,5 @@ out/
 *.pyc
 py/venv/
 test/
+map/
+map_elites_*

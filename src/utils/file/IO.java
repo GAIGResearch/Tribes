@@ -49,10 +49,10 @@ public class IO
      * @param lines content to write
      * @return true if all worked
      */
-    public boolean writeFile(String filename, ArrayList<String> lines)
+    public boolean writeFile(String filename, ArrayList<String> lines, boolean append)
     {
         try{
-            BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filename), false));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filename), append));
             for(String line : lines)
             {
                 writer.write(line + "\n");

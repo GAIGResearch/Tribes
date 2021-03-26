@@ -20,7 +20,7 @@ public class Generator {
      * @return random Object
      */
     public static Object getRandomElementFromArray(ArrayList<?> list) {
-        int randomId = Generator.generateRandomInteger(list.size());
+        int randomId = new Random().nextInt(list.size());
         return list.get(randomId);
     }
 
@@ -41,6 +41,15 @@ public class Generator {
      * @param weightList list to be filled with random weights
      */
     public static void setRandomWeights(double[] weightList, double min, double inc, double max) {
+        ArrayList<Double> choices = generateRandomChoices(min, inc, max);
+        for (int i = 0; i < weightList.length; i++) {
+            int idx = new Random().nextInt(choices.size());
+            weightList[i] = choices.get(idx);
+        }
+    }
+
+    public static ArrayList<Double> generateRandomChoices(double min, double inc, double max)
+    {
         ArrayList<Double> choices = new ArrayList<>();
         choices.add(min);
         double val = min + inc;
@@ -50,31 +59,9 @@ public class Generator {
             val+=inc;
         }
         choices.add(max);
-
-        for (int i = 0; i < weightList.length; i++) {
-            int idx = new Random().nextInt(choices.size());
-            weightList[i] = choices.get(idx);
-        }
+        return choices;
     }
 
-    /**
-     * Evolve list of weights by the evolution method of choice
-     * @param weightList list of weights to be evolved
-     */
-    public static void evolveWeightList(double[] weightList) {
-        stochasticHillClimberMutation(weightList);
-    }
-
-    /**
-     * Generates a random integer between 0 and the max value. 
-     * The maximum value is excluded from the generation.
-     * @param max excluded maximum value
-     * @return
-     */
-    private static int generateRandomInteger(int max) {
-        Random randomGenerator = new Random();
-        return randomGenerator.nextInt(max);
-    }
 
     /**
      * Generates a random weight. 
@@ -110,8 +97,24 @@ public class Generator {
      * 2) Generate a new random weight for it
      * @param weightList list of weights to be mutated
      */
-    private static void stochasticHillClimberMutation(double[] weightList) {
-        int randomElementId = Generator.generateRandomInteger(weightList.length);
+    public static void stochasticHillClimberMutation(double[] weightList) {
+        int randomElementId = new Random().nextInt(weightList.length);
         weightList[randomElementId] = Generator.generateRandomWeight();
     }
+
+    public static void stochasticHillClimberMutation(double[] weightList, double min, double inc, double max) {
+        ArrayList<Double> choices = generateRandomChoices(min, inc, max);
+        int randomElementId = new Random().nextInt(weightList.length);
+        int randomIdxChoice = new Random().nextInt(choices.size());
+        double newVal = choices.get(randomIdxChoice);
+        while(Math.abs(newVal - weightList[randomElementId]) < inc*0.5)
+        {
+            randomIdxChoice = new Random().nextInt(choices.size());
+            newVal = choices.get(randomIdxChoice);
+        }
+        weightList[randomElementId] = newVal;
+    }
 }
+
+
+

@@ -86,7 +86,7 @@ public class Tournament {
         boolean shiftTribes = true;
         Constants.VERBOSE = true;
 
-        JSONObject config = null;
+        JSONObject config = new IO().readJSON("tournament.json");
         if(args.length > 0)
             //First argument should be the name of the JSON file with the tournament configuration
             config = new IO().readJSON(args[0]);

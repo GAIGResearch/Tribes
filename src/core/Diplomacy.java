@@ -24,17 +24,38 @@ public class Diplomacy {
     /**
      * Creates allegiances for each of the existing tribes
      *
-     * @param b             board for the game
+     * @param value         value the allegiance will change by, will be negative if called by an action, positive if called by checkConsequences()
+     * @param initTribeID   ID for the tribe initiating the action
+     * @param targetTribeID ID for the target tribe of the action
+     */
+    public void updateAllegiance(int value, int initTribeID, int targetTribeID) {
+
+        // Limits the values of the status to be +-absoluteMax (in this case, 60)
+        if (Math.abs(value) + Math.abs(this.AllegianceStatus[initTribeID][targetTribeID]) > absoluteMax) {
+            value = Integer.signum(value) * (absoluteMax - Math.abs(this.AllegianceStatus[initTribeID][targetTribeID]));
+        }
+        this.AllegianceStatus[initTribeID][targetTribeID] = this.AllegianceStatus[initTribeID][targetTribeID] + value;
+        this.AllegianceStatus[targetTribeID][initTribeID] = this.AllegianceStatus[targetTribeID][initTribeID] + value;
+    }
+
+    /**
+     * Checks the consequences of the change in relationship, to see if any more allegiances need to be updated
+     *
      * @param value         value the allegiance will change by
      * @param initTribeID   ID for the tribe initiating the action
      * @param targetTribeID ID for the target tribe of the action
      */
-    public void updateAllegiance(Board b, int value, int initTribeID, int targetTribeID) {
-
-        //TODO check new value against absolute max, if new value is above, set to +-absolute max
-
-        this.AllegianceStatus[initTribeID][targetTribeID] = this.AllegianceStatus[initTribeID][targetTribeID] + value;
-        this.AllegianceStatus[targetTribeID][initTribeID] = this.AllegianceStatus[targetTribeID][initTribeID] + value;
+    public void checkConsequences(int value, int initTribeID, int targetTribeID) {
+        // inverting and halving the value
+        value = value / -2;
+        // checks all relationships for the target tribe
+        for (int i = 0; i < AllegianceStatus.length; i++) {
+            // if the target tribe has a negative relationship and it is not with the initiating tribe
+            if ((AllegianceStatus[i][targetTribeID]) < 0 && (i != initTribeID)) {
+                // call update allegiance with the new tribes and value
+                updateAllegiance(value, i, targetTribeID);
+            }
+        }
     }
 
     //Method to test the diplomacy is working

@@ -29,11 +29,10 @@ public class Diplomacy {
      * @param targetTribeID ID for the target tribe of the action
      */
     public void updateAllegiance(int value, int initTribeID, int targetTribeID) {
-
-        // Limits the values of the status to be +-absoluteMax (in this case, 60)
-        if (Math.abs(value) + Math.abs(this.AllegianceStatus[initTribeID][targetTribeID]) > absoluteMax) {
+        if ((this.AllegianceStatus[initTribeID][targetTribeID] + value < -absoluteMax) || (this.AllegianceStatus[initTribeID][targetTribeID] + value > absoluteMax)){
             value = Integer.signum(value) * (absoluteMax - Math.abs(this.AllegianceStatus[initTribeID][targetTribeID]));
         }
+
         this.AllegianceStatus[initTribeID][targetTribeID] = this.AllegianceStatus[initTribeID][targetTribeID] + value;
         this.AllegianceStatus[targetTribeID][initTribeID] = this.AllegianceStatus[targetTribeID][initTribeID] + value;
     }
@@ -50,18 +49,28 @@ public class Diplomacy {
         value = value / -2;
         // checks all relationships for the target tribe
         for (int i = 0; i < AllegianceStatus.length; i++) {
-            // if the target tribe has a negative relationship and it is not with the initiating tribe
+            // if the init tribe has a negative relationship and it is not with the initiating tribe
             if ((AllegianceStatus[i][targetTribeID]) < 0 && (i != initTribeID)) {
-                // call update allegiance with the new tribes and value
-                updateAllegiance(value, i, targetTribeID);
+                // call update allegiance for the target tribe
+                updateAllegiance(value, i, initTribeID);
             }
         }
     }
 
     //Method to test the diplomacy is working
-    public void logAllegiance() {
-        System.out.println(Arrays.deepToString(this.AllegianceStatus));
+    public void logAllegiance(Board b) {
+        System.out.println("NEW LOG");
+        for (int i = 0; i < AllegianceStatus.length; i++) {
+            System.out.print(b.getTribes()[i].getName() + ": ");
+            for (int j=0; j < AllegianceStatus.length; j ++){
+                System.out.print(this.AllegianceStatus[i][j] + ", ");
+            }
+            System.out.println();
+        }
     }
 
+    public void logAllegiance2(){
+        System.out.println(Arrays.deepToString(this.AllegianceStatus));
+    }
 }
 

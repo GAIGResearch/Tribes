@@ -4,10 +4,12 @@ import players.heuristics.AlgParams;
 import players.heuristics.PruneHeuristic;
 import players.heuristics.PrunePortfolioHeuristic;
 import players.portfolio.Portfolio;
+import utils.stats.LinearRegression;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 
 @SuppressWarnings("WeakerAccess")
 public class PortfolioMCTSParams extends AlgParams {
@@ -124,9 +126,15 @@ public class PortfolioMCTSParams extends AlgParams {
 
     public static void main(String args[])
     {
-        PortfolioMCTSParams params = new PortfolioMCTSParams();
-        for(int nChildren = 1; nChildren <= 50; nChildren++) {
-            params.printPruneLine(nChildren);
-        }
+//        PortfolioMCTSParams params = new PortfolioMCTSParams();
+//        for(int nChildren = 1; nChildren <= 50; nChildren++) {
+//            params.printPruneLine(nChildren);
+//        }
+
+
+        double[] x = {1.0, 2.0, 3.0, 4.0, 5.0};
+        double[] y = {0.0, 0.5, 1.0, 1.5, 2.0};
+        LinearRegression lr = new LinearRegression(x, y);
+        System.out.println(lr);
     }
 }

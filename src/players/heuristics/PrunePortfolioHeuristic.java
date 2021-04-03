@@ -37,6 +37,7 @@ public class PrunePortfolioHeuristic implements PruneHeuristic
         return weights.get(aas.getAction().getActionType());
     }
 
+
     public double evaluatePrune(GameState state, ActionAssignment aas)
     {
         Types.ACTION actionType = aas.getAction().getActionType();

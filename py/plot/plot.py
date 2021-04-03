@@ -27,13 +27,14 @@ def process_file(f_name):
     techs = {}
     cities_l = {}
     prods = {}
-    for ag in agents:
-        victories[ag] = []
-        positions[ag] = []
-        points_l[ag] = []
-        techs[ag] = []
-        cities_l[ag] = []
-        prods[ag] = []
+    gpstats = {}
+    # for ag in agents:
+    #     victories[ag] = []
+    #     positions[ag] = []
+    #     points_l[ag] = []
+    #     techs[ag] = []
+    #     cities_l[ag] = []
+    #     prods[ag] = []
 
     with open(f_name) as f:
 
@@ -46,11 +47,15 @@ def process_file(f_name):
     seed_per_game = [-1 for _ in range(N_GAMES)]
     data_per_game = {}
     all_data = {}
+    all_features = {}
+    all_features_per_game = {}
     sum_data = {}
     for ag in agents:
         data_per_game[ag] = [[] for _ in range(N_GAMES)]
         all_data[ag] = [[] for _ in range(6)]
         sum_data[ag] = []
+        all_features[ag] = {}
+        all_features_per_game[ag] = [[] for _ in range(N_GAMES)]
 
     with open(f_name) as f:
         lines = f.readlines()
@@ -63,7 +68,7 @@ def process_file(f_name):
                 if "Playing level with seed" in line:
                     seed = line.split(" ")[-2]
                     seed_per_game[game+1] = seed
-                # print "game " + str(game) + " seed " + str(seed)
+                    # print "game " + str(game) + " seed " + str(seed)
 
                 if rep > 0:
                     for ag in agents:
@@ -75,6 +80,14 @@ def process_file(f_name):
                         game_info.append(np.average(cities_l[ag]))
                         game_info.append(np.average(prods[ag]))
                         data_per_game[ag][game] = game_info
+
+                        for featname in gpstats[ag]:
+                            if featname not in all_features[ag]:
+                                all_features[ag][featname] = []
+                            for v in gpstats[ag][featname]:
+                                all_features[ag][featname].append(v)
+                        all_features_per_game[ag][game].append(gpstats[ag])
+
 
                 rep = 0
                 game = game + 1
@@ -91,6 +104,7 @@ def process_file(f_name):
                     techs[ag] = []
                     cities_l[ag] = []
                     prods[ag] = []
+                    gpstats[ag] = {}
 
 
 
@@ -125,6 +139,18 @@ def process_file(f_name):
                 all_data[agent][4].append(c)
                 all_data[agent][5].append(pr)
 
+
+            if "GPS:" in line:
+                chunks = line.split(":")
+                agent = agents_dict[chunks[2]]
+                feature = chunks[3]
+                value = float(chunks[4])
+
+                if feature not in gpstats[agent]:
+                    gpstats[agent][feature] = []
+                gpstats[agent][feature].append(value)
+
+
     for ag in agents:
         agent_data = all_data[ag]
         n = len(agent_data[0])
@@ -155,7 +181,7 @@ def process_file(f_name):
         sum_data[ag].append(pr_stderr)
 
 
-    return agents, all_data, sum_data, data_per_game, seed_per_game
+    return agents, all_data, sum_data, data_per_game, seed_per_game, all_features, all_features_per_game
 
 
 def print_agent_pw(ag, data, column_order):
@@ -187,7 +213,7 @@ def print_agent_pw(ag, data, column_order):
 
 def main():
 
-    file_path = "C:\\Work\\Tribes-results\\Portfolio pruning\\vsMCTS\\"
+    file_path = "C:\\Work\\Tribes-results\\validation-7-8-1\\"
     column_order = ["MCTS", "PORTFOLIO_MCTS"]
     files = [join(file_path, f) for f in listdir(file_path) if isfile(join(file_path, f)) and f.endswith("test.txt")]
 
@@ -198,6 +224,8 @@ def main():
     technologies = {}
     cities = {}
     productions = {}
+    all_features = {}
+    all_features_per_game = {}
 
     for ag in agent_names:
         victories[ag] = {}
@@ -206,6 +234,8 @@ def main():
         technologies[ag] = {}
         cities[ag] = {}
         productions[ag] = {}
+        all_features[ag] = {}
+        all_features_per_game[ag] = {}
 
         victories[ag]['tot'] = []
         positions[ag]['tot'] = []
@@ -225,7 +255,7 @@ def main():
             # length = int(f.split(".")[-2].split("_")[3])
             # pop_size = int(f.split(".")[-2].split("_")[6])
 
-            agents, all_data, sum_data, data_per_game, seed_per_game = process_file(f)
+            agents, all_data, sum_data, data_per_game, seed_per_game, all_features, all_features_per_game = process_file(f)
 
             victories[agents[0]][agents[1]] = [sum_data[agents[0]][1] * 100, sum_data[agents[0]][2] * 100]
             victories[agents[1]][agents[0]] = [sum_data[agents[1]][1] * 100, sum_data[agents[1]][2] * 100]
@@ -305,32 +335,46 @@ def main():
 
     if True:
         for ag in agent_names:
-            victories[ag]['tot'] = [np.average(victories[ag]['tot']) * 100, np.average(victories[ag]['tot']) / np.sqrt(len(victories[ag]['tot'])) * 100]
-            positions[ag]['tot'] = [np.average(positions[ag]['tot']), np.average(positions[ag]['tot']) / np.sqrt(len(positions[ag]['tot']))]
-            scores[ag]['tot'] = [np.average(scores[ag]['tot']), np.average(scores[ag]['tot']) / np.sqrt(len(scores[ag]['tot']))]
-            technologies[ag]['tot'] = [np.average(technologies[ag]['tot']) * 100 / 24, np.average(technologies[ag]['tot']) / np.sqrt(len(technologies[ag]['tot'])) * 100 / 24]
-            cities[ag]['tot'] = [np.average(cities[ag]['tot']), np.average(cities[ag]['tot']) / np.sqrt(len(cities[ag]['tot']))]
-            productions[ag]['tot'] = [np.average(productions[ag]['tot']), np.average(productions[ag]['tot']) / np.sqrt(len(productions[ag]['tot']))]
+            if len(victories[ag]['tot']) > 0:
+                victories[ag]['tot'] = [np.average(victories[ag]['tot']) * 100, np.average(victories[ag]['tot']) / np.sqrt(len(victories[ag]['tot'])) * 100]
+                positions[ag]['tot'] = [np.average(positions[ag]['tot']), np.average(positions[ag]['tot']) / np.sqrt(len(positions[ag]['tot']))]
+                scores[ag]['tot'] = [np.average(scores[ag]['tot']), np.average(scores[ag]['tot']) / np.sqrt(len(scores[ag]['tot']))]
+                technologies[ag]['tot'] = [np.average(technologies[ag]['tot']) * 100 / 24, np.average(technologies[ag]['tot']) / np.sqrt(len(technologies[ag]['tot'])) * 100 / 24]
+                cities[ag]['tot'] = [np.average(cities[ag]['tot']), np.average(cities[ag]['tot']) / np.sqrt(len(cities[ag]['tot']))]
+                productions[ag]['tot'] = [np.average(productions[ag]['tot']), np.average(productions[ag]['tot']) / np.sqrt(len(productions[ag]['tot']))]
 
-            # HUMAN
-            # print ag
-            # print "victories", victories[ag]['tot']
-            # print "positions", positions[ag]['tot']
-            # print "scores", scores[ag]['tot']
-            # print "technologies", technologies[ag]['tot']
-            # print "cities", cities[ag]['tot']
-            # print "productions", productions[ag]['tot']
+                # LATEX
+                txt = ag + " & {a:.2f}\% ({b:.2f}) & {c:.2f} ({d:.2f}) & {e:.2f} ({f:.2f}) & {g:.2f}\% ({h:.2f}) & {i:.2f} ({j:.2f}) & {k:.2f} ({l:.2f}) \\\\"
+                print(txt.format(
+                      a=victories[ag]['tot'][0], b=victories[ag]['tot'][1],
+                      c=positions[ag]['tot'][0], d=positions[ag]['tot'][1],
+                      e=scores[ag]['tot'][0], f=scores[ag]['tot'][1],
+                      g=technologies[ag]['tot'][0], h=technologies[ag]['tot'][1],
+                      i=cities[ag]['tot'][0], j=cities[ag]['tot'][1],
+                      k=productions[ag]['tot'][0], l=productions[ag]['tot'][1]))
+                print ("\\hline")
 
-            # LATEX
-            txt = ag + " & {a:.2f}\% ({b:.2f}) & {c:.2f} ({d:.2f}) & {e:.2f} ({f:.2f}) & {g:.2f}\% ({h:.2f}) & {i:.2f} ({j:.2f}) & {k:.2f} ({l:.2f}) \\\\"
-            print(txt.format(
-                  a=victories[ag]['tot'][0], b=victories[ag]['tot'][1],
-                  c=positions[ag]['tot'][0], d=positions[ag]['tot'][1],
-                  e=scores[ag]['tot'][0], f=scores[ag]['tot'][1],
-                  g=technologies[ag]['tot'][0], h=technologies[ag]['tot'][1],
-                  i=cities[ag]['tot'][0], j=cities[ag]['tot'][1],
-                  k=productions[ag]['tot'][0], l=productions[ag]['tot'][1]))
-            print ("\\hline")
+                if ag in all_features:
+                    # txt_feat = ag
+                    # txt_val = ag
+                    human_readable = {}
+
+                    for featname in all_features[ag]:
+                        # txt_feat = txt_feat + " & " + featname
+                        avg = np.average(all_features[ag][featname])
+                        tv = " & {a:.2f}".format(a=avg)
+                        # txt_val = txt_val + tv
+
+                        human_readable[featname] = avg
+
+                    # print(txt_feat)
+                    # print(txt_val)
+
+                    if True:
+                        print(ag)
+                        for f in human_readable:
+                            print(f + ": " + str(human_readable[f]))
+
 
     # print victories
 

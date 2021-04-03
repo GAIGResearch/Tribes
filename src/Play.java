@@ -56,6 +56,19 @@ public class Play {
                 Types.GAME_MODE gameMode = config.getString("Game Mode").equalsIgnoreCase("Capitals") ?
                         CAPITALS : SCORE;
 
+                Run.MAX_LENGTH = config.getInt("Search Depth");
+                Run.FORCE_TURN_END = config.getBoolean("Force End");
+                Run.MCTS_ROLLOUTS = config.getBoolean("Rollouts");
+                Run.POP_SIZE = config.getInt("Population Size");
+
+                //Portfolio and pruning variables:
+                Run.PRUNING = config.getBoolean("Pruning");
+                Run.PROGBIAS = config.getBoolean("Progressive Bias");
+                Run.K_INIT_MULT = config.getDouble("K init mult");
+                Run.T_MULT = config.getDouble("T mult");
+                Run.A_MULT = config.getDouble("A mult");
+                Run.B = config.getDouble("B");
+
                 AGENT_SEED = config.getLong("Agents Seed");
                 GAME_SEED = config.getLong("Game Seed");
                 long levelSeed = config.getLong("Level Seed");
@@ -163,7 +176,7 @@ public class Play {
 
         for(int i = 0; i < playerTypes.length; ++i)
         {
-            Agent ag = _getAgent(playerTypes[i], agentSeed, ac);
+            Agent ag = Run.getAgent(playerTypes[i], agentSeed);
             assert ag != null;
             ag.setPlayerIDs(i, allIds);
             players.add(ag);
@@ -180,7 +193,7 @@ public class Play {
 
         for(int i = 0; i < playerTypes.length; ++i)
         {
-            Agent ag = _getAgent(playerTypes[i], agentSeed, null);
+            Agent ag = Run.getAgent(playerTypes[i], agentSeed);
             assert ag != null;
             ag.setPlayerIDs(i, allIds);
             players.add(ag);
@@ -191,59 +204,4 @@ public class Play {
         return game;
     }
 
-
-    private static Agent _getAgent(Run.PlayerType playerType, long agentSeed, ActionController ac)
-    {
-        switch (playerType)
-        {
-            case DONOTHING: return new DoNothingAgent(agentSeed);
-            case HUMAN: return new HumanAgent(ac);
-            case RANDOM: return new RandomAgent(agentSeed);
-            case OSLA:
-                OSLAParams oslaParams = new OSLAParams();
-                oslaParams.stop_type = oslaParams.STOP_FMCALLS; //Upper bound
-                oslaParams.heuristic_method = oslaParams.DIFF_HEURISTIC;
-                return new OneStepLookAheadAgent(agentSeed, oslaParams);
-            case MC:
-                MCParams mcparams = new MCParams();
-                mcparams.stop_type = mcparams.STOP_FMCALLS;
-//                mcparams.stop_type = mcparams.STOP_ITERATIONS;
-                mcparams.heuristic_method = mcparams.DIFF_HEURISTIC;
-                mcparams.PRIORITIZE_ROOT = true;
-                mcparams.ROLLOUT_LENGTH = 10;
-                mcparams.FORCE_TURN_END = 5;//mcparams.ROLLOUT_LENGTH+2;
-                return new MonteCarloAgent(agentSeed, mcparams);
-            case SIMPLE: return new SimpleAgent(agentSeed);
-            case MCTS:
-                MCTSParams mctsParams = new MCTSParams();
-                mctsParams.stop_type = mctsParams.STOP_FMCALLS;
-                mctsParams.PRIORITIZE_ROOT = true;
-                mctsParams.heuristic_method = mctsParams.DIFF_HEURISTIC;
-                mctsParams.ROLLOUT_LENGTH = 20;
-//                mctsParams.ROLOUTS_ENABLED = false;
-                mctsParams.FORCE_TURN_END = 25;
-                return new MCTSPlayer(agentSeed, mctsParams);
-            case RHEA:
-                RHEAParams rheaParams = new RHEAParams();
-                rheaParams.stop_type = rheaParams.STOP_FMCALLS;
-                rheaParams.heuristic_method = rheaParams.DIFF_HEURISTIC;
-                rheaParams.INDIVIDUAL_LENGTH = 20;
-                rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
-                rheaParams.POP_SIZE = 1;
-                return new RHEAAgent(agentSeed, rheaParams);
-            case OEP:
-                OEPParams oepParams = new OEPParams();
-                return new OEPAgent(agentSeed, oepParams);
-            case PORTFOLIO_MCTS:
-                PortfolioMCTSParams portfolioMCTSParams = new PortfolioMCTSParams();
-                portfolioMCTSParams.stop_type = portfolioMCTSParams.STOP_FMCALLS;
-                portfolioMCTSParams.PRIORITIZE_ROOT = false;
-                portfolioMCTSParams.heuristic_method = portfolioMCTSParams.DIFF_HEURISTIC;
-                portfolioMCTSParams.ROLLOUT_LENGTH = 20;
-                portfolioMCTSParams.PRUNING = true;
-                portfolioMCTSParams.setPortfolio(new SimplePortfolio(agentSeed));
-                return new PortfolioMCTSPlayer(agentSeed, portfolioMCTSParams);
-        }
-        return null;
-    }
 }

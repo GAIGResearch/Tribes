@@ -1,9 +1,9 @@
 {
-  "Elites features" : ["ATTACKS", "PERC_RANGE", "PRODUCTION"],
+  "Elites features" : ["RESEARCH_PROGRESS", "OWNED_TILES_PROGRESS"],
   "nWeights" : 11,
   "Elites iterations" : 20,
-  "Random inits" : 10,
-  "Repetitions" : 1,
+  "Random inits" : 1,
+  "Repetitions" : 2,
   "Progressive Bias" : true,
   "Pruning" : true,
   "K init mult": 0.5,

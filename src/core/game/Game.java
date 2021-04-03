@@ -10,6 +10,7 @@ import players.HumanAgent;
 import utils.*;
 import gui.GUI;
 import gui.WindowInput;
+import utils.mapelites.Feature;
 import utils.stats.AIStats;
 import utils.stats.GameplayStats;
 
@@ -234,6 +235,19 @@ public class Game {
                         GameplayStats gps = gpStats[idx];
                         gps.logGameEnd(tr);
                         if(VERBOSE) gps.print();
+
+                        ArrayList<GameplayStats> agps = new ArrayList<>();
+                        agps.add(gps);
+                        for (Feature f : Feature.values())
+                        {
+                            double val = f.getFeatureValue(agps);
+
+                            String[] agentChunks = players[gps.getPlayerID()].getClass().toString().split("\\.");
+                            String agentName = agentChunks[agentChunks.length - 1];
+                            System.out.println("GPS:" + gps.getPlayerID() + ":" + agentName + ":" + f + ":" + val);
+                        }
+
+
                     }
                 }
 

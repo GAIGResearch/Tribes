@@ -8,6 +8,9 @@ package utils.mapelites;
 import core.Types;
 import utils.Pair;
 import utils.stats.GameplayStats;
+import utils.stats.LinearRegression;
+import utils.stats.StatSummary;
+
 import java.util.ArrayList;
 
 // FIRST:
@@ -40,7 +43,12 @@ public enum Feature {
     NUM_SPAWN_ARCHERS("NUM_SPAWN_ARCHERS", 0, 100, 10),
     NUM_SPAWN_CATAPULTS("NUM_SPAWN_CATAPULTS", 0, 100, 10),
     NUM_SPAWN_KNIGHTS("NUM_SPAWN_KNIGHTS", 0, 100, 10),
-    NUM_SPAWN_SWORDMAN("NUM_SPAWN_SWORDMAN", 0, 100, 10);
+    NUM_SPAWN_SWORDMAN("NUM_SPAWN_SWORDMAN", 0, 100, 10),
+    NUM_SPAWN_DEFENDER("NUM_SPAWN_DEFENDER", 0, 10, 1),
+    SPEED_WIN("SPEED_WIN", 0, 50, 5),
+    RESEARCH_PROGRESS("RESEARCH_PROGRESS", 0, 20, 2), //= 10*slope; 0: no progress; 50: very fast progress
+    OWNED_TILES_PROGRESS("OWNED_TILES_PROGRESS", 0, 20, 2),
+    ;
 
     String statName;
     Integer minValue;
@@ -82,6 +90,7 @@ public enum Feature {
 
     public double getFeatureValue(ArrayList<GameplayStats> gameStats) {
         double featureValue = 0.0;
+        StatSummary ss;
 
         switch (this)
         {
@@ -111,6 +120,19 @@ public enum Feature {
             case NUM_SPAWN_SWORDMAN:
                 for (GameplayStats gps : gameStats) featureValue += gps.getFinalActionCount("Spawn SWORDMAN");
                 return featureValue / gameStats.size();
+            case NUM_SPAWN_DEFENDER:
+                for (GameplayStats gps : gameStats) featureValue += gps.getFinalActionCount("Spawn DEFENDER");
+                return featureValue / gameStats.size();
+            case SPEED_WIN:
+                ss = new StatSummary();
+                for (GameplayStats gps : gameStats)
+                {
+                    if(gps.getTribeResult().getResult() == Types.RESULT.WIN)
+                        ss.add(gps.getNumTurns());
+                }
+                if(ss.n() > 0)
+                    return ss.mean();
+                return 0.0;
 
             case PERC_RANGE:
 //                for (GameplayStats gps : gameStats)
@@ -132,12 +154,42 @@ public enum Feature {
 
                 double avgRange = NUM_SPAWN_ARCHERS.getFeatureValue(gameStats) + NUM_SPAWN_CATAPULTS.getFeatureValue(gameStats);
                 double avgMelee = NUM_SPAWN_KNIGHTS.getFeatureValue(gameStats) + NUM_SPAWN_SWORDMAN.getFeatureValue(gameStats);
-                double diff = 5.0 + (avgRange - avgMelee);
-                return diff;
+                return 5.0 + (avgRange - avgMelee);
+
+            case RESEARCH_PROGRESS:
+                ss = new StatSummary();
+                for(GameplayStats gps : gameStats)
+                {
+                    if(gps.getTribeResult().getResult() == Types.RESULT.WIN)
+                        ss.add(getRegression("Num techs", gps).slope());
+                }
+                if(ss.n() > 0)
+                    featureValue = ss.mean() * 10.0;
+                return featureValue;
+
+            case OWNED_TILES_PROGRESS:
+                ss = new StatSummary();
+                for(GameplayStats gps : gameStats)
+                {
+                    if(gps.getTribeResult().getResult() == Types.RESULT.WIN)
+                        ss.add(getRegression("Tiles owned", gps).slope());
+                }
+
+                if(ss.n() > 0)
+                    featureValue = ss.mean() * 10.0;
+                return featureValue;
         }
 
         return -1;
     }
+
+    private LinearRegression getRegression(String key, GameplayStats gps)
+    {
+        int[] tilesPerTurn = gps.getStatsArray(key);
+        LinearRegression lr = new LinearRegression(tilesPerTurn);
+        return lr;
+    }
+
 
     public Pair<Integer, Double> getBucketIdx(ArrayList<GameplayStats> gameStats) {
         double featureStatsValue = getFeatureValue(gameStats);

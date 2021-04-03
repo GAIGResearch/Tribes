@@ -20,6 +20,8 @@ import players.rhea.RHEAAgent;
 import players.rhea.RHEAParams;
 import players.portfolio.RandomPortfolio;
 import utils.file.IO;
+import utils.mapelites.Feature;
+import utils.stats.GameplayStats;
 import utils.stats.MultiStatSummary;
 
 import java.util.*;
@@ -65,6 +67,14 @@ public class Tournament {
                 Run.POP_SIZE = config.getInt("Population Size");
                 shiftTribes = config.getBoolean("Shift Tribes");
 
+                //Portfolio and pruning variables:
+                Run.PRUNING = config.getBoolean("Pruning");
+                Run.PROGBIAS = config.getBoolean("Progressive Bias");
+                Run.K_INIT_MULT = config.getDouble("K init mult");
+                Run.T_MULT = config.getDouble("T mult");
+                Run.A_MULT = config.getDouble("A mult");
+                Run.B = config.getDouble("B");
+
                 JSONArray playersArray = (JSONArray) config.get("Players");
                 JSONArray tribesArray = (JSONArray) config.get("Tribes");
                 if (playersArray.length() != tribesArray.length())
@@ -85,6 +95,9 @@ public class Tournament {
                 Constants.VERBOSE = config.getBoolean("Verbose");
                 JSONArray seeds = (JSONArray) config.get("Level Seeds");
                 t.setSeeds(seeds);
+
+                JSONArray weights = (JSONArray) config.get("pMCTS Weights");
+                Run.pMCTSweights = t.getWeights(weights);
 
             } catch (Exception e) {
                 System.out.println("Malformed JSON config file: " + e);
@@ -132,6 +145,16 @@ public class Tournament {
         {
             this.seeds[i] = Long.parseLong(seeds.getString(i));
         }
+    }
+
+
+    private double[] getWeights(JSONArray w) {
+        double[] weights = new double[w.length()];
+        for (int i = 0; i < weights.length; ++i)
+        {
+            weights[i] = w.getDouble(i);
+        }
+        return weights;
     }
 
 

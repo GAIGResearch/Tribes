@@ -8,6 +8,7 @@ import core.actions.cityactions.Spawn;
 import core.actions.tribeactions.ResearchTech;
 import core.actors.Building;
 import core.actors.City;
+import core.actors.Tribe;
 import core.actors.units.Unit;
 import core.game.GameState;
 import core.game.TribeResult;
@@ -22,13 +23,14 @@ public class GameplayStats {
     private int maxTurn;
     private final int playerID;
     private TribeResult tribeResult;
+    private int maxPotentialCities;
 
     //Data
     private TreeMap<Types.ACTION, HashMap<Integer, Integer>> actionsBreakdown;  //ACTION -> {[turn, count], [turn, count]...}
     private TreeMap<Types.ACTION, Integer> actionsCount;                        //ACTION -> turn count.
     private TreeMap<String, HashMap<Integer, Integer>> statsCount;              //String -> {[turn, count], [turn, count]...}
-    private TreeMap<String, Integer> actionSubtypeCount;      //String (actionsubtype) -> count
-    private TreeMap<String, HashMap<Integer, Integer>> actionSubtypeCountTurn;      //String (actionsubtype) -> {[turn, count], [turn, count]...}
+    private TreeMap<String, Integer> actionSubtypeCount;                        //String (actionsubtype) -> count
+    private TreeMap<String, HashMap<Integer, Integer>> actionSubtypeCountTurn;  //String (actionsubtype) -> {[turn, count], [turn, count]...}
 
     public int getFinalActionCount(Types.ACTION action)
     {
@@ -41,7 +43,7 @@ public class GameplayStats {
     }
 
     //Array helpers for data collection
-    private final String[] stats = new String[]{"Production", "Num cities",
+    private final String[] stats = new String[]{"Production", "Num cities", "Tiles owned",
             "Num units", "Num units WARRIOR", "Num units RIDER", "Num units DEFENDER", "Num units SWORDMAN", "Num units ARCHER",
             "Num units CATAPULT", "Num units KNIGHT", "Num units MIND_BENDER", "Num units BOAT", "Num units SHIP", "Num units BATTLESHIP", "Num units SUPERUNIT",
             "Num techs", "Num techs farm", "Num techs mountain", "Num techs naval", "Num techs range", "Num techs roads",
@@ -61,12 +63,20 @@ public class GameplayStats {
             "Build CUSTOMS_HOUSE", "Build LUMBER_HUT", "Build SAWMILL",
             "Research farm", "Research mountain", "Research naval", "Research range", "Research roads",
     };
-    
+
+    public int[] getStatsArray(String key)
+    {
+        HashMap<Integer, Integer> list = statsCount.get(key);
+        int[] data = new int[list.size()];
+        for(int i =0; i < list.size(); i++) data[i] = list.get(i);
+        return data;
+    }
     
     public GameplayStats(int playerID)
     {
         maxTurn = -1;
         this.playerID = playerID;
+        this.maxPotentialCities = 0;
         init();
     }
 
@@ -175,6 +185,23 @@ public class GameplayStats {
 
         //Cities is easy too.
         statsCount.get("Num cities").put(turn, gs.getCities(playerID).size());
+
+        //Count number of potential cities and villages, plus the number of tiles owned by this player.
+        maxPotentialCities = 0;
+        int ownedTiles = 0;
+        int boardSize = gs.getBoard().getSize();
+        for(int x = 0; x < boardSize; x++)
+            for(int y = 0; y < boardSize; y++)
+            {
+                Types.TERRAIN t = gs.getBoard().getTerrainAt(x, y);
+                if(t == Types.TERRAIN.CITY || t == Types.TERRAIN.VILLAGE)
+                    maxPotentialCities++;
+
+                int cityId = gs.getBoard().getCityIdAt(x, y);
+                if(gs.getTribe(playerID).getCitiesID().contains(cityId))
+                    ownedTiles++;
+            }
+        statsCount.get("Tiles owned").put(turn, ownedTiles);
 
         //Units
         HashMap<Types.UNIT, Integer> unitCount = new HashMap<>();
@@ -307,4 +334,10 @@ public class GameplayStats {
     public TribeResult getTribeResult() {
         return tribeResult;
     }
+
+    public int getNumTurns() {return maxTurn;}
+
+    public int getMaxCities() {return maxPotentialCities;}
+
+    public int getPlayerID() {return playerID;}
 }

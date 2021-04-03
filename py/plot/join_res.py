@@ -3,7 +3,7 @@ from os.path import isfile, join
 
 def main():
 
-    file_path = "C:\\Work\\Tribes-results\\PortfolioValues\\vsMCTS\\"
+    file_path = "C:\\Work\\Tribes-results\\validation-7-9-2\\"
     output_file_path = file_path + "tribes_test.txt"
     files = [join(file_path, f) for f in listdir(file_path) if isfile(join(file_path, f)) and f.endswith(".txt")]
     lines = []
@@ -26,6 +26,8 @@ def main():
                     elif ("RESULTS" in line) and (x==numFiles-1):
                         lines.append(line)
                     elif "seed" in line:
+                        lines.append(line)
+                    elif "GPS:" in line:
                         lines.append(line)
 
     with open(output_file_path, 'w') as f:

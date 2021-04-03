@@ -2,12 +2,19 @@
   "Run Mode" : "PlayLG",
   "Run Mode comment" : "PlayLG / PlayFile / Replay",
 
+  "Progressive Bias" : true,
+  "Pruning" : true,
+  "K init mult": 0.5,
+  "T mult": 2.0,
+  "A mult": 1.5,
+  "B": 1.3,
+
   "Game Mode" : "Capitals",
   "Rollouts" : false,
   "Search Depth" : 20,
   "Force End" : false,
   "Population Size" : 20,
-  "Players" : ["MCTS", "pMCTS"],
+  "Players" : ["Do Nothing", "pMCTS"],
   "Tribes" : ["Xin Xi", "Imperius"],
   "Verbose" : false,
 
@@ -16,5 +23,5 @@
 
   "Game Seed" : "-1",
   "Agents Seed" : "-1",
-  "Level Seed" : "-1"
+  "Level Seed" : "1588965819946"
 }

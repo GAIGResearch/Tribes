@@ -73,6 +73,7 @@ class Run {
     public static double T_MULT = 2.0;
     public static double A_MULT = 1.5;
     public static double B = 1.3;
+    public static double[] pMCTSweights;
 
     public static int MAX_LENGTH;
     public static boolean PRUNING;
@@ -156,6 +157,7 @@ class Run {
                 Portfolio p = new SimplePortfolio(agentSeed);
                 portfolioMCTSParams.setPortfolio(p);
                 portfolioMCTSParams.pruneHeuristic = new PrunePortfolioHeuristic(p);
+                portfolioMCTSParams.pruneHeuristic.setWeights(Run.pMCTSweights);
                 return new PortfolioMCTSPlayer(agentSeed, portfolioMCTSParams);
             case OEP:
                 OEPParams oepParams = new OEPParams();

@@ -29,10 +29,12 @@ public class Diplomacy {
      * @param targetTribeID ID for the target tribe of the action
      */
     public void updateAllegiance(int value, int initTribeID, int targetTribeID) {
+        // checks if increase or decreasing the allegiance will go over the limit
+        // if so, set the value to the the difference of the absoluteMax and the current allegiance value
         if ((this.AllegianceStatus[initTribeID][targetTribeID] + value < -absoluteMax) || (this.AllegianceStatus[initTribeID][targetTribeID] + value > absoluteMax)){
             value = Integer.signum(value) * (absoluteMax - Math.abs(this.AllegianceStatus[initTribeID][targetTribeID]));
         }
-
+        // adds the value to the allegiance
         this.AllegianceStatus[initTribeID][targetTribeID] = this.AllegianceStatus[initTribeID][targetTribeID] + value;
         this.AllegianceStatus[targetTribeID][initTribeID] = this.AllegianceStatus[targetTribeID][initTribeID] + value;
     }
@@ -49,7 +51,7 @@ public class Diplomacy {
         value = value / -2;
         // checks all relationships for the target tribe
         for (int i = 0; i < AllegianceStatus.length; i++) {
-            // if the init tribe has a negative relationship and it is not with the initiating tribe
+            // if the target tribe has a negative relationship and it is not with the initiating tribe
             if ((AllegianceStatus[i][targetTribeID]) < 0 && (i != initTribeID)) {
                 // call update allegiance for the target tribe
                 updateAllegiance(value, i, initTribeID);

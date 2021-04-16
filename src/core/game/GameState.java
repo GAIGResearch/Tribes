@@ -294,7 +294,7 @@ public class GameState {
                 ac.execute(action, this);
             }
 
-            this.board.getDiplomacy().logAllegiance();
+            // this.board.getDiplomacy().logAllegiance(board);
 
             //Post-action execution matters:
 

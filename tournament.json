@@ -5,8 +5,8 @@
   "Search Depth" : 5,
   "Force End" : false,
   "Population Size" : 20,
-  "Players" : ["MCTS", "RHEA"],
-  "Tribes" : ["Xin Xi", "Imperius"],
+  "Players" : ["MCTS", "RHEA","OSLA","MC","Random","OEP"],
+  "Tribes" : ["Xin Xi", "Imperius", "Bardur","Oumaji","Kickoo","Luxidoor"],
   "Shift Tribes" : true,
   "Verbose" : false,
   "Level Seeds" : [
@@ -24,5 +24,4 @@
     "1590182659177", "1590912178111",
     "1588407146837"
   ]
-
 }

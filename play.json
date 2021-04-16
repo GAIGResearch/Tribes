@@ -7,8 +7,8 @@
   "Search Depth" : 5,
   "Force End" : false,
   "Population Size" : 20,
-  "Players" : ["Human", "Human", "Human", "Human", "MCTS", "Human", "MCTS", "Human"],
-  "Tribes" : ["Zebasi", "Ai-Mo", "Quetzali", "Yadakk", "Kickoo", "Hoodrick", "Luxidoor", "Vengir"],
+  "Players" : ["MCTS", "MCTS", "MCTS", "MCTS", "MCTS", "MCTS", "MCTS", "MCTS"],
+  "Tribes" : ["Kickoo", "Zebasi", "Luxidoor", "Vengir", "Bardur", "Ai-Mo", "Quetzali", "Yadakk"],
   "Verbose" : false,
 
   "Replay File Name" : "save/1590072023986/0_0/game.json",

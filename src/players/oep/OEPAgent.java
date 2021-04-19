@@ -22,9 +22,9 @@ public class OEPAgent extends Agent {
     private OEPParams params;
 
     private Individual bestIndividual;
-    private boolean returnAction = false;
     private int fmCallsCount;
     private int fmCallsRun;
+    private GameState root;
 
 
     public OEPAgent(long seed, OEPParams params) {
@@ -44,15 +44,6 @@ public class OEPAgent extends Agent {
         int remainingLimit = 5;
         boolean stop = false;
 
-        if(this.returnAction){
-            Action action;
-            if(bestIndividual.getActions().size() == 1){
-                returnAction = false;
-            }
-            action = bestIndividual.returnNext();
-            return action;
-        }
-
 
         //create a population of individuals defined in param
         ArrayList<Individual> population = new ArrayList<>();
@@ -64,8 +55,11 @@ public class OEPAgent extends Agent {
         fmCallsRun = 0;
 
         this.bestIndividual = null;
+        this.root = gs.copy();
+
         //keep going until time limit gone
         while(!stop){
+
             numIters ++;
             ElapsedCpuTimer elapsedTimerIteration = new ElapsedCpuTimer();
             fmCallsRun = 0;
@@ -91,7 +85,6 @@ public class OEPAgent extends Agent {
                 if(this.bestIndividual == null){
                     this.bestIndividual = population.get(m_rnd.nextInt(population.size()));
                 }
-                returnAction = true;
                 break;
             }
 
@@ -106,12 +99,12 @@ public class OEPAgent extends Agent {
             //Kill the amount of the population that needs to die
             int amount =  (int)(population.size() * params.KILL_RATE);
             for(int i = 0; i < amount; i++){
-                population.remove(population.size() - 1);
+                population.remove(0);
+
             }
 
             if((fmCallsCount > params.num_fmcalls) || ((numIters == 1) && (fmCallsCount >= (0.9 * params.num_fmcalls)))){
                 //over limit and needs to chose individual and return
-                returnAction = true;
                 break;
             }
 
@@ -120,53 +113,24 @@ public class OEPAgent extends Agent {
                 population.add(randomActions(gs.copy()));
                 if((fmCallsCount > params.num_fmcalls) || ((numIters == 1) && (fmCallsCount >= (0.9 * params.num_fmcalls)))){
                     //over limit and needs to chose individual and return
-                    returnAction = true;
                     break;
                 }
             }
-
-//            biggest = 0;
-//            avg = 0;
-//            for(IndividualS i : population){
-//                if(i.getActions().size() > biggest){
-//                    biggest = i.getActions().size();
-//                }
-//                avg += i.getActions().size();
-//            }
-//            avg = avg/population.size();
-//
-//            System.out.println("biggest in: " + biggest);
-//            System.out.println("avg in: " + avg);
 
             if(params.stop_type == params.STOP_TIME) {
                 acumTimeTaken += (elapsedTimerIteration.elapsedMillis()) ;
                 avgTimeTaken  = acumTimeTaken/numIters;
                 remaining = ect.remainingTimeMillis();
                 stop = remaining <= 2 * avgTimeTaken || remaining <= remainingLimit;
-                if(stop){ returnAction = true; }
             }else if(params.stop_type == params.STOP_ITERATIONS) {
                 stop = numIters >= params.num_iterations;
-                if(stop){ returnAction = true; }
             }else if(params.stop_type == params.STOP_FMCALLS){
                 stop = (fmCallsCount > params.num_fmcalls) || (fmCallsRun > (params.num_fmcalls - fmCallsCount));
-                if(stop){ returnAction = true; }
             }
 
         }
 
-        //System.out.println(this.fmCallsCount + " : " + numIters);
-
-        Action action = null;
-        if(this.returnAction){
-
-            if(bestIndividual.getActions().size() == 1){
-                returnAction = false;
-            }
-            action = bestIndividual.returnNext();
-
-        }
-
-        return action;
+        return  bestIndividual.returnNext();
 
 
     }
@@ -181,22 +145,16 @@ public class OEPAgent extends Agent {
         while ((!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())) && (individual.size() < (params.NODE_SIZE-1))){
             ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
             Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-            advance(gs, a);
-            individual.add(a);
-        }
-        if(individual.size() == (params.NODE_SIZE-1) && (individual.get((params.NODE_SIZE - 2)).getActionType() != Types.ACTION.END_TURN)){
-            ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
-            Action end = null; ;
-            for(Action a : allAvailableActions){
-                if(a.getActionType() == Types.ACTION.END_TURN){
-                    end = a;
-                    break;
-                }
+            if(!(a.getActionType() == Types.ACTION.END_TURN)){
+                advance(gs, a);
+                individual.add(a);
+            }else if(allAvailableActions.size() == 1){
+                advance(gs, a);
+                individual.add(a);
             }
-            individual.add(end);
         }
         Individual in = new Individual(individual);
-        in.setGs(gs);
+        in.setGs(gs.copy());
         return in;
     }
 
@@ -267,20 +225,22 @@ public class OEPAgent extends Agent {
                 }
             }
         }
-        child = repair(clone, child);
-        Individual in = new Individual(child);
-        in.setGs(clone);
+        Individual in = repair(clone, child);
         return in;
     }
     //repair an individual if actions can't be performed with a random action
-    private ArrayList<Action> repair(GameState gs, ArrayList<Action> child){
+    private Individual repair(GameState gs, ArrayList<Action> child){
         ArrayList<Action> repairedChild = new ArrayList<>();
         boolean mutated = false;
         for(int a = 0 ;a < child.size(); a ++) {
-            if(!(gs.getActiveTribeID() == getPlayerID())){return repairedChild;}
+            if(!(gs.getActiveTribeID() == getPlayerID())){
+                Individual in = new Individual(repairedChild);
+                in.setGs(gs.copy());
+                return in;
+            }
             int chance = m_rnd.nextInt((int)(params.MUTATION_RATE * 100));
             if((m_rnd.nextInt(100) < chance) && !mutated){
-                Action ac = mutation(gs);
+                Action ac = mutation(gs.copy());
                 advance(gs, ac);
                 repairedChild.add(ac);
                 mutated = true;
@@ -308,7 +268,11 @@ public class OEPAgent extends Agent {
             }
         }
 
-        if(!(gs.getActiveTribeID() == getPlayerID())){return repairedChild;}
+        if(!(gs.getActiveTribeID() == getPlayerID())){
+            Individual in = new Individual(repairedChild);
+            in.setGs(gs.copy());
+            return in;
+        }
 
         ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
         Action end = null; ;
@@ -320,24 +284,21 @@ public class OEPAgent extends Agent {
         }
         repairedChild.add(end);
 
-        return repairedChild;
+        Individual in = new Individual(repairedChild);
+        in.setGs(gs);
+        return in;
     }
 
     //give a random possible move as a mutation
     private Action mutation(GameState gs){
-
         ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
         return  allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-
     }
 
     public double eval( Individual actionSet){
-//        for(Action move : actionSet.getActions()){
-//            advance(gs, move);
-//        }
-//        actionSet.setGs(gs);
         GameState gs = actionSet.getGs();
-        return heuristic.evaluateState(gs);
+        return heuristic.evaluateState(this.root.copy(),gs.copy());
+        //return heuristic.evaluateState(gs.copy());
     }
 
     private boolean checkActionFeasibility(Action a, GameState gs)

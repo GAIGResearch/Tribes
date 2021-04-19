@@ -2,7 +2,6 @@ package players.oep;
 
 import core.actions.Action;
 import core.game.GameState;
-import players.rhea.Genome;
 
 import java.util.ArrayList;
 
@@ -10,7 +9,7 @@ public class Individual implements Comparable<Individual>{
 
     private ArrayList<Action> actions;
     private GameState gs;
-    private double value = 0;
+    private double value = 0.0;
 
     public Individual(ArrayList<Action> actions) {
         this.actions = actions;

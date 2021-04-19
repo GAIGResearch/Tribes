@@ -25,8 +25,8 @@ public class EMCTSAgent extends Agent {
 
     private EMCTSTreeNode root;
     private EMCTSTreeNode bestNode;
+    private GameState old_gs;
 
-    private boolean returnAction = false;
     private int fmCallsCount;
     private int fmCallsRun;
 
@@ -50,18 +50,12 @@ public class EMCTSAgent extends Agent {
         int remainingLimit = 5;
         boolean stop = false;
 
-        if (this.returnAction) {
-            Action action;
-            if (bestNode.getSequence().size() == 1) {
-                returnAction = false;
-            }
-            action = bestNode.returnNext();
-            return action;
-        }
 
         this.heuristic = params.getHeuristic(playerID, allPlayerIDs);
 
-        root = new EMCTSTreeNode(randomActions(gs.copy()), null);
+        old_gs = gs.copy();
+
+        root = randomActions(gs.copy());
         eval(gs.copy(), root);
 
         bestNode = root;
@@ -99,31 +93,15 @@ public class EMCTSAgent extends Agent {
                 avgTimeTaken = acumTimeTaken / numIters;
                 remaining = ect.remainingTimeMillis();
                 stop = remaining <= 2 * avgTimeTaken || remaining <= remainingLimit;
-                if (stop) {
-                    this.returnAction = true;
-                }
             } else if (params.stop_type == params.STOP_ITERATIONS) {
                 stop = numIters >= params.num_iterations;
-                if (stop) {
-                    this.returnAction = true;
-                }
             } else if (params.stop_type == params.STOP_FMCALLS) {
                 stop = (fmCallsCount > params.num_fmcalls) || (fmCallsRun > (params.num_fmcalls - fmCallsCount));
-                if (stop) {
-                    this.returnAction = true;
-                }
             }
         }
-        System.out.println(fmCallsCount);
+        //if(fmCallsCount>2000){System.out.println(fmCallsCount);}
 
-        Action action = null;
-        if (this.returnAction) {
-            if (bestNode.getSequence().size() == 1) {
-                returnAction = false;
-            }
-            action = bestNode.returnNext();
-        }
-        return action;
+        return bestNode.returnNext();
 
     }
 
@@ -133,11 +111,15 @@ public class EMCTSAgent extends Agent {
     }
 
     public void eval(GameState gs, EMCTSTreeNode node) {
-        for (Action move : node.getSequence()) {
-            advance(gs, move);
+        if(node.getGs() == null) {
+            for (Action move : node.getSequence()) {
+                advance(gs, move);
+            }
+            node.setGs(gs);
+            node.setValue(heuristic.evaluateState(old_gs.copy(), gs.copy()));
+        }else{
+            node.setValue(heuristic.evaluateState(old_gs.copy(), node.getGs()));
         }
-        node.setGs(gs);
-        node.setValue(heuristic.evaluateState(gs));
     }
 
     private EMCTSTreeNode nodeToExpand() {
@@ -176,13 +158,16 @@ public class EMCTSAgent extends Agent {
     }
 
     //this version of random Actions will return a list of random actions and tries to make the length as long as possible
-    private ArrayList<Action> randomActions(GameState gs) {
+    private EMCTSTreeNode randomActions(GameState gs) {
         ArrayList<Action> individual = new ArrayList<>();
         while ((!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())) && (individual.size() < (params.NODE_SIZE-1))){
             ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
             Action a = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
-            if (!(a.getActionType() == Types.ACTION.END_TURN) || allAvailableActions.size() == 1) {
+            if (!(a.getActionType() == Types.ACTION.END_TURN)) {
                 advance(gs, a);
+                individual.add(a);
+            }else if(allAvailableActions.size() == 1){
+                advance(gs,a);
                 individual.add(a);
             }
         }
@@ -197,7 +182,9 @@ public class EMCTSAgent extends Agent {
             }
             individual.add(end);
         }
-        return individual;
+        EMCTSTreeNode node = new EMCTSTreeNode(individual, null);
+        node.setGs(gs.copy());
+        return node;
     }
 
     private void advance(GameState gs, Action move) {

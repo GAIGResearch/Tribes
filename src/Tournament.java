@@ -44,13 +44,13 @@ public class Tournament {
             case OSLA:
                 OSLAParams oslaParams = new OSLAParams();
                 oslaParams.stop_type = oslaParams.STOP_FMCALLS; //Upper bound
-                oslaParams.heuristic_method = oslaParams.SIMPLE_HEURISTIC;
+                oslaParams.heuristic_method = oslaParams.DIFF_HEURISTIC;
                 return new OneStepLookAheadAgent(agentSeed, oslaParams);
             case MC:
                 MCParams mcparams = new MCParams();
                 mcparams.stop_type = mcparams.STOP_FMCALLS;
 //                mcparams.stop_type = mcparams.STOP_ITERATIONS;
-                mcparams.heuristic_method = mcparams.SIMPLE_HEURISTIC;
+                mcparams.heuristic_method = mcparams.DIFF_HEURISTIC;
                 mcparams.PRIORITIZE_ROOT = true;
                 mcparams.ROLLOUT_LENGTH = 10;
                 mcparams.FORCE_TURN_END = 5;//mcparams.ROLLOUT_LENGTH+2;
@@ -60,7 +60,7 @@ public class Tournament {
                 MCTSParams mctsParams = new MCTSParams();
                 mctsParams.stop_type = mctsParams.STOP_FMCALLS;
                 mctsParams.PRIORITIZE_ROOT = true;
-                mctsParams.heuristic_method = mctsParams.SIMPLE_HEURISTIC;
+                mctsParams.heuristic_method = mctsParams.DIFF_HEURISTIC;
                 mctsParams.ROLLOUT_LENGTH = 20;
 //                mctsParams.ROLOUTS_ENABLED = false;
                 mctsParams.FORCE_TURN_END = 25;
@@ -68,7 +68,7 @@ public class Tournament {
             case RHEA:
                 RHEAParams rheaParams = new RHEAParams();
                 rheaParams.stop_type = rheaParams.STOP_FMCALLS;
-                rheaParams.heuristic_method = rheaParams.SIMPLE_HEURISTIC;
+                rheaParams.heuristic_method = rheaParams.DIFF_HEURISTIC;
                 rheaParams.INDIVIDUAL_LENGTH = 20;
                 rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
                 rheaParams.POP_SIZE = 100;
@@ -76,12 +76,12 @@ public class Tournament {
             case OEP:
                 OEPParams oepParams = new OEPParams();
                 oepParams.stop_type = oepParams.STOP_FMCALLS;
-                oepParams.heuristic_method = oepParams.SIMPLE_HEURISTIC;
+                oepParams.heuristic_method = oepParams.DIFF_HEURISTIC;
                 return new OEPAgent(agentSeed, oepParams);
             case EMCTS:
                 EMCTSParams emctsParams = new EMCTSParams();
                 emctsParams.stop_type = emctsParams.STOP_FMCALLS;
-                emctsParams.heuristic_method = emctsParams.SIMPLE_HEURISTIC;
+                emctsParams.heuristic_method = emctsParams.DIFF_HEURISTIC;
                 return new EMCTSAgent(agentSeed,emctsParams);
         }
         return null;

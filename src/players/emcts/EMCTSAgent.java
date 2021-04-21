@@ -213,7 +213,6 @@ public class EMCTSAgent extends Agent {
         for (int i = moveToMutate + 1; i < seq.size(); i++) {
             newSeq.add(seq.get(i));
         }
-
         newSeq = repair(newSeq, clone);
         EMCTSTreeNode newNode = new EMCTSTreeNode(newSeq, node);
         node.addChild(newNode);

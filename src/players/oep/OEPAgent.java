@@ -63,6 +63,25 @@ public class OEPAgent extends Agent {
             numIters ++;
             ElapsedCpuTimer elapsedTimerIteration = new ElapsedCpuTimer();
             fmCallsRun = 0;
+
+            // rate each individual and sort them
+            for(Individual individual : population){
+                individual.setValue(eval( individual));
+            }
+            Collections.sort(population, Collections.reverseOrder());
+            this.bestIndividual = population.get(population.size() - 1);
+
+            //Kill the amount of the population that needs to die
+            int amount =  (int)(population.size() * params.KILL_RATE);
+            for(int i = 0; i < amount; i++){
+                population.remove(0);
+            }
+
+            if(((fmCallsCount > params.num_fmcalls) || ((numIters == 1) && (fmCallsCount >= (0.9 * params.num_fmcalls))))&& params.stop_type == params.STOP_FMCALLS){
+                //over limit and needs to chose individual and return
+                break;
+            }
+
             //perform uniform crossover
             boolean even = false;
             if(population.size() % 2 == 0){
@@ -80,40 +99,28 @@ public class OEPAgent extends Agent {
                 population.add(crossover(gs.copy(), person1, population.get(m_rnd.nextInt(population.size()))));
             }
 
-            if((fmCallsCount > params.num_fmcalls)  || ((numIters == 1) && (fmCallsCount >= (0.9 * params.num_fmcalls)))){
-                //over limit and needs to chose individual and return
-                if(this.bestIndividual == null){
-                    this.bestIndividual = population.get(m_rnd.nextInt(population.size()));
-                }
-                break;
-            }
-
-            // rate each individual and sort them
-            for(Individual individual : population){
-                individual.setValue(eval( individual));
-            }
-            Collections.sort(population, Collections.reverseOrder());
-            this.bestIndividual = population.get(population.size() - 1);
-
-            //Kill the amount of the population that needs to die
-            int amount =  (int)(population.size() * params.KILL_RATE);
-            for(int i = 0; i < amount; i++){
-                population.remove(0);
-            }
-
-            if((fmCallsCount > params.num_fmcalls) || ((numIters == 1) && (fmCallsCount >= (0.9 * params.num_fmcalls)))){
+            if(((fmCallsCount > params.num_fmcalls)  || ((numIters == 1) && (fmCallsCount >= (0.9 * params.num_fmcalls)))) && params.stop_type == params.STOP_FMCALLS){
                 //over limit and needs to chose individual and return
                 break;
             }
+
+
+//            //Kill the amount of the population that needs to die
+//            int amount =  (int)(population.size() * params.KILL_RATE);
+//            for(int i = 0; i < amount; i++){
+//                population.remove(0);
+//            }
 
             // fill the population with random individuals
-            for(int i = population.size() - 1; i < params.POP_SIZE; i++){
-                population.add(randomActions(gs.copy()));
-                if((fmCallsCount > params.num_fmcalls) || ((numIters == 1) && (fmCallsCount >= (0.9 * params.num_fmcalls)))){
-                    //over limit and needs to chose individual and return
-                    break;
-                }
-            }
+//            for(int i = population.size() - 1; i < params.POP_SIZE; i++){
+//                population.add(randomActions(gs.copy()));
+//                if(((fmCallsCount > params.num_fmcalls) || ((numIters == 1) && (fmCallsCount >= (0.9 * params.num_fmcalls))))&& params.stop_type == params.STOP_FMCALLS){
+//                    //over limit and needs to chose individual and return
+//                    break;
+//                }
+//            }
+
+            population = shiftPop(gs.copy(),population);
 
             if(params.stop_type == params.STOP_TIME) {
                 acumTimeTaken += (elapsedTimerIteration.elapsedMillis()) ;
@@ -173,23 +180,46 @@ public class OEPAgent extends Agent {
     private ArrayList<Individual> procreate (GameState gs, ArrayList<Individual> population){
         ArrayList<Individual> group1 = new ArrayList<>();
         ArrayList<Individual> group2 = new ArrayList<>();
-        boolean g1 = true;
+
         while(population.size() > 0){
-            Individual temp = population.get(m_rnd.nextInt(population.size()));
-            if(g1){
-                group1.add(temp);
-                g1 = false;
-            }else{
-                group2.add(temp);
-                g1 = true;
-            }
-            population.remove(temp);
+            Individual[] winners = tournamentSelection(population);
+
+            group1.add(winners[0]);
+            group2.add(winners[1]);
+
+            population.remove(winners[0]);
+            population.remove(winners[1]);
+
         }
+
 
         for(int i = 0; i < group1.size(); i++){
             population.add(crossover(gs.copy(), group1.get(i), group2.get(i)));
         }
         return population;
+    }
+
+    private Individual[] tournamentSelection(ArrayList<Individual> pop){
+        if(pop.size() < params.TOURNAMENT_SIZE){
+            if(pop.size() == 1){return new Individual[]{pop.get(0), pop.get(0)};}
+            Collections.sort(pop);
+            return new Individual[]{pop.get(0), pop.get(1)};
+        }
+        ArrayList<Individual> tournament1  =  new ArrayList<>();
+        while(tournament1.size() < params.TOURNAMENT_SIZE){
+            Individual temp = pop.get(m_rnd.nextInt(pop.size()));
+            if(!(tournament1.contains(temp))){tournament1.add(temp);}
+        }
+        Collections.sort(tournament1);
+
+        ArrayList<Individual> tournament2  =  new ArrayList<>();
+        while(tournament2.size() < params.TOURNAMENT_SIZE){
+            Individual temp = pop.get(m_rnd.nextInt(pop.size()));
+            if(!(tournament2.contains(temp))){tournament2.add(temp);}
+        }
+        Collections.sort(tournament2);
+
+        return new Individual[]{tournament1.get(0), tournament2.get(0)};
     }
 
     //method to perform uniform crossover on two individuals
@@ -304,6 +334,90 @@ public class OEPAgent extends Agent {
     private Action mutation(GameState gs){
         ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
         return  allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+    }
+
+    private ArrayList<Individual> shiftPop(GameState gs, ArrayList<Individual> population){
+        ArrayList<Individual> newPop = new ArrayList<>();
+
+        shift(gs.copy(), population.get(population.size()-1));
+        newPop.add(population.get(population.size()-1));
+
+        for(int i = 1; i < (params.POP_SIZE/2); i++){
+            Individual ind = mutateInd(population.get(population.size()-1), gs.copy());
+            newPop.add(ind);
+        }
+
+        for(int i = newPop.size(); i < params.POP_SIZE; i++){
+            newPop.add(randomActions(gs.copy()));
+        }
+
+        return newPop;
+    }
+
+    private void shift(GameState gs, Individual individual){
+        GameState clone = gs.copy();
+        individual.shift();
+
+        boolean feasible = true;
+        int j = 0;
+        while(feasible && j < individual.getActions().size())
+        {
+            Action act = individual.getActions().get(j);
+            feasible = checkActionFeasibility(act, gs);
+            if(feasible)
+            {
+                advance(gs, act);
+                j++;
+            }
+        }
+
+        int i = j;
+        while((!gs.isGameOver() && (gs.getActiveTribeID() == getPlayerID())) && i < params.NODE_SIZE)
+        {
+            ArrayList<Action> allAvailableActions = this.allGoodActions(gs.copy(), m_rnd);
+            Action ac = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+            individual.getActions().add(ac);
+            advance(gs, ac);
+            i++;
+        }
+
+        //Eval individual
+        double score = heuristic.evaluateState(clone,gs);
+        individual.setValue(score);
+        individual.setGs(gs.copy());
+    }
+
+    private Individual mutateInd(Individual individual, GameState gs){
+        ArrayList<Action> child = new ArrayList<>();
+
+        for(int a = 0 ;a < individual.getActions().size(); a ++) {
+            if (!(gs.getActiveTribeID() == getPlayerID())) {
+                Individual in = new Individual(child);
+                in.setGs(gs.copy());
+                return in;
+            }
+            int chance = m_rnd.nextInt((int) (params.MUTATION_RATE * 100));
+            if ((m_rnd.nextInt(100) < chance) ) {
+                Action ac = mutation(gs.copy());
+                advance(gs, ac);
+                child.add(ac);
+            }else{
+                if(checkActionFeasibility(individual.getActions().get(a), gs.copy())){
+                    advance(gs,individual.getActions().get(a));
+                    child.add(individual.getActions().get(a));
+                }
+                else{
+                    ArrayList<Action> allAvailableActions = this.allGoodActions(gs.copy(), m_rnd);
+                    Action ac = allAvailableActions.get(m_rnd.nextInt(allAvailableActions.size()));
+                    advance(gs,ac);
+                    child.add(ac);
+                }
+            }
+        }
+
+        Individual in = new Individual(child);
+        in.setGs(gs.copy());
+        return in;
     }
 
     public double eval( Individual actionSet){

@@ -8,4 +8,5 @@ public class OEPParams extends AlgParams {
     public double MUTATION_RATE = 0.1;
     public double KILL_RATE = 0.5;
     public int NODE_SIZE = 20;
+    public int TOURNAMENT_SIZE = 5;
 }

@@ -7,8 +7,8 @@
   "Search Depth" : 5,
   "Force End" : false,
   "Population Size" : 20,
-  "Players" : ["RHEA", "MCTS", "EMCTS", "Rule Based"],
-  "Tribes" : ["Xin Xi", "Imperius", "Bardur", "Oumaji"],
+  "Players" : ["EMCTS", "RHEA" ],
+  "Tribes" : ["Xin Xi", "Imperius"],
   "Verbose" : false,
 
   "Replay File Name" : "save/1590072023986/0_0/game.json",

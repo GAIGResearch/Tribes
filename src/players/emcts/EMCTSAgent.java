@@ -67,6 +67,7 @@ public class EMCTSAgent extends Agent {
 
             EMCTSTreeNode toMutate = nodeToExpand();
 
+            //mutate to a cirtian depth
             int depth = 0;
             while (depth < params.depth) {
                 EMCTSTreeNode child = mutate(toMutate, gs.copy());
@@ -82,6 +83,7 @@ public class EMCTSAgent extends Agent {
                 depth++;
             }
 
+            //update node values
             for (int i = 0; i < params.depth; i++) {
                 toMutate.refreshScore(params.bias);
                 toMutate = toMutate.getParent();
@@ -187,12 +189,14 @@ public class EMCTSAgent extends Agent {
         return node;
     }
 
+
     private void advance(GameState gs, Action move) {
         this.fmCallsCount++;
         this.fmCallsRun++;
         gs.advance(move, true);
     }
 
+    //mutate a random action
     private EMCTSTreeNode mutate(EMCTSTreeNode node, GameState gs) {
         GameState clone = gs.copy();
         ArrayList<Action> seq = node.getSequence();
@@ -217,6 +221,7 @@ public class EMCTSAgent extends Agent {
         return newNode;
     }
 
+    //repair the node and make sure that it is valid
     private ArrayList<Action> repair(ArrayList<Action> child, GameState gs) {
         ArrayList<Action> repairedChild = new ArrayList<>();
 
@@ -312,7 +317,7 @@ public class EMCTSAgent extends Agent {
         } else {
             return;
         }
-        newActions = repair(newActions, clone.copy());
+        //newActions = repair(newActions, clone.copy());
         EMCTSTreeNode newNode = new EMCTSTreeNode(newActions, node.getParent());
         eval(clone, newNode);
         if (newNode.getValue() > node.getValue()) {

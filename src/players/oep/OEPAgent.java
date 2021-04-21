@@ -88,7 +88,6 @@ public class OEPAgent extends Agent {
                 break;
             }
 
-
             // rate each individual and sort them
             for(Individual individual : population){
                 individual.setValue(eval( individual));
@@ -100,7 +99,6 @@ public class OEPAgent extends Agent {
             int amount =  (int)(population.size() * params.KILL_RATE);
             for(int i = 0; i < amount; i++){
                 population.remove(0);
-
             }
 
             if((fmCallsCount > params.num_fmcalls) || ((numIters == 1) && (fmCallsCount >= (0.9 * params.num_fmcalls)))){
@@ -129,7 +127,7 @@ public class OEPAgent extends Agent {
             }
 
         }
-
+        //System.out.println(numIters);
         return  bestIndividual.returnNext();
 
 
@@ -153,6 +151,19 @@ public class OEPAgent extends Agent {
                 individual.add(a);
             }
         }
+        //if one less then max node size
+        if(individual.size() == (params.NODE_SIZE-1) && (individual.get((params.NODE_SIZE-2)).getActionType() != Types.ACTION.END_TURN)){
+            ArrayList<Action> allAvailableActions = this.allGoodActions(gs, m_rnd);
+            Action end = null; ;
+            for(Action a : allAvailableActions){
+                if(a.getActionType() == Types.ACTION.END_TURN){
+                    end = a;
+                    break;
+                }
+            }
+            individual.add(end);
+        }
+
         Individual in = new Individual(individual);
         in.setGs(gs.copy());
         return in;

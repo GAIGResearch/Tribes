@@ -64,6 +64,12 @@ public class Tribe extends Actor {
     //Turns since the last attack of this tribe if Meditation is reseached.
     private int nPacifistCount;
 
+    // Number to track the number of stars sent in a turn
+    private int starsSent;
+
+    // Bool to track if the tribe has already declared war in the current turn
+    private boolean hasDeclaredWar = false;
+
     public Tribe(Types.TRIBE tribe) {
         this.tribe = tribe;
         init();
@@ -654,4 +660,25 @@ public class Tribe extends Actor {
         return nPacifistCount;
     }
 
+    public void setStarsSent(int numStars){
+        this.starsSent = numStars;
+    }
+
+    public int getStarsSent(){
+        return starsSent;
+    }
+
+    public boolean canSendStars(int numStars){
+        return starsSent < 30 && numStars < stars && stars > 0;
+    }
+
+    public void resetStarsSent(){starsSent = 0;}
+
+    public void setHasDeclaredWar(boolean hasDeclaredWar) {
+        this.hasDeclaredWar = hasDeclaredWar;
+    }
+
+    public boolean getHasDeclaredWar(){
+        return hasDeclaredWar;
+    }
 }

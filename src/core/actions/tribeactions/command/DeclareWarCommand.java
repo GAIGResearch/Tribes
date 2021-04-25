@@ -1,14 +1,24 @@
 package core.actions.tribeactions.command;
 
+import core.Diplomacy;
 import core.actions.Action;
 import core.actions.ActionCommand;
-import core.game.Game;
+import core.actions.tribeactions.DeclareWar;
 import core.game.GameState;
 
 public class DeclareWarCommand implements ActionCommand {
 
     @Override
     public boolean execute(Action a, GameState gs){
-        return true;
+        DeclareWar action = (DeclareWar)a;
+        if (action.isFeasible(gs)){
+            Diplomacy d = gs.getBoard().getDiplomacy();
+            int tribeID = action.getTribeId();
+            int targetID = action.getTargetID();
+            gs.getTribe(tribeID).setHasDeclaredWar(true);
+            d.updateAllegiance(-30 - d.getAllegianceStatus()[tribeID][targetID], tribeID, targetID);
+            return true;
+        }
+        return false;
     }
 }

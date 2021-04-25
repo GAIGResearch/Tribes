@@ -292,9 +292,14 @@ public class GameState {
             if(!executed && ac != null) {
                 System.out.println("Tick: " + this.tick + "; action [" + action + "] couldn't execute?");
                 ac.execute(action, this);
+            } else{
+                if (action.getActionType().toString().equals("DECLARE_WAR") || action.getActionType().toString().equals("SEND_STARS")){
+                    System.out.println(action.toString());
+                    board.getDiplomacy().logAllegiance(board);
+                }
             }
 
-            // this.board.getDiplomacy().logAllegiance(board);
+
 
             //Post-action execution matters:
 
@@ -467,6 +472,10 @@ public class GameState {
 
         //3. Update tribe pacifist counter
         tribe.addPacifistCount();
+        // Update the stars counter
+        tribe.resetStarsSent();
+        // Set hasDeclaredWar to false at beginning of new turn
+        tribe.setHasDeclaredWar(false);
     }
 
 

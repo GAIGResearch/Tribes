@@ -22,11 +22,11 @@ public class AttackCommand implements ActionCommand {
     public boolean execute(Action a, GameState gs) {
         Attack action = (Attack) a;
 
-        // Getting diplomacy to update values
-        Diplomacy d = gs.getBoard().getDiplomacy();
-
         //Check if action is feasible before execution
         if (action.isFeasible(gs)) {
+
+            // Getting diplomacy to update values
+            Diplomacy d = gs.getBoard().getDiplomacy();
 
             int unitId = action.getUnitId();
             int targetId = action.getTargetId();

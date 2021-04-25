@@ -2,8 +2,6 @@ package core;
 
 import core.game.Board;
 
-import java.util.Arrays;
-
 public class Diplomacy {
 
     // stores the allegiances of the tribes
@@ -21,6 +19,10 @@ public class Diplomacy {
         this.AllegianceStatus = new int[size][size];
     }
 
+    public int[][] getAllegianceStatus() {
+        return AllegianceStatus;
+    }
+
     /**
      * Creates allegiances for each of the existing tribes
      *
@@ -31,7 +33,7 @@ public class Diplomacy {
     public void updateAllegiance(int value, int initTribeID, int targetTribeID) {
         // checks if increase or decreasing the allegiance will go over the limit
         // if so, set the value to the the difference of the absoluteMax and the current allegiance value
-        if ((this.AllegianceStatus[initTribeID][targetTribeID] + value < -absoluteMax) || (this.AllegianceStatus[initTribeID][targetTribeID] + value > absoluteMax)){
+        if ((this.AllegianceStatus[initTribeID][targetTribeID] + value < -absoluteMax) || (this.AllegianceStatus[initTribeID][targetTribeID] + value > absoluteMax)) {
             value = Integer.signum(value) * (absoluteMax - Math.abs(this.AllegianceStatus[initTribeID][targetTribeID]));
         }
         // adds the value to the allegiance
@@ -64,15 +66,10 @@ public class Diplomacy {
         System.out.println("NEW LOG");
         for (int i = 0; i < AllegianceStatus.length; i++) {
             System.out.print(b.getTribes()[i].getName() + ": ");
-            for (int j=0; j < AllegianceStatus.length; j ++){
+            for (int j = 0; j < AllegianceStatus.length; j++) {
                 System.out.print(this.AllegianceStatus[i][j] + ", ");
             }
             System.out.println();
         }
     }
-
-    public void logAllegiance2(){
-        System.out.println(Arrays.deepToString(this.AllegianceStatus));
-    }
 }
-

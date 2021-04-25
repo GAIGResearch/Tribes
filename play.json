@@ -7,7 +7,7 @@
   "Search Depth" : 5,
   "Force End" : false,
   "Population Size" : 20,
-  "Players" : ["MCTS", "MCTS", "MCTS", "MCTS", "MCTS", "MCTS", "MCTS", "MCTS"],
+  "Players" : ["Human", "MCTS", "MCTS", "MCTS", "MCTS", "MCTS", "MCTS", "MCTS"],
   "Tribes" : ["Kickoo", "Zebasi", "Luxidoor", "Vengir", "Bardur", "Ai-Mo", "Quetzali", "Yadakk"],
   "Verbose" : false,
 

@@ -3,9 +3,7 @@ package core;
 import core.actions.Action;
 import core.actions.ActionCommand;
 import core.actions.cityactions.command.*;
-import core.actions.tribeactions.command.BuildRoadCommand;
-import core.actions.tribeactions.command.EndTurnCommand;
-import core.actions.tribeactions.command.ResearchTechCommand;
+import core.actions.tribeactions.command.*;
 import core.actions.unitactions.command.*;
 import core.actors.units.*;
 import org.json.JSONObject;
@@ -788,6 +786,7 @@ public class Types {
         END_TURN(null, null),
         RESEARCH_TECH(null, null),
         DECLARE_WAR(null,null),
+        SEND_STARS(null,null),
 
         //unit
         ATTACK("img/actions/attack.png", null),
@@ -838,6 +837,8 @@ public class Types {
                 case BUILD_ROAD: return new BuildRoadCommand();
                 case END_TURN: return new EndTurnCommand();
                 case RESEARCH_TECH: return new ResearchTechCommand();
+                case DECLARE_WAR: return new DeclareWarCommand();
+                case SEND_STARS: return new SendStarsCommand();
 
                 //Unit actions
                 case ATTACK: return new AttackCommand();

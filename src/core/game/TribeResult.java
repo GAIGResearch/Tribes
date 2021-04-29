@@ -12,8 +12,10 @@ public class TribeResult implements Comparable
     private int numTechsResearched;
     private int numCities;
     private int production;
+    private int numWars;
+    private int numStars;
 
-    public TribeResult(int id, Types.RESULT res, int score, int numTechsResearched, int numCities, int production)
+    public TribeResult(int id, Types.RESULT res, int score, int numTechsResearched, int numCities, int production, int numWars, int numStars)
     {
         this.id = id;
         this.result = res;
@@ -21,6 +23,8 @@ public class TribeResult implements Comparable
         this.numTechsResearched = numTechsResearched;
         this.numCities = numCities;
         this.production = production;
+        this.numWars = numWars;
+        this.numStars = numStars;
     }
 
     @Override
@@ -65,6 +69,18 @@ public class TribeResult implements Comparable
         else if(this.production < other.production)
             return 1;
 
+        //Tie breaker 4: wars
+        if(this.numWars > other.numWars)
+            return -1;
+        else if(this.numWars < other.numWars)
+            return 1;
+
+        //Tie breaker 5: stars
+        if(this.numStars > other.numStars)
+            return -1;
+        else if(this.numStars < other.numStars)
+            return 1;
+
         //If here, all is the same. Choose at random.
         return new Random().nextBoolean() ? -1 : 1;
     }
@@ -89,12 +105,16 @@ public class TribeResult implements Comparable
         return score;
     }
 
+    public int getNumWars() { return numWars; }
+
+    public int getNumStars() { return numStars; }
+
     public Types.RESULT getResult() {
         return result;
     }
 
     public TribeResult copy() {
-        return new TribeResult(id, result, score, numTechsResearched, numCities, production);
+        return new TribeResult(id, result, score, numTechsResearched, numCities, production, numWars, numStars);
     }
 
     public void setResult(Types.RESULT result) {

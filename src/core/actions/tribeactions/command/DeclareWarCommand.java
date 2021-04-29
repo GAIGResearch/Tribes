@@ -4,6 +4,7 @@ import core.Diplomacy;
 import core.actions.Action;
 import core.actions.ActionCommand;
 import core.actions.tribeactions.DeclareWar;
+import core.actors.Tribe;
 import core.game.GameState;
 
 public class DeclareWarCommand implements ActionCommand {
@@ -15,8 +16,11 @@ public class DeclareWarCommand implements ActionCommand {
             Diplomacy d = gs.getBoard().getDiplomacy();
             int tribeID = action.getTribeId();
             int targetID = action.getTargetID();
-            gs.getTribe(tribeID).setHasDeclaredWar(true);
+            Tribe tribe = gs.getTribe(tribeID);
+            tribe.setHasDeclaredWar(true);
+            tribe.setnWarsDeclared(tribe.getnWarsDeclared() + 1);
             d.updateAllegiance(-30 - d.getAllegianceStatus()[tribeID][targetID], tribeID, targetID);
+            d.checkConsequences(-30, tribeID, targetID);
             return true;
         }
         return false;

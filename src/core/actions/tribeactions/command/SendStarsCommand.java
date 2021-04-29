@@ -20,15 +20,17 @@ public class SendStarsCommand implements ActionCommand {
             target.addStars(action.getNumStars());
 
             tribe.setStarsSent(tribe.getStarsSent() + action.getNumStars());
+            tribe.setnStarsSent(tribe.getnStarsSent() + action.getNumStars());
 
             // adding score for the tribe sending stars
-            tribe.addScore(action.getNumStars()*10);
+            tribe.addScore(action.getNumStars());
 
             // updating the diplomacy
             Diplomacy d = gs.getBoard().getDiplomacy();
             int tribeID = action.getTribeId();
             int targetID = action.getTargetID();
             d.updateAllegiance(action.getNumStars(), tribeID, targetID);
+            d.checkConsequences(action.getNumStars(), tribeID, targetID);
             return true;
         }
         return false;

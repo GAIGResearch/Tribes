@@ -25,7 +25,7 @@ public class DeclareWar extends TribeAction {
         int[][] allegiances = d.getAllegianceStatus();
 
         // if the two tribes are already at war, or the tribe has already declared war this turn, return false, else return true
-        return allegiances[this.tribeId][this.targetID] > -30;
+        return allegiances[this.tribeId][this.targetID] > -30 && !gs.getTribe(this.tribeId).getHasDeclaredWar();
     }
 
     @Override

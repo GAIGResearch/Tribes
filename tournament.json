@@ -1,9 +1,9 @@
 {
   "Game Mode" : "Score",
-  "Repetitions" : 6,
-  "Rollouts" : false,
+  "Repetitions" : 36,
+  "Rollouts" : true,
   "Search Depth" : 5,
-  "Force End" : true,
+  "Force End" : false,
   "Population Size" : 20,
   "Players" : ["MCTS", "RHEA","OSLA","MC","Random","Rule Based"],
   "Tribes" : ["Xin Xi", "Imperius", "Bardur","Oumaji","Kickoo","Luxidoor"],

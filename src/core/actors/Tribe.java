@@ -70,6 +70,10 @@ public class Tribe extends Actor {
     // Bool to track if the tribe has already declared war in the current turn
     private boolean hasDeclaredWar = false;
 
+    // Ints to track the total wars declared and stars sent for a tribe
+    private int nWarsDeclared;
+    private int nStarsSent;
+
     public Tribe(Types.TRIBE tribe) {
         this.tribe = tribe;
         init();
@@ -660,17 +664,13 @@ public class Tribe extends Actor {
         return nPacifistCount;
     }
 
-    public void setStarsSent(int numStars){
-        this.starsSent = numStars;
-    }
+    public void setStarsSent(int numStars){ this.starsSent = numStars; }
 
     public int getStarsSent(){
         return starsSent;
     }
 
-    public boolean canSendStars(int numStars){
-        return starsSent < 30 && numStars < stars && stars > 0;
-    }
+    public boolean canSendStars(int numStars){ return starsSent < 30 && numStars < stars && stars > 0; }
 
     public void resetStarsSent(){starsSent = 0;}
 
@@ -681,4 +681,12 @@ public class Tribe extends Actor {
     public boolean getHasDeclaredWar(){
         return hasDeclaredWar;
     }
+
+    public int getnWarsDeclared(){return nWarsDeclared;}
+
+    public int getnStarsSent(){return nStarsSent;}
+
+    public void setnStarsSent(int numStars){ this.nStarsSent = numStars;}
+
+    public void setnWarsDeclared(int warsDeclared){this.nWarsDeclared = warsDeclared;}
 }

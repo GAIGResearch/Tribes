@@ -20,7 +20,7 @@ public class SendStarsFactory implements ActionFactory {
             return actions;
         }
         for (int ids = 0; ids < gs.getBoard().getTribes().length; ids++) {
-            for (int stars = 1; stars <= 15; stars++) {
+            for (int stars = 1; stars < Math.min(tribe.getStars(), 15); stars++) {
                 if (ids != tribe.getTribeId()) {
                     if (tribe.canSendStars(stars)) {
                         SendStars ss = new SendStars(tribe.getTribeId());

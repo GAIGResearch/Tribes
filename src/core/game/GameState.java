@@ -292,12 +292,12 @@ public class GameState {
             if(!executed && ac != null) {
                 System.out.println("Tick: " + this.tick + "; action [" + action + "] couldn't execute?");
                 ac.execute(action, this);
-            } else{
+            } /*else{
                 if (action.getActionType().toString().equals("DECLARE_WAR") || action.getActionType().toString().equals("SEND_STARS")){
                     System.out.println(action.toString());
                     board.getDiplomacy().logAllegiance(board);
                 }
-            }
+            }*/
 
 
 
@@ -655,7 +655,7 @@ public class GameState {
         for(int i = 0; i < canEndTurn.length; ++i)
         {
             Tribe t = board.getTribe(i);
-            TribeResult tribeResult = new TribeResult(i, t.getWinner(), t.getScore(), t.getTechTree().getNumResearched(), t.getNumCities(), t.getMaxProduction(this));
+            TribeResult tribeResult = new TribeResult(i, t.getWinner(), t.getScore(), t.getTechTree().getNumResearched(), t.getNumCities(), t.getMaxProduction(this), t.getnWarsDeclared(), t.getnStarsSent());
             ranking.add(tribeResult);
         }
     }

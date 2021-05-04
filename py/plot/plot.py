@@ -213,7 +213,7 @@ def print_agent_pw(ag, data, column_order):
 
 def main():
 
-    file_path = "C:\\Work\\Tribes-results\\validation-7-8-1\\"
+    file_path = "C:\\Work\\Tribes-results\\validation-5-6-6\\"
     column_order = ["MCTS", "PORTFOLIO_MCTS"]
     files = [join(file_path, f) for f in listdir(file_path) if isfile(join(file_path, f)) and f.endswith("test.txt")]
 
@@ -309,26 +309,27 @@ def main():
     # print_agent_pw("OSLA", victories, column_order)
     # print_agent_pw("Random", victories, column_order)
 
-    N_REPRESENTATIVES = 10
-    representative = {} # [-1 for _ in column_order]
-    for c in column_order:
-        print_agent_pw(c, victories, column_order)
-        representative[c] = []
+    if False:
+        N_REPRESENTATIVES = 10
+        representative = {} # [-1 for _ in column_order]
+        for c in column_order:
+            print_agent_pw(c, victories, column_order)
+            representative[c] = []
 
-    for agent in data_per_game:
-        data = data_per_game[agent]
-        avg_vict = np.average(victories[agent]['tot'])
-        # for res in data:  # For each game
-        for game_idx in range(len(data)):  # For each game
-            res = data[game_idx]
-            vict_err = np.power(res[0] - avg_vict, 2)
-            representative[agent].append([game_idx, vict_err, avg_vict, res[0]])
+        for agent in data_per_game:
+            data = data_per_game[agent]
+            avg_vict = np.average(victories[agent]['tot'])
+            # for res in data:  # For each game
+            for game_idx in range(len(data)):  # For each game
+                res = data[game_idx]
+                vict_err = np.power(res[0] - avg_vict, 2)
+                representative[agent].append([game_idx, vict_err, avg_vict, res[0]])
 
-        representative[agent].sort(key = lambda x: x[1])
-        print("Most representative games for " + agent + " (avg win: " + str(avg_vict) + "): ")
-        for i in range(0, N_REPRESENTATIVES):
-            game_idx = representative[agent][i][0]
-            print(str(i)+ ": game " + str(game_idx) + ", avg: " + str(representative[agent][i][3]) + ", err: " + str(representative[agent][i][1]) + ", seed: " + str(seed_per_game[game_idx]))
+            representative[agent].sort(key = lambda x: x[1])
+            print("Most representative games for " + agent + " (avg win: " + str(avg_vict) + "): ")
+            for i in range(0, N_REPRESENTATIVES):
+                game_idx = representative[agent][i][0]
+                print(str(i)+ ": game " + str(game_idx) + ", avg: " + str(representative[agent][i][3]) + ", err: " + str(representative[agent][i][1]) + ", seed: " + str(seed_per_game[game_idx]))
 
     print ("_____________")
 

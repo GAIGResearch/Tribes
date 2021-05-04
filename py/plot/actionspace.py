@@ -16,7 +16,7 @@ agents_dict = {"DoNothing" : "DoNothing", "Random" : "Random", "SimpleAgent" : "
 game_modes = ["CAPITALS", "SCORE"]
 
 
-TURNS = 51
+TURNS = 50
 
 
 def errorfill(x, y, yerr, lnst='-', color=None, alpha_fill=0.3, ax=None):
@@ -41,6 +41,7 @@ def process_file(f_name, max_data = 200000, bounds = [0, TURNS]):
         game_data = [[] for _ in range(6)]
         all_game_data = []
         theresData = False
+        expected_data_length = bounds[1] - bounds[0] + 1
 
         for line in lines:
 
@@ -65,50 +66,45 @@ def process_file(f_name, max_data = 200000, bounds = [0, TURNS]):
 
             if skipTillNext is False and ("Branching factor" in line or "moves in turn:" in line or "Actions Per Step Avg" in line):
 
+                data = []
+
                 if "Branching factor" in line:
                     theresData = True
-                    spaces = line.split(",")[2].split(" ")
+                    spaces = line.split(",")[2].strip().split(" ")
                     for idx in range(len(spaces)):
                         if idx >= bounds[0] and idx <= bounds[1]:
                             d = spaces[idx]
                             if len(d) > 0 and d != '\n':
-                                game_data[dataCount].append(float(d))
+                                data.append(float(d))
+
+
 
                 if "moves in turn:" in line:
                     theresData = True
-                    moves = line.split(",")[2].split(" ")
+                    moves = line.split(",")[2].strip().split(" ")
                     for idx in range(len(moves)):
                         if idx >= bounds[0] and idx <= bounds[1]:
                             m = moves[idx]
                             if len(m) > 0 and m != '\n':
-                                game_data[dataCount].append(int(m))
+                                data.append(int(m))
 
 
                 if "Actions Per Step Avg" in line:
                     theresData = True
-                    aps = line.split(",")[2].split(" ")
+                    aps = line.split(",")[2].strip().split(" ")
                     for idx in range(len(aps)):
                         if idx >= bounds[0] and idx <= bounds[1]:
                             a = aps[idx]
                             if len(a) > 0 and a != '\n':
-                                game_data[dataCount].append(float(a))
+                                data.append(float(a))
+
+
+                if len(data) == expected_data_length:
+                    game_data[dataCount] = data
+                else:
+                    skipTillNext = True
 
                 dataCount = dataCount + 1
-
-                # elif "Actions Per Step" in line:
-                #
-                #     turns = int(line.split(",")[1])
-                #     if turns < TURNS:
-                #         skipTillNext = True
-                #
-                #     aps = line.split(",")[2].split(" ")
-                #     for idx in range(len(aps)):
-                #         if idx >= bounds[0] and idx <= bounds[1]:
-                #             a = aps[idx]
-                #             if len(a) > 0 and a != '\n':
-                #                 game_data[dataCount].append(float(a))
-
-
 
 
     return all_game_data
@@ -212,6 +208,51 @@ def getTrends(f, max_data, indices = [0,2,1,3], apply_log10 = True, bounds = [0,
 
     return bfs, moves
 
+
+
+def getTrendsSingle(f, max_data, indices = [1, 2], apply_log10 = True, bounds = [0,TURNS]):
+    all_game_data = process_file(f, max_data, bounds)
+    samples = len(all_game_data)
+    series_length = len(all_game_data[0][0])
+
+    bf = [[] for _ in range(series_length)]
+    bf_avg = []
+    bf_std = []
+    moves = [[] for _ in range(series_length)]
+    moves_avg = []
+    moves_std = []
+
+    for game_data in all_game_data:
+        # print game_data[0][t] + " " + str(np.log10())
+        for t in range(series_length):
+
+            if apply_log10:
+                # print game_data
+                bf[t].append(np.log10(game_data[indices[0]][t]))
+            else:
+                bf[t].append(game_data[indices[0]][t])
+
+            moves[t].append(game_data[indices[1]][t])
+
+    for t in range(len(bf)):
+        bf_avg.append(np.average(bf[t]))
+        bf_std.append(bf_avg[t] / np.sqrt(samples))
+
+        moves_avg.append(np.average(moves[t]))
+        moves_std.append(moves_avg[t] / np.sqrt(samples))
+
+
+    bfs = [bf_avg, bf_std]
+    moves = [moves_avg, moves_std]
+
+    print("Num samples: " + str(samples))
+    print("Avg trend1[0]: " + str(np.average(bf_avg)))
+    print("Avg trend2[0]: " + str(np.average(moves_avg)))
+    # print bf_win_avg
+    # print all_game_data
+
+    return bfs, moves
+
 def main():
 
     # f = "../../res/action_spaces.txt"
@@ -219,8 +260,8 @@ def main():
     # bfs, moves = getTrends(f, 200)
     # f = "/Users/dperez/sandbox/2/action_spaces_mean.txt"
     # bfs_mean, moves2 = getTrends(f,200)
-    f = "C:\\Work\\git\\Tribes\\test\\vsRHEA\\"
-    inputFile = "tribes_test.txt"
+    f = "C:\\Work\\Tribes-results\\action-space-pmcts\\"
+    inputFile = "action-space-pmcts_test.txt"
 
     # drawPlot([bfs[0], bfs[2]], 'Turns', 'Action Space Size (log-10 scale)',
     #          ['ABF Winner', 'ABF Loser'], 'Action Space', 'output.png',
@@ -248,23 +289,38 @@ def main():
     #          [trend1[1], trend1[3], trend2[1], trend2[3]], True, True)
 
 
-    bounds = [0, 51]
-    # bounds = [0,25]
-    # bounds = [46,51]
-    trend1, trend2 = getTrends(f + inputFile, 400, [1, 4, 0, 3], True, bounds)
+    bounds = [26, 50]
+    # Two-player analysis
+    # trend1, trend2 = getTrends(f + inputFile, 400, [1, 4, 0, 3], True, bounds)
+    # drawPlot([trend1[0], trend1[2]], 'Turns', 'Branching Factor per Turn (log-10 scale)',
+    #          ['Winning', 'Losing'], 'Average Branching Factor per Turn', f + 'branchingFactorTurn.png',
+    #          [trend1[1], trend1[3]], True, True)
+    #
+    #
+    # drawPlot([trend2[0], trend2[2]], 'Turns', 'Available Actions per Move',
+    #          ['Winning', 'Losing'], 'Average Available Actions per Move', f + 'branchingFactorStep.png',
+    #          [trend2[1], trend2[3]], True, True)
+    #
+    #
+    # moves, a = getTrends(f+inputFile, 200, [2, 5, 0, 0], False, bounds)
+    # drawPlot([moves[0], moves[2]], 'Turns', 'Number of Moves', ['Avg Moves Win Player', 'Avg Moves Lose Player'], 'Average Moves Played per Turn', f + 'movesPlayed.png', [moves[1], moves[3]], True, True)
+
+    bfs, moves = getTrendsSingle(f + inputFile, 400, [1,2], True, bounds)
+
+    drawPlot([bfs[0]], 'Turns', 'Branching Factor per Turn (log-10 scale)',
+             ['Winning'], 'Average Branching Factor per Turn', f + 'branchingFactorTurn.png',
+             [bfs[1]], True, True)
 
 
-    drawPlot([trend1[0], trend1[2]], 'Turns', 'Branching Factor per Turn (log-10 scale)',
-             ['Winning', 'Losing'], 'Average Branching Factor per Turn', f + 'branchingFactorTurn.png',
-             [trend1[1], trend1[3]], True, True)
+    # drawPlot([trend2[0]], 'Turns', 'Available Actions per Move',
+    #          ['Winning'], 'Average Available Actions per Move', f + 'branchingFactorStep.png',
+    #          [trend2[1]], True, True)
 
 
-    drawPlot([trend2[0], trend2[2]], 'Turns', 'Available Actions per Move',
-             ['Winning', 'Losing'], 'Average Available Actions per Move', f + 'branchingFactorStep.png',
-             [trend2[1], trend2[3]], True, True)
+    # moves, a = getTrendsSingle(f+inputFile, 200, [2, 5, 0, 0], False, bounds)
+    drawPlot([moves[0]], 'Turns', 'Number of Moves', ['Avg Moves Win Player'], 'Average Moves Played per Turn', f + 'movesPlayed.png', [moves[1]], True, True)
 
 
-    moves, a = getTrends(f+inputFile, 200, [2, 5, 0, 0], False, bounds)
-    drawPlot([moves[0], moves[2]], 'Turns', 'Number of Moves', ['Avg Moves Win Player', 'Avg Moves Lose Player'], 'Average Moves Played per Turn', f + 'movesPlayed.png', [moves[1], moves[3]], True, True)
+
 
 main()

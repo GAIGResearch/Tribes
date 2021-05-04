@@ -135,23 +135,6 @@ public enum Feature {
                 return 0.0;
 
             case PERC_RANGE:
-//                for (GameplayStats gps : gameStats)
-//                {
-//                    // Hypothesis: The fact that I give high value to the "Spawn ARCHER" action _alone_ doesn't mean that
-//                    // there will be more archers AND the strategy will be successful.
-//                    int rangeSpawns = gps.getFinalActionCount("Spawn ARCHER") + gps.getFinalActionCount("Spawn CATAPULT");
-//                    int meleeSpawns = gps.getFinalActionCount("Spawn KNIGHT") + gps.getFinalActionCount("Spawn SWORDMAN");
-//
-//                    featureValue = 5 + (rangeSpawns - meleeSpawns); //0 .. 10
-//
-////                    int total = rangeSpawns + meleeSpawns;
-////                    double prop = 50.0;
-////                    if(total>0)
-////                        prop = 100.0 * (double)rangeSpawns / total;
-////                    featureValue += prop;
-//                }
-//                return featureValue / gameStats.size();
-
                 double avgRange = NUM_SPAWN_ARCHERS.getFeatureValue(gameStats) + NUM_SPAWN_CATAPULTS.getFeatureValue(gameStats);
                 double avgMelee = NUM_SPAWN_KNIGHTS.getFeatureValue(gameStats) + NUM_SPAWN_SWORDMAN.getFeatureValue(gameStats);
                 return 5.0 + (avgRange - avgMelee);

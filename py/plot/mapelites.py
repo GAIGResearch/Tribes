@@ -11,6 +11,8 @@ LABELS = { "NUM_SPAWN_DEFENDER": "Defender Spawns",
            "ATTACKS" : "# Attacks",
            "PERC_RANGE" : "Support Unit (Range - Melee)",
            "PRODUCTION" : "Final Production",
+           "RESEARCH_PROGRESS" : "Research Progress",
+           "OWNED_TILES_PROGRESS" : "Tile Dominance",
            }
 
 RANGES = { "NUM_SPAWN_DEFENDER": np.arange(0, 10 + 1, step=1),
@@ -18,6 +20,9 @@ RANGES = { "NUM_SPAWN_DEFENDER": np.arange(0, 10 + 1, step=1),
            "ATTACKS": np.arange(0, 20 + 1, step=2),
            "PERC_RANGE": np.arange(-5, 5 + 1, step=1),
            "PRODUCTION" : np.arange(0, 30 + 1, step=3),
+           "RESEARCH_PROGRESS": np.arange(0, 20 + 1, step=2),
+           "OWNED_TILES_PROGRESS": np.arange(0, 20 + 1, step=2),
+           # "OWNED_TILES_PROGRESS": np.arange(0.0, 0.2 + 0.1, step=0.2),
            }
 
 
@@ -74,8 +79,7 @@ def heatmap(data, row_labels, col_labels, ax=None, clim=[0,100],
                    labeltop=False, labelbottom=True)
 
     # Rotate the tick labels and set their alignment.
-    plt.setp(ax.get_xticklabels(), rotation=-30, ha="right",
-             rotation_mode="anchor")
+    plt.setp(ax.get_xticklabels(), rotation=-30, ha="center")
 
     # Turn spines off and create white grid.
     # ax.spines[:].set_visible(False)
@@ -189,9 +193,35 @@ def draw_heatmap(labels, data, output_filename, x_min, x_max, y_min, y_max):
     x_ticks = RANGES[labels[0]][y_min:y_max+1]
     y_ticks = RANGES[labels[1]][x_min:x_max+1]
 
-    # mapelites_wins = np.array(data)
-    # x_ticks = [ x for x in range(0, len(RANGES[labels[0]][y_min:y_max+1])) ]
-    # y_ticks = [ x for x in range(0, len(RANGES[labels[1]][x_min:x_max+1])) ]
+    # n_x_ticks = []
+    # for x in x_ticks:
+    #     n_x_ticks.append("{:1.1f}".format(x * 0.1))
+    # x_ticks = n_x_ticks
+    #
+    # n_y_ticks = []
+    # for y in y_ticks:
+    #     n_y_ticks.append("{:1.1f}".format(y * 0.1))
+    # y_ticks = n_y_ticks
+
+    # new_x_ticks = []
+    # inc = RANGES[labels[0]][y_min:y_max+1][1] - RANGES[labels[0]][y_min:y_max+1][0]
+    # for x in x_ticks:
+    #     x_low = x - inc*0.5
+    #     x_high = x + inc*0.5
+    #     txt = "[" + str(x_low) + " - " + str(x_high) + "]"
+    #     new_x_ticks.append(txt)
+    # x_ticks = new_x_ticks
+
+    # new_y_ticks = []
+    # inc = RANGES[labels[1]][x_min:x_max+1][1] - RANGES[labels[1]][x_min:x_max+1][0]
+    # for y in y_ticks:
+    #     y_low = y - inc*0.5
+    #     y_high = y + inc*0.5
+    #     txt = "[" + str(y_low) + " - " + str(y_high) + "]"
+    #     new_y_ticks.append(txt)
+    # y_ticks = new_y_ticks
+
+
 
     fig, ax = plt.subplots()
     im, cbar = heatmap(mapelites_wins, y_ticks, x_ticks, ax=ax,
@@ -199,6 +229,7 @@ def draw_heatmap(labels, data, output_filename, x_min, x_max, y_min, y_max):
     annotate_heatmap(im, valfmt="{x:.0f}%")
     plt.xlabel(LABELS[labels[0]])
     plt.ylabel(LABELS[labels[1]])
+    plt.tight_layout()
 
     plt.show()
     outputFile = join(file_path, output_filename)
@@ -338,13 +369,13 @@ def threeD(output_filename = "heatmap.png"):
 
 
 
-file_path = "C:\\Work\\Tribes-results\\mcts-3-distributed-b\\map\\"
+file_path = "C:\\Work\\Tribes-results\\mcts-distributed-b\\map\\"
 output_file = "heatmap"
-# output_file = "attacks-support-hm"
+# output_file = "research-dominance-hm"
 
 def main():
-    # twoD(file_path + "/" + output_file)
-    threeD(file_path + "/" + output_file)
+    twoD(file_path + "/" + output_file)
+    # threeD(file_path + "/" + output_file)
 
 
 main()

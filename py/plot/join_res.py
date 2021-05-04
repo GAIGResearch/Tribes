@@ -3,8 +3,8 @@ from os.path import isfile, join
 
 def main():
 
-    file_path = "C:\\Work\\Tribes-results\\validation-7-9-2\\"
-    output_file_path = file_path + "tribes_test.txt"
+    file_path = "C:\\Work\\Tribes-results\\action-space-pmcts\\"
+    output_file_path = file_path + "action-space-pmcts_test.txt"
     files = [join(file_path, f) for f in listdir(file_path) if isfile(join(file_path, f)) and f.endswith(".txt")]
     lines = []
 
@@ -29,6 +29,10 @@ def main():
                         lines.append(line)
                     elif "GPS:" in line:
                         lines.append(line)
+                    elif "Actions Per Step" in line or "Branching factor" in line or "#moves in turn" in line:
+                        lines.append(line)
+
+
 
     with open(output_file_path, 'w') as f:
         for item in lines:

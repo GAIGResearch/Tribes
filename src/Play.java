@@ -1,3 +1,4 @@
+import core.Constants;
 import core.Types;
 import core.game.Game;
 import org.json.JSONArray;
@@ -39,6 +40,7 @@ public class Play {
 
             if (config != null && !config.isEmpty()) {
                 String runMode = config.getString("Run Mode");
+                Constants.VERBOSE = config.getBoolean("Verbose");
 
                 JSONArray playersArray = (JSONArray) config.get("Players");
                 JSONArray tribesArray = (JSONArray) config.get("Tribes");
@@ -68,6 +70,11 @@ public class Play {
                 Run.T_MULT = config.getDouble("T mult");
                 Run.A_MULT = config.getDouble("A mult");
                 Run.B = config.getDouble("B");
+
+                JSONArray weights = null;
+                if(config.has("pMCTS Weights"))
+                    weights = (JSONArray) config.get("pMCTS Weights");
+                Run.pMCTSweights = Run.getWeights(weights);
 
                 AGENT_SEED = config.getLong("Agents Seed");
                 GAME_SEED = config.getLong("Game Seed");

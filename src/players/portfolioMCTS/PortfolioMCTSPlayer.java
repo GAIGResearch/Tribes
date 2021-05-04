@@ -7,6 +7,7 @@ import core.game.GameState;
 import players.Agent;
 import players.portfolio.ActionAssignment;
 import utils.ElapsedCpuTimer;
+import utils.stats.AIStats;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,12 +18,14 @@ public class PortfolioMCTSPlayer extends Agent {
     private final Random m_rnd;
     private PortfolioMCTSParams params;
     private PortfolioTreeNode m_root;
+    private AIStats aiStats;
 
     public PortfolioMCTSPlayer(long seed)
     {
         super(seed);
         m_rnd = new Random(seed);
         this.params = new PortfolioMCTSParams();
+        this.aiStats = new AIStats(this.playerID);
     }
 
     public PortfolioMCTSPlayer(long seed, PortfolioMCTSParams params) {
@@ -47,6 +50,9 @@ public class PortfolioMCTSPlayer extends Agent {
 
         ActionAssignment act = m_root.getActions().get(m_root.bestAction());
 //        ActionAssignment act = m_root.getActions().get(m_root.mostVisitedAction());
+
+        this.updateBranchingFactor(gs);
+
         return act.getAction();
     }
 
@@ -91,4 +97,21 @@ public class PortfolioMCTSPlayer extends Agent {
     public PortfolioMCTSParams getParams() {
         return params;
     }
+
+    private void updateBranchingFactor(GameState gameState) {
+        ArrayList<Integer> actionCounts = actionsPerUnit(gameState);
+        aiStats.addBranchingFactor(gameState.getTick(), actionCounts);
+        aiStats.addActionsPerStep(gameState.getTick(), actionsPerGameState(gameState));
+    }
+
+
+    /**
+     * Function called at the end of the game. May be used by agents for final analysis.
+     * @param reward - final reward for this agent.
+     */
+    public void result(GameState gs, double reward)
+    {
+        aiStats.print();
+    }
+
 }

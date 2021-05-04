@@ -96,8 +96,10 @@ public class Tournament {
                 JSONArray seeds = (JSONArray) config.get("Level Seeds");
                 t.setSeeds(seeds);
 
-                JSONArray weights = (JSONArray) config.get("pMCTS Weights");
-                Run.pMCTSweights = t.getWeights(weights);
+                JSONArray weights = null;
+                if(config.has("pMCTS Weights"))
+                    weights = (JSONArray) config.get("pMCTS Weights");
+                Run.pMCTSweights = Run.getWeights(weights);
 
             } catch (Exception e) {
                 System.out.println("Malformed JSON config file: " + e);
@@ -148,14 +150,6 @@ public class Tournament {
     }
 
 
-    private double[] getWeights(JSONArray w) {
-        double[] weights = new double[w.length()];
-        for (int i = 0; i < weights.length; ++i)
-        {
-            weights[i] = w.getDouble(i);
-        }
-        return weights;
-    }
 
 
     private void run(int repetitions, boolean shift)

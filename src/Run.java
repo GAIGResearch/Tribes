@@ -1,5 +1,6 @@
 import core.Types;
 import core.game.Game;
+import org.json.JSONArray;
 import players.*;
 import gui.GUI;
 import gui.WindowInput;
@@ -113,6 +114,16 @@ class Run {
         throw new Exception("Error: unrecognized Tribe: " + arg);
     }
 
+    public static double[] getWeights(JSONArray w) {
+        if (w == null) return null;
+        double[] weights = new double[w.length()];
+        for (int i = 0; i < weights.length; ++i)
+        {
+            weights[i] = w.getDouble(i);
+        }
+        return weights;
+    }
+
     public static Agent getAgent(Run.PlayerType playerType, long agentSeed)
     {
         switch (playerType)
@@ -157,7 +168,8 @@ class Run {
                 Portfolio p = new SimplePortfolio(agentSeed);
                 portfolioMCTSParams.setPortfolio(p);
                 portfolioMCTSParams.pruneHeuristic = new PrunePortfolioHeuristic(p);
-                portfolioMCTSParams.pruneHeuristic.setWeights(Run.pMCTSweights);
+                if(Run.pMCTSweights != null)
+                    portfolioMCTSParams.pruneHeuristic.setWeights(Run.pMCTSweights);
                 return new PortfolioMCTSPlayer(agentSeed, portfolioMCTSParams);
             case OEP:
                 OEPParams oepParams = new OEPParams();

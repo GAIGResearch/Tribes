@@ -234,17 +234,18 @@ public class Game {
                         if(VERBOSE) ais.print();
                         GameplayStats gps = gpStats[idx];
                         gps.logGameEnd(tr);
-                        if(VERBOSE) gps.print();
+                        if(VERBOSE) {
+                            gps.print();
 
-                        ArrayList<GameplayStats> agps = new ArrayList<>();
-                        agps.add(gps);
-                        for (Feature f : Feature.values())
-                        {
-                            double val = f.getFeatureValue(agps);
+                            ArrayList<GameplayStats> agps = new ArrayList<>();
+                            agps.add(gps);
+                            for (Feature f : Feature.values()) {
+                                double val = f.getFeatureValue(agps);
 
-                            String[] agentChunks = players[gps.getPlayerID()].getClass().toString().split("\\.");
-                            String agentName = agentChunks[agentChunks.length - 1];
-                            System.out.println("GPS:" + gps.getPlayerID() + ":" + agentName + ":" + f + ":" + val);
+                                String[] agentChunks = players[gps.getPlayerID()].getClass().toString().split("\\.");
+                                String agentName = agentChunks[agentChunks.length - 1];
+                                System.out.println("GPS:" + gps.getPlayerID() + ":" + agentName + ":" + f + ":" + val);
+                            }
                         }
 
 
@@ -382,7 +383,7 @@ public class Game {
                         continueTurn = !gs.isTurnEnding();
                         if (!isHumanPlayer) {
                             ect.setMaxTimeMillis(remainingECT);
-                            boolean timeOut = TURN_LIMITED && ect.exceededMaxTime();
+                            boolean timeOut = TURN_TIME_LIMITED && ect.exceededMaxTime();
                             continueTurn &= gs.existAvailableActions(tribe) && !timeOut;
                         }
 

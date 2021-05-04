@@ -53,6 +53,7 @@ class Run {
             case "MCTS": return Tournament.PlayerType.MCTS;
             case "RHEA": return Tournament.PlayerType.RHEA;
             case "OEP": return Tournament.PlayerType.OEP;
+            case "EMCTS": return Tournament.PlayerType.EMCTS;
         }
         throw new Exception("Error: unrecognized Player Type: " + arg);
     }

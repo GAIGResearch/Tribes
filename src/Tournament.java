@@ -5,6 +5,8 @@ import core.game.TribeResult;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import players.*;
+import players.emcts.EMCTSAgent;
+import players.emcts.EMCTSParams;
 import players.mc.MCParams;
 import players.mc.MonteCarloAgent;
 import players.mcts.MCTSParams;
@@ -39,7 +41,6 @@ public class Tournament {
         {
             case DONOTHING: return new DoNothingAgent(agentSeed);
             case RANDOM: return new RandomAgent(agentSeed);
-            case SIMPLE: return new SimpleAgent(agentSeed);
             case OSLA:
                 OSLAParams oslaParams = new OSLAParams();
                 oslaParams.stop_type = oslaParams.STOP_FMCALLS; //Upper bound
@@ -48,37 +49,45 @@ public class Tournament {
             case MC:
                 MCParams mcparams = new MCParams();
                 mcparams.stop_type = mcparams.STOP_FMCALLS;
+//                mcparams.stop_type = mcparams.STOP_ITERATIONS;
                 mcparams.heuristic_method = mcparams.DIFF_HEURISTIC;
                 mcparams.PRIORITIZE_ROOT = true;
-                mcparams.ROLLOUT_LENGTH = MAX_LENGTH;
-                mcparams.FORCE_TURN_END = FORCE_TURN_END ? 5 : mcparams.ROLLOUT_LENGTH + 1;
+                mcparams.ROLLOUT_LENGTH = 10;
+                mcparams.FORCE_TURN_END = 5;//mcparams.ROLLOUT_LENGTH+2;
                 return new MonteCarloAgent(agentSeed, mcparams);
+            case SIMPLE: return new SimpleAgent(agentSeed);
             case MCTS:
                 MCTSParams mctsParams = new MCTSParams();
                 mctsParams.stop_type = mctsParams.STOP_FMCALLS;
-                mctsParams.heuristic_method = mctsParams.DIFF_HEURISTIC;
                 mctsParams.PRIORITIZE_ROOT = true;
-                mctsParams.ROLLOUT_LENGTH = MAX_LENGTH;
-                mctsParams.FORCE_TURN_END = FORCE_TURN_END ? 5 : mctsParams.ROLLOUT_LENGTH + 1;
-                mctsParams.ROLOUTS_ENABLED = MCTS_ROLLOUTS;
+                mctsParams.heuristic_method = mctsParams.DIFF_HEURISTIC;
+                mctsParams.ROLLOUT_LENGTH = 20;
+//                mctsParams.ROLOUTS_ENABLED = false;
+                mctsParams.FORCE_TURN_END = 25;
                 return new MCTSPlayer(agentSeed, mctsParams);
-            case OEP:
-                OEPParams oepParams = new OEPParams();
-                return new OEPAgent(agentSeed, oepParams);
             case RHEA:
                 RHEAParams rheaParams = new RHEAParams();
                 rheaParams.stop_type = rheaParams.STOP_FMCALLS;
                 rheaParams.heuristic_method = rheaParams.DIFF_HEURISTIC;
-                rheaParams.INDIVIDUAL_LENGTH = MAX_LENGTH;
+                rheaParams.INDIVIDUAL_LENGTH = 20;
                 rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
-                rheaParams.POP_SIZE = POP_SIZE;
+                rheaParams.POP_SIZE = 100;
                 return new RHEAAgent(agentSeed, rheaParams);
+            case OEP:
+                OEPParams oepParams = new OEPParams();
+                oepParams.stop_type = oepParams.STOP_FMCALLS;
+                oepParams.heuristic_method = oepParams.DIFF_HEURISTIC;
+                return new OEPAgent(agentSeed, oepParams);
+            case EMCTS:
+                EMCTSParams emctsParams = new EMCTSParams();
+                emctsParams.stop_type = emctsParams.STOP_FMCALLS;
+                emctsParams.heuristic_method = emctsParams.DIFF_HEURISTIC;
+                return new EMCTSAgent(agentSeed,emctsParams);
         }
         return null;
     }
 
     public static void main(String[] args) {
-
         //Some defaults:
         Types.GAME_MODE gameMode = CAPITALS; //SCORE;
         Tournament t = new Tournament(gameMode);
@@ -95,6 +104,7 @@ public class Tournament {
         {
             t.setPlayers(new PlayerType[]{PlayerType.MC, PlayerType.MC});
             t.setTribes(new Types.TRIBE[]{XIN_XI, IMPERIUS});
+
         }else {
             try {
 
@@ -392,7 +402,8 @@ public class Tournament {
         SIMPLE,
         MCTS,
         RHEA,
-        OEP
+        OEP,
+        EMCTS,
     }
 
     private static class Participant

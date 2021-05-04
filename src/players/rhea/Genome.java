@@ -37,7 +37,11 @@ public class Genome implements Comparable<Genome>{
 
     @Override
     public int compareTo(Genome o) {
-        return (int)(o.getValue() - this.getValue());
+        if(this == o){return  0;}
+        if(o.getValue() > this.getValue()){return 1;}
+        if(o.getValue() < this.getValue()){return -1;}
+        else{return 0;}
+        //return (int)(o.getValue() - this.getValue());
     }
 
     @Override

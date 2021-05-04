@@ -80,6 +80,7 @@ public class RHEAAgent extends Agent {
                 end = numIters >= params.num_iterations;
 
         }
+        //System.out.println(fmcalls);
         Collections.sort(pop);
     }
 

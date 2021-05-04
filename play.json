@@ -2,13 +2,13 @@
   "Run Mode" : "PlayLG",
   "Run Mode comment" : "PlayLG / PlayFile / Replay",
 
-  "Game Mode" : "Capitals",
+  "Game Mode" : "Score",
   "Rollouts" : false,
   "Search Depth" : 5,
   "Force End" : false,
   "Population Size" : 20,
-  "Players" : ["Human", "MCTS", "MCTS", "MCTS"],
-  "Tribes" : ["Xin Xi", "Imperius", "Bardur", "Oumaji"],
+  "Players" : ["OEP", "RHEA" ],
+  "Tribes" : ["Xin Xi", "Imperius"],
   "Verbose" : false,
 
   "Replay File Name" : "save/1590072023986/0_0/game.json",

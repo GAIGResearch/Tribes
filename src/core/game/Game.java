@@ -357,7 +357,7 @@ public class Game {
                         continueTurn = !gs.isTurnEnding();
                         if (!isHumanPlayer) {
                             ect.setMaxTimeMillis(remainingECT);
-                            boolean timeOut = TURN_LIMITED && ect.exceededMaxTime();
+                            boolean timeOut = TURN_TIME_LIMITED && ect.exceededMaxTime();
                             continueTurn &= gs.existAvailableActions(tribe) && !timeOut;
                         }
                     }

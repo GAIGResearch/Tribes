@@ -68,12 +68,16 @@ public class RHEAAgent extends Agent {
     private void rheaLoop(GameState gs)
     {
         boolean end = false;
+        int numIters = 0;
         while (!end){
             Collections.sort(pop);
             pop = nextGeneration(gs);
+            numIters++;
 
             if(params.stop_type == params.STOP_FMCALLS)
                 end = this.fmcalls >= params.num_fmcalls;
+            else if(params.stop_type == params.STOP_ITERATIONS)
+                end = numIters >= params.num_iterations;
 
         }
         //System.out.println(fmcalls);

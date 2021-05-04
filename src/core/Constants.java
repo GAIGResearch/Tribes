@@ -6,8 +6,8 @@ public class Constants {
     public static boolean WRITE_SAVEGAMES = false;
     public static boolean DISABLE_NON_HUMAN_GRID_HIGHLIGHT = true;  // If true, human observing/playing doesn't have access to actions of non-human players
     public static int FRAME_DELAY = 0;// 500; //1000;
-    public static boolean TURN_LIMITED = false;
-    public static long TURN_TIME_MILLIS = 1000; //10000; //10 seconds.
+    public static boolean TURN_TIME_LIMITED = false; // if true, agents have a limited amount of time to finish their turn, which is specified by TURN_TIME_MILLIS
+    public static long TURN_TIME_MILLIS = 10000000; //10000; //10 seconds.
     public static int GUI_INFO_DELAY = 0;//50000;
     public static boolean GUI_PAN_TO_TRIBE = false;
 

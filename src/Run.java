@@ -4,6 +4,8 @@ import org.json.JSONArray;
 import players.*;
 import gui.GUI;
 import gui.WindowInput;
+import players.emcts.EMCTSAgent;
+import players.emcts.EMCTSParams;
 import players.heuristics.PrunePortfolioHeuristic;
 import players.mc.MCParams;
 import players.mc.MonteCarloAgent;
@@ -99,7 +101,7 @@ class Run {
             case "RHEA": return Run.PlayerType.RHEA;
             case "OEP": return Run.PlayerType.OEP;
             case "pMCTS": return Run.PlayerType.PORTFOLIO_MCTS;
-            case "EMCTS": return Tournament.PlayerType.EMCTS;
+            case "EMCTS": return Run.PlayerType.EMCTS;
         }
         throw new Exception("Error: unrecognized Player Type: " + arg);
     }

@@ -12,7 +12,7 @@
   "Search Depth" : 20,
   "Force End" : false,
   "Population Size" : 1,
-  "Players" : ["Do Nothing", "pMCTS"],
+  "Players" : ["OEP", "pMCTS"],
   "Tribes" : ["Xin Xi", "Imperius"],
   "Verbose" : false,
   "Replay File Name" : "save/1590072023986/0_0/game.json",

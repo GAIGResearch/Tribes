@@ -67,6 +67,7 @@ class Run {
         MCTS,
         RHEA,
         OEP,
+        EMCTS,
         PORTFOLIO_MCTS
     }
 
@@ -98,6 +99,7 @@ class Run {
             case "RHEA": return Run.PlayerType.RHEA;
             case "OEP": return Run.PlayerType.OEP;
             case "pMCTS": return Run.PlayerType.PORTFOLIO_MCTS;
+            case "EMCTS": return Tournament.PlayerType.EMCTS;
         }
         throw new Exception("Error: unrecognized Player Type: " + arg);
     }
@@ -173,7 +175,14 @@ class Run {
                 return new PortfolioMCTSPlayer(agentSeed, portfolioMCTSParams);
             case OEP:
                 OEPParams oepParams = new OEPParams();
+                oepParams.stop_type = oepParams.STOP_FMCALLS;
+                oepParams.heuristic_method = oepParams.DIFF_HEURISTIC;
                 return new OEPAgent(agentSeed, oepParams);
+            case EMCTS:
+                EMCTSParams emctsParams = new EMCTSParams();
+                emctsParams.stop_type = emctsParams.STOP_FMCALLS;
+                emctsParams.heuristic_method = emctsParams.DIFF_HEURISTIC;
+                return new EMCTSAgent(agentSeed,emctsParams);
             case RHEA:
                 RHEAParams rheaParams = new RHEAParams();
                 rheaParams.stop_type = rheaParams.STOP_FMCALLS;

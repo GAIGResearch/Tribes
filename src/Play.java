@@ -4,6 +4,8 @@ import core.game.Game;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import players.*;
+import players.emcts.EMCTSAgent;
+import players.emcts.EMCTSParams;
 import players.mc.MCParams;
 import players.mc.MonteCarloAgent;
 import players.mcts.MCTSParams;

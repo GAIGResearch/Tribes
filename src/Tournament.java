@@ -5,6 +5,8 @@ import core.game.TribeResult;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import players.*;
+import players.emcts.EMCTSAgent;
+import players.emcts.EMCTSParams;
 import players.mc.MCParams;
 import players.mc.MonteCarloAgent;
 import players.mcts.MCTSParams;
@@ -34,9 +36,7 @@ import static core.Types.TRIBE.*;
  */
 public class Tournament {
 
-
     public static void main(String[] args) {
-
         //Some defaults:
         Types.GAME_MODE gameMode = CAPITALS; //SCORE;
         Tournament t = new Tournament(gameMode);
@@ -53,6 +53,7 @@ public class Tournament {
         {
             t.setPlayers(new Run.PlayerType[]{Run.PlayerType.MC, Run.PlayerType.MC});
             t.setTribes(new Types.TRIBE[]{XIN_XI, IMPERIUS});
+
         }else {
             try {
 
@@ -338,7 +339,6 @@ public class Tournament {
         }
 
     }
-
 
 
     private static void printRunHelp(String[] args)

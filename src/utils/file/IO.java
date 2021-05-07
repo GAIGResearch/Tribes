@@ -2,8 +2,7 @@ package utils.file;
 
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
 
 /**
@@ -42,6 +41,33 @@ public class IO
         }
         return lines.toArray(new String[lines.size()]);
     }
+
+
+    /**
+     * Writes in a file data passed as a String[]
+     * @param filename file to write to.
+     * @param lines content to write
+     * @return true if all worked
+     */
+    public boolean writeFile(String filename, ArrayList<String> lines, boolean append)
+    {
+        try{
+            BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filename), append));
+            for(String line : lines)
+            {
+                writer.write(line + "\n");
+            }
+            writer.close();
+        }catch(Exception e)
+        {
+            System.out.println("Error writing the file " + filename + ": " + e.toString());
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+
 
     /**
      * Reads 'filename' and returns it as a JSON Object.

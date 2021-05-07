@@ -1,6 +1,7 @@
 package core.actions.tribeactions;
 import core.TribesConfig;
 import core.actions.Action;
+import core.actions.unitactions.Move;
 import core.actors.Tribe;
 import core.game.GameState;
 import utils.Vector2d;
@@ -45,4 +46,13 @@ public class BuildRoad extends TribeAction {
     public String toString() {
         return "BUILD_ROAD by tribe " + this.tribeId + " at location " + position;
     }
+
+    public boolean equals(Object o) {
+        if(!(o instanceof BuildRoad))
+            return false;
+        BuildRoad other = (BuildRoad) o;
+
+        return super.equals(other) && position == other.position;
+    }
+
 }

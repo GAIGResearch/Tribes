@@ -35,7 +35,7 @@ public class MonteCarloAgent extends Agent {
     public Action act(GameState gs, ElapsedCpuTimer ect) {
 
         //Set up the heuristic for this player
-        this.heuristic = params.getHeuristic(playerID, allPlayerIDs);
+        this.heuristic = params.getStateHeuristic(playerID, allPlayerIDs);
 
         //Counter for turns and actions returned within the same turn.
         if(lastTurn == gs.getTick())

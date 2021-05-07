@@ -50,4 +50,13 @@ public class LevelUp extends CityAction {
     {
         return "LEVEL_UP by city " + this.cityId+ " with bonus " + bonus.toString();
     }
+
+    public boolean equals(Object o) {
+        if(!(o instanceof LevelUp))
+            return false;
+
+        LevelUp other = (LevelUp) o;
+
+        return super.equals(other) && bonus == other.bonus;
+    }
 }

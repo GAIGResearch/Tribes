@@ -1,5 +1,7 @@
 package players.heuristics;
 
+import players.portfolio.Portfolio;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +39,7 @@ public class AlgParams
         return names;
     }
 
-    public StateHeuristic getHeuristic(int playerID, ArrayList<Integer> allIDs)
+    public StateHeuristic getStateHeuristic(int playerID, ArrayList<Integer> allIDs)
     {
         if (heuristic_method == ENTROPY_HEURISTIC)
             return new TribesEntropyHeuristic(playerID, allIDs);
@@ -45,6 +47,11 @@ public class AlgParams
             return new TribesSimpleHeuristic(playerID, allIDs);
         else if (heuristic_method == DIFF_HEURISTIC)
             return new TribesDiffHeuristic(playerID, allIDs);
+        return null;
+    }
+
+    public PruneHeuristic getPruneHeuristic()
+    {
         return null;
     }
 }

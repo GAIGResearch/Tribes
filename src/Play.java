@@ -1,3 +1,4 @@
+import core.Constants;
 import core.Types;
 import core.game.Game;
 import org.json.JSONArray;
@@ -13,8 +14,12 @@ import players.oep.OEPAgent;
 import players.oep.OEPParams;
 import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
+import players.portfolio.SimplePortfolio;
+import players.portfolioMCTS.PortfolioMCTSParams;
+import players.portfolioMCTS.PortfolioMCTSPlayer;
 import players.rhea.RHEAAgent;
 import players.rhea.RHEAParams;
+import players.portfolio.RandomPortfolio;
 import utils.file.IO;
 
 import java.util.*;
@@ -37,6 +42,7 @@ public class Play {
 
             if (config != null && !config.isEmpty()) {
                 String runMode = config.getString("Run Mode");
+                Constants.VERBOSE = config.getBoolean("Verbose");
 
                 JSONArray playersArray = (JSONArray) config.get("Players");
                 JSONArray tribesArray = (JSONArray) config.get("Tribes");
@@ -44,7 +50,7 @@ public class Play {
                     throw new Exception("Number of players must be equal to number of tribes");
 
                 int nPlayers = playersArray.length();
-                Tournament.PlayerType[] playerTypes = new Tournament.PlayerType[nPlayers];
+                Run.PlayerType[] playerTypes = new Run.PlayerType[nPlayers];
                 Types.TRIBE[] tribes = new Types.TRIBE[nPlayers];
 
                 for (int i = 0; i < nPlayers; ++i) {
@@ -53,6 +59,24 @@ public class Play {
                 }
                 Types.GAME_MODE gameMode = config.getString("Game Mode").equalsIgnoreCase("Capitals") ?
                         CAPITALS : SCORE;
+
+                Run.MAX_LENGTH = config.getInt("Search Depth");
+                Run.FORCE_TURN_END = config.getBoolean("Force End");
+                Run.MCTS_ROLLOUTS = config.getBoolean("Rollouts");
+                Run.POP_SIZE = config.getInt("Population Size");
+
+                //Portfolio and pruning variables:
+                Run.PRUNING = config.getBoolean("Pruning");
+                Run.PROGBIAS = config.getBoolean("Progressive Bias");
+                Run.K_INIT_MULT = config.getDouble("K init mult");
+                Run.T_MULT = config.getDouble("T mult");
+                Run.A_MULT = config.getDouble("A mult");
+                Run.B = config.getDouble("B");
+
+                JSONArray weights = null;
+                if(config.has("pMCTS Weights"))
+                    weights = (JSONArray) config.get("pMCTS Weights");
+                Run.pMCTSweights = Run.getWeights(weights);
 
                 AGENT_SEED = config.getLong("Agents Seed");
                 GAME_SEED = config.getLong("Game Seed");
@@ -84,7 +108,7 @@ public class Play {
         }
     }
 
-    private static void play(Types.TRIBE[] tribes, long levelSeed, Tournament.PlayerType[] playerTypes, Types.GAME_MODE gameMode)
+    private static void play(Types.TRIBE[] tribes, long levelSeed, Run.PlayerType[] playerTypes, Types.GAME_MODE gameMode)
     {
         KeyController ki = new KeyController(true);
         ActionController ac = new ActionController();
@@ -93,7 +117,7 @@ public class Play {
         Run.runGame(game, ki, ac);
     }
 
-    private static void play(String levelFile, Tournament.PlayerType[] playerTypes, Types.GAME_MODE gameMode)
+    private static void play(String levelFile, Run.PlayerType[] playerTypes, Types.GAME_MODE gameMode)
     {
         KeyController ki = new KeyController(true);
         ActionController ac = new ActionController();
@@ -103,7 +127,7 @@ public class Play {
     }
 
 
-    private static void load(Tournament.PlayerType[] playerTypes, String saveGameFile)
+    private static void load(Run.PlayerType[] playerTypes, String saveGameFile)
     {
         KeyController ki = new KeyController(true);
         ActionController ac = new ActionController();
@@ -115,7 +139,7 @@ public class Play {
     }
 
 
-    private static Game _prepareGame(String levelFile, Tournament.PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
+    private static Game _prepareGame(String levelFile, Run.PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
     {
         long gameSeed = GAME_SEED == -1 ? System.currentTimeMillis() : GAME_SEED;
         if(RUN_VERBOSE) System.out.println("Game seed: " + gameSeed);
@@ -127,7 +151,7 @@ public class Play {
         return game;
     }
 
-    private static Game _prepareGame(Types.TRIBE[] tribes, long levelSeed, Tournament.PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
+    private static Game _prepareGame(Types.TRIBE[] tribes, long levelSeed, Run.PlayerType[] playerTypes, Types.GAME_MODE gameMode, ActionController ac)
     {
         long gameSeed = GAME_SEED == -1 ? System.currentTimeMillis() : GAME_SEED;
 
@@ -148,7 +172,7 @@ public class Play {
         return game;
     }
 
-    private static ArrayList<Agent> getPlayers(Tournament.PlayerType[] playerTypes, ActionController ac)
+    private static ArrayList<Agent> getPlayers(Run.PlayerType[] playerTypes, ActionController ac)
     {
         ArrayList<Agent> players = new ArrayList<>();
         long agentSeed = AGENT_SEED == -1 ? System.currentTimeMillis() + new Random().nextInt() : AGENT_SEED;
@@ -161,7 +185,7 @@ public class Play {
 
         for(int i = 0; i < playerTypes.length; ++i)
         {
-            Agent ag = _getAgent(playerTypes[i], agentSeed, ac);
+            Agent ag = Run.getAgent(playerTypes[i], agentSeed);
             assert ag != null;
             ag.setPlayerIDs(i, allIds);
             players.add(ag);
@@ -169,7 +193,7 @@ public class Play {
         return players;
     }
 
-    private static Game _loadGame(Tournament.PlayerType[] playerTypes, String saveGameFile, long agentSeed)
+    private static Game _loadGame(Run.PlayerType[] playerTypes, String saveGameFile, long agentSeed)
     {
         ArrayList<Agent> players = new ArrayList<>();
         ArrayList<Integer> allIds = new ArrayList<>();
@@ -178,7 +202,7 @@ public class Play {
 
         for(int i = 0; i < playerTypes.length; ++i)
         {
-            Agent ag = _getAgent(playerTypes[i], agentSeed, null);
+            Agent ag = Run.getAgent(playerTypes[i], agentSeed);
             assert ag != null;
             ag.setPlayerIDs(i, allIds);
             players.add(ag);
@@ -189,57 +213,4 @@ public class Play {
         return game;
     }
 
-
-    private static Agent _getAgent(Tournament.PlayerType playerType, long agentSeed, ActionController ac)
-    {
-        switch (playerType)
-        {
-            case DONOTHING: return new DoNothingAgent(agentSeed);
-            case HUMAN: return new HumanAgent(ac);
-            case RANDOM: return new RandomAgent(agentSeed);
-            case OSLA:
-                OSLAParams oslaParams = new OSLAParams();
-                oslaParams.stop_type = oslaParams.STOP_FMCALLS; //Upper bound
-                oslaParams.heuristic_method = oslaParams.DIFF_HEURISTIC;
-                return new OneStepLookAheadAgent(agentSeed, oslaParams);
-            case MC:
-                MCParams mcparams = new MCParams();
-                mcparams.stop_type = mcparams.STOP_FMCALLS;
-//                mcparams.stop_type = mcparams.STOP_ITERATIONS;
-                mcparams.heuristic_method = mcparams.DIFF_HEURISTIC;
-                mcparams.PRIORITIZE_ROOT = true;
-                mcparams.ROLLOUT_LENGTH = 10;
-                mcparams.FORCE_TURN_END = 5;//mcparams.ROLLOUT_LENGTH+2;
-                return new MonteCarloAgent(agentSeed, mcparams);
-            case SIMPLE: return new SimpleAgent(agentSeed);
-            case MCTS:
-                MCTSParams mctsParams = new MCTSParams();
-                mctsParams.stop_type = mctsParams.STOP_FMCALLS;
-                mctsParams.PRIORITIZE_ROOT = true;
-                mctsParams.heuristic_method = mctsParams.DIFF_HEURISTIC;
-                mctsParams.ROLLOUT_LENGTH = 20;
-//                mctsParams.ROLOUTS_ENABLED = false;
-                mctsParams.FORCE_TURN_END = 25;
-                return new MCTSPlayer(agentSeed, mctsParams);
-            case RHEA:
-                RHEAParams rheaParams = new RHEAParams();
-                rheaParams.stop_type = rheaParams.STOP_FMCALLS;
-                rheaParams.heuristic_method = rheaParams.DIFF_HEURISTIC;
-                rheaParams.INDIVIDUAL_LENGTH = 20;
-                rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
-                rheaParams.POP_SIZE = 1;
-                return new RHEAAgent(agentSeed, rheaParams);
-            case OEP:
-                OEPParams oepParams = new OEPParams();
-                oepParams.stop_type = oepParams.STOP_FMCALLS;
-                oepParams.heuristic_method = oepParams.DIFF_HEURISTIC;
-                return new OEPAgent(agentSeed, oepParams);
-            case EMCTS:
-                EMCTSParams emctsParams = new EMCTSParams();
-                emctsParams.stop_type = emctsParams.STOP_FMCALLS;
-                emctsParams.heuristic_method = emctsParams.DIFF_HEURISTIC;
-                return new EMCTSAgent(agentSeed,emctsParams);
-        }
-        return null;
-    }
 }

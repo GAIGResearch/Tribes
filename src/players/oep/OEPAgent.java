@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+
 public class OEPAgent extends Agent {
 
     private Random m_rnd;
@@ -103,22 +104,6 @@ public class OEPAgent extends Agent {
                 //over limit and needs to chose individual and return
                 break;
             }
-
-
-//            //Kill the amount of the population that needs to die
-//            int amount =  (int)(population.size() * params.KILL_RATE);
-//            for(int i = 0; i < amount; i++){
-//                population.remove(0);
-//            }
-
-            // fill the population with random individuals
-//            for(int i = population.size() - 1; i < params.POP_SIZE; i++){
-//                population.add(randomActions(gs.copy()));
-//                if(((fmCallsCount > params.num_fmcalls) || ((numIters == 1) && (fmCallsCount >= (0.9 * params.num_fmcalls))))&& params.stop_type == params.STOP_FMCALLS){
-//                    //over limit and needs to chose individual and return
-//                    break;
-//                }
-//            }
 
             population = shiftPop(gs.copy(),population);
 

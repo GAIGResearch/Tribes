@@ -48,4 +48,12 @@ public class Convert extends UnitAction
     }
 
     public String toString() { return "CONVERT by unit " + this.unitId + " to unit " + this.targetId;}
+
+    public boolean equals(Object o) {
+        if(!(o instanceof Convert))
+            return false;
+        Convert other = (Convert) o;
+
+        return super.equals(other) && targetId == other.targetId;
+    }
 }

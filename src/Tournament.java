@@ -15,9 +15,15 @@ import players.oep.OEPAgent;
 import players.oep.OEPParams;
 import players.osla.OSLAParams;
 import players.osla.OneStepLookAheadAgent;
+import players.portfolio.SimplePortfolio;
+import players.portfolioMCTS.PortfolioMCTSParams;
+import players.portfolioMCTS.PortfolioMCTSPlayer;
 import players.rhea.RHEAAgent;
 import players.rhea.RHEAParams;
+import players.portfolio.RandomPortfolio;
 import utils.file.IO;
+import utils.mapelites.Feature;
+import utils.stats.GameplayStats;
 import utils.stats.MultiStatSummary;
 
 import java.util.*;
@@ -29,63 +35,6 @@ import static core.Types.TRIBE.*;
  * Entry point of the framework.
  */
 public class Tournament {
-
-    private static int MAX_LENGTH;
-    private static boolean FORCE_TURN_END;
-    private static boolean MCTS_ROLLOUTS;
-    private static int POP_SIZE;
-
-    private static Agent _getAgent(PlayerType playerType, long agentSeed)
-    {
-        switch (playerType)
-        {
-            case DONOTHING: return new DoNothingAgent(agentSeed);
-            case RANDOM: return new RandomAgent(agentSeed);
-            case OSLA:
-                OSLAParams oslaParams = new OSLAParams();
-                oslaParams.stop_type = oslaParams.STOP_FMCALLS; //Upper bound
-                oslaParams.heuristic_method = oslaParams.DIFF_HEURISTIC;
-                return new OneStepLookAheadAgent(agentSeed, oslaParams);
-            case MC:
-                MCParams mcparams = new MCParams();
-                mcparams.stop_type = mcparams.STOP_FMCALLS;
-//                mcparams.stop_type = mcparams.STOP_ITERATIONS;
-                mcparams.heuristic_method = mcparams.DIFF_HEURISTIC;
-                mcparams.PRIORITIZE_ROOT = true;
-                mcparams.ROLLOUT_LENGTH = 10;
-                mcparams.FORCE_TURN_END = 5;//mcparams.ROLLOUT_LENGTH+2;
-                return new MonteCarloAgent(agentSeed, mcparams);
-            case SIMPLE: return new SimpleAgent(agentSeed);
-            case MCTS:
-                MCTSParams mctsParams = new MCTSParams();
-                mctsParams.stop_type = mctsParams.STOP_FMCALLS;
-                mctsParams.PRIORITIZE_ROOT = true;
-                mctsParams.heuristic_method = mctsParams.DIFF_HEURISTIC;
-                mctsParams.ROLLOUT_LENGTH = 20;
-//                mctsParams.ROLOUTS_ENABLED = false;
-                mctsParams.FORCE_TURN_END = 25;
-                return new MCTSPlayer(agentSeed, mctsParams);
-            case RHEA:
-                RHEAParams rheaParams = new RHEAParams();
-                rheaParams.stop_type = rheaParams.STOP_FMCALLS;
-                rheaParams.heuristic_method = rheaParams.DIFF_HEURISTIC;
-                rheaParams.INDIVIDUAL_LENGTH = 20;
-                rheaParams.FORCE_TURN_END = rheaParams.INDIVIDUAL_LENGTH + 1;
-                rheaParams.POP_SIZE = 100;
-                return new RHEAAgent(agentSeed, rheaParams);
-            case OEP:
-                OEPParams oepParams = new OEPParams();
-                oepParams.stop_type = oepParams.STOP_FMCALLS;
-                oepParams.heuristic_method = oepParams.DIFF_HEURISTIC;
-                return new OEPAgent(agentSeed, oepParams);
-            case EMCTS:
-                EMCTSParams emctsParams = new EMCTSParams();
-                emctsParams.stop_type = emctsParams.STOP_FMCALLS;
-                emctsParams.heuristic_method = emctsParams.DIFF_HEURISTIC;
-                return new EMCTSAgent(agentSeed,emctsParams);
-        }
-        return null;
-    }
 
     public static void main(String[] args) {
         //Some defaults:
@@ -102,7 +51,7 @@ public class Tournament {
 
         if(config == null || config.isEmpty())
         {
-            t.setPlayers(new PlayerType[]{PlayerType.MC, PlayerType.MC});
+            t.setPlayers(new Run.PlayerType[]{Run.PlayerType.MC, Run.PlayerType.MC});
             t.setTribes(new Types.TRIBE[]{XIN_XI, IMPERIUS});
 
         }else {
@@ -113,11 +62,19 @@ public class Tournament {
                 t = new Tournament(gameMode);
                 nRepetitions = config.getInt("Repetitions");
 
-                MAX_LENGTH = config.getInt("Search Depth");
-                FORCE_TURN_END = config.getBoolean("Force End");
-                MCTS_ROLLOUTS = config.getBoolean("Rollouts");
-                POP_SIZE = config.getInt("Population Size");
+                Run.MAX_LENGTH = config.getInt("Search Depth");
+                Run.FORCE_TURN_END = config.getBoolean("Force End");
+                Run.MCTS_ROLLOUTS = config.getBoolean("Rollouts");
+                Run.POP_SIZE = config.getInt("Population Size");
                 shiftTribes = config.getBoolean("Shift Tribes");
+
+                //Portfolio and pruning variables:
+                Run.PRUNING = config.getBoolean("Pruning");
+                Run.PROGBIAS = config.getBoolean("Progressive Bias");
+                Run.K_INIT_MULT = config.getDouble("K init mult");
+                Run.T_MULT = config.getDouble("T mult");
+                Run.A_MULT = config.getDouble("A mult");
+                Run.B = config.getDouble("B");
 
                 JSONArray playersArray = (JSONArray) config.get("Players");
                 JSONArray tribesArray = (JSONArray) config.get("Tribes");
@@ -125,7 +82,7 @@ public class Tournament {
                     throw new Exception("Number of players must be equal to number of tribes");
 
                 int nPlayers = playersArray.length();
-                PlayerType[] playerTypes = new PlayerType[nPlayers];
+                Run.PlayerType[] playerTypes = new Run.PlayerType[nPlayers];
                 Types.TRIBE[] tribes = new Types.TRIBE[nPlayers];
 
                 for (int i = 0; i < nPlayers; ++i) {
@@ -139,6 +96,11 @@ public class Tournament {
                 Constants.VERBOSE = config.getBoolean("Verbose");
                 JSONArray seeds = (JSONArray) config.get("Level Seeds");
                 t.setSeeds(seeds);
+
+                JSONArray weights = null;
+                if(config.has("pMCTS Weights"))
+                    weights = (JSONArray) config.get("pMCTS Weights");
+                Run.pMCTSweights = Run.getWeights(weights);
 
             } catch (Exception e) {
                 System.out.println("Malformed JSON config file: " + e);
@@ -165,7 +127,7 @@ public class Tournament {
         this.participants = new HashMap<>();
     }
 
-    public void setPlayers(PlayerType[] playerTypes)
+    public void setPlayers(Run.PlayerType[] playerTypes)
     {
         stats = new MultiStatSummary[playerTypes.length];
         for(int i = 0; i < playerTypes.length; ++i)
@@ -189,6 +151,8 @@ public class Tournament {
     }
 
 
+
+
     private void run(int repetitions, boolean shift)
     {
         int starter = 0;
@@ -205,7 +169,7 @@ public class Tournament {
 
                 HashMap<Types.TRIBE, Participant> assignment = new HashMap<>();
                 int next = starter;
-                PlayerType[] players = new PlayerType[participants.size()];
+                Run.PlayerType[] players = new Run.PlayerType[participants.size()];
 
                 int playersIn = 0;
                 System.out.print("Playing with [");
@@ -262,7 +226,7 @@ public class Tournament {
         return mss;
     }
 
-    private Game _prepareGame(Types.TRIBE[] tribes, long levelSeed, PlayerType[] playerTypes, Types.GAME_MODE gameMode)
+    private Game _prepareGame(Types.TRIBE[] tribes, long levelSeed, Run.PlayerType[] playerTypes, Types.GAME_MODE gameMode)
     {
         long gameSeed = System.currentTimeMillis();
 
@@ -283,7 +247,7 @@ public class Tournament {
         return game;
     }
 
-    private ArrayList<Agent> getPlayers(PlayerType[] playerTypes)
+    private ArrayList<Agent> getPlayers(Run.PlayerType[] playerTypes)
     {
         ArrayList<Agent> players = new ArrayList<>();
         long agentSeed = System.currentTimeMillis();
@@ -296,7 +260,7 @@ public class Tournament {
 
         for(int i = 0; i < playerTypes.length; ++i)
         {
-            Agent ag = _getAgent(playerTypes[i], agentSeed);
+            Agent ag = Run.getAgent(playerTypes[i], agentSeed);
             assert ag != null;
             ag.setPlayerIDs(i, allIds);
             players.add(ag);
@@ -377,7 +341,6 @@ public class Tournament {
     }
 
 
-
     private static void printRunHelp(String[] args)
     {
         System.out.print("Invalid Arguments ");
@@ -392,26 +355,12 @@ public class Tournament {
 
     /// ----- Players and participants -----
 
-    public enum PlayerType
-    {
-        DONOTHING,
-        HUMAN,
-        RANDOM,
-        OSLA,
-        MC,
-        SIMPLE,
-        MCTS,
-        RHEA,
-        OEP,
-        EMCTS,
-    }
-
     private static class Participant
     {
-        PlayerType playerType;
+        Run.PlayerType playerType;
         int participantId;
 
-        Participant(PlayerType playerType, int participantId)
+        Participant(Run.PlayerType playerType, int participantId)
         {
             this.playerType = playerType;
             this.participantId = participantId;

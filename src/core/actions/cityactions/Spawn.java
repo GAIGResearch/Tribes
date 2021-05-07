@@ -2,6 +2,7 @@ package core.actions.cityactions;
 
 import core.Types;
 import core.actions.Action;
+import core.actions.tribeactions.BuildRoad;
 import core.actors.Tribe;
 import core.actors.units.Unit;
 import core.game.GameState;
@@ -58,5 +59,14 @@ public class Spawn extends CityAction
     public String toString()
     {
         return "SPAWN by city " + this.cityId+ " : " + unit_type.toString();
+    }
+
+    public boolean equals(Object o) {
+        if(!(o instanceof Spawn))
+            return false;
+
+        Spawn other = (Spawn) o;
+
+        return super.equals(other) && unit_type == other.unit_type;
     }
 }

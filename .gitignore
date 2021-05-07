@@ -9,3 +9,8 @@ save/*
 res/
 out/
 .idea/
+*.pyc
+py/venv/
+test/
+map/
+map_elites_*

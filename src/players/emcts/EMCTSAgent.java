@@ -51,7 +51,7 @@ public class EMCTSAgent extends Agent {
         boolean stop = false;
 
 
-        this.heuristic = params.getHeuristic(playerID, allPlayerIDs);
+        this.heuristic = params.getStateHeuristic(playerID, allPlayerIDs);
 
         old_gs = gs.copy();
 

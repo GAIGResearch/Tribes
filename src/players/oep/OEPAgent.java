@@ -52,7 +52,7 @@ public class OEPAgent extends Agent {
             population.add(randomActions(gs.copy()));
         }
 
-        this.heuristic = params.getHeuristic(playerID, allPlayerIDs);
+        this.heuristic = params.getStateHeuristic(playerID, allPlayerIDs);
         fmCallsRun = 0;
 
         this.bestIndividual = null;

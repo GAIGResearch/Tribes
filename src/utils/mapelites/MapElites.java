@@ -137,8 +137,6 @@ public class MapElites {
             printMapElitesInfo("map_" + runStr + "_" + nIteration + ".txt");
         }
 
-        // When the algorithm is over, we need to make sure the final elites have all the data available
-        //processMapElitesData();
     }
 
     /**
@@ -159,11 +157,7 @@ public class MapElites {
     }
 
     private void createGameplayElite(double[] genome, Runner runner) {
-        // Get the game stats needed for the calculations for the map for current controller and weights. 
-        // During the iteration of the algorithm, only the stats involved in performance and features are needed
-        //GameStats gameStats = gameplayFramework.createMapEliteStatsFromGameplay(controller, performanceCriteria, new Features[]{featureInfoX, featureInfoY});
 
-//        Constants.MAX_TURNS_CAPITALS = 10;
         ArrayList<GameplayStats> allStats = runner.run(genome);
 
         // Create elite with information and results
@@ -238,7 +232,6 @@ public class MapElites {
         }
 
         if (currentElite == null) {
-//            elite.setDataForSerialisation(performanceCriteria, featuresInfo);
             mapElites.setCell(featuresIdx, elite);
             occupiedCellsIdx.add(new EliteIdx(featuresIdx));
         } else {
@@ -247,7 +240,6 @@ public class MapElites {
             if(elite.isBetterThan(currentElite))
             {
                 if(ELITE_VERBOSE) System.out.println("New elite has better performance; replace");
-//                elite.setDataForSerialisation(performanceCriteria, featuresInfo);
                 mapElites.setCell(featuresIdx, elite);
             }
         }

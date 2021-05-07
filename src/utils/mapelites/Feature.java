@@ -13,26 +13,6 @@ import utils.stats.StatSummary;
 
 import java.util.ArrayList;
 
-// FIRST:
-// Weights (29): Attack, Convert, Spawn, Level Up, Research, Move
-//  ATTACKS: 0,50,5
-//  PERC_RANGE: 0,100,10 (feature = 100 * proportion range/(range+melee))
-//  PRODUCTION: 0,50,5
-
-// SECOND:
-// Weights (11): Spawn, Research
-//  ATTACKS: 0,20,2
-//  PERC_RANGE: 0,10,1 (feature = 5 + (range - melee))
-//  PRODUCTION: 0,30,3
-
-// THIRD:
-// As second, but:
-//                double avgRange = NUM_SPAWN_ARCHERS.getFeatureValue(gameStats) + NUM_SPAWN_CATAPULTS.getFeatureValue(gameStats);
-//                double avgMelee = NUM_SPAWN_KNIGHTS.getFeatureValue(gameStats) + NUM_SPAWN_SWORDMAN.getFeatureValue(gameStats);
-//                PERC_RANGE = 5.0 + (avgRange - avgMelee);
-// Also: 5 representative games, x2 = 10 games per Elite.
-
-
 public enum Feature {
     WINS("WIN", 0, 100, 10),
     SCORE("SCORE", 4000, 10000, 1000),

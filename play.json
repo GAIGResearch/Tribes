@@ -13,7 +13,7 @@
   "Rollouts" : false,
   "Search Depth" : 20,
   "Force End" : false,
-  "Population Size" : 20,
+  "Population Size" : 1,
   "Players" : ["Do Nothing", "pMCTS"],
   "Tribes" : ["Xin Xi", "Imperius"],
   "Verbose" : false,
@@ -23,5 +23,5 @@
 
   "Game Seed" : "-1",
   "Agents Seed" : "-1",
-  "Level Seed" : "1588965819946"
+  "Level Seed" : "-1"
 }

@@ -1,10 +1,10 @@
 {
   "Game Mode" : "Capitals",
-  "Repetitions" : 2,
+  "Repetitions" : 20,
   "Rollouts" : false,
   "Search Depth" : 20,
   "Force End" : false,
-  "Population Size" : 20,
+  "Population Size" : 1,
   "Players" : ["MCTS", "pMCTS"],
   "Tribes" : ["Xin Xi", "Imperius"],
   "Shift Tribes" : true,
@@ -30,6 +30,5 @@
   "K init mult": 0.5,
   "T mult": 2.0,
   "A mult": 1.5,
-  "B": 1.3,
-  "pMCTS Weights" : [0.25, 0.5, 0.25, 1.0, 0.5, 0.0, 0.75, 0.25, 1.0, 0.0, 1.0]
+  "B": 1.3
 }

@@ -10,14 +10,6 @@ public class EliteRecord
     double[] weights;
     TreeMap<String, Double> features;
 
-    public EliteRecord() {}
-
-    public EliteRecord(double[] wList, TreeMap<String, Double> features)
-    {
-        this.weights = wList;
-        this.features = features;
-    }
-
     public int compareTo(Elite e)
     {
         double eWins = Feature.WINS.getFeatureValue(e.allStats);
@@ -65,11 +57,7 @@ public class EliteRecord
         new IO().writeFile(statsResultsFileName, lines, true);
     }
 
-    /*
-Weights: [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-Feature values (map): ATTACKS:10.3, PERC_RANGE:6.5,
-Feature values (not in map): WIN:90.0, SCORE:7952.0, PRODUCTION:23.8, NUM_SPAWN_ARCHERS:0.8, NUM_SPAWN_CATAPULTS:1.5, NUM_SPAWN_KNIGHTS:0.8, NUM_SPAWN_SWORDMAN:0.0,
- */
+
     public void readFromFile(String filename)
     {
         String[] lines = new IO().readFile(filename);

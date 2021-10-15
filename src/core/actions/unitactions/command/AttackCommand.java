@@ -1,5 +1,6 @@
 package core.actions.unitactions.command;
 
+import core.Diplomacy;
 import core.TribesConfig;
 import core.Types;
 import core.actions.Action;
@@ -19,9 +20,13 @@ public class AttackCommand implements ActionCommand {
 
     @Override
     public boolean execute(Action a, GameState gs) {
-        Attack action = (Attack)a;
+        Attack action = (Attack) a;
+
         //Check if action is feasible before execution
-        if(action.isFeasible(gs)) {
+        if (action.isFeasible(gs)) {
+
+            // Getting diplomacy to update values
+            Diplomacy d = gs.getBoard().getDiplomacy();
 
             int unitId = action.getUnitId();
             int targetId = action.getTargetId();
@@ -37,9 +42,17 @@ public class AttackCommand implements ActionCommand {
             int attackResult = results.getFirst();
             int defenceResult = results.getSecond();
 
+            // Updating relationship between tribes, deducting 5
+            d.updateAllegiance(-5, attacker.getTribeId(), target.getTribeId());
+            // Checks consequences of the update
+            d.checkConsequences(-5, attacker.getTribeId(), target.getTribeId());
+
             if (target.getCurrentHP() <= attackResult) {
-                int nextHP = Math.max(target.getCurrentHP() - attackResult, 0);
-                target.setCurrentHP(nextHP);
+
+                // Updating relationship between tribes, deducting an additional 5 if the unit is killed
+                d.updateAllegiance(-5, attacker.getTribeId(), target.getTribeId());
+                // Checks consequences of the update
+                d.checkConsequences(-5, attacker.getTribeId(), target.getTribeId());
 
                 attacker.addKill();
                 attackerTribe.addKill();
@@ -58,18 +71,18 @@ public class AttackCommand implements ActionCommand {
                         gs.getBoard().tryPush(attackerTribe, attacker, attacker.getPosition().x, attacker.getPosition().y, target.getPosition().x, target.getPosition().y, gs.getRandomGenerator());
                 }
             } else {
+
                 target.setCurrentHP(target.getCurrentHP() - attackResult);
 
                 //Retaliation attack
 
                 //Check if this unit is in target's attacking range (we can use chebichev distance)
                 double distance = Vector2d.chebychevDistance(attacker.getPosition(), target.getPosition());
-                if(distance <= target.RANGE)
-                {
+                if (distance <= target.RANGE) {
                     //Deal damage based on targets defence stat, regardless of this units defence stat
-                    attacker.setCurrentHP(attacker.getCurrentHP()-defenceResult);
+                    attacker.setCurrentHP(attacker.getCurrentHP() - defenceResult);
                     //Check if attack kills this unit, if it does add a kill to the target
-                    if(attacker.getCurrentHP() <=0 ) {
+                    if (attacker.getCurrentHP() <= 0) {
                         target.addKill();
                         gs.getTribe(target.getTribeId()).addKill();
 
@@ -86,6 +99,7 @@ public class AttackCommand implements ActionCommand {
 
     /**
      * Calculates the damage dealt by the attacker and by the defender.
+     *
      * @param gs - current game state
      * @return Pair, where first element is the attack power (attackResult) and second is defence power (defenceResult)
      */
@@ -95,8 +109,8 @@ public class AttackCommand implements ActionCommand {
         Vector2d targetPos = target.getPosition();
         Tribe targetTribe = gs.getTribe(target.getTribeId());
 
-        double attackForce = attacker.ATK*((double) attacker.getCurrentHP()/ attacker.getMaxHP());
-        double defenceForce =target.DEF*((double)target.getCurrentHP()/target.getMaxHP());
+        double attackForce = attacker.ATK * ((double) attacker.getCurrentHP() / attacker.getMaxHP());
+        double defenceForce = target.DEF * ((double) target.getCurrentHP() / target.getMaxHP());
         double accelerator = TribesConfig.ATTACK_MODIFIER;
 
         // Defence bonuses:
@@ -108,32 +122,31 @@ public class AttackCommand implements ActionCommand {
         //     * in mountain tile if Meditation is researched.
 
         Types.TERRAIN targetTerrain = gs.getBoard().getTerrainAt(targetPos.x, targetPos.y);
-        if(targetTerrain == CITY)
-        {
+        if (targetTerrain == CITY) {
             int cityID = gs.getBoard().getCityIdAt(targetPos.x, targetPos.y);
-            if (targetTribe.controlsCity(cityID)){
+            if (targetTribe.controlsCity(cityID)) {
                 City c = (City) gs.getActor(cityID);
                 if (c.hasWalls())
                     defenceForce *= TribesConfig.DEFENCE_IN_WALLS;
                 else if (target.getType().canFortify())
                     defenceForce *= TribesConfig.DEFENCE_BONUS;
             }
-        }else if(targetTerrain == MOUNTAIN && targetTribe.getTechTree().isResearched(MEDITATION) ||
+        } else if (targetTerrain == MOUNTAIN && targetTribe.getTechTree().isResearched(MEDITATION) ||
                 (targetTerrain.isWater() && targetTribe.getTechTree().isResearched(AQUATISM)) ||
                 (targetTerrain == FOREST && targetTribe.getTechTree().isResearched(ARCHERY))) {
             defenceForce *= TribesConfig.DEFENCE_BONUS;
         }
 
-        double totalDamage =attackForce+defenceForce;
+        double totalDamage = attackForce + defenceForce;
 
-        int attackResult = (int) Math.round((attackForce/totalDamage)* attacker.ATK*accelerator);
-        int defenceResult = (int) Math.round((defenceForce / totalDamage) * target.DEF *accelerator);
+        int attackResult = (int) Math.round((attackForce / totalDamage) * attacker.ATK * accelerator);
+        int defenceResult = (int) Math.round((defenceForce / totalDamage) * target.DEF * accelerator);
 
         return new Pair<>(attackResult, defenceResult);
     }
 
     public boolean isRetaliation(Attack action, GameState gs) {
-        if(action.isFeasible(gs)) {
+        if (action.isFeasible(gs)) {
             Unit attacker = (Unit) gs.getActor(action.getUnitId());
             Unit target = (Unit) gs.getActor(action.getTargetId());
             int attackResult = getAttackResults(action, gs).getFirst();

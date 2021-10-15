@@ -1,6 +1,7 @@
 package core.actions.tribeactions.factory;
 
 import core.actions.Action;
+import core.actions.tribeactions.DeclareWar;
 import core.actions.tribeactions.factory.BuildRoadFactory;
 import core.actions.tribeactions.factory.EndTurnFactory;
 import core.actions.tribeactions.factory.ResearchTechFactory;
@@ -27,6 +28,12 @@ public class TribeActionBuilder
 
         //Research Tech
         allActions.addAll(new ResearchTechFactory().computeActionVariants(tribe, gs));
+
+        //Declare War
+        allActions.addAll(new DeclareWarFactory().computeActionVariants(tribe, gs));
+
+        //Send Stars
+        allActions.addAll(new SendStarsFactory().computeActionVariants(tribe, gs));
 
         //End Turn Action
         allActions.addAll(new EndTurnFactory().computeActionVariants(tribe, gs));

@@ -114,6 +114,14 @@ class Run {
             case "Imperius": return IMPERIUS;
             case "Bardur": return BARDUR;
             case "Oumaji": return OUMAJI;
+            case "Kickoo": return KICKOO;
+            case "Hoodrick": return HOODRICK;
+            case "Luxidoor": return LUXIDOOR;
+            case "Vengir": return VENGIR;
+            case "Zebasi": return ZEBASI;
+            case "Ai-Mo": return AI_MO;
+            case "Quetzali": return QUETZALI;
+            case "Yadakk": return YADAKK;
         }
         throw new Exception("Error: unrecognized Tribe: " + arg);
     }

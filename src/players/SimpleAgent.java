@@ -1,11 +1,13 @@
 package players;
 
+import core.Diplomacy;
 import core.Types;
 import core.actions.Action;
 import core.actions.cityactions.*;
 import core.actions.tribeactions.BuildRoad;
 import core.actions.tribeactions.EndTurn;
 import core.actions.tribeactions.ResearchTech;
+import core.actions.tribeactions.SendStars;
 import core.actions.unitactions.*;
 import core.actors.Building;
 import core.actors.City;
@@ -154,6 +156,8 @@ public class SimpleAgent extends Agent {
             score = evalRoad(a,gs,thisTribe);
         }else if (a.getActionType() ==  RESEARCH_TECH) {
             score = evalResearch(a, gs, thisTribe);
+        }else if (a.getActionType() ==  SEND_STARS) {
+            score = evalSendStars(a, gs, thisTribe);
         }else if (a.getActionType() ==  END_TURN)
         {
             score = -1;
@@ -163,11 +167,35 @@ public class SimpleAgent extends Agent {
 
     }
 
+    private int evalSendStars(Action a, GameState gs, Tribe thisTribe){
+        // we don't really want to send stars unless we have an abundance or we are close to having a positive relationship
+        SendStars ss = (SendStars) a;
+        int numStars = thisTribe.getStars();
+        Diplomacy d = gs.getBoard().getDiplomacy();
+        int allegianceVal = d.getAllegianceStatus()[thisTribe.getTribeId()][ss.getTargetID()];
+
+        // if we have a massive amount of stars - well over the turn limit -  it's always good to improve relationships
+        if (numStars > 60){
+            return 4;
+        } else if (numStars > 30) {
+            // if we still have a decent amount of stars and we can get a positive relationship
+            if (allegianceVal < 0 & allegianceVal + ss.getNumStars() > 0) {
+                return 3;
+            }
+            return 2;
+        } else if(-5 <= allegianceVal & allegianceVal < 0 & ss.getNumStars() <= 5){
+            // if we don't have many stars but we can increase a relationship to positive by sending a small num of stars
+            return 4;
+        }
+        // if none of these, we probably shouldn't send stars
+        return -1;
+    }
+
     private int evalLevelUp(Action a)
     {
         LevelUp lUp = (LevelUp) a;
         if(lUp.getBonus() == Types.CITY_LEVEL_UP.BORDER_GROWTH || lUp.getBonus() == Types.CITY_LEVEL_UP.WORKSHOP ||
-            lUp.getBonus() == Types.CITY_LEVEL_UP.RESOURCES || lUp.getBonus() == Types.CITY_LEVEL_UP.SUPERUNIT)
+                lUp.getBonus() == Types.CITY_LEVEL_UP.RESOURCES || lUp.getBonus() == Types.CITY_LEVEL_UP.SUPERUNIT)
             return 5;
         return 0;
     }
@@ -450,20 +478,31 @@ public class SimpleAgent extends Agent {
 
     //Evaluate the convert action, lesser units such as Warriors, riders are prioritised far less than more expensive ones.
     private int evalConvert(Action a, GameState gs) {
-        Unit defender = (Unit) gs.getActor(((Convert) a).getTargetId());
-        if(defender!=null) {
+        Convert con = (Convert) a;
+        Unit defender = (Unit) gs.getActor((con).getTargetId());
+        Diplomacy d = gs.getBoard().getDiplomacy();
+        int allegianceVal = d.getAllegianceStatus()[con.getUnitId()][con.getTargetId()];
+        if (defender != null) {
             switch (defender.getType()) {
                 case BATTLESHIP:
                 case SUPERUNIT:
                 case SWORDMAN:
                 case KNIGHT:
                 case CATAPULT:
-                    return 5;
+                    if (allegianceVal < 0) {
+                        return 5;
+                    } else if(allegianceVal < 15){
+                        return 2;
+                    }
                 case MIND_BENDER:
                 case BOAT:
                 case SHIP:
                 case WARRIOR:
-                    return 4;
+                    if (allegianceVal < 0) {
+                        return 4;
+                    } else if(allegianceVal < 15){
+                        return 1;
+                    }
             }
         }
         return 0;
@@ -545,17 +584,24 @@ public class SimpleAgent extends Agent {
         Unit attacker = (Unit) gs.getActor(((Attack) a).getUnitId());
         Unit defender = (Unit) gs.getActor(((Attack) a).getTargetId());
         Board b = gs.getBoard();
+        Diplomacy d = b.getDiplomacy();
+        // allegiance value for the current relationship, higher priority given if allegiance value is negative
+        int allegianceVal = d.getAllegianceStatus()[attacker.getTribeId()][defender.getTribeId()];
         Types.UNIT attType = attacker.getType();
         if(!attType.isRanged()){
             if (attacker.getCurrentHP() >= defender.getCurrentHP()) {
                 if (attacker.ATK > defender.DEF) {
-                    return 5;
-                } else { // Less priortiy given to
-                    return 1;
+                    if (allegianceVal < 0) {
+                        return 5;
+                    } else{
+                        return allegianceVal < 15 ? 2 : 0;
+                    }
+                } else { // Less priority given to
+                    return allegianceVal < 0 ? 1 : 0;
                 }
             } else if (attacker.getCurrentHP() < defender.getCurrentHP()) {
                 if (attacker.ATK > defender.DEF) {
-                    return 1;
+                    return allegianceVal < 0 ? 1 : 0;
                 }//else don't add anything to the score.
             }
         } else {
@@ -567,9 +613,18 @@ public class SimpleAgent extends Agent {
                 //High retaliation danger
                 return 0;
             }else if(enemyInRange && !inEnemyRange) {
-                score = 5;
+                if (allegianceVal < 0) {
+                    score = 5;
+                } else{
+                    score = allegianceVal < 15 ? 2 : 0;
+                }
             }else if (defender.DEF < attacker.ATK && attacker.getCurrentHP() >= defender.getCurrentHP()) { //Incentive to attack weaker enemy
-                score = 4; // Incentive to stay and attack target
+                // Incentive to stay and attack target
+                if (allegianceVal < 0) {
+                    return 4;
+                } else{
+                    return allegianceVal < 15 ? 1 : 0;
+                }
             }
         }
         return score;

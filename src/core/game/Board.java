@@ -2,6 +2,7 @@ package core.game;
 
 import core.Constants;
 import core.TechnologyTree;
+import core.Diplomacy;
 import core.TribesConfig;
 import core.Types;
 import core.actors.Actor;
@@ -54,6 +55,9 @@ public class Board {
 
     //Trade Network of this board
     private TradeNetwork tradeNetwork;
+
+    //Diplomacy of the board
+    private Diplomacy diplomacy;
 
     //Indicate if this model is native (not a copy of the game one) or not.
     private boolean isNative;
@@ -115,6 +119,7 @@ public class Board {
         }
 
         tradeNetwork = new TradeNetwork(networkTiles);
+        diplomacy = new Diplomacy(tribes.length);
     }
 
 
@@ -133,6 +138,7 @@ public class Board {
         units = new int[size][size];
         tileCityId = new int[size][size];
         tradeNetwork = new TradeNetwork(size);
+        diplomacy = new Diplomacy(tribes.length);
         isNative = true;
 
         for(Tribe t : tribes)
@@ -174,6 +180,7 @@ public class Board {
         copyBoard.activeTribeID = activeTribeID;
         copyBoard.actorIDcounter = actorIDcounter;
         copyBoard.tradeNetwork = new TradeNetwork(size);
+        copyBoard.diplomacy = new Diplomacy(this.tribes.length);
         copyBoard.isNative = false;
         copyBoard.capitalIDs = new int[tribes.length];
 
@@ -307,7 +314,7 @@ public class Board {
     }
 
     /**
-     * Attampts to push a unitt from one position to another.
+     * Attempts to push a unit from one position to another.
      * @param tribe tribe of the unit that is being pushed.
      * @param toPush unit being pushed
      * @param startX x coordinate of the position where the unit is being pushed from
@@ -824,6 +831,20 @@ public class Board {
     }
 
     /**
+     * Upgrades a city on start if they don't have a starting technology
+     * @param c city to add
+     */
+
+    void upgradeCityOnStart(City c, int tribeID){
+        if (tribes[tribeID].getName().equals("Luxidoor")){
+            c.levelUp();
+            c.levelUp();
+            c.setWalls(true);
+            c.setPopulation(0);
+        }
+    }
+
+    /**
      * Removes a unit from the board.
      * @param u unit to remove.
      */
@@ -1037,4 +1058,5 @@ public class Board {
     public int getActorIDcounter() {
         return actorIDcounter;
     }
+    public Diplomacy getDiplomacy(){ return diplomacy; }
 }

@@ -469,6 +469,10 @@ public class GameState {
 
         //3. Update tribe pacifist counter
         tribe.addPacifistCount();
+        // Update the stars counter
+        tribe.resetStarsSent();
+        // Set hasDeclaredWar to false at beginning of new turn
+        tribe.setHasDeclaredWar(false);
     }
 
 
@@ -648,7 +652,7 @@ public class GameState {
         for(int i = 0; i < canEndTurn.length; ++i)
         {
             Tribe t = board.getTribe(i);
-            TribeResult tribeResult = new TribeResult(i, t.getWinner(), t.getScore(), t.getTechTree().getNumResearched(), t.getNumCities(), t.getMaxProduction(this));
+            TribeResult tribeResult = new TribeResult(i, t.getWinner(), t.getScore(), t.getTechTree().getNumResearched(), t.getNumCities(), t.getMaxProduction(this), t.getnWarsDeclared(), t.getnStarsSent());
             ranking.add(tribeResult);
         }
     }

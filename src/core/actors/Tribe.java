@@ -64,6 +64,16 @@ public class Tribe extends Actor {
     //Turns since the last attack of this tribe if Meditation is reseached.
     private int nPacifistCount;
 
+    // Number to track the number of stars sent in a turn
+    private int starsSent;
+
+    // Bool to track if the tribe has already declared war in the current turn
+    private boolean hasDeclaredWar = false;
+
+    // Ints to track the total wars declared and stars sent for a tribe
+    private int nWarsDeclared;
+    private int nStarsSent;
+
     public Tribe(Types.TRIBE tribe) {
         this.tribe = tribe;
         init();
@@ -122,10 +132,15 @@ public class Tribe extends Actor {
     private void init() {
         techTree = new TechnologyTree();
         Types.TECHNOLOGY initTech = tribe.getInitialTech();
-        techTree.doResearch(initTech);
+        // checking if tribe starts with initial tech
+        if (initTech != null){
+            // if so assign initTech and update score
+            techTree.doResearchInit(initTech);
+            score = initTech.getPoints();
+        }
+
         citiesID = new ArrayList<>();
         stars = TribesConfig.INITIAL_STARS;
-        score = initTech.getPoints();
         tribesMet = new ArrayList<>();
         extraUnits = new ArrayList<>();
         connectedCities = new ArrayList<>();
@@ -153,6 +168,10 @@ public class Tribe extends Actor {
         tribeCopy.capitalID = this.capitalID;
         tribeCopy.nKills = hideInfo ? 0 : this.nKills;
         tribeCopy.nPacifistCount = hideInfo ? 0 : this.nPacifistCount;
+        tribeCopy.starsSent = this.starsSent;
+        tribeCopy.hasDeclaredWar = this.hasDeclaredWar;
+        tribeCopy.nWarsDeclared = this.nWarsDeclared;
+        tribeCopy.nStarsSent = this.nStarsSent;
 
         tribeCopy.techTree = hideInfo ? new TechnologyTree() : this.techTree.copy();
 
@@ -649,4 +668,29 @@ public class Tribe extends Actor {
         return nPacifistCount;
     }
 
+    public void setStarsSent(int numStars){ this.starsSent = numStars; }
+
+    public int getStarsSent(){
+        return starsSent;
+    }
+
+    public boolean canSendStars(int numStars){ return starsSent < 30 && numStars < stars && stars > 0; }
+
+    public void resetStarsSent(){starsSent = 0;}
+
+    public void setHasDeclaredWar(boolean hasDeclaredWar) {
+        this.hasDeclaredWar = hasDeclaredWar;
+    }
+
+    public boolean getHasDeclaredWar(){
+        return hasDeclaredWar;
+    }
+
+    public int getnWarsDeclared(){return nWarsDeclared;}
+
+    public int getnStarsSent(){return nStarsSent;}
+
+    public void setnStarsSent(int numStars){ this.nStarsSent = numStars;}
+
+    public void setnWarsDeclared(int warsDeclared){this.nWarsDeclared = warsDeclared;}
 }

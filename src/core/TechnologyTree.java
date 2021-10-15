@@ -118,6 +118,14 @@ public class TechnologyTree {
    }
 
     /**
+     * Researches the initial technology. Allows for research of techs with parents' that aren't researched
+     * @param target the target tech.
+     */
+   public void doResearchInit(Types.TECHNOLOGY target){
+        researched[target.ordinal()] = true;
+   }
+
+    /**
      * Researches a technology at random within the tree.
      * @param rnd random generator to pick a tech.
      * @return true if a technology could be researched.

@@ -44,7 +44,7 @@ public class Tournament {
         boolean shiftTribes = true;
         Constants.VERBOSE = true;
 
-        JSONObject config = null;
+        JSONObject config = new IO().readJSON("tournament.json");
         if(args.length > 0)
             //First argument should be the name of the JSON file with the tournament configuration
             config = new IO().readJSON(args[0]);
@@ -223,6 +223,8 @@ public class Tournament {
         mss.registerVariable("t");
         mss.registerVariable("c");
         mss.registerVariable("p");
+        mss.registerVariable("d");
+        mss.registerVariable("r");
         return mss;
     }
 
@@ -283,6 +285,8 @@ public class Tournament {
             stats[pId].getVariable("t").add(tr.getNumTechsResearched());
             stats[pId].getVariable("c").add(tr.getNumCities());
             stats[pId].getVariable("p").add(tr.getProduction());
+            stats[pId].getVariable("d").add(tr.getNumWars());
+            stats[pId].getVariable("r").add(tr.getNumStars());
         }
     }
 
@@ -316,6 +320,16 @@ public class Tournament {
                 else if(o1.getVariable("p").mean() < o2.getVariable("p").mean())
                     return 1;
 
+                if(o1.getVariable("d").mean() > o2.getVariable("d").mean())
+                    return -1;
+                else if(o1.getVariable("d").mean() < o2.getVariable("d").mean())
+                    return 1;
+
+                if(o1.getVariable("r").mean() > o2.getVariable("r").mean())
+                    return -1;
+                else if(o1.getVariable("r").mean() < o2.getVariable("r").mean())
+                    return 1;
+
                 return 0;
             });
 
@@ -333,6 +347,8 @@ public class Tournament {
                 System.out.printf("[T:%.2f];", stat.getVariable("t").mean());
                 System.out.printf("[C:%.2f];", stat.getVariable("c").mean());
                 System.out.printf("[P:%.2f];", stat.getVariable("p").mean());
+                System.out.printf("[D:%.2f];", stat.getVariable("d").mean());
+                System.out.printf("[R:%.2f];", stat.getVariable("r").mean());
                 System.out.printf("[Player:%d:%s]", thisParticipant.participantId, thisParticipant.playerType);
                 System.out.println();
             }

@@ -2,6 +2,7 @@ package core.actions.unitactions;
 
 import core.Types;
 import core.actions.Action;
+import core.actions.cityactions.CityAction;
 import core.game.GameState;
 import core.actors.units.Unit;
 
@@ -41,4 +42,12 @@ public class Attack extends UnitAction
     }
 
     public String toString() { return "ATTACK by unit " + this.unitId + " to unit " + this.targetId;}
+
+    public boolean equals(Object o) {
+        if(!(o instanceof Attack))
+            return false;
+        Attack other = (Attack) o;
+
+        return super.equals(other) && targetId == other.targetId;
+    }
 }

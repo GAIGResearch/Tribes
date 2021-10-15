@@ -327,6 +327,7 @@ public class GameState {
             if(!executed && ac != null) {
                 System.out.println("FM: Action [" + action + "] couldn't execute?");
                 ac.execute(action, this);
+                //return false;
             }
 
             if(executed) {
@@ -368,8 +369,11 @@ public class GameState {
                 computedActionTribeIdFlag = -1;
                 if (computeActions)
                     this.computePlayerActions(getActiveTribe());
+
             }
+            //return true;
         }
+        //return false;
     }
 
     /**

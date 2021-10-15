@@ -1,19 +1,22 @@
 {
   "Run Mode" : "PlayLG",
   "Run Mode comment" : "PlayLG / PlayFile / Replay",
-
+  "Progressive Bias" : true,
+  "Pruning" : true,
+  "K init mult": 0.5,
+  "T mult": 2.0,
+  "A mult": 1.5,
+  "B": 1.3,
   "Game Mode" : "Capitals",
   "Rollouts" : false,
-  "Search Depth" : 5,
+  "Search Depth" : 20,
   "Force End" : false,
-  "Population Size" : 20,
-  "Players" : ["Human", "MCTS", "MCTS", "MCTS", "MCTS", "MCTS", "MCTS", "MCTS"],
-  "Tribes" : ["Kickoo", "Zebasi", "Luxidoor", "Vengir", "Bardur", "Ai-Mo", "Quetzali", "Yadakk"],
+  "Population Size" : 1,
+  "Players" : ["OEP", "pMCTS"],
+  "Tribes" : ["Xin Xi", "Imperius"],
   "Verbose" : false,
-
   "Replay File Name" : "save/1590072023986/0_0/game.json",
   "Level File" : "levels/SampleLevel.csv",
-
   "Game Seed" : "-1",
   "Agents Seed" : "-1",
   "Level Seed" : "-1"

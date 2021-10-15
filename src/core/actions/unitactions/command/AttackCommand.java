@@ -48,6 +48,7 @@ public class AttackCommand implements ActionCommand {
             d.checkConsequences(-5, attacker.getTribeId(), target.getTribeId());
 
             if (target.getCurrentHP() <= attackResult) {
+
                 // Updating relationship between tribes, deducting an additional 5 if the unit is killed
                 d.updateAllegiance(-5, attacker.getTribeId(), target.getTribeId());
                 // Checks consequences of the update

@@ -9,6 +9,7 @@ import players.mc.MonteCarloAgent;
 import utils.ElapsedCpuTimer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public abstract class Agent {
@@ -150,6 +151,39 @@ public abstract class Agent {
         allActions.addAll(tribeActions);
         return allActions;
     }
+
+
+    /**
+     * Returns the number of actions available for each of the actors, from the perspective of this agent.
+     * By default, it's the same as the game state says - but overriding this function allows for pruning analysis.
+     */
+    public ArrayList<Integer> actionsPerUnit(GameState gs)
+    {
+        ArrayList<Integer> actionCounts = new ArrayList<>();
+
+        HashMap<Integer, ArrayList<Action>> cityActions = gs.getCityActions();
+        for (Integer id : cityActions.keySet()) {
+            actionCounts.add(cityActions.get(id).size());
+        }
+
+        HashMap<Integer, ArrayList<Action>> unitAcions = gs.getUnitActions();
+        for (Integer id : unitAcions.keySet()) {
+            actionCounts.add(unitAcions.get(id).size());
+        }
+
+        actionCounts.add(gs.getTribeActions().size());
+        return actionCounts;
+    }
+
+    /**
+     * Returns the total number of actions available in a game state, from the perspective of this agent.
+     * By default, it's the same as the game state says - but overriding this function allows for pruning analysis.
+     */
+    public int actionsPerGameState(GameState gs)
+    {
+        return gs.getAllAvailableActions().size();
+    }
+
 
 
 }

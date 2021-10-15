@@ -23,4 +23,12 @@ public class TribeAction extends Action {
     public Action copy() {
         return null;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(!(o instanceof TribeAction))
+            return false;
+        TribeAction other = (TribeAction) o;
+        return tribeId == other.tribeId && actionType == other.actionType;
+    }
 }

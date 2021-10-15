@@ -1,12 +1,12 @@
 {
-  "Game Mode" : "Score",
-  "Repetitions" : 36,
-  "Rollouts" : true,
-  "Search Depth" : 5,
+  "Game Mode" : "Capitals",
+  "Repetitions" : 20,
+  "Rollouts" : false,
+  "Search Depth" : 20,
   "Force End" : false,
-  "Population Size" : 20,
-  "Players" : ["MCTS", "RHEA","OSLA","MC","Random","Rule Based"],
-  "Tribes" : ["Xin Xi", "Imperius", "Bardur","Oumaji","Kickoo","Luxidoor"],
+  "Population Size" : 1,
+  "Players" : ["MCTS", "pMCTS"],
+  "Tribes" : ["Xin Xi", "Imperius"],
   "Shift Tribes" : true,
   "Verbose" : false,
   "Level Seeds" : [
@@ -22,6 +22,11 @@
     "1592435145738", "1592040799152",
     "1588965819946", "1589014941900",
     "1590182659177", "1590912178111",
-    "1588407146837"
-  ]
+    "1588407146837"],
+  "Progressive Bias" : true,
+  "Pruning" : true,
+  "K init mult": 0.5,
+  "T mult": 2.0,
+  "A mult": 1.5,
+  "B": 1.3
 }

@@ -2,6 +2,7 @@ package core.actions.tribeactions;
 
 import core.Types;
 import core.actions.Action;
+import core.actions.unitactions.Attack;
 import core.actors.Tribe;
 import core.game.GameState;
 
@@ -42,5 +43,13 @@ public class ResearchTech extends TribeAction {
     public String toString()
     {
         return "RESEARCH_TECH by tribe " + this.tribeId+ " : " + tech.toString();
+    }
+
+    public boolean equals(Object o) {
+        if(!(o instanceof ResearchTech))
+            return false;
+        ResearchTech other = (ResearchTech) o;
+
+        return super.equals(other) && tech == other.getTech();
     }
 }

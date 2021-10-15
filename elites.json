@@ -1,0 +1,28 @@
+{
+  "Elites features" : ["RESEARCH_PROGRESS", "OWNED_TILES_PROGRESS"],
+  "nWeights" : 11,
+  "Elites iterations" : 20,
+  "Random inits" : 1,
+  "Repetitions" : 2,
+  "Progressive Bias" : true,
+  "Pruning" : true,
+  "K init mult": 0.5,
+  "T mult": 2.0,
+  "A mult": 1.5,
+  "B": 1.3,
+  "Game Mode" : "Capitals",
+  "Rollouts" : false,
+  "Search Depth" : 20,
+  "Force End" : false,
+  "Population Size" : 20,
+  "Players" : ["MCTS", "pMCTS"],
+  "Tribes" : ["Xin Xi", "Imperius"],
+  "Shift Tribes" : true,
+  "Verbose" : false,
+  "Level Seeds" : [
+    "1590557911279"
+  ],
+  "Master" : false,
+  "Map folder" : "map/",
+  "File based" : true
+}

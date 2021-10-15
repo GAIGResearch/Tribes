@@ -80,6 +80,7 @@ public class Types {
         }
 
         public int getPoints() { return this.tier * TECH_TIER_POINTS;}
+        public int getTier() {return this.tier;}
 
     }
 

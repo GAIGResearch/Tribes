@@ -2,8 +2,6 @@ package players.rhea;
 
 import core.actions.Action;
 import core.actions.cityactions.CityAction;
-import core.actions.tribeactions.EndTurn;
-import core.actions.unitactions.Attack;
 import core.actions.unitactions.UnitAction;
 import core.actors.Actor;
 import core.actors.City;
@@ -40,7 +38,7 @@ public class RHEAAgent extends Agent {
     @Override
     public Action act(GameState gs, ElapsedCpuTimer ect) {
 
-        this.heuristic = params.getHeuristic(playerID, allPlayerIDs);
+        this.heuristic = params.getStateHeuristic(playerID, allPlayerIDs);
         this.fmcalls = 0;
 
         if (currentTurn != gs.getTick()){
@@ -68,14 +66,19 @@ public class RHEAAgent extends Agent {
     private void rheaLoop(GameState gs)
     {
         boolean end = false;
+        int numIters = 0;
         while (!end){
             Collections.sort(pop);
             pop = nextGeneration(gs);
+            numIters++;
 
             if(params.stop_type == params.STOP_FMCALLS)
                 end = this.fmcalls >= params.num_fmcalls;
+            else if(params.stop_type == params.STOP_ITERATIONS)
+                end = numIters >= params.num_iterations;
 
         }
+        //System.out.println(fmcalls);
         Collections.sort(pop);
     }
 

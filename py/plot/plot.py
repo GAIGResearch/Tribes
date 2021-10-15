@@ -4,11 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pylab
 
-colors = ["#E66908", "#FFCE6B", "#5F7EC6", "#FF8A6B", "#B3F064", "#8D5DC7", "#FFF36B", "#0000FF"]
+colors = ["#E66908", "#FFCE6B", "#5F7EC6", "#FF8A6B", "#B3F064", "#8D5DC7", "#FFF36B", "#0000FF", "#0000FF"]
 
-agent_names = ["DoNothing", "Random", "RuleBased", "OSLA", "MC", "MCTS", "RHEA", "OEP"]
-agents_dict = {"DoNothing" : "DoNothing", "RandomAgent" : "Random", "SimpleAgent" : "RuleBased", "OneStepLookAheadAgent" : "OSLA",
-               "MonteCarloAgent" : "MC", "MCTSPlayer":"MCTS", "RHEAAgent":"RHEA", "OEP":"OEP"}
+agent_names = ["DoNothing", "Random", "SIMPLE", "OSLA", "MC", "MCTS", "RHEA", "OEP", "PORTFOLIO_MCTS"]
+agents_dict = {"DoNothing" : "DoNothing", "RandomAgent" : "Random", "SimpleAgent" : "SIMPLE", "OneStepLookAheadAgent" : "OSLA",
+               "MonteCarloAgent" : "MC", "MCTSPlayer":"MCTS", "RHEAAgent":"RHEA", "OEP":"OEP", "PortfolioMCTSPlayer" : "PORTFOLIO_MCTS"}
 
 game_modes = ["CAPITALS", "SCORE"]
 
@@ -27,28 +27,35 @@ def process_file(f_name):
     techs = {}
     cities_l = {}
     prods = {}
-    for ag in agents:
-        victories[ag] = []
-        positions[ag] = []
-        points_l[ag] = []
-        techs[ag] = []
-        cities_l[ag] = []
-        prods[ag] = []
+    gpstats = {}
+    # for ag in agents:
+    #     victories[ag] = []
+    #     positions[ag] = []
+    #     points_l[ag] = []
+    #     techs[ag] = []
+    #     cities_l[ag] = []
+    #     prods[ag] = []
 
-    agents.append(agent_names[int(f_name.split(".")[-2].split("_")[7])])
-    agents.append(agent_names[int(f_name.split(".")[-2].split("_")[8])])
-    if nparams >= 13:
-        agents.append(agent_names[int(f_name.split(".")[-2].split("_")[9])])
-    if nparams == 15:
-        agents.append(agent_names[int(f_name.split(".")[-2].split("_")[10])])
+    with open(f_name) as f:
 
+        lines = f.readlines()
+        line2 = lines[1]
+
+        agents.append(line2.split(":")[1].split("(")[0])
+        agents.append(line2.split(":")[2].split("(")[0])
+
+    seed_per_game = [-1 for _ in range(N_GAMES)]
     data_per_game = {}
     all_data = {}
+    all_features = {}
+    all_features_per_game = {}
     sum_data = {}
     for ag in agents:
         data_per_game[ag] = [[] for _ in range(N_GAMES)]
         all_data[ag] = [[] for _ in range(6)]
         sum_data[ag] = []
+        all_features[ag] = {}
+        all_features_per_game[ag] = [[] for _ in range(N_GAMES)]
 
     with open(f_name) as f:
         lines = f.readlines()
@@ -57,8 +64,11 @@ def process_file(f_name):
 
         for line in lines:
             if "Playing level with seed" in line or "RESULTS" in line:
-                seed = line.split(" ")[-2]
-                # print "game " + str(game) + " seed " + str(seed)
+
+                if "Playing level with seed" in line:
+                    seed = line.split(" ")[-2]
+                    seed_per_game[game+1] = seed
+                    # print "game " + str(game) + " seed " + str(seed)
 
                 if rep > 0:
                     for ag in agents:
@@ -70,6 +80,14 @@ def process_file(f_name):
                         game_info.append(np.average(cities_l[ag]))
                         game_info.append(np.average(prods[ag]))
                         data_per_game[ag][game] = game_info
+
+                        for featname in gpstats[ag]:
+                            if featname not in all_features[ag]:
+                                all_features[ag][featname] = []
+                            for v in gpstats[ag][featname]:
+                                all_features[ag][featname].append(v)
+                        all_features_per_game[ag][game].append(gpstats[ag])
+
 
                 rep = 0
                 game = game + 1
@@ -86,6 +104,7 @@ def process_file(f_name):
                     techs[ag] = []
                     cities_l[ag] = []
                     prods[ag] = []
+                    gpstats[ag] = {}
 
 
 
@@ -120,6 +139,18 @@ def process_file(f_name):
                 all_data[agent][4].append(c)
                 all_data[agent][5].append(pr)
 
+
+            if "GPS:" in line:
+                chunks = line.split(":")
+                agent = agents_dict[chunks[2]]
+                feature = chunks[3]
+                value = float(chunks[4])
+
+                if feature not in gpstats[agent]:
+                    gpstats[agent][feature] = []
+                gpstats[agent][feature].append(value)
+
+
     for ag in agents:
         agent_data = all_data[ag]
         n = len(agent_data[0])
@@ -150,7 +181,7 @@ def process_file(f_name):
         sum_data[ag].append(pr_stderr)
 
 
-    return agents, all_data, sum_data, data_per_game
+    return agents, all_data, sum_data, data_per_game, seed_per_game, all_features, all_features_per_game
 
 
 def print_agent_pw(ag, data, column_order):
@@ -168,7 +199,7 @@ def print_agent_pw(ag, data, column_order):
 
     all_txt = all_txt + "\\\\"
     all_txt = all_txt + "\\hline"
-    print all_txt
+    print (all_txt)
 
 
     #
@@ -182,8 +213,9 @@ def print_agent_pw(ag, data, column_order):
 
 def main():
 
-    file_path = "../../res/scores/"
-    files = [join(file_path, f) for f in listdir(file_path) if isfile(join(file_path, f)) and f.endswith(".txt")]
+    file_path = "C:\\Work\\Tribes-results\\validation-5-6-6\\"
+    column_order = ["MCTS", "PORTFOLIO_MCTS"]
+    files = [join(file_path, f) for f in listdir(file_path) if isfile(join(file_path, f)) and f.endswith("test.txt")]
 
     victories = {}
     positions = {}
@@ -192,6 +224,8 @@ def main():
     technologies = {}
     cities = {}
     productions = {}
+    all_features = {}
+    all_features_per_game = {}
 
     for ag in agent_names:
         victories[ag] = {}
@@ -200,6 +234,8 @@ def main():
         technologies[ag] = {}
         cities[ag] = {}
         productions[ag] = {}
+        all_features[ag] = {}
+        all_features_per_game[ag] = {}
 
         victories[ag]['tot'] = []
         positions[ag]['tot'] = []
@@ -213,13 +249,13 @@ def main():
 
         if "tribes_" in f:
 
-            print " --- " + f + " --- "
+            print (" --- " + f + " --- ")
 
-            game_mode = game_modes[int(f.split(".")[-2].split("_")[1])]
-            length = int(f.split(".")[-2].split("_")[3])
-            pop_size = int(f.split(".")[-2].split("_")[6])
+            # game_mode = game_modes[int(f.split(".")[-2].split("_")[1])]
+            # length = int(f.split(".")[-2].split("_")[3])
+            # pop_size = int(f.split(".")[-2].split("_")[6])
 
-            agents, all_data, sum_data, data_per_game = process_file(f)
+            agents, all_data, sum_data, data_per_game, seed_per_game, all_features, all_features_per_game = process_file(f)
 
             victories[agents[0]][agents[1]] = [sum_data[agents[0]][1] * 100, sum_data[agents[0]][2] * 100]
             victories[agents[1]][agents[0]] = [sum_data[agents[1]][1] * 100, sum_data[agents[1]][2] * 100]
@@ -261,44 +297,85 @@ def main():
                 # plot(all_scores_n, False, 'upper right')
 
     # column_order = ["RHEA", "RuleBased", "MCTS", "MC", "OSLA", "Random"]
-    column_order = ["RHEA", "RuleBased", "MCTS", "MC", "OSLA"]
-    print_agent_pw("RHEA", victories, column_order)
-    print_agent_pw("RuleBased", victories, column_order)
-    print_agent_pw("MCTS", victories, column_order)
-    print_agent_pw("MC", victories, column_order)
-    print_agent_pw("OSLA", victories, column_order)
+#    column_order = ["RHEA", "RuleBased", "MCTS", "MC", "OSLA"]
+#     column_order = ["MCTS", "PORTFOLIO_MCTS"]
+#     column_order = ["SIMPLE", "PORTFOLIO_MCTS"]
+    # column_order = ["RHEA", "PORTFOLIO_MCTS"]
+    # print_agent_pw("RHEA", victories, column_order)
+    # print_agent_pw("SIMPLE", victories, column_order)
+    # print_agent_pw("MCTS", victories, column_order)
+    # print_agent_pw("PORTFOLIO_MCTS", victories, column_order)
+    # print_agent_pw("MC", victories, column_order)
+    # print_agent_pw("OSLA", victories, column_order)
     # print_agent_pw("Random", victories, column_order)
 
-    print "_____________"
+    if False:
+        N_REPRESENTATIVES = 10
+        representative = {} # [-1 for _ in column_order]
+        for c in column_order:
+            print_agent_pw(c, victories, column_order)
+            representative[c] = []
+
+        for agent in data_per_game:
+            data = data_per_game[agent]
+            avg_vict = np.average(victories[agent]['tot'])
+            # for res in data:  # For each game
+            for game_idx in range(len(data)):  # For each game
+                res = data[game_idx]
+                vict_err = np.power(res[0] - avg_vict, 2)
+                representative[agent].append([game_idx, vict_err, avg_vict, res[0]])
+
+            representative[agent].sort(key = lambda x: x[1])
+            print("Most representative games for " + agent + " (avg win: " + str(avg_vict) + "): ")
+            for i in range(0, N_REPRESENTATIVES):
+                game_idx = representative[agent][i][0]
+                print(str(i)+ ": game " + str(game_idx) + ", avg: " + str(representative[agent][i][3]) + ", err: " + str(representative[agent][i][1]) + ", seed: " + str(seed_per_game[game_idx]))
+
+    print ("_____________")
+
 
     if True:
         for ag in agent_names:
-            victories[ag]['tot'] = [np.average(victories[ag]['tot']) * 100, np.average(victories[ag]['tot']) / np.sqrt(len(victories[ag]['tot'])) * 100]
-            positions[ag]['tot'] = [np.average(positions[ag]['tot']), np.average(positions[ag]['tot']) / np.sqrt(len(positions[ag]['tot']))]
-            scores[ag]['tot'] = [np.average(scores[ag]['tot']), np.average(scores[ag]['tot']) / np.sqrt(len(scores[ag]['tot']))]
-            technologies[ag]['tot'] = [np.average(technologies[ag]['tot']) * 100 / 24, np.average(technologies[ag]['tot']) / np.sqrt(len(technologies[ag]['tot'])) * 100 / 24]
-            cities[ag]['tot'] = [np.average(cities[ag]['tot']), np.average(cities[ag]['tot']) / np.sqrt(len(cities[ag]['tot']))]
-            productions[ag]['tot'] = [np.average(productions[ag]['tot']), np.average(productions[ag]['tot']) / np.sqrt(len(productions[ag]['tot']))]
+            if len(victories[ag]['tot']) > 0:
+                victories[ag]['tot'] = [np.average(victories[ag]['tot']) * 100, np.average(victories[ag]['tot']) / np.sqrt(len(victories[ag]['tot'])) * 100]
+                positions[ag]['tot'] = [np.average(positions[ag]['tot']), np.average(positions[ag]['tot']) / np.sqrt(len(positions[ag]['tot']))]
+                scores[ag]['tot'] = [np.average(scores[ag]['tot']), np.average(scores[ag]['tot']) / np.sqrt(len(scores[ag]['tot']))]
+                technologies[ag]['tot'] = [np.average(technologies[ag]['tot']) * 100 / 24, np.average(technologies[ag]['tot']) / np.sqrt(len(technologies[ag]['tot'])) * 100 / 24]
+                cities[ag]['tot'] = [np.average(cities[ag]['tot']), np.average(cities[ag]['tot']) / np.sqrt(len(cities[ag]['tot']))]
+                productions[ag]['tot'] = [np.average(productions[ag]['tot']), np.average(productions[ag]['tot']) / np.sqrt(len(productions[ag]['tot']))]
 
-            # HUMAN
-            # print ag
-            # print "victories", victories[ag]['tot']
-            # print "positions", positions[ag]['tot']
-            # print "scores", scores[ag]['tot']
-            # print "technologies", technologies[ag]['tot']
-            # print "cities", cities[ag]['tot']
-            # print "productions", productions[ag]['tot']
+                # LATEX
+                txt = ag + " & {a:.2f}\% ({b:.2f}) & {c:.2f} ({d:.2f}) & {e:.2f} ({f:.2f}) & {g:.2f}\% ({h:.2f}) & {i:.2f} ({j:.2f}) & {k:.2f} ({l:.2f}) \\\\"
+                print(txt.format(
+                      a=victories[ag]['tot'][0], b=victories[ag]['tot'][1],
+                      c=positions[ag]['tot'][0], d=positions[ag]['tot'][1],
+                      e=scores[ag]['tot'][0], f=scores[ag]['tot'][1],
+                      g=technologies[ag]['tot'][0], h=technologies[ag]['tot'][1],
+                      i=cities[ag]['tot'][0], j=cities[ag]['tot'][1],
+                      k=productions[ag]['tot'][0], l=productions[ag]['tot'][1]))
+                print ("\\hline")
 
-            # LATEX
-            txt = ag + " & {a:.2f}\% ({b:.2f}) & {c:.2f} ({d:.2f}) & {e:.2f} ({f:.2f}) & {g:.2f}\% ({h:.2f}) & {i:.2f} ({j:.2f}) & {k:.2f} ({l:.2f}) \\\\"
-            print(txt.format(
-                  a=victories[ag]['tot'][0], b=victories[ag]['tot'][1],
-                  c=positions[ag]['tot'][0], d=positions[ag]['tot'][1],
-                  e=scores[ag]['tot'][0], f=scores[ag]['tot'][1],
-                  g=technologies[ag]['tot'][0], h=technologies[ag]['tot'][1],
-                  i=cities[ag]['tot'][0], j=cities[ag]['tot'][1],
-                  k=productions[ag]['tot'][0], l=productions[ag]['tot'][1]))
-            print "\\hline"
+                if ag in all_features:
+                    # txt_feat = ag
+                    # txt_val = ag
+                    human_readable = {}
+
+                    for featname in all_features[ag]:
+                        # txt_feat = txt_feat + " & " + featname
+                        avg = np.average(all_features[ag][featname])
+                        tv = " & {a:.2f}".format(a=avg)
+                        # txt_val = txt_val + tv
+
+                        human_readable[featname] = avg
+
+                    # print(txt_feat)
+                    # print(txt_val)
+
+                    if True:
+                        print(ag)
+                        for f in human_readable:
+                            print(f + ": " + str(human_readable[f]))
+
 
     # print victories
 

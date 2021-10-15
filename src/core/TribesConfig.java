@@ -203,6 +203,14 @@ public class TribesConfig
     public static final int CITY_EXPANSION_TILES = 1;
     public static final int POINTS_PER_POPULATION = 5;
 
+    // Diplomacy
+    public static final int ALLEGIANCE_MAX = 60;
+    public static final int ATTACK_REPERCUSSION = -5;
+    public static final int CAPTURE_REPERCUSSION = -30;
+    public static final int CONVERT_REPERCUSSION = -5;
+    public static final int MIN_STARS_SEND = 15;
+
+
     // Research
     public static final int TECH_BASE_COST = 4;
     public static final Types.TECHNOLOGY TECH_DISCOUNT = Types.TECHNOLOGY.PHILOSOPHY;

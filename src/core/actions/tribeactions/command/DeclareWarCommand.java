@@ -7,6 +7,8 @@ import core.actions.tribeactions.DeclareWar;
 import core.actors.Tribe;
 import core.game.GameState;
 
+import static core.TribesConfig.ALLEGIANCE_MAX;
+
 public class DeclareWarCommand implements ActionCommand {
 
     @Override
@@ -19,8 +21,8 @@ public class DeclareWarCommand implements ActionCommand {
             Tribe tribe = gs.getTribe(tribeID);
             tribe.setHasDeclaredWar(true);
             tribe.setnWarsDeclared(tribe.getnWarsDeclared() + 1);
-            d.updateAllegiance(-30 - d.getAllegianceStatus()[tribeID][targetID], tribeID, targetID);
-            d.checkConsequences(-30, tribeID, targetID);
+            d.updateAllegiance((int) (-(float)(ALLEGIANCE_MAX/2.0) - d.getAllegianceStatus()[tribeID][targetID]), tribeID, targetID);
+            d.checkConsequences((int) (-(float)(ALLEGIANCE_MAX/2.0)), tribeID, targetID);
             return true;
         }
         return false;

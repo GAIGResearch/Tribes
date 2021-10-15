@@ -10,6 +10,8 @@ import core.game.GameState;
 
 import java.util.LinkedList;
 
+import static core.TribesConfig.ALLEGIANCE_MAX;
+
 public class DeclareWarFactory implements ActionFactory {
 
     @Override
@@ -23,7 +25,7 @@ public class DeclareWarFactory implements ActionFactory {
         int[][] allegiances = d.getAllegianceStatus();
         if (!tribe.getHasDeclaredWar()) {
             for (int i = 0; i < allegiances.length; i++) {
-                if (allegiances[tribe.getTribeId()][i] > -30 && tribe.getTribeId() != i) {
+                if (allegiances[tribe.getTribeId()][i] > -(float)(ALLEGIANCE_MAX/2.0) && tribe.getTribeId() != i) {
                     DeclareWar declareWar = new DeclareWar(tribe.getTribeId());
                     declareWar.setTargetID(i);
                     actions.add(declareWar);

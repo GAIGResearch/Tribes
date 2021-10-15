@@ -72,7 +72,15 @@ class LevelLoader
                         //A city to create. Add it and assign it to the next tribe.
                         City c = new City(i, j, tribeID);
                         c.setCapital(true);
-                        board.upgradeCityOnStart(c, tribeID);
+
+                        //Special case with Luxidoor. May be a better way of doing this more generally.
+                        if (tribes[tribeID].getName().equals("Luxidoor")) {
+                            c.levelUp();
+                            c.levelUp();
+                            c.setWalls(true);
+                            c.setPopulation(0);
+                        }
+
                         board.addCityToTribe(c,rnd);
 
                         //Add score for this city centre

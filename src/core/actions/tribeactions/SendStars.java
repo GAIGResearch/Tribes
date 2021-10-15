@@ -5,6 +5,8 @@ import core.actions.Action;
 import core.actors.Tribe;
 import core.game.GameState;
 
+import static core.TribesConfig.MIN_STARS_SEND;
+
 public class SendStars extends TribeAction{
 
     private int numStars;
@@ -24,7 +26,7 @@ public class SendStars extends TribeAction{
     @Override
     public boolean isFeasible(GameState gs) {
         Tribe tribe = gs.getTribe(tribeId);
-        return tribe.canSendStars(numStars) && numStars <= 15;
+        return tribe.canSendStars(numStars) && numStars <= MIN_STARS_SEND;
     }
 
     @Override

@@ -12,6 +12,8 @@ import core.game.Board;
 import core.game.GameState;
 import utils.Vector2d;
 
+import static core.TribesConfig.CAPTURE_REPERCUSSION;
+
 public class CaptureCommand implements ActionCommand {
 
     @Override
@@ -38,9 +40,9 @@ public class CaptureCommand implements ActionCommand {
                 //Updating diplomacy
                 Diplomacy d = gs.getBoard().getDiplomacy();
                 // Updating the relationship of the tribes, deducting 30 for a capture
-                d.updateAllegiance(-30, thisTribe.getTribeId(), targetTribe.getTribeId());
+                d.updateAllegiance(CAPTURE_REPERCUSSION, thisTribe.getTribeId(), targetTribe.getTribeId());
                 // Checks consequences of the update
-                d.checkConsequences(-30, thisTribe.getTribeId(), targetTribe.getTribeId());
+                d.checkConsequences(CAPTURE_REPERCUSSION, thisTribe.getTribeId(), targetTribe.getTribeId());
 
                 //the unit that captures exhausts their turn
                 unit.setStatus(Types.TURN_STATUS.FINISHED);

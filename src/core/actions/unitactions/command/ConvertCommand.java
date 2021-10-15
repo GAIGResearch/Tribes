@@ -10,6 +10,8 @@ import core.actors.Tribe;
 import core.actors.units.Unit;
 import core.game.GameState;
 
+import static core.TribesConfig.CONVERT_REPERCUSSION;
+
 public class ConvertCommand implements ActionCommand {
 
     @Override
@@ -37,9 +39,9 @@ public class ConvertCommand implements ActionCommand {
             gs.getActiveTribe().addExtraUnit(target);
 
             // Updating relationship between tribes, deducting 5
-            d.updateAllegiance(-5, unit.getTribeId(), target.getTribeId());
+            d.updateAllegiance(CONVERT_REPERCUSSION, unit.getTribeId(), target.getTribeId());
             // Checks consequences of the update
-            d.checkConsequences(-5, unit.getTribeId(), target.getTribeId());
+            d.checkConsequences(CONVERT_REPERCUSSION, unit.getTribeId(), target.getTribeId());
 
             //manage status of the units after the action is executed
             unit.transitionToStatus(Types.TURN_STATUS.ATTACKED);

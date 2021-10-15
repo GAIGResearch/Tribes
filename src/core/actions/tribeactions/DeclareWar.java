@@ -5,6 +5,8 @@ import core.Types;
 import core.actions.Action;
 import core.game.GameState;
 
+import static core.TribesConfig.ALLEGIANCE_MAX;
+
 public class DeclareWar extends TribeAction {
 
     private int targetID;
@@ -25,7 +27,7 @@ public class DeclareWar extends TribeAction {
         int[][] allegiances = d.getAllegianceStatus();
 
         // if the two tribes are already at war, or the tribe has already declared war this turn, return false, else return true
-        return allegiances[this.tribeId][this.targetID] > -30 && !gs.getTribe(this.tribeId).getHasDeclaredWar();
+        return allegiances[this.tribeId][this.targetID] > -(float)(ALLEGIANCE_MAX/2.0) && !gs.getTribe(this.tribeId).getHasDeclaredWar();
     }
 
     @Override

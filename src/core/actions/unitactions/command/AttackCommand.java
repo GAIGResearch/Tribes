@@ -13,6 +13,7 @@ import core.game.GameState;
 import utils.Pair;
 import utils.Vector2d;
 
+import static core.TribesConfig.ATTACK_REPERCUSSION;
 import static core.Types.TECHNOLOGY.*;
 import static core.Types.TERRAIN.*;
 
@@ -43,16 +44,16 @@ public class AttackCommand implements ActionCommand {
             int defenceResult = results.getSecond();
 
             // Updating relationship between tribes, deducting 5
-            d.updateAllegiance(-5, attacker.getTribeId(), target.getTribeId());
+            d.updateAllegiance(ATTACK_REPERCUSSION, attacker.getTribeId(), target.getTribeId());
             // Checks consequences of the update
-            d.checkConsequences(-5, attacker.getTribeId(), target.getTribeId());
+            d.checkConsequences(ATTACK_REPERCUSSION, attacker.getTribeId(), target.getTribeId());
 
             if (target.getCurrentHP() <= attackResult) {
 
                 // Updating relationship between tribes, deducting an additional 5 if the unit is killed
-                d.updateAllegiance(-5, attacker.getTribeId(), target.getTribeId());
+                d.updateAllegiance(ATTACK_REPERCUSSION, attacker.getTribeId(), target.getTribeId());
                 // Checks consequences of the update
-                d.checkConsequences(-5, attacker.getTribeId(), target.getTribeId());
+                d.checkConsequences(ATTACK_REPERCUSSION, attacker.getTribeId(), target.getTribeId());
 
                 attacker.addKill();
                 attackerTribe.addKill();

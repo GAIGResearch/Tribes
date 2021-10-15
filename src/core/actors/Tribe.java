@@ -133,7 +133,7 @@ public class Tribe extends Actor {
         techTree = new TechnologyTree();
         Types.TECHNOLOGY initTech = tribe.getInitialTech();
         // checking if tribe starts with initial tech
-        if (!(initTech == null)){
+        if (initTech != null){
             // if so assign initTech and update score
             techTree.doResearchInit(initTech);
             score = initTech.getPoints();
@@ -168,6 +168,10 @@ public class Tribe extends Actor {
         tribeCopy.capitalID = this.capitalID;
         tribeCopy.nKills = hideInfo ? 0 : this.nKills;
         tribeCopy.nPacifistCount = hideInfo ? 0 : this.nPacifistCount;
+        tribeCopy.starsSent = this.starsSent;
+        tribeCopy.hasDeclaredWar = this.hasDeclaredWar;
+        tribeCopy.nWarsDeclared = this.nWarsDeclared;
+        tribeCopy.nStarsSent = this.nStarsSent;
 
         tribeCopy.techTree = hideInfo ? new TechnologyTree() : this.techTree.copy();
 

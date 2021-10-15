@@ -180,7 +180,7 @@ public class Board {
         copyBoard.activeTribeID = activeTribeID;
         copyBoard.actorIDcounter = actorIDcounter;
         copyBoard.tradeNetwork = new TradeNetwork(size);
-        copyBoard.diplomacy = new Diplomacy(this.tribes.length);
+        copyBoard.diplomacy = diplomacy.copy();
         copyBoard.isNative = false;
         copyBoard.capitalIDs = new int[tribes.length];
 
@@ -828,20 +828,6 @@ public class Board {
 
         //By default, cities are considered to be roads for trade network purposes.
         tradeNetwork.setTradeNetwork(this, c.getPosition().x, c.getPosition().y, true);
-    }
-
-    /**
-     * Upgrades a city on start if they don't have a starting technology
-     * @param c city to add
-     */
-
-    void upgradeCityOnStart(City c, int tribeID){
-        if (tribes[tribeID].getName().equals("Luxidoor")){
-            c.levelUp();
-            c.levelUp();
-            c.setWalls(true);
-            c.setPopulation(0);
-        }
     }
 
     /**

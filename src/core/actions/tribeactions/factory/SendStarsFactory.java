@@ -9,6 +9,8 @@ import core.game.GameState;
 
 import java.util.LinkedList;
 
+import static core.TribesConfig.MIN_STARS_SEND;
+
 public class SendStarsFactory implements ActionFactory {
     @Override
     public LinkedList<Action> computeActionVariants(final Actor actor, final GameState gs) {
@@ -20,7 +22,7 @@ public class SendStarsFactory implements ActionFactory {
             return actions;
         }
         for (int ids = 0; ids < gs.getBoard().getTribes().length; ids++) {
-            for (int stars = 1; stars < Math.min(tribe.getStars(), 15); stars++) {
+            for (int stars = 1; stars < Math.min(tribe.getStars(), MIN_STARS_SEND); stars++) {
                 if (ids != tribe.getTribeId()) {
                     if (tribe.canSendStars(stars)) {
                         SendStars ss = new SendStars(tribe.getTribeId());

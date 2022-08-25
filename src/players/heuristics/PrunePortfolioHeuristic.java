@@ -2,7 +2,6 @@ package players.heuristics;
 
 import core.Types;
 import core.game.GameState;
-import jdk.nashorn.api.tree.Tree;
 import players.portfolio.ActionAssignment;
 import players.portfolio.Portfolio;
 import players.portfolio.scripts.BaseScript;
